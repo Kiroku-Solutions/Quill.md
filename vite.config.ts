@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitest/config';
 import { playwright } from '@vitest/browser-playwright';
 import tailwindcss from '@tailwindcss/vite';
-import adapter from '@sveltejs/adapter-auto';
+import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
@@ -14,10 +14,15 @@ export default defineConfig({
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
 
-			// adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
-			// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
-			// See https://svelte.dev/docs/kit/adapters for more information about adapters.
-			adapter: adapter()
+			// Static SPA build per ERS 5.3 / 5.4. The app is interactive from the first byte;
+			// no SSR, no prerender. Per-page settings live in src/routes/+layout.ts.
+			adapter: adapter({
+				pages: 'build',
+				assets: 'build',
+				fallback: 'index.html',
+				precompress: false,
+				strict: true
+			})
 		})
 	],
 	test: {
