@@ -31,10 +31,11 @@ Use `pnpm <script>`, not `npm run` (README examples are stale — they predate p
 
 Runes are mandatory outside `node_modules`. Use `$props()`, `$state()`, `$derived()`, `$effect()`, `{@render children()}`. Never `export let`, never `<slot>`. See `src/routes/+layout.svelte` for the canonical pattern (`let { children } = $props()`).
 
-## Testing (two-project split in `vite.config.ts`)
+## Testing (three-project split in `vite.config.ts`)
 
-- **`client` project**: Playwright + Chromium, headless. Picks up `src/**/*.svelte.{test,spec}.{js,ts}` only. Excludes `src/lib/server/**`. Requires Playwright browsers to be installed.
-- **`server` project**: Node env. Picks up `src/**/*.{test,spec}.{js,ts}`, excluding `*.svelte.{test,spec}`.
+- **`client` project**: Playwright + Chromium, headless. Picks up `src/**/*.svelte.{test,spec}.{js,ts}` only. Excludes `src/lib/server/**` and any tests that depend on Node-only APIs (Buffer-backed `gray-matter`, isomorphic-git, DOMPurify with jsdom). Requires Playwright browsers to be installed.
+- **`server` project**: Node env. Picks up `src/**/*.{test,spec}.{js,ts}`, excluding `*.svelte.{test,spec}`. Hosts all service-layer tests, the integration test, and the isomorphic-git + memory-fs tests.
+- **`renderer` project**: Node env + jsdom-injected `window` for the Markdown renderer. Required because `jsdom` needs `SharedArrayBuffer`, which Chromium only provides behind cross-origin isolation headers — sandboxing it is easier than fighting the browser.
 - New tests must match the correct glob; a `.svelte.spec.ts` accidentally placed under `src/lib/server/**` will be silently skipped by the client project.
 - `expect` requires assertions (`expect: { requireAssertions: true }`).
 - `src/lib/vitest-examples/` is `sv create` scaffold (greet + Welcome) — safe to delete once real code lands.
