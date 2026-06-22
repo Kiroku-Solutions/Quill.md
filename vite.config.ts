@@ -76,7 +76,15 @@ export default defineConfig({
 						// in the `server` project; the `client` project would try to
 						// re-bundle it for Chromium, which the isomorphic-git API
 						// doesn't support.
-						'tests/adapters/remote-git.test.ts'
+						'tests/adapters/remote-git.test.ts',
+						// The serializer round-trip uses `gray-matter`, which calls
+						// `Buffer.from(...)` internally; Buffer isn't available in
+						// headless Chromium. Runs only in the `server` project.
+						'tests/services/serializer.test.ts',
+						// The integration test exercises the full parse → serialize
+						// pipeline through `parseIssueFile`, which needs `gray-matter`
+						// (and therefore `Buffer`). Same reason: server-only.
+						'tests/services/integration.test.ts'
 					]
 				}
 			},
