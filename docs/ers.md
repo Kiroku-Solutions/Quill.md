@@ -1,13 +1,13 @@
 # Engineering Requirements Specification — AgnosticIssuer
 
-| Field | Value |
-| --- | --- |
+| Field       | Value                     |
+| ----------- | ------------------------- |
 | Document ID | `ERS-AGNOSTIC-ISSUER-001` |
-| Version | 1.0.0 |
-| Status | Draft |
-| Date | 2026-06-20 |
-| Author | Jose |
-| Project | AgnosticIssuer |
+| Version     | 1.0.0                     |
+| Status      | Draft                     |
+| Date        | 2026-06-20                |
+| Author      | Jose                      |
+| Project     | AgnosticIssuer            |
 
 ---
 
@@ -49,18 +49,18 @@ The goal of the project is to remove the dependency on third-party issue tracker
 
 ### 1.3 Definitions and Acronyms
 
-| Term | Definition |
-| --- | --- |
-| ERS | Engineering Requirements Specification (this document). |
-| FSA | File System Access API. A browser API that grants JavaScript read/write access to a user-selected local directory. |
-| PAT | Personal Access Token. A credential used to authenticate against a Git provider. |
-| SPA | Single-Page Application. |
-| Frontmatter | The YAML metadata block at the top of a Markdown file, delimited by `---`. |
-| Section marker | An HTML comment pair of the form `<!-- [SECTION_START: name] -->` and `<!-- [SECTION_END: name] -->`. |
-| Template | A JSON file under `.agnostic-issuer/templates/` describing the fields and sections of one issue type. |
-| Issue | A single Markdown file under `.agnostic-issuer/issues/`, with a frontmatter header and a body of section-delimited Markdown. |
-| Partial clone | A clone of a Git repository that fetches only a specified subtree of the working tree, rather than the full repository history. |
-| LightningFS | An IndexedDB-backed virtual filesystem used by `isomorphic-git` in the browser. |
+| Term           | Definition                                                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| ERS            | Engineering Requirements Specification (this document).                                                                         |
+| FSA            | File System Access API. A browser API that grants JavaScript read/write access to a user-selected local directory.              |
+| PAT            | Personal Access Token. A credential used to authenticate against a Git provider.                                                |
+| SPA            | Single-Page Application.                                                                                                        |
+| Frontmatter    | The YAML metadata block at the top of a Markdown file, delimited by `---`.                                                      |
+| Section marker | An HTML comment pair of the form `<!-- [SECTION_START: name] -->` and `<!-- [SECTION_END: name] -->`.                           |
+| Template       | A JSON file under `.agnostic-issuer/templates/` describing the fields and sections of one issue type.                           |
+| Issue          | A single Markdown file under `.agnostic-issuer/issues/`, with a frontmatter header and a body of section-delimited Markdown.    |
+| Partial clone  | A clone of a Git repository that fetches only a specified subtree of the working tree, rather than the full repository history. |
+| LightningFS    | An IndexedDB-backed virtual filesystem used by `isomorphic-git` in the browser.                                                 |
 
 ### 1.4 References
 
@@ -77,9 +77,9 @@ The goal of the project is to remove the dependency on third-party issue tracker
 
 ### 1.5 Revision History
 
-| Version | Date | Author | Notes |
-| --- | --- | --- | --- |
-| 1.0.0 | 2026-06-20 | Jose | Initial draft. |
+| Version | Date       | Author | Notes          |
+| ------- | ---------- | ------ | -------------- |
+| 1.0.0   | 2026-06-20 | Jose   | Initial draft. |
 
 ---
 
@@ -228,11 +228,11 @@ The frontmatter MUST support a `relations` array, where each entry has the shape
 
 ```yaml
 relations:
-  - { type: parent,      id: 3 }
-  - { type: blocks,      id: 7 }
-  - { type: depends_on,  id: 9 }
-  - { type: relates_to,  id: 4 }
-  - { type: child,       id: 12 }
+  - { type: parent, id: 3 }
+  - { type: blocks, id: 7 }
+  - { type: depends_on, id: 9 }
+  - { type: relates_to, id: 4 }
+  - { type: child, id: 12 }
 ```
 
 Relation types:
@@ -338,13 +338,13 @@ The application MUST compute and persist a content hash of every issue file in o
 
 #### NFR-5: Browser support
 
-| Browser | Local Edit Mode | Remote Read-Only Mode |
-| --- | --- | --- |
-| Chrome (latest 2) | Supported | Supported |
-| Edge (latest 2) | Supported | Supported |
-| Firefox (latest 2) | Not supported (no FSA) | Supported |
-| Safari (latest 2) | Not supported (no FSA) | Supported |
-| Mobile browsers | Not supported (v1) | Not supported (v1) |
+| Browser            | Local Edit Mode        | Remote Read-Only Mode |
+| ------------------ | ---------------------- | --------------------- |
+| Chrome (latest 2)  | Supported              | Supported             |
+| Edge (latest 2)    | Supported              | Supported             |
+| Firefox (latest 2) | Not supported (no FSA) | Supported             |
+| Safari (latest 2)  | Not supported (no FSA) | Supported             |
+| Mobile browsers    | Not supported (v1)     | Not supported (v1)    |
 
 #### NFR-6: Internationalization
 
@@ -451,26 +451,26 @@ The application supports any provider that exposes the Git Smart HTTP protocol w
 
 ### 5.3 Technology Stack
 
-| Concern | Library / API | Notes |
-| --- | --- | --- |
-| Framework | SvelteKit + `adapter-static` | SPA build, no SSR. |
-| Component model | Svelte 5 (runes) | `$state`, `$derived`, `$effect`. |
-| Styling | **Tailwind CSS v4** | With `@tailwindcss/typography` for prose. |
-| Icons | **lucide-svelte** | Template icons, status icons, UI chrome. |
-| Local filesystem | File System Access API | Native browser API. |
-| Remote Git | `isomorphic-git` + `@isomorphic-git/lightning-fs` | Partial clone. |
-| CORS proxy | Configurable URL (default `cors.isomorphic-git.org`) | Configurable per project. |
-| YAML parsing | `js-yaml` | Frontmatter. |
-| Frontmatter + sections | `gray-matter` (extended) | `gray-matter` handles the `---` block; a custom adapter handles the section markers. |
-| Markdown rendering | `marked` + `DOMPurify` | Sanitized output. |
-| Code highlighting | `shiki` (preferred) or `highlight.js` | For code blocks in sections. |
-| Integrity hash | Web Crypto API (`crypto.subtle.digest`) | Native SHA-256 for FR-15. No third-party hashing library. |
-| Drag-and-drop | `svelte-dnd-action` | Kanban. |
-| Gantt | Custom SVG component | Built on plain SVG; no third-party Gantt library. |
-| State | Svelte stores + runes | Reactive. |
-| Testing | Vitest + Playwright | Unit and end-to-end. |
-| Bundler | Vite (via SvelteKit) | Default. |
-| Hosting | Static (any) | GitHub Pages, Netlify, etc. |
+| Concern                | Library / API                                        | Notes                                                                                |
+| ---------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Framework              | SvelteKit + `adapter-static`                         | SPA build, no SSR.                                                                   |
+| Component model        | Svelte 5 (runes)                                     | `$state`, `$derived`, `$effect`.                                                     |
+| Styling                | **Tailwind CSS v4**                                  | With `@tailwindcss/typography` for prose.                                            |
+| Icons                  | **lucide-svelte**                                    | Template icons, status icons, UI chrome.                                             |
+| Local filesystem       | File System Access API                               | Native browser API.                                                                  |
+| Remote Git             | `isomorphic-git` + `@isomorphic-git/lightning-fs`    | Partial clone.                                                                       |
+| CORS proxy             | Configurable URL (default `cors.isomorphic-git.org`) | Configurable per project.                                                            |
+| YAML parsing           | `js-yaml`                                            | Frontmatter.                                                                         |
+| Frontmatter + sections | `gray-matter` (extended)                             | `gray-matter` handles the `---` block; a custom adapter handles the section markers. |
+| Markdown rendering     | `marked` + `DOMPurify`                               | Sanitized output.                                                                    |
+| Code highlighting      | `shiki` (preferred) or `highlight.js`                | For code blocks in sections.                                                         |
+| Integrity hash         | Web Crypto API (`crypto.subtle.digest`)              | Native SHA-256 for FR-15. No third-party hashing library.                            |
+| Drag-and-drop          | `svelte-dnd-action`                                  | Kanban.                                                                              |
+| Gantt                  | Custom SVG component                                 | Built on plain SVG; no third-party Gantt library.                                    |
+| State                  | Svelte stores + runes                                | Reactive.                                                                            |
+| Testing                | Vitest + Playwright                                  | Unit and end-to-end.                                                                 |
+| Bundler                | Vite (via SvelteKit)                                 | Default.                                                                             |
+| Hosting                | Static (any)                                         | GitHub Pages, Netlify, etc.                                                          |
 
 ### 5.4 Build and Deploy
 
@@ -536,23 +536,23 @@ The frontmatter is a single YAML mapping. Recognized keys are listed in [Section
 
 #### 6.1.3 Frontmatter schema
 
-| Key | Type | Required | Description |
-| --- | --- | --- | --- |
-| `id` | integer | yes | Globally unique issue id. Assigned at creation. |
-| `title` | string | yes | Human-readable title. Used to derive the filename slug. |
-| `author` | string | yes | User id of the creator. |
-| `creation_date` | date (ISO 8601) | yes | Date of creation, set automatically. |
-| `updated_date` | date (ISO 8601) | yes | Date of the last save. |
-| `issue_type` | string | yes | The id of a template under `.agnostic-issuer/templates/`. |
-| `status` | string | yes | The id of an entry in `config.statuses`. |
-| `assignee` | string \| null | no | User id of the assignee, or `null` for unassigned. |
-| `labels` | string[] | no | List of label ids. |
-| `relations` | relation[] | no | See [Section 3.1 FR-9](#fr-9-cross-issue-relations). |
-| `start_date` | date (ISO 8601) | no | Gantt start. |
-| `end_date` | date (ISO 8601) | no | Gantt end (mutually exclusive with `duration` for a given issue). |
-| `duration` | integer | no | Gantt duration in days (mutually exclusive with `end_date`). |
-| `integrity_hash` | string | no | SHA-256 hash of the file content with this field stripped, in the form `sha256:<hex>`. See FR-15. |
-| `<template_field_key>` | varies | varies | Any additional field defined by the template. |
+| Key                    | Type            | Required | Description                                                                                       |
+| ---------------------- | --------------- | -------- | ------------------------------------------------------------------------------------------------- |
+| `id`                   | integer         | yes      | Globally unique issue id. Assigned at creation.                                                   |
+| `title`                | string          | yes      | Human-readable title. Used to derive the filename slug.                                           |
+| `author`               | string          | yes      | User id of the creator.                                                                           |
+| `creation_date`        | date (ISO 8601) | yes      | Date of creation, set automatically.                                                              |
+| `updated_date`         | date (ISO 8601) | yes      | Date of the last save.                                                                            |
+| `issue_type`           | string          | yes      | The id of a template under `.agnostic-issuer/templates/`.                                         |
+| `status`               | string          | yes      | The id of an entry in `config.statuses`.                                                          |
+| `assignee`             | string \| null  | no       | User id of the assignee, or `null` for unassigned.                                                |
+| `labels`               | string[]        | no       | List of label ids.                                                                                |
+| `relations`            | relation[]      | no       | See [Section 3.1 FR-9](#fr-9-cross-issue-relations).                                              |
+| `start_date`           | date (ISO 8601) | no       | Gantt start.                                                                                      |
+| `end_date`             | date (ISO 8601) | no       | Gantt end (mutually exclusive with `duration` for a given issue).                                 |
+| `duration`             | integer         | no       | Gantt duration in days (mutually exclusive with `end_date`).                                      |
+| `integrity_hash`       | string          | no       | SHA-256 hash of the file content with this field stripped, in the form `sha256:<hex>`. See FR-15. |
+| `<template_field_key>` | varies          | varies   | Any additional field defined by the template.                                                     |
 
 A `relation` has the shape:
 
@@ -567,8 +567,11 @@ The body is a flat sequence of named sections. A section is delimited by HTML co
 
 ```markdown
 <!-- [SECTION_START: Description] -->
+
 # Lorem ipsum dolor
+
 sit amet, consectetur adipiscing elit.
+
 <!-- [SECTION_END: Description] -->
 ```
 
@@ -581,13 +584,13 @@ The order of sections in the body is the order in which they were created or las
 ```markdown
 ---
 id: 42
-title: "Fix login redirect"
-author: "jane"
+title: 'Fix login redirect'
+author: 'jane'
 creation_date: 2026-10-20
 updated_date: 2026-10-21
 issue_type: bug
 status: in_progress
-assignee: "jane"
+assignee: 'jane'
 labels: [security, frontend]
 relations:
   - { type: blocks, id: 45 }
@@ -596,17 +599,20 @@ start_date: 2026-10-20
 duration: 3
 severity: high
 priority: p1
-integrity_hash: "sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+integrity_hash: 'sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'
 ---
 
 <!-- [SECTION_START: Description] -->
+
 # Login form
 
 After submitting valid credentials, the user is redirected to a
 404 page instead of the dashboard.
+
 <!-- [SECTION_END: Description] -->
 
 <!-- [SECTION_START: Steps to reproduce] -->
+
 1. Navigate to `/login`.
 2. Enter valid credentials.
 3. Click "Sign in".
@@ -622,62 +628,95 @@ Templates live at `.agnostic-issuer/templates/<type>.json`. They declare the sch
 
 Each entry in `fields` has:
 
-| Key | Type | Description |
-| --- | --- | --- |
-| `id` | integer | Sequential numeric id. Defines display order in the form (ascending). |
-| `key` | string | Stable key used as the frontmatter property name. MUST be unique within the template. |
-| `type` | enum | One of: `text`, `longtext`, `date`, `number`, `select`, `multi-select`, `user`, `relations`. |
-| `name` | string | Human-readable label shown in the form. |
-| `obligatory` | boolean | If `true`, the field MUST be non-empty on save (FR-8). |
-| `default` | varies | Default value when creating a new issue. |
-| `options` | string[] | Required for `select` and `multi-select`. |
-| `options_source` | string | For `multi-select` of `labels`: `"config.labels"`. |
-| `allow_cycle` | boolean | For `relations`: defaults to `false`. If `true`, the relation may form a cycle. |
+| Key              | Type     | Description                                                                                  |
+| ---------------- | -------- | -------------------------------------------------------------------------------------------- |
+| `id`             | integer  | Sequential numeric id. Defines display order in the form (ascending).                        |
+| `key`            | string   | Stable key used as the frontmatter property name. MUST be unique within the template.        |
+| `type`           | enum     | One of: `text`, `longtext`, `date`, `number`, `select`, `multi-select`, `user`, `relations`. |
+| `name`           | string   | Human-readable label shown in the form.                                                      |
+| `obligatory`     | boolean  | If `true`, the field MUST be non-empty on save (FR-8).                                       |
+| `default`        | varies   | Default value when creating a new issue.                                                     |
+| `options`        | string[] | Required for `select` and `multi-select`.                                                    |
+| `options_source` | string   | For `multi-select` of `labels`: `"config.labels"`.                                           |
+| `allow_cycle`    | boolean  | For `relations`: defaults to `false`. If `true`, the relation may form a cycle.              |
 
 #### 6.2.2 Sections
 
 Each entry in `sections` has:
 
-| Key | Type | Description |
-| --- | --- | --- |
-| `id` | integer | Sequential numeric id. Defines display order. |
-| `key` | string | Stable key. MUST be unique within the template. |
-| `name` | string | Human-readable label. |
+| Key          | Type    | Description                                              |
+| ------------ | ------- | -------------------------------------------------------- |
+| `id`         | integer | Sequential numeric id. Defines display order.            |
+| `key`        | string  | Stable key. MUST be unique within the template.          |
+| `name`       | string  | Human-readable label.                                    |
 | `obligatory` | boolean | If `true`, the section MUST be non-empty on save (FR-8). |
-| `default` | string | Default Markdown body when creating a new issue. |
+| `default`    | string  | Default Markdown body when creating a new issue.         |
 
 #### 6.2.3 Type-level metadata
 
-| Key | Type | Description |
-| --- | --- | --- |
-| `id` | string | Stable id of the issue type (matches the filename without `.json`). |
-| `name` | string | Human-readable name. |
-| `icon` | string | A **lucide** icon name (e.g. `bug`, `flame`, `book-open`, `check-square`). If the name is not a known lucide icon, the renderer falls back to treating it as an emoji string. |
-| `color` | string | Hex color (e.g. `#e74c3c`) used for the type badge throughout the UI. |
-| `default_status` | string | The id of the status assigned to new issues of this type. |
-| `fields` | field[] | See [6.2.1](#621-fields). |
-| `sections` | section[] | See [6.2.2](#622-sections). |
+| Key              | Type      | Description                                                                                                                                                                   |
+| ---------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`             | string    | Stable id of the issue type (matches the filename without `.json`).                                                                                                           |
+| `name`           | string    | Human-readable name.                                                                                                                                                          |
+| `icon`           | string    | A **lucide** icon name (e.g. `bug`, `flame`, `book-open`, `check-square`). If the name is not a known lucide icon, the renderer falls back to treating it as an emoji string. |
+| `color`          | string    | Hex color (e.g. `#e74c3c`) used for the type badge throughout the UI.                                                                                                         |
+| `default_status` | string    | The id of the status assigned to new issues of this type.                                                                                                                     |
+| `fields`         | field[]   | See [6.2.1](#621-fields).                                                                                                                                                     |
+| `sections`       | section[] | See [6.2.2](#622-sections).                                                                                                                                                   |
 
 #### 6.2.4 Example
 
 ```json
 {
-  "id": "bug",
-  "name": "Bug",
-  "icon": "bug",
-  "color": "#e74c3c",
-  "default_status": "open",
-  "fields": [
-    { "id": 1, "key": "severity", "name": "Severity",     "type": "select", "obligatory": true,  "options": ["low", "medium", "high", "critical"] },
-    { "id": 2, "key": "priority", "name": "Priority",     "type": "select", "obligatory": true,  "options": ["p0", "p1", "p2", "p3"] },
-    { "id": 3, "key": "assignee", "name": "Assignee",     "type": "user",   "obligatory": false },
-    { "id": 4, "key": "labels",   "name": "Labels",       "type": "multi-select", "obligatory": false, "options_source": "config.labels" }
-  ],
-  "sections": [
-    { "id": 1, "key": "description",         "name": "Description",        "obligatory": true,  "default": "" },
-    { "id": 2, "key": "steps_to_reproduce",  "name": "Steps to reproduce", "obligatory": true,  "default": "" },
-    { "id": 3, "key": "expected_actual",     "name": "Expected vs. actual","obligatory": false, "default": "" }
-  ]
+	"id": "bug",
+	"name": "Bug",
+	"icon": "bug",
+	"color": "#e74c3c",
+	"default_status": "open",
+	"fields": [
+		{
+			"id": 1,
+			"key": "severity",
+			"name": "Severity",
+			"type": "select",
+			"obligatory": true,
+			"options": ["low", "medium", "high", "critical"]
+		},
+		{
+			"id": 2,
+			"key": "priority",
+			"name": "Priority",
+			"type": "select",
+			"obligatory": true,
+			"options": ["p0", "p1", "p2", "p3"]
+		},
+		{ "id": 3, "key": "assignee", "name": "Assignee", "type": "user", "obligatory": false },
+		{
+			"id": 4,
+			"key": "labels",
+			"name": "Labels",
+			"type": "multi-select",
+			"obligatory": false,
+			"options_source": "config.labels"
+		}
+	],
+	"sections": [
+		{ "id": 1, "key": "description", "name": "Description", "obligatory": true, "default": "" },
+		{
+			"id": 2,
+			"key": "steps_to_reproduce",
+			"name": "Steps to reproduce",
+			"obligatory": true,
+			"default": ""
+		},
+		{
+			"id": 3,
+			"key": "expected_actual",
+			"name": "Expected vs. actual",
+			"obligatory": false,
+			"default": ""
+		}
+	]
 }
 ```
 
@@ -685,15 +724,15 @@ Each entry in `sections` has:
 
 `config.json` defines workflow-level settings. It is read on startup and edited through a dedicated settings panel.
 
-| Key | Type | Description |
-| --- | --- | --- |
-| `statuses` | status[] | Ordered list of statuses. |
-| `default_status` | string | The id of the default status assigned to new issues. |
-| `labels` | label[] | Catalog of labels available in `multi-select` fields. |
-| `users` | user[] | Catalog of users available in `user` fields. |
-| `kanban` | object | Kanban configuration (see below). |
-| `gantt` | object | Gantt configuration (see below). |
-| `remote` | object | Remote-mode configuration (see below). |
+| Key              | Type     | Description                                           |
+| ---------------- | -------- | ----------------------------------------------------- |
+| `statuses`       | status[] | Ordered list of statuses.                             |
+| `default_status` | string   | The id of the default status assigned to new issues.  |
+| `labels`         | label[]  | Catalog of labels available in `multi-select` fields. |
+| `users`          | user[]   | Catalog of users available in `user` fields.          |
+| `kanban`         | object   | Kanban configuration (see below).                     |
+| `gantt`          | object   | Gantt configuration (see below).                      |
+| `remote`         | object   | Remote-mode configuration (see below).                |
 
 `status`:
 
@@ -735,34 +774,34 @@ Each entry in `sections` has:
 
 ```json
 {
-  "statuses": [
-    { "id": "open",        "name": "Open",        "color": "#22c55e" },
-    { "id": "in_progress", "name": "In progress", "color": "#3b82f6" },
-    { "id": "in_review",   "name": "In review",   "color": "#f59e0b" },
-    { "id": "done",        "name": "Done",        "color": "#10b981" },
-    { "id": "closed",      "name": "Closed",      "color": "#6b7280" }
-  ],
-  "default_status": "open",
-  "labels": [
-    { "id": "frontend",  "name": "Frontend",  "color": "#a855f7" },
-    { "id": "backend",   "name": "Backend",   "color": "#0ea5e9" },
-    { "id": "docs",      "name": "Docs",      "color": "#64748b" },
-    { "id": "security",  "name": "Security",  "color": "#ef4444" }
-  ],
-  "users": [
-    { "id": "jane", "name": "Jane Doe" },
-    { "id": "john", "name": "John Roe" }
-  ],
-  "kanban": {
-    "columns": ["open", "in_progress", "in_review", "done"]
-  },
-  "gantt": {
-    "group_by": "issue_type",
-    "default_view": "months"
-  },
-  "remote": {
-    "cors_proxy": "https://cors.isomorphic-git.org"
-  }
+	"statuses": [
+		{ "id": "open", "name": "Open", "color": "#22c55e" },
+		{ "id": "in_progress", "name": "In progress", "color": "#3b82f6" },
+		{ "id": "in_review", "name": "In review", "color": "#f59e0b" },
+		{ "id": "done", "name": "Done", "color": "#10b981" },
+		{ "id": "closed", "name": "Closed", "color": "#6b7280" }
+	],
+	"default_status": "open",
+	"labels": [
+		{ "id": "frontend", "name": "Frontend", "color": "#a855f7" },
+		{ "id": "backend", "name": "Backend", "color": "#0ea5e9" },
+		{ "id": "docs", "name": "Docs", "color": "#64748b" },
+		{ "id": "security", "name": "Security", "color": "#ef4444" }
+	],
+	"users": [
+		{ "id": "jane", "name": "Jane Doe" },
+		{ "id": "john", "name": "John Roe" }
+	],
+	"kanban": {
+		"columns": ["open", "in_progress", "in_review", "done"]
+	},
+	"gantt": {
+		"group_by": "issue_type",
+		"default_view": "months"
+	},
+	"remote": {
+		"cors_proxy": "https://cors.isomorphic-git.org"
+	}
 }
 ```
 
@@ -829,30 +868,30 @@ The application ships with four built-in templates (see [Appendix C](#appendix-c
 
 Each requirement is matched with one or more testable conditions. Conditions are phrased as pass/fail.
 
-| Req | Acceptance Criteria |
-| --- | --- |
-| FR-1 | Given a valid issue file, the parser produces an in-memory object with all frontmatter keys, all sections, and the Markdown body of each section. Re-serializing the object produces a file that, when parsed again, yields an equivalent object (round-trip). |
-| FR-2 | Given a template, the editor renders one input per field, in ascending `id` order. `longtext` fields and `sections` are rendered as Markdown editors. |
-| FR-3 | Given a missing or malformed `config.json`, the application shows an actionable error and refuses to start. |
-| FR-4 | Create, read, update, delete operations succeed against a real local folder in a Chromium browser. The folder handle is restored across page reloads. "Switch folder" works. |
-| FR-5 | A partial clone of a public GitHub repository with `.agnostic-issuer/` completes in under 10 s on a 2020-era laptop with a cold cache. The PAT does not appear in any log or URL. |
-| FR-6 | List view renders 1,000 issues in under 500 ms. Kanban supports drag-and-drop in Local Mode and is read-only in Remote Mode. Gantt renders 200 bars + dependency arrows in under 200 ms. |
-| FR-7 | All filter predicates are combinable with AND. The active filter set survives a page reload. |
-| FR-8 | Saving an issue with an empty obligatory field or empty obligatory section is blocked with a per-field error message. |
-| FR-9 | Cycles in `parent`/`child` and `blocks`/`depends_on` are detected and refused. Cycles in `relates_to` are allowed. |
-| FR-10 | Reloading Remote Read-Only Mode for a previously-cloned URL+branch reuses the cache and does not re-fetch objects that are already in IndexedDB. |
-| FR-11 | On a folder without `.agnostic-issuer/`, the wizard appears. Both paths ("Use built-in templates" and "Create your own") are functional. At least one template is required to exit the wizard. |
-| FR-12 | A custom CORS proxy URL is read from `config.json` and used for the next fetch. The default is `https://cors.isomorphic-git.org` and is used when no override is present. The fetched objects are limited to the `.agnostic-issuer/` subtree. |
-| FR-13 | Markdown sections render correctly. Code blocks are syntax-highlighted. A `<script>` tag in a section is stripped by the sanitizer. |
-| FR-14 | Light and dark themes render correctly. The theme preference persists across reloads. |
-| FR-15 | Saving an issue writes a `sha256:` hash into the `integrity_hash` field. Re-loading a manually edited file produces a warning banner. The user can still edit and save the file; the warning is cleared on the next save performed through the web app. |
-| NFR-1 | Performance budgets are met on the test machine described in NFR-1. |
-| NFR-2 | The PAT is held in memory only. It does not appear in any log, error message, URL, or IndexedDB store. |
-| NFR-3 | The application's network tab shows requests only to (a) the Git provider, (b) the configured CORS proxy, and (c) the static asset host. No other requests are made. |
-| NFR-4 | The application is fully operable by keyboard. Statuses and labels are conveyed by text, not color alone. The Gantt view has a textual fallback. |
-| NFR-5 | The browser support matrix in [Section 3.2 NFR-5](#nfr-5-browser-support) holds. |
-| NFR-6 | All user-facing strings are sourced from a single map. |
-| NFR-7 | A failed remote fetch does not corrupt the cache. A failed local write is rolled back. A revoked FSA handle re-prompts without losing in-memory editor state. |
+| Req   | Acceptance Criteria                                                                                                                                                                                                                                            |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FR-1  | Given a valid issue file, the parser produces an in-memory object with all frontmatter keys, all sections, and the Markdown body of each section. Re-serializing the object produces a file that, when parsed again, yields an equivalent object (round-trip). |
+| FR-2  | Given a template, the editor renders one input per field, in ascending `id` order. `longtext` fields and `sections` are rendered as Markdown editors.                                                                                                          |
+| FR-3  | Given a missing or malformed `config.json`, the application shows an actionable error and refuses to start.                                                                                                                                                    |
+| FR-4  | Create, read, update, delete operations succeed against a real local folder in a Chromium browser. The folder handle is restored across page reloads. "Switch folder" works.                                                                                   |
+| FR-5  | A partial clone of a public GitHub repository with `.agnostic-issuer/` completes in under 10 s on a 2020-era laptop with a cold cache. The PAT does not appear in any log or URL.                                                                              |
+| FR-6  | List view renders 1,000 issues in under 500 ms. Kanban supports drag-and-drop in Local Mode and is read-only in Remote Mode. Gantt renders 200 bars + dependency arrows in under 200 ms.                                                                       |
+| FR-7  | All filter predicates are combinable with AND. The active filter set survives a page reload.                                                                                                                                                                   |
+| FR-8  | Saving an issue with an empty obligatory field or empty obligatory section is blocked with a per-field error message.                                                                                                                                          |
+| FR-9  | Cycles in `parent`/`child` and `blocks`/`depends_on` are detected and refused. Cycles in `relates_to` are allowed.                                                                                                                                             |
+| FR-10 | Reloading Remote Read-Only Mode for a previously-cloned URL+branch reuses the cache and does not re-fetch objects that are already in IndexedDB.                                                                                                               |
+| FR-11 | On a folder without `.agnostic-issuer/`, the wizard appears. Both paths ("Use built-in templates" and "Create your own") are functional. At least one template is required to exit the wizard.                                                                 |
+| FR-12 | A custom CORS proxy URL is read from `config.json` and used for the next fetch. The default is `https://cors.isomorphic-git.org` and is used when no override is present. The fetched objects are limited to the `.agnostic-issuer/` subtree.                  |
+| FR-13 | Markdown sections render correctly. Code blocks are syntax-highlighted. A `<script>` tag in a section is stripped by the sanitizer.                                                                                                                            |
+| FR-14 | Light and dark themes render correctly. The theme preference persists across reloads.                                                                                                                                                                          |
+| FR-15 | Saving an issue writes a `sha256:` hash into the `integrity_hash` field. Re-loading a manually edited file produces a warning banner. The user can still edit and save the file; the warning is cleared on the next save performed through the web app.        |
+| NFR-1 | Performance budgets are met on the test machine described in NFR-1.                                                                                                                                                                                            |
+| NFR-2 | The PAT is held in memory only. It does not appear in any log, error message, URL, or IndexedDB store.                                                                                                                                                         |
+| NFR-3 | The application's network tab shows requests only to (a) the Git provider, (b) the configured CORS proxy, and (c) the static asset host. No other requests are made.                                                                                           |
+| NFR-4 | The application is fully operable by keyboard. Statuses and labels are conveyed by text, not color alone. The Gantt view has a textual fallback.                                                                                                               |
+| NFR-5 | The browser support matrix in [Section 3.2 NFR-5](#nfr-5-browser-support) holds.                                                                                                                                                                               |
+| NFR-6 | All user-facing strings are sourced from a single map.                                                                                                                                                                                                         |
+| NFR-7 | A failed remote fetch does not corrupt the cache. A failed local write is rolled back. A revoked FSA handle re-prompts without losing in-memory editor state.                                                                                                  |
 
 ---
 
@@ -878,35 +917,35 @@ The following are explicitly **not** part of v1:
 
 ### Glossary
 
-| Term | Definition |
-| --- | --- |
-| CORS | Cross-Origin Resource Sharing. A browser-enforced restriction on cross-domain requests. |
-| Frontmatter | YAML metadata block at the top of a Markdown file, delimited by `---`. |
-| IndexedDB | Browser-native key-value store. Used by LightningFS to back the remote cache. |
-| LightningFS | A virtual filesystem backed by IndexedDB, used by `isomorphic-git` in the browser. |
-| PAT | Personal Access Token. A credential for Git provider APIs. |
-| Partial clone | A Git clone that fetches only a specified subtree. |
-| Section | A named Markdown block in an issue file, delimited by `SECTION_START` and `SECTION_END` markers. |
-| Slug | A URL- and filename-safe version of a string, lowercased with non-alphanumerics replaced by `-`. |
-| Template | A JSON file describing the schema of an issue type. |
-| Type | Synonym for "issue type". A category of issue (e.g. Bug, Epic, User Story, Task). |
+| Term          | Definition                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------ |
+| CORS          | Cross-Origin Resource Sharing. A browser-enforced restriction on cross-domain requests.          |
+| Frontmatter   | YAML metadata block at the top of a Markdown file, delimited by `---`.                           |
+| IndexedDB     | Browser-native key-value store. Used by LightningFS to back the remote cache.                    |
+| LightningFS   | A virtual filesystem backed by IndexedDB, used by `isomorphic-git` in the browser.               |
+| PAT           | Personal Access Token. A credential for Git provider APIs.                                       |
+| Partial clone | A Git clone that fetches only a specified subtree.                                               |
+| Section       | A named Markdown block in an issue file, delimited by `SECTION_START` and `SECTION_END` markers. |
+| Slug          | A URL- and filename-safe version of a string, lowercased with non-alphanumerics replaced by `-`. |
+| Template      | A JSON file describing the schema of an issue type.                                              |
+| Type          | Synonym for "issue type". A category of issue (e.g. Bug, Epic, User Story, Task).                |
 
 ### Appendix A: Technology Stack with Rationale
 
-| Choice | Rationale |
-| --- | --- |
+| Choice                       | Rationale                                                                                                                                                                                                      |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | SvelteKit + `adapter-static` | The simplest path to a pure static SPA with file-system-based routing, layouts, and a mature build pipeline. Svelte 5 runes give fine-grained reactivity without the boilerplate of older reactive primitives. |
-| Tailwind CSS v4 | Utility-first styling with strong defaults for prose via `@tailwindcss/typography`. Version 4 brings a smaller bundle and faster builds. |
-| `lucide-svelte` | A large, consistent, well-maintained icon set with first-class Svelte bindings. |
-| File System Access API | The only browser API that gives JavaScript read/write access to a local folder. Limited to Chromium for now, which is acceptable given the target audience. |
-| `isomorphic-git` | The only mature pure-JS Git implementation that runs in the browser. Supports partial clone through `singleBranch` + tree walking. |
-| `LightningFS` | The filesystem implementation recommended by `isomorphic-git` for the browser. Backed by IndexedDB. |
-| `gray-matter` | Battle-tested frontmatter parser. We extend it with a small post-processing step to handle section markers. |
-| `js-yaml` | The standard YAML parser for JavaScript. Used by `gray-matter` internally and re-used directly for non-frontmatter YAML (e.g. template validation). |
-| `marked` + `DOMPurify` | `marked` is small, fast, and extensible. `DOMPurify` is the de-facto XSS sanitizer. |
-| `svelte-dnd-action` | A keyboard-accessible drag-and-drop library for Svelte, used in the Kanban view. |
-| Custom SVG Gantt | Off-the-shelf Gantt libraries are heavy and not customizable enough for our use case. A 200-bar custom SVG component is well within scope. |
-| Web Crypto API | Native browser API. Used for SHA-256 integrity hashing (FR-15). Avoids adding a hashing dependency for a single digest. |
+| Tailwind CSS v4              | Utility-first styling with strong defaults for prose via `@tailwindcss/typography`. Version 4 brings a smaller bundle and faster builds.                                                                       |
+| `lucide-svelte`              | A large, consistent, well-maintained icon set with first-class Svelte bindings.                                                                                                                                |
+| File System Access API       | The only browser API that gives JavaScript read/write access to a local folder. Limited to Chromium for now, which is acceptable given the target audience.                                                    |
+| `isomorphic-git`             | The only mature pure-JS Git implementation that runs in the browser. Supports partial clone through `singleBranch` + tree walking.                                                                             |
+| `LightningFS`                | The filesystem implementation recommended by `isomorphic-git` for the browser. Backed by IndexedDB.                                                                                                            |
+| `gray-matter`                | Battle-tested frontmatter parser. We extend it with a small post-processing step to handle section markers.                                                                                                    |
+| `js-yaml`                    | The standard YAML parser for JavaScript. Used by `gray-matter` internally and re-used directly for non-frontmatter YAML (e.g. template validation).                                                            |
+| `marked` + `DOMPurify`       | `marked` is small, fast, and extensible. `DOMPurify` is the de-facto XSS sanitizer.                                                                                                                            |
+| `svelte-dnd-action`          | A keyboard-accessible drag-and-drop library for Svelte, used in the Kanban view.                                                                                                                               |
+| Custom SVG Gantt             | Off-the-shelf Gantt libraries are heavy and not customizable enough for our use case. A 200-bar custom SVG component is well within scope.                                                                     |
+| Web Crypto API               | Native browser API. Used for SHA-256 integrity hashing (FR-15). Avoids adding a hashing dependency for a single digest.                                                                                        |
 
 ### Appendix B: Complete Example Files
 
@@ -914,34 +953,34 @@ The following are explicitly **not** part of v1:
 
 ```json
 {
-  "statuses": [
-    { "id": "open",        "name": "Open",        "color": "#22c55e" },
-    { "id": "in_progress", "name": "In progress", "color": "#3b82f6" },
-    { "id": "in_review",   "name": "In review",   "color": "#f59e0b" },
-    { "id": "done",        "name": "Done",        "color": "#10b981" },
-    { "id": "closed",      "name": "Closed",      "color": "#6b7280" }
-  ],
-  "default_status": "open",
-  "labels": [
-    { "id": "frontend", "name": "Frontend", "color": "#a855f7" },
-    { "id": "backend",  "name": "Backend",  "color": "#0ea5e9" },
-    { "id": "docs",     "name": "Docs",     "color": "#64748b" },
-    { "id": "security", "name": "Security", "color": "#ef4444" }
-  ],
-  "users": [
-    { "id": "jane", "name": "Jane Doe" },
-    { "id": "john", "name": "John Roe" }
-  ],
-  "kanban": {
-    "columns": ["open", "in_progress", "in_review", "done"]
-  },
-  "gantt": {
-    "group_by": "issue_type",
-    "default_view": "months"
-  },
-  "remote": {
-    "cors_proxy": "https://cors.isomorphic-git.org"
-  }
+	"statuses": [
+		{ "id": "open", "name": "Open", "color": "#22c55e" },
+		{ "id": "in_progress", "name": "In progress", "color": "#3b82f6" },
+		{ "id": "in_review", "name": "In review", "color": "#f59e0b" },
+		{ "id": "done", "name": "Done", "color": "#10b981" },
+		{ "id": "closed", "name": "Closed", "color": "#6b7280" }
+	],
+	"default_status": "open",
+	"labels": [
+		{ "id": "frontend", "name": "Frontend", "color": "#a855f7" },
+		{ "id": "backend", "name": "Backend", "color": "#0ea5e9" },
+		{ "id": "docs", "name": "Docs", "color": "#64748b" },
+		{ "id": "security", "name": "Security", "color": "#ef4444" }
+	],
+	"users": [
+		{ "id": "jane", "name": "Jane Doe" },
+		{ "id": "john", "name": "John Roe" }
+	],
+	"kanban": {
+		"columns": ["open", "in_progress", "in_review", "done"]
+	},
+	"gantt": {
+		"group_by": "issue_type",
+		"default_view": "months"
+	},
+	"remote": {
+		"cors_proxy": "https://cors.isomorphic-git.org"
+	}
 }
 ```
 
@@ -949,21 +988,34 @@ The following are explicitly **not** part of v1:
 
 ```json
 {
-  "id": "epic",
-  "name": "Epic",
-  "icon": "flame",
-  "color": "#f97316",
-  "default_status": "open",
-  "fields": [
-    { "id": 1, "key": "owner",    "name": "Owner",     "type": "user",        "obligatory": true  },
-    { "id": 2, "key": "labels",   "name": "Labels",    "type": "multi-select","obligatory": false, "options_source": "config.labels" },
-    { "id": 3, "key": "relations","name": "Relations", "type": "relations",   "obligatory": false }
-  ],
-  "sections": [
-    { "id": 1, "key": "summary",         "name": "Summary",         "obligatory": true,  "default": "" },
-    { "id": 2, "key": "goals",           "name": "Goals",           "obligatory": false, "default": "" },
-    { "id": 3, "key": "success_criteria","name": "Success criteria","obligatory": true,  "default": "" }
-  ]
+	"id": "epic",
+	"name": "Epic",
+	"icon": "flame",
+	"color": "#f97316",
+	"default_status": "open",
+	"fields": [
+		{ "id": 1, "key": "owner", "name": "Owner", "type": "user", "obligatory": true },
+		{
+			"id": 2,
+			"key": "labels",
+			"name": "Labels",
+			"type": "multi-select",
+			"obligatory": false,
+			"options_source": "config.labels"
+		},
+		{ "id": 3, "key": "relations", "name": "Relations", "type": "relations", "obligatory": false }
+	],
+	"sections": [
+		{ "id": 1, "key": "summary", "name": "Summary", "obligatory": true, "default": "" },
+		{ "id": 2, "key": "goals", "name": "Goals", "obligatory": false, "default": "" },
+		{
+			"id": 3,
+			"key": "success_criteria",
+			"name": "Success criteria",
+			"obligatory": true,
+			"default": ""
+		}
+	]
 }
 ```
 
@@ -971,23 +1023,36 @@ The following are explicitly **not** part of v1:
 
 ```json
 {
-  "id": "user-story",
-  "name": "User Story",
-  "icon": "book-open",
-  "color": "#0ea5e9",
-  "default_status": "open",
-  "fields": [
-    { "id": 1, "key": "user",      "name": "As a",      "type": "text", "obligatory": true },
-    { "id": 2, "key": "action",    "name": "I want",    "type": "text", "obligatory": true },
-    { "id": 3, "key": "objective", "name": "So that",   "type": "text", "obligatory": true },
-    { "id": 4, "key": "assignee",  "name": "Assignee",  "type": "user", "obligatory": false },
-    { "id": 5, "key": "labels",    "name": "Labels",    "type": "multi-select", "obligatory": false, "options_source": "config.labels" },
-    { "id": 6, "key": "relations", "name": "Relations", "type": "relations",    "obligatory": false }
-  ],
-  "sections": [
-    { "id": 1, "key": "description",       "name": "Description",        "obligatory": true,  "default": "" },
-    { "id": 2, "key": "acceptance_criteria","name": "Acceptance criteria","obligatory": true,  "default": "" }
-  ]
+	"id": "user-story",
+	"name": "User Story",
+	"icon": "book-open",
+	"color": "#0ea5e9",
+	"default_status": "open",
+	"fields": [
+		{ "id": 1, "key": "user", "name": "As a", "type": "text", "obligatory": true },
+		{ "id": 2, "key": "action", "name": "I want", "type": "text", "obligatory": true },
+		{ "id": 3, "key": "objective", "name": "So that", "type": "text", "obligatory": true },
+		{ "id": 4, "key": "assignee", "name": "Assignee", "type": "user", "obligatory": false },
+		{
+			"id": 5,
+			"key": "labels",
+			"name": "Labels",
+			"type": "multi-select",
+			"obligatory": false,
+			"options_source": "config.labels"
+		},
+		{ "id": 6, "key": "relations", "name": "Relations", "type": "relations", "obligatory": false }
+	],
+	"sections": [
+		{ "id": 1, "key": "description", "name": "Description", "obligatory": true, "default": "" },
+		{
+			"id": 2,
+			"key": "acceptance_criteria",
+			"name": "Acceptance criteria",
+			"obligatory": true,
+			"default": ""
+		}
+	]
 }
 ```
 
@@ -995,21 +1060,34 @@ The following are explicitly **not** part of v1:
 
 ```json
 {
-  "id": "task",
-  "name": "Task",
-  "icon": "check-square",
-  "color": "#10b981",
-  "default_status": "open",
-  "fields": [
-    { "id": 1, "key": "estimate",  "name": "Estimate (hours)", "type": "number", "obligatory": false },
-    { "id": 2, "key": "assignee",  "name": "Assignee",         "type": "user",   "obligatory": false },
-    { "id": 3, "key": "labels",    "name": "Labels",           "type": "multi-select", "obligatory": false, "options_source": "config.labels" },
-    { "id": 4, "key": "relations", "name": "Relations",        "type": "relations",    "obligatory": false }
-  ],
-  "sections": [
-    { "id": 1, "key": "description", "name": "Description", "obligatory": true,  "default": "" },
-    { "id": 2, "key": "notes",       "name": "Notes",       "obligatory": false, "default": "" }
-  ]
+	"id": "task",
+	"name": "Task",
+	"icon": "check-square",
+	"color": "#10b981",
+	"default_status": "open",
+	"fields": [
+		{
+			"id": 1,
+			"key": "estimate",
+			"name": "Estimate (hours)",
+			"type": "number",
+			"obligatory": false
+		},
+		{ "id": 2, "key": "assignee", "name": "Assignee", "type": "user", "obligatory": false },
+		{
+			"id": 3,
+			"key": "labels",
+			"name": "Labels",
+			"type": "multi-select",
+			"obligatory": false,
+			"options_source": "config.labels"
+		},
+		{ "id": 4, "key": "relations", "name": "Relations", "type": "relations", "obligatory": false }
+	],
+	"sections": [
+		{ "id": 1, "key": "description", "name": "Description", "obligatory": true, "default": "" },
+		{ "id": 2, "key": "notes", "name": "Notes", "obligatory": false, "default": "" }
+	]
 }
 ```
 
@@ -1017,23 +1095,56 @@ The following are explicitly **not** part of v1:
 
 ```json
 {
-  "id": "bug",
-  "name": "Bug",
-  "icon": "bug",
-  "color": "#e74c3c",
-  "default_status": "open",
-  "fields": [
-    { "id": 1, "key": "severity",  "name": "Severity", "type": "select", "obligatory": true,  "options": ["low", "medium", "high", "critical"] },
-    { "id": 2, "key": "priority",  "name": "Priority", "type": "select", "obligatory": true,  "options": ["p0", "p1", "p2", "p3"] },
-    { "id": 3, "key": "assignee",  "name": "Assignee", "type": "user",   "obligatory": false },
-    { "id": 4, "key": "labels",    "name": "Labels",   "type": "multi-select", "obligatory": false, "options_source": "config.labels" },
-    { "id": 5, "key": "relations", "name": "Relations","type": "relations",    "obligatory": false }
-  ],
-  "sections": [
-    { "id": 1, "key": "description",        "name": "Description",         "obligatory": true,  "default": "" },
-    { "id": 2, "key": "steps_to_reproduce", "name": "Steps to reproduce",  "obligatory": true,  "default": "" },
-    { "id": 3, "key": "expected_actual",    "name": "Expected vs. actual", "obligatory": false, "default": "" }
-  ]
+	"id": "bug",
+	"name": "Bug",
+	"icon": "bug",
+	"color": "#e74c3c",
+	"default_status": "open",
+	"fields": [
+		{
+			"id": 1,
+			"key": "severity",
+			"name": "Severity",
+			"type": "select",
+			"obligatory": true,
+			"options": ["low", "medium", "high", "critical"]
+		},
+		{
+			"id": 2,
+			"key": "priority",
+			"name": "Priority",
+			"type": "select",
+			"obligatory": true,
+			"options": ["p0", "p1", "p2", "p3"]
+		},
+		{ "id": 3, "key": "assignee", "name": "Assignee", "type": "user", "obligatory": false },
+		{
+			"id": 4,
+			"key": "labels",
+			"name": "Labels",
+			"type": "multi-select",
+			"obligatory": false,
+			"options_source": "config.labels"
+		},
+		{ "id": 5, "key": "relations", "name": "Relations", "type": "relations", "obligatory": false }
+	],
+	"sections": [
+		{ "id": 1, "key": "description", "name": "Description", "obligatory": true, "default": "" },
+		{
+			"id": 2,
+			"key": "steps_to_reproduce",
+			"name": "Steps to reproduce",
+			"obligatory": true,
+			"default": ""
+		},
+		{
+			"id": 3,
+			"key": "expected_actual",
+			"name": "Expected vs. actual",
+			"obligatory": false,
+			"default": ""
+		}
+	]
 }
 ```
 
@@ -1042,13 +1153,13 @@ The following are explicitly **not** part of v1:
 ```markdown
 ---
 id: 42
-title: "Fix login redirect"
-author: "jane"
+title: 'Fix login redirect'
+author: 'jane'
 creation_date: 2026-10-20
 updated_date: 2026-10-21
 issue_type: bug
 status: in_progress
-assignee: "jane"
+assignee: 'jane'
 labels: [security, frontend]
 relations:
   - { type: blocks, id: 45 }
@@ -1057,17 +1168,20 @@ start_date: 2026-10-20
 duration: 3
 severity: high
 priority: p1
-integrity_hash: "sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+integrity_hash: 'sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'
 ---
 
 <!-- [SECTION_START: Description] -->
+
 # Login form
 
 After submitting valid credentials, the user is redirected to a
 404 page instead of the dashboard.
+
 <!-- [SECTION_END: Description] -->
 
 <!-- [SECTION_START: Steps to reproduce] -->
+
 1. Navigate to `/login`.
 2. Enter valid credentials.
 3. Click "Sign in".
@@ -1075,9 +1189,11 @@ After submitting valid credentials, the user is redirected to a
 <!-- [SECTION_END: Steps to reproduce] -->
 
 <!-- [SECTION_START: Expected vs. actual] -->
+
 **Expected:** redirect to `/dashboard`.
 
 **Actual:** redirect to `/404`.
+
 <!-- [SECTION_END: Expected vs. actual] -->
 ```
 
@@ -1085,12 +1201,12 @@ After submitting valid credentials, the user is redirected to a
 
 The application ships with the following four templates in a bundle, accessible to the first-run wizard (FR-11). They are stored as a single JSON file at build time and copied verbatim into the user's `.agnostic-issuer/templates/` directory when selected.
 
-| Template id | Name | Icon | Color | Default status |
-| --- | --- | --- | --- | --- |
-| `epic` | Epic | `flame` | `#f97316` | `open` |
-| `user-story` | User Story | `book-open` | `#0ea5e9` | `open` |
-| `task` | Task | `check-square` | `#10b981` | `open` |
-| `bug` | Bug | `bug` | `#e74c3c` | `open` |
+| Template id  | Name       | Icon           | Color     | Default status |
+| ------------ | ---------- | -------------- | --------- | -------------- |
+| `epic`       | Epic       | `flame`        | `#f97316` | `open`         |
+| `user-story` | User Story | `book-open`    | `#0ea5e9` | `open`         |
+| `task`       | Task       | `check-square` | `#10b981` | `open`         |
+| `bug`        | Bug        | `bug`          | `#e74c3c` | `open`         |
 
 Full schemas are in [Appendix B](#appendix-b-complete-example-files) (sections B.2, B.3, B.4, B.5).
 
@@ -1124,4 +1240,4 @@ The `filepaths` option (or the equivalent tree-walk filter) is the mechanism by 
 
 ---
 
-*End of document.*
+_End of document._

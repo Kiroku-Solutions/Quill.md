@@ -37,8 +37,20 @@ export default defineConfig({
 						provider: playwright(),
 						instances: [{ browser: 'chromium', headless: true }]
 					},
-					include: ['src/**/*.svelte.{test,spec}.{js,ts}'],
-					exclude: ['src/lib/server/**']
+					include: ['src/**/*.svelte.{test,spec}.{js,ts}', 'tests/**/*.{test,spec}.{js,ts}'],
+					// Node-environment tests that simulate browser scenarios or pull
+					// in Node-only deps (gray-matter → Buffer). They run in the
+					// `server` project; running them here would fail because the
+					// browser globals (window) are read-only and Buffer is absent.
+					exclude: [
+						'src/lib/server/**',
+						'tests/adapters/feature-detect.test.ts',
+						'tests/adapters/memory-fs.test.ts',
+						// The local-fs test uses a pure-TS FSA mock; it has no business
+						// in a real Chromium FSA context (File.text is sync in Chromium,
+						// not Promise<string> like in Node).  Run it in the server project.
+						'tests/adapters/local-fs.test.ts'
+					]
 				}
 			},
 
@@ -47,7 +59,7 @@ export default defineConfig({
 				test: {
 					name: 'server',
 					environment: 'node',
-					include: ['src/**/*.{test,spec}.{js,ts}'],
+					include: ['src/**/*.{test,spec}.{js,ts}', 'tests/**/*.{test,spec}.{js,ts}'],
 					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
 				}
 			}

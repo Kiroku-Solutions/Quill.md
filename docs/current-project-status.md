@@ -11,16 +11,16 @@ ERS scope covered by v0: FR-1, FR-2, FR-3, FR-4, FR-8, FR-9, FR-15 + the data mo
 
 ## Step status
 
-| # | Step | Status |
-|---|---|---|
-| 1 | Bootstrap deps + switch to adapter-static | **Done** |
-| 2 | Domain types under `src/lib/types/` | **Done** |
-| 3 | Service layer (parser, serializer, integrity, validator, slugs, loaders) | **Done** |
-| 4 | Adapter layer (directory adapter, local-fs, memory-fs, handle-store, renderer) | Pending |
-| 5 | State layer (runes-based stores) | Pending |
-| 6 | UI layer (layout, home, local views, editor, components) | Pending |
-| 7 | Service-layer tests + adapter memory-fs mock | Pending |
-| 8 | Verify (`pnpm check && pnpm lint && pnpm test`) + manual smoke test | Pending |
+| #   | Step                                                                           | Status   |
+| --- | ------------------------------------------------------------------------------ | -------- |
+| 1   | Bootstrap deps + switch to adapter-static                                      | **Done** |
+| 2   | Domain types under `src/lib/types/`                                            | **Done** |
+| 3   | Service layer (parser, serializer, integrity, validator, slugs, loaders)       | **Done** |
+| 4   | Adapter layer (directory adapter, local-fs, memory-fs, handle-store, renderer) | Pending  |
+| 5   | State layer (runes-based stores)                                               | Pending  |
+| 6   | UI layer (layout, home, local views, editor, components)                       | Pending  |
+| 7   | Service-layer tests + adapter memory-fs mock                                   | Pending  |
+| 8   | Verify (`pnpm check && pnpm lint && pnpm test`) + manual smoke test            | Pending  |
 
 ---
 
@@ -28,18 +28,18 @@ ERS scope covered by v0: FR-1, FR-2, FR-3, FR-4, FR-8, FR-9, FR-15 + the data mo
 
 ### New files
 
-| File | Purpose |
-|---|---|
-| `src/lib/adapters/directory-adapter.ts` | `DirectoryAdapter` interface + path helpers (`splitPath`, `normalizePath`). The interface is the seam between service and adapter layers; the FSA implementation lands in step 4. |
-| `src/lib/services/slugs.ts` | `slugify`, `padIssueId`, `buildIssueFilename`, `nextIssueId` (ERS §6.1.1). |
-| `src/lib/services/integrity.ts` | `sha256Hex`, `computeIntegrityHash`, `stripIntegrityHashLine`, `verifyIntegrity`. Uses `globalThis.crypto.subtle` so it works in both Node and the browser. |
-| `src/lib/services/parser.ts` | `parseIssueFile(text, sourcePath)` — text → `LoadedIssue`. Uses `gray-matter` for the frontmatter block and a custom scanner for `<!-- [SECTION_START: name] -->` markers. Computes FR-15 integrity on load. |
-| `src/lib/services/serializer.ts` | `serializeIssue(issue)` and `canonicalForm(issue)`. Emits system keys in `SYSTEM_FRONTMATTER_KEY_ORDER`, then custom fields, then the freshly computed `integrity_hash`. |
-| `src/lib/services/validator.ts` | `validateIssue(issue, ctx)` returning `{ ok, errors[] }`. Implements FR-8 checks (obligatory template fields/sections, status membership, relation validity) and FR-9 cycle detection (parent/child/blocks/depends_on). |
-| `src/lib/services/config-loader.ts` | `loadConfig(adapter)` — reads `.agnostic-issuer/config.json`, validates shape, throws an actionable error per FR-3. |
-| `src/lib/services/template-loader.ts` | `loadTemplates(adapter)` — reads every `*.json` under `.agnostic-issuer/templates/`, validates shape. |
-| `src/lib/services/issue-loader.ts` | `loadIssues(adapter)` — reads every `*.md` under `.agnostic-issuer/issues/`, parses each via `parseIssueFile`. Missing directory is treated as empty set. |
-| `src/lib/services/index.ts` | Barrel re-exports. |
+| File                                    | Purpose                                                                                                                                                                                                                 |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/adapters/directory-adapter.ts` | `DirectoryAdapter` interface + path helpers (`splitPath`, `normalizePath`). The interface is the seam between service and adapter layers; the FSA implementation lands in step 4.                                       |
+| `src/lib/services/slugs.ts`             | `slugify`, `padIssueId`, `buildIssueFilename`, `nextIssueId` (ERS §6.1.1).                                                                                                                                              |
+| `src/lib/services/integrity.ts`         | `sha256Hex`, `computeIntegrityHash`, `stripIntegrityHashLine`, `verifyIntegrity`. Uses `globalThis.crypto.subtle` so it works in both Node and the browser.                                                             |
+| `src/lib/services/parser.ts`            | `parseIssueFile(text, sourcePath)` — text → `LoadedIssue`. Uses `gray-matter` for the frontmatter block and a custom scanner for `<!-- [SECTION_START: name] -->` markers. Computes FR-15 integrity on load.            |
+| `src/lib/services/serializer.ts`        | `serializeIssue(issue)` and `canonicalForm(issue)`. Emits system keys in `SYSTEM_FRONTMATTER_KEY_ORDER`, then custom fields, then the freshly computed `integrity_hash`.                                                |
+| `src/lib/services/validator.ts`         | `validateIssue(issue, ctx)` returning `{ ok, errors[] }`. Implements FR-8 checks (obligatory template fields/sections, status membership, relation validity) and FR-9 cycle detection (parent/child/blocks/depends_on). |
+| `src/lib/services/config-loader.ts`     | `loadConfig(adapter)` — reads `.agnostic-issuer/config.json`, validates shape, throws an actionable error per FR-3.                                                                                                     |
+| `src/lib/services/template-loader.ts`   | `loadTemplates(adapter)` — reads every `*.json` under `.agnostic-issuer/templates/`, validates shape.                                                                                                                   |
+| `src/lib/services/issue-loader.ts`      | `loadIssues(adapter)` — reads every `*.md` under `.agnostic-issuer/issues/`, parses each via `parseIssueFile`. Missing directory is treated as empty set.                                                               |
+| `src/lib/services/index.ts`             | Barrel re-exports.                                                                                                                                                                                                      |
 
 ### Key design decisions
 

@@ -14,16 +14,16 @@ AgnosticIssuer is a SvelteKit + Svelte 5 client-side web app for managing reposi
 
 Use `pnpm <script>`, not `npm run` (README examples are stale — they predate pnpm).
 
-| Task | Command |
-| --- | --- |
-| Dev server | `pnpm dev` |
-| Production build | `pnpm build` (uses `@sveltejs/adapter-auto`) |
-| Preview build | `pnpm preview` |
-| Typecheck | `pnpm check` (runs `svelte-kit sync` then `svelte-check`) |
-| Lint (format + lint) | `pnpm lint` (`prettier --check . && eslint .`) |
-| Format | `pnpm format` |
-| Tests (single run) | `pnpm test` |
-| Tests (watch) | `pnpm test:unit` |
+| Task                 | Command                                                   |
+| -------------------- | --------------------------------------------------------- |
+| Dev server           | `pnpm dev`                                                |
+| Production build     | `pnpm build` (uses `@sveltejs/adapter-static`)            |
+| Preview build        | `pnpm preview`                                            |
+| Typecheck            | `pnpm check` (runs `svelte-kit sync` then `svelte-check`) |
+| Lint (format + lint) | `pnpm lint` (`prettier --check . && eslint .`)            |
+| Format               | `pnpm format`                                             |
+| Tests (single run)   | `pnpm test`                                               |
+| Tests (watch)        | `pnpm test:unit`                                          |
 
 **Pre-commit verification chain**: `pnpm check && pnpm lint && pnpm test`. There is no CI, no pre-commit hook — run these locally before pushing.
 
@@ -47,7 +47,7 @@ ESLint flat config disables `no-undef` (TypeScript handles it) and runs `eslint-
 
 ## Architecture notes that aren't obvious
 
-- **No `svelte.config.js`** — SvelteKit uses defaults. `adapter-auto` is wired in `vite.config.ts`, but the ERS calls for `@sveltejs/adapter-static` for v1 (static-only deploy). Switching the adapter is a tracked scope item, not a refactor.
+- **No `svelte.config.js`** — SvelteKit uses defaults. `adapter-static` is wired in `vite.config.ts`, but the ERS calls for `@sveltejs/adapter-static` for v1 (static-only deploy). Switching the adapter is a tracked scope item, not a refactor.
 - **`prepare` script** runs `svelte-kit sync`; this regenerates `.svelte-kit/` (gitignored). Don't commit anything from `.svelte-kit/`. `tsconfig.json` extends `.svelte-kit/tsconfig.json`.
 - **`$lib` public surface**: `src/lib/index.ts` re-exports the public API. Add new shared modules under `src/lib/`.
 - **Server-only code**: place under `src/lib/server/` to keep it out of client bundles and out of browser tests.

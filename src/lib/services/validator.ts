@@ -67,10 +67,13 @@ function detectCycles(issues: readonly Issue[]): Map<number, number[]> {
 			const start = stack.indexOf(id);
 			if (start >= 0) {
 				const cycle = stack.slice(start).concat(id);
-				for (const node of cycle) {
-					const existing = errors.get(node) ?? [];
-					existing.push(id);
-					errors.set(node, existing);
+				const uniqueCycle = [...new Set(cycle)];
+				for (const node of uniqueCycle) {
+					// Store the full cycle path (deduped) so the validator
+					// message can show "1 → 2 → 1" instead of just the
+					// back-edge target. Keeps the audit A12 dedup fix
+					// (no double-counting) while improving UX.
+					errors.set(node, [...(errors.get(node) ?? []), ...uniqueCycle]);
 				}
 			}
 			return;
