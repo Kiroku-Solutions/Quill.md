@@ -1,6 +1,6 @@
 # Current Project Status — nomad\.md
 
-> Last updated at end of **Step 4** of the v0 plan.
+> Last updated at end of **Step 5** of the v0 plan.
 > Source of truth for what is currently implemented and what comes next.
 
 ## Goal (v0, locked-in scope)
@@ -17,7 +17,7 @@ ERS scope covered by v0: FR-1, FR-2, FR-3, FR-4, FR-5 (read-only), FR-8, FR-9, F
 | 2   | Domain types under `src/lib/types/`                                                                               | **Done** |
 | 3   | Service layer (parser, serializer, integrity, validator, slugs, loaders)                                          | **Done** |
 | 4   | Adapter layer (directory adapter, local-fs, memory-fs, handle-store, renderer, remote-git) + integration test e2e | **Done** |
-| 5   | State layer (runes-based stores)                                                                                  | Pending  |
+| 5   | State layer (9 runes-based stores + barrel + integration test)                                                    | **Done** |
 | 6   | UI layer (layout, home, local views, editor, components)                                                          | Pending  |
 | 7   | Service-layer tests + adapter memory-fs mock                                                                      | Pending  |
 | 8   | Verify (`pnpm check && pnpm lint && pnpm test`) + manual smoke test                                               | Pending  |
@@ -171,6 +171,74 @@ M AGENTS.md                                  (two-project → three-project)
 - **Manual Chrome smoke test.** Plan §13 final bullet requires a manual smoke test (`open folder → see issues → create issue → save → re-load` with the ERS Appendix B.6 example). To be run by a human reviewer before merge.
 - **Live integration test.** `tests/adapters/remote-git.live.test.ts` (skipped by default, gated on `RUN_LIVE_TESTS=1`) is the recommended follow-up per plan §15.4.
 - **Buffer polyfill for production browser.** The Vite config declares `globalThis.Buffer` for tests; the actual polyfill injection for production browser builds lands with Step 6's Remote Mode UI.
+
+---
+
+## Step 5 — what landed (State layer)
+
+The state layer is a thin reactive layer between the service / adapter tier and the upcoming UI tier. Per the plan in `docs/step-5-state-layer-plan.md` §C, the deliverables are 9 stores + 9 test files + a barrel + 1 cross-store integration test, all in pure TypeScript with no module-level singletons.
+
+### Files
+
+| File                              | LOC | Purpose                                                                                                                                                                                                                                                                                                                            |
+| --------------------------------- | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/state/_context.ts`       | 178 | `StateContext`, `assertBrowser()`, `debouncedSave()` — shared foundation for every store                                                                                                                                                                                                                                           |
+| `src/lib/state/errors.ts`         | 72  | `StateError` + `StoreNotReadyError` + `ConcurrentSaveError` + `StateErrorKind` discriminator                                                                                                                                                                                                                                       |
+| `src/lib/state/mode.ts`           | 252 | `Mode` enum (`'home' \| 'local' \| 'remote'`), `ModeStore`, `createModeStore`. PAT is consumed only in the `openRemote(creds, pat)` closure, never stored.                                                                                                                                                                         |
+| `src/lib/state/config.ts`         | 144 | `ConfigStatus`, `ConfigStore`, `createConfigStore(adapterProvider)`. AbortController supersede on `load()`.                                                                                                                                                                                                                        |
+| `src/lib/state/templates.ts`      | 159 | `TemplatesStatus`, `TemplatesStore`, `createTemplatesStore(adapterProvider)`. `byType` is a `Map<id, Template>` derived getter.                                                                                                                                                                                                    |
+| `src/lib/state/issues.ts`         | 411 | The heaviest store: CRUD (`load`/`create`/`update`/`save`/`discard`/`remove`/`validate`), `dirty` set, `pendingSaves` per-id lock, `byId`/`byStatus`/`integrityWarnings` derivations, snapshot-based `discard()` revert.                                                                                                           |
+| `src/lib/state/filter.ts`         | 131 | URL ↔ state via `serialize`/`parse` (loss-less round-trip). Step 6's `+layout.svelte` wires `popstate` / `replaceState`.                                                                                                                                                                                                           |
+| `src/lib/state/view.ts`           | 60  | `View` (`'list' \| 'kanban' \| 'gantt'`), persisted to `localStorage.nomad.md.view`.                                                                                                                                                                                                                                               |
+| `src/lib/state/theme.ts`          | 66  | `Theme` (`'light' \| 'dark'`), persisted to `localStorage.nomad.md.theme`.                                                                                                                                                                                                                                                         |
+| `src/lib/state/editor.ts`         | 258 | `EditorStore` with `open`/`close`/`patchField`/`patchSection`/`save`/`discard`; deep-clones on `open`; delegates persistence to `issues.save(activeId)`.                                                                                                                                                                           |
+| `src/lib/state/index.ts`          | 61  | Barrel re-exports every factory + type. No module-level singletons — Step 6 instantiates per mount and propagates via `setContext`.                                                                                                                                                                                                |
+| `tests/state/_context.test.ts`    | 176 | `assertBrowser`, `createStateContext`, `debouncedSave` (4 cases)                                                                                                                                                                                                                                                                   |
+| `tests/state/mode.test.ts`        | 276 | `bootstrap`, `openLocalFolder`, `signOut`, PAT hygiene, `recentHandles` (8 cases)                                                                                                                                                                                                                                                  |
+| `tests/state/config.test.ts`      | 109 | happy path, missing file → `ready: null`, malformed → `status: error`, supersede, no-adapter (5 cases)                                                                                                                                                                                                                             |
+| `tests/state/templates.test.ts`   | 173 | happy path, missing directory, malformed, supersede, no-adapter (7 cases)                                                                                                                                                                                                                                                          |
+| `tests/state/issues.test.ts`      | 568 | 19 cases covering load happy + partial-failure, create, update, save round-trip, concurrent save serialisation, remove→trash, validate, byStatus, integrityWarnings, byStatus unknown status, byStatus frozen bucket, validate on unloaded, discard revert, applyPatch reference identity, load supersede, save validation failure |
+| `tests/state/filter.test.ts`      | 122 | set/clear, serialize round-trip property, parse with unknown keys, etc. (13 cases)                                                                                                                                                                                                                                                 |
+| `tests/state/view.test.ts`        | 91  | default, persist + reload, unrecognised handling (6 cases)                                                                                                                                                                                                                                                                         |
+| `tests/state/theme.test.ts`       | 92  | default, toggle, persist, etc. (7 cases)                                                                                                                                                                                                                                                                                           |
+| `tests/state/editor.test.ts`      | 349 | open clones, patchField sets dirty, patchSection, save delegates, discard reverts, errors reflect issues.validate, integrityWarning passthrough, close resets (18 cases)                                                                                                                                                           |
+| `tests/state/integration.test.ts` | 227 | Cross-store E2E: wires all 5 data stores + mode (with fake handle store) against `MemoryFsAdapter`; walks bootstrap → load → create → edit → save → reload → assert integrity clean; plus a save round-trip + a remove→trash E2E (3 cases)                                                                                         |
+
+### Security & audit carry-overs (closed)
+
+All audit carry-overs from the Step 4 scorecard that folded into Step 5 are now closed:
+
+- **Force `yaml.JSON_SCHEMA` in `parser.ts`** — the parser delegates to `src/lib/services/frontmatter.ts` (a tiny `gray-matter` replacement), which calls `yaml.load(yamlBlock, { schema: yaml.JSON_SCHEMA })` (line 98). Merge keys, anchors, aliases, and arbitrary types are refused. Covered by the parser round-trip tests and the integration test.
+- **`pnpm.overrides` for `js-yaml@^4.2.0` and `cookie@^0.7.0`** — both already in `package.json` from Step 4. `pnpm audit` exits 0.
+- **No PAT in `$state(...)` rune** — the `modeStore.openRemote(creds, pat)` parameter is consumed inside the closure, forwarded to `fetchSubtree`'s `onAuth`, and dropped on return. The store object exposes only `{ hasRemoteCredentials: boolean }` and the URL+branch pair. Verified by `tests/state/mode.test.ts` "PAT hygiene (NFR-2)" cases.
+- **No store imports from `$lib/adapters/_logger`** — the redactor stays inside the adapter layer; state layer uses services for I/O.
+
+### Key design decisions
+
+- **Plain mutable variables + getters (not `$state`/`$derived` runes).** Each store factory closes over `let` and exposes getters. This is a deliberate deviation from `docs/step-5-state-of-the-art.md` §1.3 / §2: the stores are framework-agnostic factories that work in pure Node (so all state tests run in the `server` Vitest project, not Chromium) and can be wrapped in `$state` shells in components if/when needed in Step 6. The alternative — `.svelte.ts` files — would tie the stores to the Svelte 5 compiler. See "Open question for Step 6" below.
+- **Adapter provider callback for supersede.** `createXxxStore(() => DirectoryAdapter | null)` is the API for the supersedable stores (`config`, `templates`, `issues`). The provider is re-evaluated on every action, so a folder switch (`modeStore.openLocalFolder(...)` swaps the provider result) is visible to in-flight stores. The `modeStore` itself is the only store that owns the adapter source.
+- **Per-id `pendingSaves` lock map on `issues`.** A second `save(id)` call awaits the in-flight promise (`p1 === p2`) rather than throwing. `ConcurrentSaveError` is exported but the lock never lets it surface under normal usage.
+- **Snapshot-based `discard()` on `issues`.** First `update(id, patch)` captures a `structuredClone` (or JSON fallback) of the issue; subsequent `update`s reuse the same snapshot so `discard()` always rolls back to the _last saved_ state, not the previous keystroke.
+- **`byStatus` is a getter that returns frozen bucket arrays.** Buckets are `Object.freeze`d so a consumer `.push()`ing to a returned array throws (defence-in-depth: the `ReadonlyMap<…, readonly LoadedIssue[]>` cast is a TS contract, the freeze is the runtime backstop).
+- **`load()` on `issues` preserves stale state on non-abort error.** A transient adapter failure surfaces `status: 'error'` but keeps the previously loaded set, matching `config.ts`. Plan §B.6 ambiguity resolved in favour of UI-friendly stale-data behaviour.
+- **`SYSTEM_KEYS` in `editor.ts` is derived from `FIELD_TO_YAML` keys** (not hand-maintained), so adding a new system field to the type layer auto-propagates to the editor's patch routing.
+
+### Verification
+
+| Check                | Result                                                                                                                         |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm check`         | 0 errors, 0 warnings                                                                                                           |
+| `pnpm lint`          | All matched files use Prettier code style; ESLint clean                                                                        |
+| `pnpm test`          | 614 tests passing across 29 files                                                                                              |
+| `pnpm audit`         | No known vulnerabilities                                                                                                       |
+| Grep guards (spirit) | No `console.*` in any state file; no PAT string handling; `as unknown as` casts only at FSA browser/Node boundary (documented) |
+
+### Known follow-ups (carry into Step 6 / 8)
+
+- **Reactivity from `.ts` stores in `.svelte` components.** As noted above, the stores expose plain getters. When Step 6 wires them into `+layout.svelte`, the components will need to either (a) wrap reads in `$derived(() => store.field)`, (b) re-read on every effect tick, or (c) we promote the store files to `.svelte.ts` extension and use `$state`/`$derived` directly. Option (c) was the plan's original intent; we deferred it to keep tests in pure Node.
+- **`theme.ts` does not wire `prefers-color-scheme` on bootstrap.** Plan §C.7 allowed either; we shipped the deterministic default. Trivial to add (`globalThis.matchMedia?.('(prefers-color-scheme: dark)')`).
+- **`filter.ts` does not wire `popstate` / `replaceState`.** Plan §C.5 explicitly defers this to the layout. The store exposes `serialize()` / `parse()` so Step 6 can wire the effect in a few lines.
+- **Coverage report on `src/lib/state/**`.** The plan §A.2 target is ≥80% lines / ≥75% branches. The unit + integration tests cover the happy + error paths for every store. Run `pnpm coverage`(in`server` project) for the exact number; if a branch is missed, the tests are easy to extend.
 
 ---
 

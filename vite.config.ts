@@ -100,7 +100,14 @@ export default defineConfig({
 					name: 'server',
 					environment: 'node',
 					include: ['src/**/*.{test,spec}.{js,ts}', 'tests/**/*.{test,spec}.{js,ts}'],
-					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
+					exclude: [
+						'src/**/*.svelte.{test,spec}.{js,ts}',
+						// handle-store exercises real Chromium IndexedDB;
+						// `server` (Node) has no `window.indexedDB`, so
+						// `isIndexedDBAvailable()` returns false and `openDb()`
+						// rejects every call. Run only in the `client` project.
+						'tests/adapters/handle-store.test.ts'
+					]
 				}
 			},
 

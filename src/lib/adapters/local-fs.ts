@@ -130,7 +130,7 @@ export class LocalFsAdapter implements DirectoryAdapter {
 	 */
 	async requestPermission(): Promise<PermissionState> {
 		try {
-			return this.handle.requestPermission({ mode: 'readwrite' }) as Promise<PermissionState>;
+			return await this.handle.requestPermission({ mode: 'readwrite' });
 		} catch (cause) {
 			if (cause instanceof DOMException && cause.name === 'AbortError') {
 				throw new FsaPermissionError(this.handle.name, cause);
