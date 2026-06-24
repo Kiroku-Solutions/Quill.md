@@ -65,6 +65,8 @@
 	"dependencies": {
 		"@isomorphic-git/lightning-fs": "^4.6.2",
 		"@lucide/svelte": "^1.21.0",
+		"async-lock": "^1.4.1",
+		"buffer": "^6.0.3",
 		"dompurify": "^3.4.11",
 		"isomorphic-git": "^1.38.5",
 		"js-yaml": "^4.2.0",

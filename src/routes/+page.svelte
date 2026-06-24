@@ -50,7 +50,12 @@
 			await stores.mode.openLocalFolder(adapter.directoryHandle);
 			await Promise.all([stores.config.load(), stores.templates.load()]);
 			await stores.issues.load();
-			await goto(resolve('/local'));
+			
+			if (stores.config.config === null) {
+				await goto(resolve('/wizard'));
+			} else {
+				await goto(resolve('/local'));
+			}
 		} catch (cause) {
 			openError = (cause as Error).message;
 		} finally {

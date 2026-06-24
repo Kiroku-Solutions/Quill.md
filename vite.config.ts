@@ -48,7 +48,7 @@ export default defineConfig({
 		// isomorphic-git has dynamic sub-imports that confuse Vite's
 		// pre-bundler. Excluding it from the optimization step lets the
 		// package's own ESM resolution kick in.
-		exclude: ['isomorphic-git'],
+		// exclude: ['isomorphic-git'],
 		// Pre-bundle the lucide icons that 6C chrome tests import
 		// (AppShell → TopBar → settings gear, etc.). Without this
 		// entry Vite discovers them at runtime, triggers an
@@ -57,6 +57,7 @@ export default defineConfig({
 		// imported module" error. Adding the icons here is the
 		// documented fix per the Vitest 4 migration guide.
 		include: [
+			'async-lock',
 			'@lucide/svelte/icons/settings',
 			'@lucide/svelte/icons/panel-left-open',
 			'@lucide/svelte/icons/panel-left-close',

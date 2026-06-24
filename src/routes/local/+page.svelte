@@ -32,6 +32,8 @@
 	onMount(async () => {
 		if (stores.mode.mode !== 'local') {
 			await goto(resolve('/'));
+		} else if (stores.config.config === null) {
+			await goto(resolve('/wizard'));
 		}
 	});
 </script>

@@ -73,7 +73,14 @@
 
 	async function reBind(record: HandleRecord): Promise<void> {
 		await stores.mode.openLocalFolder(record.handle);
-		await goto(resolve('/local'));
+		await Promise.all([stores.config.load(), stores.templates.load()]);
+		await stores.issues.load();
+		
+		if (stores.config.config === null) {
+			await goto(resolve('/wizard'));
+		} else {
+			await goto(resolve('/local'));
+		}
 	}
 </script>
 

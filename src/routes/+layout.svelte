@@ -9,6 +9,8 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import AppShell from '$lib/components/AppShell.svelte';
 	import type { ShellMode } from '$lib/components/TopBar.svelte';
 	import { t } from '$lib/ui/strings';
@@ -116,6 +118,10 @@
 			if (mode.localAdapter) {
 				await Promise.all([config.load(), templates.load()]);
 				await issues.load();
+				
+				if (config.config === null && !$page.url.pathname.startsWith('/wizard')) {
+					await goto(resolve('/wizard'));
+				}
 			} else if (mode.remoteAdapter) {
 				await Promise.all([config.load(), templates.load()]);
 				await issues.load();

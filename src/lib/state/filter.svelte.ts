@@ -38,6 +38,7 @@
  * `history`; the store itself is pure and works in any environment.
  */
 
+import { untrack } from 'svelte';
 import { assertBrowser } from './_context.ts';
 
 /** Inclusive date range (ISO `YYYY-MM-DD` strings, per ERS §6.1.3). */
@@ -128,7 +129,7 @@ export function createFilterStore(): FilterStore {
 
 	function set(patch: Partial<FilterState>): void {
 		assertBrowser();
-		const next: FilterState = { ...filter };
+		const next: FilterState = { ...untrack(() => filter) };
 		// Iterate only the keys actually present in `patch` so that omitted
 		// keys are preserved — this matches the documented "shallow-merge"
 		// contract (the existing key is left alone unless the caller names

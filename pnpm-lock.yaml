@@ -18,6 +18,12 @@ importers:
       '@lucide/svelte':
         specifier: ^1.21.0
         version: 1.21.0(svelte@5.56.3(@typescript-eslint/types@8.61.1))
+      async-lock:
+        specifier: ^1.4.1
+        version: 1.4.1
+      buffer:
+        specifier: ^6.0.3
+        version: 6.0.3
       dompurify:
         specifier: ^3.4.11
         version: 3.4.11
