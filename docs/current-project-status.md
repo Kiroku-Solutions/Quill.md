@@ -319,7 +319,7 @@ Two small additions beyond the plan text:
 - Buffer polyfill for production browser builds lands with Step 6's Remote Mode UI.
 - Cosmetic YAML divergences from the ERS example (date quoting, flow vs block style) — leave as-is for v0, address in a polish pass if desired.
 
-## Next step
+## Step 5 plan (Completed)
 
 **Step 5 — State layer.** Build the runes-based stores that consume the adapters and services. This is the layer between I/O and UI; once it lands, Step 6 (UI) is mostly a presentation exercise.
 
@@ -348,24 +348,24 @@ Stores to build (one file each under `src/lib/state/`):
 
 ### Step 5 deliverable checklist
 
-- [ ] `src/lib/state/mode.ts` + factory + tests
-- [ ] `src/lib/state/config.ts` + tests
-- [ ] `src/lib/state/templates.ts` + tests
-- [ ] `src/lib/state/issues.ts` + tests (heaviest — covers CRUD, validation on save, integrity recompute)
-- [ ] `src/lib/state/filter.ts` + URL-sync tests
-- [ ] `src/lib/state/view.ts` + `theme.ts` + `editor.ts`
-- [ ] `src/lib/state/index.ts` barrel
-- [ ] `pnpm check && pnpm lint && pnpm test` green
-- [ ] `pnpm coverage` ≥80% on the state layer
+- [x] `src/lib/state/mode.ts` + factory + tests
+- [x] `src/lib/state/config.ts` + tests
+- [x] `src/lib/state/templates.ts` + tests
+- [x] `src/lib/state/issues.ts` + tests (heaviest — covers CRUD, validation on save, integrity recompute)
+- [x] `src/lib/state/filter.ts` + URL-sync tests
+- [x] `src/lib/state/view.ts` + `theme.ts` + `editor.ts`
+- [x] `src/lib/state/index.ts` barrel
+- [x] `pnpm check && pnpm lint && pnpm test` green
+- [x] `pnpm coverage` ≥80% on the state layer
 
 ### Security / quality items folded into Step 5
 
 From the security audit (see section above), the following are **mandatory** before Step 5 is considered Done:
 
-- [ ] **Force `yaml.JSON_SCHEMA` in `parser.ts`.** `matter(text, { engines: { yaml: { schema: yaml.JSON_SCHEMA } } })`. Defense-in-depth against any future YAML bug in `gray-matter`'s transitive dep tree.
-- [ ] **No PAT ever enters a `$state(...)` rune.** Add a lint rule or an explicit comment block in `mode.ts` to that effect.
-- [ ] **Logger redactor wraps the state layer's `console.*` calls** if any are added (prefer silent operations over noisy ones).
-- [ ] **`pnpm.overrides` for `js-yaml@^4.2.0` and `cookie@^0.7.0`** added at the start of Step 5 so the rest of the step builds on a clean dependency tree. Run `pnpm audit` after the override and confirm zero advisories before continuing.
+- [x] **Force `yaml.JSON_SCHEMA` in `parser.ts`.** `matter(text, { engines: { yaml: { schema: yaml.JSON_SCHEMA } } })`. Defense-in-depth against any future YAML bug in `gray-matter`'s transitive dep tree.
+- [x] **No PAT ever enters a `$state(...)` rune.** Add a lint rule or an explicit comment block in `mode.ts` to that effect.
+- [x] **Logger redactor wraps the state layer's `console.*` calls** if any are added (prefer silent operations over noisy ones).
+- [x] **`pnpm.overrides` for `js-yaml@^4.2.0` and `cookie@^0.7.0`** added at the start of Step 5 so the rest of the step builds on a clean dependency tree. Run `pnpm audit` after the override and confirm zero advisories before continuing.
 
 ### Out of scope for Step 5 (deferred)
 
@@ -386,3 +386,16 @@ Before declaring Step 5 Done, the author should be able to answer yes to all of 
 4. Does `grep -R "as unknown as" src/lib/state/` return zero matches?
 5. Does every store have a corresponding `*.test.ts` in `tests/state/`?
 6. Does `issuesStore` round-trip a save through `MemoryFsAdapter` without leaking the integrity hash across reloads?
+
+---
+
+## Next step
+
+**Step 6 — UI layer.** Build the presentation layer using Svelte components. This includes the layout, home view, local and remote views, the editor, and general components.
+
+### Step 6 scope
+- `+layout.svelte` (global routing and mode switching)
+- `home` view (welcome screen, open local/remote)
+- `local` and `remote` views (list, kanban, gantt)
+- `editor` (issue creation and editing panel)
+- Shared UI components (buttons, dialogs, warnings)
