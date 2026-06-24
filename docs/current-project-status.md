@@ -425,10 +425,8 @@ does not add new product surfaces.
 
 ### Step 8 scope (verify + manual smoke)
 
-- **Human runs the smoke at `docs/smoke-tests/step-6.md`** in Chromium
-  (Local Mode) and Firefox (Remote Mode). The agent-environment
-  verification subset is documented in
-  `docs/smoke-tests/step-6-results.md`.
+- **Human runs the smoke (per the ERS §7 use cases UC-1 through UC-4)**
+  in Chromium (Local Mode) and Firefox (Remote Mode).
 - **Real screen-reader smoke** on NVDA / VoiceOver / Orca.
 - **High-contrast mode** (`forced-colors: active` media query).
 - **Gantt long descriptions** (`aria-describedby` + a hidden prose
@@ -446,13 +444,6 @@ does not add new product surfaces.
 - **Kanban DnD Enter/Space keybinding** — full keyboard parity test.
 - **`pnpm check && pnpm lint && pnpm test && pnpm build && pnpm audit`**
   green at the end.
-
-Full Step 6 retrospective lives in
-`docs/changelogs/step-6-report.md`. The smoke scripts are at
-`docs/smoke-tests/step-6.md` and `docs/smoke-tests/step-6-results.md`.
-The a11y audit is at `docs/audits/2026-06-23/step-6-a11y.md`; the
-CSP / SRI / Trusted Types audit is at
-`docs/audits/2026-06-23/step-6-csp.md`.
 
 ---
 
@@ -479,7 +470,7 @@ verification chain is green.
 | Static / hosting       | `static/_headers`, `static/_redirects`                                                                                                                                                                                                                                                                             |
 | Lint scripts           | `scripts/check-i18n.mjs` (346 lines), `scripts/check-csp.mjs` (306 lines), `scripts/add-sri.mjs` (polished)                                                                                                                                                                                                          |
 | Tests                  | `tests/ui/{tabs,modal,app-shell,recent-folders,kanban-dnd,list-keyboard,remote-toolbar,form-fields,markdown-preview,settings-panel,filter-url-sync,strings}.svelte.test.ts`, `tests/ui/{KanbanDndHarness,MarkdownPreviewHarness,ModalHarness,TabsHarness,FilterUrlSyncHarness}.svelte`, `tests/a11y/{step-6.a11y,keyboard-nav}.test.ts`, `tests/state/mode.refresh-remote.test.ts` |
-| Docs                   | `docs/step-6-ui-layer-plan.md`, `docs/audits/2026-06-23/step-6-a11y.md`, `docs/audits/2026-06-23/step-6-csp.md`, `docs/hosting/github-pages.md`, `docs/changelogs/step-6-report.md`, `docs/smoke-tests/step-6.md`, `docs/smoke-tests/step-6-results.md`, `SECURITY.md` (updated)                                       |
+| Docs                   | (deleted: per the user's request, only `docs/ers.md` and `docs/current-project-status.md` remain)                                                                                                                              |
 
 ### Files modified
 
@@ -496,11 +487,11 @@ verification chain is green.
 
 ### Key design decisions
 
-- **Hybrid design system (per `docs/step-6-ui-layer-plan.md` §3).**
-  daisyUI 5 for primitives (Button, Input, Tabs, Modal, …); custom
-  hero surfaces (TopBar, LeftRail, Home, Editor, Wizard, Settings,
-  Integrity banner). The two systems don't overlap — primitives
-  consume daisyUI classes, hero surfaces consume `tokens.css`.
+- **Hybrid design system.** daisyUI 5 for primitives (Button,
+  Input, Tabs, Modal, …); custom hero surfaces (TopBar, LeftRail,
+  Home, Editor, Wizard, Settings, Integrity banner). The two systems
+  don't overlap — primitives consume daisyUI classes, hero surfaces
+  consume `tokens.css`.
 - **`svelte-dnd-action` for Kanban DnD.** Full keyboard parity
   (mouse, touch, ←/→/↑/↓/Enter). Remote Mode makes the drop a no-op
   with a tooltip.
@@ -548,10 +539,10 @@ verification chain is green.
 - **Trusted Types.** `require-trusted-types-for 'script'` +
   `trusted-types nomad-md dompurify default`. DOMPurify is the
   documented Trusted Types sink.
-- **GitHub Pages equivalent.** `docs/hosting/github-pages.md`
-  documents the `<meta http-equiv>` fallback (covers
-  `frame-ancestors 'none'`) and the residual HSTS / Trusted Types
-  gap when shipping on a host that doesn't honour `_headers`.
+- **GitHub Pages equivalent.** The existing `<meta http-equiv>`
+  fallback in `src/app.html:13` covers `frame-ancestors 'none'`. The
+  residual HSTS / Trusted Types gap when shipping on a host that
+  doesn't honour `_headers` is documented in the commit history.
 - **CVE-2026-53550 (js-yaml ≤4.1.1) + CVE-2024-47764 (cookie
   <0.7.0).** Both stay at 0 via the `pnpm.overrides` from Step 5.
 
