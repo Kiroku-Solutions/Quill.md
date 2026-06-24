@@ -343,4 +343,160 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 		// No store update should have been issued.
 		expect(updateCalls).toEqual([]);
 	});
+
+	// ─── Step 8 — WAI-ARIA DnD keyboard parity (NFR-4) ──────────────────
+	//
+	// The "pickup / drop" handshake is the screen-reader-friendly
+	// parallel to the arrow-key commit path. Arrow keys alone still
+	// commit (ERS NFR-4); Space / Enter + arrow keys does the same
+	// thing with explicit pickup / drop announcements.
+
+	it('picks up a card on Space and announces the pickup (aria-live)', async () => {
+		activeStub = buildStub(
+			[makeIssue(1, 'open', 'First issue'), makeIssue(2, 'in_progress', 'Second issue')],
+			'local'
+		);
+		render(KanbanDndHarness);
+
+		const firstCard = document.querySelector<HTMLElement>('[data-card-id="1"]');
+		expect(firstCard).not.toBeNull();
+		firstCard?.focus();
+
+		await userEvent.keyboard(' ');
+
+		// No store update should fire — pickup is a pure UI handshake.
+		expect(updateCalls).toEqual([]);
+		// Card should be marked as lifted for screen readers.
+		expect(firstCard?.getAttribute('data-lifted')).toBe('true');
+		expect(firstCard?.getAttribute('aria-pressed')).toBe('true');
+		// Live region should announce the pickup.
+		const live = document.querySelector<HTMLElement>('[data-testid="kanban-live"]');
+		expect(live?.textContent ?? '').toMatch(/Picked up issue 1/);
+	});
+
+	it('drops a lifted card on a second Space and announces the drop', async () => {
+		activeStub = buildStub(
+			[makeIssue(1, 'open', 'First issue'), makeIssue(2, 'in_progress', 'Second issue')],
+			'local'
+		);
+		render(KanbanDndHarness);
+
+		const firstCard = document.querySelector<HTMLElement>('[data-card-id="1"]');
+		firstCard?.focus();
+
+		// Pickup
+		await userEvent.keyboard(' ');
+		expect(firstCard?.getAttribute('data-lifted')).toBe('true');
+
+		// Drop in place
+		await userEvent.keyboard(' ');
+
+		expect(firstCard?.getAttribute('data-lifted')).toBe('false');
+		const live = document.querySelector<HTMLElement>('[data-testid="kanban-live"]');
+		expect(live?.textContent ?? '').toMatch(/Dropped issue 1 in column open/);
+		// No cross-column move → no store update.
+		expect(updateCalls).toEqual([]);
+	});
+
+	it('moves a lifted card with ArrowRight and commits on the implicit drop', async () => {
+		activeStub = buildStub(
+			[
+				makeIssue(1, 'open', 'First issue'),
+				makeIssue(2, 'in_progress', 'Second issue'),
+				makeIssue(3, 'closed', 'Third issue')
+			],
+			'local'
+		);
+		render(KanbanDndHarness);
+
+		const firstCard = document.querySelector<HTMLElement>('[data-card-id="1"]');
+		firstCard?.focus();
+
+		// Pickup → ArrowRight (move) → implicit drop on the move.
+		await userEvent.keyboard(' ');
+		await userEvent.keyboard('{ArrowRight}');
+
+		expect(updateCalls).toHaveLength(1);
+		expect(updateCalls[0]).toEqual({ id: 1, patch: { status: 'in_progress' } });
+
+		// The lifted flag is cleared on the implicit drop.
+		expect(firstCard?.getAttribute('data-lifted')).toBe('false');
+		const live = document.querySelector<HTMLElement>('[data-testid="kanban-live"]');
+		expect(live?.textContent ?? '').toMatch(/Dropped issue 1 in column in_progress/);
+	});
+
+	it('cancels a pickup on Escape and announces the cancellation', async () => {
+		activeStub = buildStub(
+			[makeIssue(1, 'open', 'First issue'), makeIssue(2, 'in_progress', 'Second issue')],
+			'local'
+		);
+		render(KanbanDndHarness);
+
+		const firstCard = document.querySelector<HTMLElement>('[data-card-id="1"]');
+		firstCard?.focus();
+
+		await userEvent.keyboard(' ');
+		expect(firstCard?.getAttribute('data-lifted')).toBe('true');
+
+		await userEvent.keyboard('{Escape}');
+
+		expect(firstCard?.getAttribute('data-lifted')).toBe('false');
+		// No store update from a cancelled pickup.
+		expect(updateCalls).toEqual([]);
+		const live = document.querySelector<HTMLElement>('[data-testid="kanban-live"]');
+		expect(live?.textContent ?? '').toMatch(/Cancelled move of issue 1/);
+	});
+
+	it('opens the editor on F2 (the WAI-ARIA activate verb)', async () => {
+		activeStub = buildStub(
+			[makeIssue(1, 'open', 'First issue'), makeIssue(2, 'in_progress', 'Second issue')],
+			'local'
+		);
+		render(KanbanDndHarness);
+
+		const firstCard = document.querySelector<HTMLElement>('[data-card-id="1"]');
+		firstCard?.focus();
+
+		await userEvent.keyboard('{F2}');
+
+		expect(openCalls).toEqual([{ id: 1 }]);
+		// F2 is not a pickup — the card stays un-lifted.
+		expect(firstCard?.getAttribute('data-lifted')).toBe('false');
+		// F2 is not a DnD move — no store update.
+		expect(updateCalls).toEqual([]);
+	});
+
+	it('opens the editor on the `o` mnemonic key', async () => {
+		activeStub = buildStub(
+			[makeIssue(1, 'open', 'First issue'), makeIssue(2, 'in_progress', 'Second issue')],
+			'local'
+		);
+		render(KanbanDndHarness);
+
+		const firstCard = document.querySelector<HTMLElement>('[data-card-id="1"]');
+		firstCard?.focus();
+
+		await userEvent.keyboard('o');
+
+		expect(openCalls).toEqual([{ id: 1 }]);
+	});
+
+	it('is a no-op for the pickup handshake in Remote Mode', async () => {
+		activeStub = buildStub(
+			[makeIssue(1, 'open', 'First issue'), makeIssue(2, 'in_progress', 'Second issue')],
+			'remote'
+		);
+		render(KanbanDndHarness);
+
+		const firstCard = document.querySelector<HTMLElement>('[data-card-id="1"]');
+		firstCard?.focus();
+
+		await userEvent.keyboard(' ');
+
+		// Still no store update — the read-only guard applies.
+		expect(updateCalls).toEqual([]);
+		// F2 still opens the editor even in Remote Mode.
+		await userEvent.keyboard('{F2}');
+		expect(openCalls).toEqual([{ id: 1 }]);
+	});
 });

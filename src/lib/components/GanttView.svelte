@@ -287,6 +287,7 @@
 				{/each}
 
 				{#each bars as bar (bar.id)}
+					{@const barDescId = `gantt-bar-desc-${bar.id}`}
 					<g
 						class="cursor-pointer"
 						onclick={() => open(bar.id)}
@@ -299,6 +300,7 @@
 						role="button"
 						tabindex="0"
 						aria-label={t('gantt.barAria', { id: bar.id, title: bar.title })}
+						aria-describedby={barDescId}
 					>
 						<rect
 							x={bar.x}
@@ -322,6 +324,29 @@
 					{/each}
 				</g>
 			</svg>
+			<!--
+				Screen-reader-only prose descriptions for every bar.
+				Each `<span>` is referenced by the matching bar's
+				`aria-describedby`. Mounted once per bar so the ID
+				resolution is stable for assistive tech. `sr-only`
+				keeps the descriptions out of the visual flow without
+				suppressing them from the accessibility tree.
+				(Step 8, NFR-4 — bar-by-bar descriptions.)
+			-->
+			<div class="sr-only" data-testid="gantt-bar-descriptions">
+				{#each bars as bar (bar.id)}
+					<span id={`gantt-bar-desc-${bar.id}`}>
+						{t('gantt.barDescription', {
+							status: bar.status,
+							type: bar.type,
+							group: bar.group,
+							start: bar.startDate ?? '?',
+							end: bar.endDate ?? '',
+							duration: bar.duration ?? 0
+						})}
+					</span>
+				{/each}
+			</div>
 		</div>
 	{/if}
 

@@ -305,7 +305,19 @@ export const STRINGS = {
 
 	kanban: {
 		cardAria: (params: Params) => `Issue ${params.id}: ${params.title} in column ${params.col}`,
-		readOnlyTooltip: 'Read-only — open this issue locally to change its status'
+		readOnlyTooltip: 'Read-only — open this issue locally to change its status',
+		// Step 8 WAI-ARIA DnD keyboard parity (NFR-4). The card
+		// "pickup / drop" pattern lets screen-reader users hear an
+		// explicit announcement when the move begins and ends.
+		// Arrow keys alone still commit (ERS NFR-4: "arrow keys to
+		// move the focused card between columns") — Space / Enter
+		// is the parallel explicit path. F2 is the standard
+		// "activate" verb for opening the editor.
+		pickedUp: (params: Params) =>
+			`Picked up issue ${params.id}. Use arrow keys to move, Space or Enter to drop, Escape to cancel.`,
+		dropped: (params: Params) => `Dropped issue ${params.id} in column ${params.col}`,
+		cancelled: (params: Params) => `Cancelled move of issue ${params.id}.`,
+		activateHint: 'Press F2 to open the issue editor'
 	},
 
 	gantt: {
@@ -314,6 +326,14 @@ export const STRINGS = {
 		ariaLabel: 'Gantt timeline',
 		roleDescription: 'gantt timeline',
 		barAria: (params: Params) => `Issue ${params.id}: ${params.title}`,
+		// Step 8 (NFR-4) — full per-bar prose for screen readers. Linked
+		// via `aria-describedby` so the bar's short `aria-label` stays
+		// scannable while a longer description (status, type, group,
+		// start, end / duration) is available on demand.
+		barDescription: (params: Params) =>
+			`Status ${params.status}, type ${params.type}, group ${params.group}. ` +
+			`Starts ${params.start ?? 'unknown'}, ` +
+			(params.end ? `ends ${params.end}.` : `duration ${params.duration ?? '?'} days.`),
 		truncation: '…',
 		fallbackSummary: 'Textual fallback (NFR-4 accessibility)',
 		fallbackEmpty: 'No issues match the current filter.',

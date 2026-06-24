@@ -117,6 +117,8 @@ const ALLOWED_ATTRIBUTES = new Set([
 	'aria-describedby',
 	'aria-selected',
 	'aria-labelledby',
+	'aria-live', // "polite" | "assertive" | "off" — WAI-ARIA live region politeness
+	'aria-atomic', // "true" | "false" — WAI-ARIA live region atomicity
 	'variant', // 6B Button variant prop (primary | secondary | ghost | ...)
 	'size', // 6B Button size prop (sm | md | lg)
 	'position', // Tooltip position prop (top | bottom | left | right)
