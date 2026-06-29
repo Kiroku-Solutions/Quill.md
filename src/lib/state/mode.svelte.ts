@@ -3,12 +3,12 @@
  * of the app is active.
  *
  * Reactivity: `mode`, `activeHandle`, `localAdapter`, `remoteAdapter`,
- * `proxyWarning` are Svelte 5 `$state` slots; `recentHandles` is
- * `$state.raw` (the array is replaced wholesale on every refresh — a
- * deep proxy would interfere with the HandleRecord shape). The PAT
- * lives ONLY in the `_patScope` closure variable — it is deliberately
- * **not** a rune, so it is invisible to the reactivity graph
- * (NFR-2 security contract).
+ * `proxyWarning`, `lastFetchedAt` are Svelte 5 `$state` slots;
+ * `recentHandles` is `$state.raw` (the array is replaced wholesale on
+ * every refresh — a deep proxy would interfere with the HandleRecord
+ * shape). The PAT lives ONLY in the `_patScope` closure variable — it
+ * is deliberately **not** a rune, so it is invisible to the reactivity
+ * graph (NFR-2 security contract).
  *
  * Three modes:
  *  - `home`   : no folder open. The home screen invites the user to open
@@ -41,6 +41,7 @@ import type {
 } from '../adapters/directory-adapter.ts';
 import type { RepoUrl, Branch } from '../adapters/remote-git.ts';
 import { isFsaAvailable } from '../adapters/feature-detect.ts';
+import { StateError } from './errors.ts';
 import type { StateContext } from './_context.ts';
 
 /** Top-level application mode. */
@@ -68,8 +69,9 @@ export interface ModeStore {
 	readonly recentHandles: readonly HandleRecord[];
 	readonly hasRemoteCredentials: boolean;
 	/**
-	 * CORS proxy warning text returned by the most recent `openRemote`
-	 * call. `null` when no remote is active, or after `signOut()`.
+	 * CORS proxy warning text returned by the most recent remote fetch
+	 * (either `openRemote` or `refreshRemote`). `null` when no remote
+	 * is active, or after `signOut()`.
 	 *
 	 * Safe to expose on the public surface: it contains only the proxy
 	 * host (e.g. `cors.isomorphic-git.org`), never the PAT or the
@@ -77,6 +79,15 @@ export interface ModeStore {
 	 * as a non-blocking banner (FR-12).
 	 */
 	readonly proxyWarning: string | null;
+	/**
+	 * Wall-clock timestamp (`Date.now()`) of the last successful
+	 * `openRemote` / `refreshRemote` call. `null` when no remote is
+	 * active, or after `signOut()`. Surfaced by the `RemoteToolbar` as
+	 * the "Last fetched" indicator. Updated atomically with
+	 * `remoteAdapter` so the toolbar's `formatRelative` read stays
+	 * consistent with the adapter it is reading through.
+	 */
+	readonly lastFetchedAt: number | null;
 	/** Writable adapter bound when a local folder handle is active. */
 	readonly localAdapter: WritableDirectoryAdapter | null;
 	/** Read-only adapter bound when a remote repository is open. */
@@ -86,6 +97,27 @@ export interface ModeStore {
 	readonly openLocalFolder: (handle: FileSystemDirectoryHandle) => Promise<void>;
 	readonly switchFolder: () => Promise<FileSystemDirectoryHandle | null>;
 	readonly openRemote: (creds: RemoteCredentials, pat: string) => Promise<void>;
+	/**
+	 * Re-fetch the remote subtree without dropping the cached handle.
+	 *
+	 * **Contract (sub-phase 6F, the smallest v0 change):**
+	 *  - Requires `mode === 'remote'`; otherwise throws
+	 *    {@link RemotePatRequired} (the toolbar redirects the user to
+	 *    `/` so they can re-open the remote and re-supply a PAT).
+	 *  - The PAT is **not** persisted (NFR-2). `refreshRemote(pat)`
+	 *    always takes a fresh PAT from the caller — the
+	 *    `RemoteToolbar` collects it from a tiny modal that mirrors
+	 *    the home page's open-remote form.
+	 *  - On success: swaps `remoteAdapter` for the freshly fetched
+	 *    subtree, updates `lastFetchedAt = Date.now()`, and reloads
+	 *    the issues / config / templates stores through
+	 *    {@link onRefreshSuccess} (the layout wires this in 6C).
+	 *  - On failure (network, auth, partial clone error): re-throws and
+	 *    leaves the existing `remoteAdapter` bound so the user keeps
+	 *    their cached subtree (NFR-7: "A failed remote fetch MUST NOT
+	 *    corrupt the cached state").
+	 */
+	readonly refreshRemote: (pat: string) => Promise<void>;
 	readonly signOut: () => Promise<void>;
 }
 
@@ -100,6 +132,33 @@ export interface ModeStoreDeps {
 	readonly createLocalAdapter?: (handle: FileSystemDirectoryHandle) => WritableDirectoryAdapter;
 	/** IndexedDB-backed handle persistence. Defaults to the singleton from `handle-store.ts`. */
 	readonly handles?: typeof handleStore;
+	/**
+	 * Optional callback invoked after every successful remote fetch
+	 * (both `openRemote` and `refreshRemote`). The layout wires this to
+	 * a `reload issues / config / templates` orchestration; the mode
+	 * store itself stays out of the business of driving other stores.
+	 *
+	 * Defaults to a no-op so the contract is opt-in and tests can
+	 * omit it.
+	 */
+	readonly onRefreshSuccess?: () => Promise<void>;
+}
+
+/**
+ * Error thrown when the user tries to refresh the remote subtree
+ * without supplying a PAT (or while not in remote mode). The
+ * `RemoteToolbar` catches this and shows the re-prompt flow; the
+ * page-level catch redirects the user to `/` so they can re-open the
+ * remote from the home screen.
+ *
+ * Distinct from `StateError` because the credential-flow contract is
+ * a mode-store concern, not a generic state-layer error.
+ */
+export class RemotePatRequiredError extends Error {
+	readonly name = 'RemotePatRequiredError';
+	constructor(message = 'A PAT is required to refresh the remote subtree') {
+		super(message);
+	}
 }
 
 /**
@@ -112,6 +171,7 @@ export interface ModeStoreDeps {
 export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): ModeStore {
 	const handles = deps.handles ?? handleStore;
 	const createLocal = deps.createLocalAdapter;
+	const onRefreshSuccess = deps.onRefreshSuccess ?? (async () => undefined);
 
 	// ─── Reactive state (Svelte 5 runes) ────────────────────────────────
 	let mode = $state<Mode>('home');
@@ -120,9 +180,14 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 	let localAdapter = $state<WritableDirectoryAdapter | null>(null);
 	let remoteAdapter = $state<ReadOnlyDirectoryAdapter | null>(null);
 	// CORS proxy warning text. Populated by openRemote from
-	// fetchSubtree's `proxyWarning` field; cleared on signOut. Safe to
-	// expose on the public surface — see the `proxyWarning` getter.
+	// fetchSubtree's `proxyWarning` field; cleared on signOut. Safe
+	// to expose on the public surface — see the `proxyWarning` getter.
 	let proxyWarning = $state<string | null>(null);
+	// Timestamp (Date.now()) of the last successful remote fetch. Used by
+	// the RemoteToolbar's "Last fetched: N min ago" indicator. Atomically
+	// bumped with `remoteAdapter` so the toolbar's `formatRelative` read
+	// stays consistent with the adapter it is reading through.
+	let lastFetchedAt = $state<number | null>(null);
 	// PAT lives ONLY in this closure. Never read after openRemote returns.
 	// Deliberately NOT a rune — keeping it out of the reactivity graph is
 	// a security boundary (NFR-2): no consumer can subscribe to a PAT slot
@@ -267,10 +332,63 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 		// Capture the CORS proxy warning text for the UI (FR-12). Safe
 		// to expose — see the `proxyWarning` getter docstring.
 		proxyWarning = warning;
+		// Stamp the fetch timestamp so the toolbar can show "Last fetched".
+		lastFetchedAt = Date.now();
 		// Remote Mode is read-only; clear any local session markers.
 		activeHandle = null;
 		localAdapter = null;
 		mode = 'remote';
+		await onRefreshSuccess();
+	}
+
+	async function refreshRemote(pat: string): Promise<void> {
+		// The cached scope (url, branch) is the only credential we keep;
+		// the PAT must be supplied fresh by the caller (NFR-2).
+		if (!_patScope) {
+			throw new RemotePatRequiredError(
+				'refreshRemote requires an active remote session (mode === "remote")'
+			);
+		}
+		if (mode !== 'remote') {
+			throw new RemotePatRequiredError(
+				'refreshRemote requires an active remote session (mode === "remote")'
+			);
+		}
+		// Defensive: a malformed PAT argument (empty / whitespace) is the
+		// same UX as no session — surface the re-prompt path. The bare
+		// openRemote form rejects empty values too; we mirror that here so
+		// the toolbar does not need a separate validation step.
+		if (typeof pat !== 'string' || pat.trim() === '') {
+			throw new RemotePatRequiredError('refreshRemote requires a non-empty PAT');
+		}
+		const scope = _patScope;
+		// Snapshot the existing adapter so we can roll back on failure
+		// (NFR-7: "A failed remote fetch MUST NOT corrupt the cached state").
+		// We only swap `remoteAdapter` after the new fetch resolves; on
+		// rejection the existing adapter remains bound and the user keeps
+		// their cached subtree.
+		const previousAdapter = remoteAdapter;
+		let nextAdapter: ReadOnlyDirectoryAdapter;
+		let nextWarning: string;
+		try {
+			const result = await consumePatAndFetch(scope, pat);
+			nextAdapter = result.adapter;
+			nextWarning = result.proxyWarning;
+		} catch (cause) {
+			// Re-throw with the existing adapter left in place. Do NOT
+			// clear `lastFetchedAt` — it still describes the cache the
+			// user is reading through.
+			throw cause instanceof Error ? cause : new StateError('internal', String(cause), { cause });
+		}
+		// Commit: swap adapter, bump timestamp, refresh proxy warning.
+		remoteAdapter = nextAdapter;
+		proxyWarning = nextWarning;
+		lastFetchedAt = Date.now();
+		await onRefreshSuccess();
+		// `previousAdapter` is captured to make the rollback contract
+		// explicit; it is not used after the swap because the old
+		// adapter's LightningFS handle is GC-eligible (no live references).
+		void previousAdapter;
 	}
 
 	async function signOut(): Promise<void> {
@@ -279,6 +397,7 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 		activeHandle = null;
 		localAdapter = null;
 		proxyWarning = null;
+		lastFetchedAt = null;
 		await handles.clearActive();
 		await readRecent();
 		mode = 'home';
@@ -300,6 +419,9 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 		get proxyWarning() {
 			return proxyWarning;
 		},
+		get lastFetchedAt() {
+			return lastFetchedAt;
+		},
 		get localAdapter() {
 			return localAdapter;
 		},
@@ -310,6 +432,7 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 		openLocalFolder,
 		switchFolder,
 		openRemote,
+		refreshRemote,
 		signOut
 	};
 }

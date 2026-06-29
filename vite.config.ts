@@ -48,7 +48,51 @@ export default defineConfig({
 		// isomorphic-git has dynamic sub-imports that confuse Vite's
 		// pre-bundler. Excluding it from the optimization step lets the
 		// package's own ESM resolution kick in.
-		exclude: ['isomorphic-git']
+		exclude: ['isomorphic-git'],
+		// Pre-bundle the lucide icons that 6C chrome tests import
+		// (AppShell → TopBar → settings gear, etc.). Without this
+		// entry Vite discovers them at runtime, triggers an
+		// "optimized dependencies changed" reload, and the test file
+		// import fails with a transient "Failed to fetch dynamically
+		// imported module" error. Adding the icons here is the
+		// documented fix per the Vitest 4 migration guide.
+		include: [
+			'@lucide/svelte/icons/settings',
+			'@lucide/svelte/icons/panel-left-open',
+			'@lucide/svelte/icons/panel-left-close',
+			'@lucide/svelte/icons/alert-triangle',
+			'@lucide/svelte/icons/folder',
+			'@lucide/svelte/icons/folder-open',
+			'@lucide/svelte/icons/folder-plus',
+			'@lucide/svelte/icons/globe',
+			'@lucide/svelte/icons/layout-list',
+			'@lucide/svelte/icons/lock',
+			'@lucide/svelte/icons/pencil-line',
+			'@lucide/svelte/icons/x',
+			// 6E: NewIssueModal type-picker icon table + the new
+			// toolbar/modal surfaces.
+			'@lucide/svelte/icons/bug',
+			'@lucide/svelte/icons/check-square',
+			'@lucide/svelte/icons/file-text',
+			'@lucide/svelte/icons/flag',
+			'@lucide/svelte/icons/git-branch',
+			'@lucide/svelte/icons/git-pull-request',
+			'@lucide/svelte/icons/layers',
+			'@lucide/svelte/icons/list-checks',
+			'@lucide/svelte/icons/package',
+			'@lucide/svelte/icons/sparkles',
+			'@lucide/svelte/icons/tag',
+			'@lucide/svelte/icons/wrench',
+			'@lucide/svelte/icons/zap',
+			// 6F: RemoteToolbar refresh + sign-out icons.
+			'@lucide/svelte/icons/refresh-cw',
+			'@lucide/svelte/icons/log-out',
+			// 6H: SettingsPanel theme picker + command icons.
+			'@lucide/svelte/icons/sun',
+			'@lucide/svelte/icons/moon',
+			'@lucide/svelte/icons/monitor',
+			'@lucide/svelte/icons/trash-2'
+		]
 	},
 	test: {
 		expect: { requireAssertions: true },
@@ -126,7 +170,19 @@ export default defineConfig({
 						// `server` (Node) has no `window.indexedDB`, so
 						// `isIndexedDBAvailable()` returns false and `openDb()`
 						// rejects every call. Run only in the `client` project.
-						'tests/adapters/handle-store.test.ts'
+						'tests/adapters/handle-store.test.ts',
+						// Every `tests/ui/*.svelte.test.ts` imports `vitest/browser`
+						// (directly or transitively through `vitest-browser-svelte`),
+						// which is browser-mode-only. Run only in the `client`
+						// project (Playwright Chromium). 6C extended the 6B
+						// hard-coded list (`tabs.svelte.test.ts`,
+						// `modal.svelte.test.ts`) to a wildcard so future tests
+						// added under `tests/ui/` inherit the same exclusion
+						// without needing another config edit per test.
+						'tests/ui/*.svelte.test.ts',
+						// 6K a11y tests import `vitest/browser` and run axe-core
+						// against a real DOM. They are Playwright-Chromium-only.
+						'tests/a11y/*'
 					]
 				}
 			},

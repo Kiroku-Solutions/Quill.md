@@ -8,6 +8,10 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
+	import AppShell from '$lib/components/AppShell.svelte';
+	import type { ShellMode } from '$lib/components/TopBar.svelte';
+	import { t } from '$lib/ui/strings';
 	import {
 		createConfigStore,
 		createEditorStore,
@@ -76,14 +80,24 @@
 
 	setStores({ mode, config, templates, issues, editor, filter, view, theme });
 
+	// The wizard route has its own standalone layout; the chrome that
+	// wraps every other page reads the current pathname and forwards a
+	// `ShellMode` to AppShell. The store's `mode.mode` only distinguishes
+	// home / local / remote; wizard detection is URL-based.
+	const currentMode = $derived<ShellMode>(
+		$page.url.pathname.startsWith('/wizard') ? 'wizard' : mode.mode
+	);
+
 	// Bootstrap the mode + theme on mount. `mode.bootstrap()` restores the
 	// last folder handle from IndexedDB; `theme` reads localStorage.
 	// Both are no-ops on the server / in tests.
 	onMount(async () => {
 		if (!isFsaAvailable()) return;
-		// Apply the theme to <html> before any component renders to avoid
-		// a flash. The `prefers-color-scheme` fallback is handled by the
-		// store constructor.
+		// The no-flash theme class is set by the inline script in
+		// `app.html` before the first paint. The line below is a
+		// safety net for the rare case where the inline script
+		// throws (private mode with a locked-down `localStorage`,
+		// for example); idempotent with the inline script.
 		document.documentElement.classList.toggle('dark', theme.theme === 'dark');
 		try {
 			await mode.bootstrap();
@@ -102,7 +116,9 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>nomad.md</title>
+	<title>{t('app.name')}</title>
 </svelte:head>
 
-{@render children()}
+<AppShell mode={currentMode}>
+	{@render children()}
+</AppShell>

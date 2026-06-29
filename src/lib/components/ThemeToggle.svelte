@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getStores } from '$lib/state';
+	import { t } from '$lib/ui/strings';
 
 	const { theme } = getStores();
 
@@ -18,7 +19,7 @@
 	type="button"
 	class="btn btn-ghost btn-sm"
 	onclick={toggle}
-	aria-label={theme.theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+	aria-label={theme.theme === 'dark' ? t('theme.switchToLight') : t('theme.switchToDark')}
 >
 	{#if theme.theme === 'dark'}
 		<svg

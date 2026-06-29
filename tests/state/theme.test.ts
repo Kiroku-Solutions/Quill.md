@@ -133,3 +133,157 @@ describe('createThemeStore — prefers-color-scheme fallback (FR-14)', () => {
 		expect(store.theme).toBe('light');
 	});
 });
+
+describe('createThemeStore — system preference (sub-phase 6H)', () => {
+	// A MediaQueryList stub that mirrors the `change` event semantics.
+	// The listener registered via `installListener` is held in a
+	// closure and is fired by the `dispatch()` helper so tests can
+	// simulate an OS-level theme change without invoking `addEventListener`
+	// (the production code uses `installListener` directly, not the
+	// MQL's `addEventListener`).
+	function makeMatchMediaWithListener(initialDark: boolean): {
+		matchMedia: typeof globalThis.matchMedia;
+		dispatch: (toDark: boolean) => void;
+	} {
+		let currentDark = initialDark;
+		let installed: ((e: { matches: boolean }) => void) | null = null;
+		const matchMedia = ((query: string) => ({
+			matches: query === '(prefers-color-scheme: dark)' && currentDark,
+			media: query,
+			onchange: null,
+			addListener: () => undefined,
+			removeListener: () => undefined,
+			addEventListener: (_event: string, cb: (e: { matches: boolean }) => void) => {
+				installed = cb;
+			},
+			removeEventListener: () => undefined,
+			dispatchEvent: () => false
+		})) as unknown as typeof globalThis.matchMedia;
+		const dispatch = (toDark: boolean): void => {
+			currentDark = toDark;
+			installed?.({ matches: toDark });
+		};
+		return { matchMedia, dispatch };
+	}
+
+	it("defaults preference to 'light' (system → light when OS prefers light)", () => {
+		const ls = makeStorage();
+		const { matchMedia } = makeMatchMediaWithListener(false);
+		const store = createThemeStore({
+			storage: ls,
+			matchMedia,
+			installListener: () => () => undefined
+		});
+		expect(store.preference).toBe('light');
+		expect(store.theme).toBe('light');
+	});
+
+	it("defaults preference to 'dark' (system → dark when OS prefers dark)", () => {
+		const ls = makeStorage();
+		const { matchMedia } = makeMatchMediaWithListener(true);
+		const store = createThemeStore({
+			storage: ls,
+			matchMedia,
+			installListener: () => () => undefined
+		});
+		expect(store.preference).toBe('dark');
+		expect(store.theme).toBe('dark');
+	});
+
+	it("restores a stored 'system' preference and resolves it through the OS", () => {
+		const ls = makeStorage({ 'nomad.md.theme': 'system' });
+		const { matchMedia } = makeMatchMediaWithListener(true);
+		const store = createThemeStore({
+			storage: ls,
+			matchMedia,
+			installListener: () => () => undefined
+		});
+		expect(store.preference).toBe('system');
+		expect(store.theme).toBe('dark');
+	});
+
+	it("setTheme('system') persists and updates preference + effective theme", () => {
+		const ls = makeStorage();
+		const { matchMedia } = makeMatchMediaWithListener(false);
+		const store = createThemeStore({
+			storage: ls,
+			matchMedia,
+			installListener: () => () => undefined
+		});
+		store.setTheme('system');
+		expect(store.preference).toBe('system');
+		expect(store.theme).toBe('light');
+		expect(ls.getItem('nomad.md.theme')).toBe('system');
+	});
+
+	it("setTheme('dark') overrides a 'system' preference and persists", () => {
+		const ls = makeStorage({ 'nomad.md.theme': 'system' });
+		const { matchMedia } = makeMatchMediaWithListener(false);
+		const store = createThemeStore({
+			storage: ls,
+			matchMedia,
+			installListener: () => () => undefined
+		});
+		store.setTheme('dark');
+		expect(store.preference).toBe('dark');
+		expect(store.theme).toBe('dark');
+		expect(ls.getItem('nomad.md.theme')).toBe('dark');
+	});
+
+	it("toggle() from 'system' lands on an explicit dark preference when effective is light", () => {
+		const ls = makeStorage({ 'nomad.md.theme': 'system' });
+		const { matchMedia } = makeMatchMediaWithListener(false);
+		const store = createThemeStore({
+			storage: ls,
+			matchMedia,
+			installListener: () => () => undefined
+		});
+		store.toggle();
+		expect(store.preference).toBe('dark');
+		expect(store.theme).toBe('dark');
+		expect(ls.getItem('nomad.md.theme')).toBe('dark');
+	});
+
+	it("OS preference change updates effective theme live while preference is 'system'", () => {
+		const ls = makeStorage();
+		const { matchMedia, dispatch } = makeMatchMediaWithListener(false);
+		const store = createThemeStore({
+			storage: ls,
+			matchMedia,
+			// Default `installListener` subscribes via the MQL's
+			// `addEventListener`, which the stub captures for `dispatch`.
+			installListener: (cb) => {
+				const mql = matchMedia('(prefers-color-scheme: dark)');
+				mql.addEventListener('change', cb);
+				return () => mql.removeEventListener('change', cb);
+			}
+		});
+		store.setTheme('system');
+		expect(store.theme).toBe('light');
+		// Simulate the user switching the OS to dark mode at runtime.
+		dispatch(true);
+		expect(store.theme).toBe('dark');
+		// Switching back to light works too.
+		dispatch(false);
+		expect(store.theme).toBe('light');
+	});
+
+	it("OS preference change is a no-op when preference is an explicit 'dark'", () => {
+		const ls = makeStorage({ 'nomad.md.theme': 'dark' });
+		const { matchMedia, dispatch } = makeMatchMediaWithListener(false);
+		const store = createThemeStore({
+			storage: ls,
+			matchMedia,
+			installListener: (cb) => {
+				const mql = matchMedia('(prefers-color-scheme: dark)');
+				mql.addEventListener('change', cb);
+				return () => mql.removeEventListener('change', cb);
+			}
+		});
+		expect(store.theme).toBe('dark');
+		// Firing the change event while preference is explicit 'dark'
+		// must NOT flip the theme.
+		dispatch(true);
+		expect(store.theme).toBe('dark');
+	});
+});

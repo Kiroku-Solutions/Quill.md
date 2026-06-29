@@ -1,0 +1,22 @@
+# Netlify SPA fallback
+# ─────────────────────
+# SvelteKit's `adapter-static` emits `build/index.html` as the SPA
+# fallback. Netlify's static host serves files literally from the
+# `publish` directory — without a rewrite rule, refreshing
+# `https://example.com/remote/123` would 404 because there is no
+# `build/remote/123/index.html` file. This rule rewrites every
+# unmatched path to `/index.html` with status `200` so the client
+# router takes over.
+#
+# Cloudflare Pages auto-emits its own `_redirects` in
+# `build/_redirects`; the file under `static/` is harmless on
+# Cloudflare (the build-time one wins) and required on Netlify.
+# GitHub Pages does not honour `_redirects`; the SPA fallback is
+# handled by 404.html — see `docs/hosting/github-pages.md`.
+#
+# Syntax: `<from>  <to>  <status>` (whitespace-separated, no quotes).
+# `/*` matches every path; `200` is the Netlify-specific SPA
+# fallback status (200, not 404, keeps the URL stable so the
+# client router gets the path it expects).
+
+/*    /index.html   200

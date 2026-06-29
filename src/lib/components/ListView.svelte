@@ -1,14 +1,36 @@
+<!--
+	ListView.svelte — sortable table of issues (sub-phase 6E polish).
+
+	Behaviours inherited from 6C:
+	  - Inline filter logic (search / status / type) is unchanged; the
+	    6C tests cover it. The `rows` derived array is the source of
+	    truth for the table body.
+
+	Behaviours added in 6E:
+	  - Sort indicator chevron (▲/▼) next to the active sort column.
+	    The chevron is `aria-hidden="true"`; the active sort direction
+	    is communicated via `aria-sort` on the `<th>`.
+	  - "X of Y issues" header above the table — X is the filtered
+	    count, Y is the total.
+	  - Full keyboard nav: ↓ / ↑ move the focused row, Enter / Space
+	    open the editor. Each row is `tabindex="0"` with `role="button"`
+	    and an `aria-label` like "Open issue N: <title>". The first
+	    row is auto-focused on mount.
+-->
 <script lang="ts">
+	import { onMount, tick } from 'svelte';
 	import { getStores } from '$lib/state';
-	import { onMount } from 'svelte';
+	import { t } from '$lib/ui/strings';
 	import type { LoadedIssue } from '$lib/types';
 
-	const { issues, filter, config, editor } = getStores();
+	const { issues, filter, editor } = getStores();
 
-	// Re-read the reactive fields each tick.
+	type SortKey = 'id' | 'title' | 'updated_date' | 'status';
+	type SortDir = 'asc' | 'desc';
+
 	let rows = $state<readonly LoadedIssue[]>([]);
-	let sortKey = $state<'id' | 'title' | 'updated_date' | 'status'>('updated_date');
-	let sortDir = $state<'asc' | 'desc'>('desc');
+	let sortKey = $state<SortKey>('updated_date');
+	let sortDir = $state<SortDir>('desc');
 
 	$effect(() => {
 		const all = issues.issues;
@@ -44,7 +66,10 @@
 			});
 	});
 
-	function toggleSort(k: typeof sortKey): void {
+	const total = $derived(issues.issues.length);
+	const filteredCount = $derived(rows.length);
+
+	function toggleSort(k: SortKey): void {
 		if (sortKey === k) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
 		else {
 			sortKey = k;
@@ -56,70 +81,143 @@
 		editor.open(id);
 	}
 
-	void config; // silence unused
+	function ariaSortFor(k: SortKey): 'ascending' | 'descending' | 'none' {
+		if (sortKey !== k) return 'none';
+		return sortDir === 'asc' ? 'ascending' : 'descending';
+	}
+
+	function onRowKeydown(e: KeyboardEvent, idx: number): void {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			const li = rows[idx];
+			if (li) open(li.issue.id);
+			return;
+		}
+		if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+			e.preventDefault();
+			const delta = e.key === 'ArrowDown' ? 1 : -1;
+			const nextIdx = Math.max(0, Math.min(rows.length - 1, idx + delta));
+			const next = rows[nextIdx];
+			if (next) {
+				void focusRow(next.issue.id);
+			}
+		}
+	}
+
+	async function focusRow(id: number): Promise<void> {
+		await tick();
+		const el = document.querySelector<HTMLElement>(`[data-row-id="${id}"]`);
+		el?.focus();
+	}
+
 	onMount(() => {
-		/* no-op */
+		if (rows.length > 0) {
+			void focusRow(rows[0].issue.id);
+		}
 	});
 </script>
 
-<div class="overflow-x-auto">
-	<table class="table table-zebra table-sm">
-		<thead>
-			<tr>
-				<th
-					><button type="button" class="btn btn-ghost btn-xs" onclick={() => toggleSort('id')}
-						>id</button
-					></th
-				>
-				<th
-					><button type="button" class="btn btn-ghost btn-xs" onclick={() => toggleSort('title')}
-						>title</button
-					></th
-				>
-				<th>type</th>
-				<th
-					><button type="button" class="btn btn-ghost btn-xs" onclick={() => toggleSort('status')}
-						>status</button
-					></th
-				>
-				<th>assignee</th>
-				<th>labels</th>
-				<th
-					><button
-						type="button"
-						class="btn btn-ghost btn-xs"
-						onclick={() => toggleSort('updated_date')}>updated</button
-					></th
-				>
-			</tr>
-		</thead>
-		<tbody>
-			{#each rows as li (li.issue.id)}
-				<tr class="hover cursor-pointer" onclick={() => open(li.issue.id)}>
-					<td class="font-mono text-xs">{li.issue.id.toString().padStart(4, '0')}</td>
-					<td class="font-medium">{li.issue.title}</td>
-					<td><span class="badge badge-ghost badge-sm">{li.issue.issueType}</span></td>
-					<td>
-						<span class="badge badge-sm" style="background-color: var(--status-color, transparent)">
-							{li.issue.status}
-						</span>
-					</td>
-					<td>{li.issue.assignee ?? '—'}</td>
-					<td>
-						{#each li.issue.labels as l (l)}
-							<span class="badge badge-outline badge-xs mr-1">{l}</span>
-						{/each}
-					</td>
-					<td class="text-xs opacity-70">{li.issue.updatedDate}</td>
-				</tr>
-			{/each}
-			{#if rows.length === 0}
+<div class="px-4 py-3" data-testid="list-view">
+	<div class="mb-2 flex items-center justify-between text-xs opacity-70">
+		<span data-testid="list-view-count">
+			{t('list.countPill', { filtered: filteredCount, total: total })}
+		</span>
+		<span>{t('list.sortLabel', { key: sortKey, dir: sortDir })}</span>
+	</div>
+
+	<div class="overflow-x-auto">
+		<table class="table table-zebra table-sm">
+			<thead>
 				<tr>
-					<td colspan="7" class="text-center opacity-60 py-8"
-						>No issues match the current filter.</td
-					>
+					<th aria-sort={ariaSortFor('id')}>
+						<button
+							type="button"
+							class="btn btn-ghost btn-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+							onclick={() => toggleSort('id')}
+						>
+							{t('list.headers.id')}
+							{#if sortKey === 'id'}<span aria-hidden="true">{sortDir === 'asc' ? '▲' : '▼'}</span
+								>{/if}
+						</button>
+					</th>
+					<th aria-sort={ariaSortFor('title')}>
+						<button
+							type="button"
+							class="btn btn-ghost btn-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+							onclick={() => toggleSort('title')}
+						>
+							{t('list.headers.title')}
+							{#if sortKey === 'title'}<span aria-hidden="true"
+									>{sortDir === 'asc' ? '▲' : '▼'}</span
+								>{/if}
+						</button>
+					</th>
+					<th>{t('list.headers.type')}</th>
+					<th aria-sort={ariaSortFor('status')}>
+						<button
+							type="button"
+							class="btn btn-ghost btn-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+							onclick={() => toggleSort('status')}
+						>
+							{t('list.headers.status')}
+							{#if sortKey === 'status'}<span aria-hidden="true"
+									>{sortDir === 'asc' ? '▲' : '▼'}</span
+								>{/if}
+						</button>
+					</th>
+					<th>{t('list.headers.assignee')}</th>
+					<th>{t('list.headers.labels')}</th>
+					<th aria-sort={ariaSortFor('updated_date')}>
+						<button
+							type="button"
+							class="btn btn-ghost btn-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+							onclick={() => toggleSort('updated_date')}
+						>
+							{t('list.headers.updated')}
+							{#if sortKey === 'updated_date'}<span aria-hidden="true"
+									>{sortDir === 'asc' ? '▲' : '▼'}</span
+								>{/if}
+						</button>
+					</th>
 				</tr>
-			{/if}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				{#each rows as li, idx (li.issue.id)}
+					<tr
+						class="hover cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+						tabindex="0"
+						role="button"
+						data-row-id={li.issue.id}
+						aria-label={t('list.rowAria', { id: li.issue.id, title: li.issue.title })}
+						onclick={() => open(li.issue.id)}
+						onkeydown={(e) => onRowKeydown(e, idx)}
+					>
+						<td class="font-mono text-xs">{li.issue.id.toString().padStart(4, '0')}</td>
+						<td class="font-medium">{li.issue.title}</td>
+						<td><span class="badge badge-ghost badge-sm">{li.issue.issueType}</span></td>
+						<td>
+							<span
+								class="badge badge-sm"
+								style="background-color: var(--status-color, transparent)"
+							>
+								{li.issue.status}
+							</span>
+						</td>
+						<td>{li.issue.assignee ?? '—'}</td>
+						<td>
+							{#each li.issue.labels as l (l)}
+								<span class="badge badge-outline badge-xs mr-1">{l}</span>
+							{/each}
+						</td>
+						<td class="text-xs opacity-70">{li.issue.updatedDate}</td>
+					</tr>
+				{/each}
+				{#if rows.length === 0}
+					<tr>
+						<td colspan="7" class="py-8 text-center opacity-60">{t('list.empty')}</td>
+					</tr>
+				{/if}
+			</tbody>
+		</table>
+	</div>
 </div>

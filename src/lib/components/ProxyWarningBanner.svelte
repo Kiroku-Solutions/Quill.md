@@ -17,6 +17,7 @@
 -->
 <script lang="ts">
 	import { getStores } from '$lib/state';
+	import { t } from '$lib/ui/strings';
 
 	const { mode } = getStores();
 
@@ -47,10 +48,10 @@
 		<button
 			type="button"
 			class="btn btn-ghost btn-sm"
-			aria-label="Dismiss proxy warning"
+			aria-label={t('proxy.dismissAria')}
 			onclick={dismiss}
 		>
-			Dismiss
+			{t('common.dismiss')}
 		</button>
 	</div>
 {/if}

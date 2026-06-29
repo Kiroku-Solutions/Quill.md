@@ -23,17 +23,37 @@
  *  3. Emits the rewritten HTML back to disk.
  *  4. Writes a sibling `build/integrity.json` mapping URL → expected hash
  *     so a deploy step can compare it against the actual host response.
+ *  5. Emits a one-line banner to stdout with the entry count — wired into
+ *     `pnpm build` so the count is visible in CI logs.
+ *
+ * ## What it does NOT do
+ *
+ *  - Does NOT modify the CSP. The `static/_headers` file is the
+ *    canonical source for CSP directives; this script is SRI-only. A
+ *    verifier that runs alongside this script (`scripts/check-csp.mjs`)
+ *    scans the bundle for `eval`/`Function`/`document.write` patterns;
+ *    see `docs/audits/2026-06-23/step-6-csp.md` for the full picture.
+ *  - Does NOT add `'unsafe-inline'` to the CSP. SRI and CSP are
+ *    orthogonal; this script only stamps `integrity=` on tags that are
+ *    already present.
+ *  - Does NOT touch `static/_headers` or `static/_redirects`. Those are
+ *    copied verbatim into `build/` by SvelteKit's `adapter-static` from
+ *    the `static/` directory.
  *
  * ## Idempotent
  *
  * Re-running the script on an already-hashed file is a no-op (the regex
- * skips tags that already carry an `integrity=` attribute).
+ * skips tags that already carry an `integrity=` attribute). The integrity
+ * map in `build/integrity.json` is overwritten on every run; that is
+ * the canonical record.
  *
  * ## Exit codes
  *
- *  - 0 — success.
- *  - 1 — `build/index.html` missing or unreadable.
- *  - 2 — A target asset cannot be read.
+ *  - 0 — every referenced asset exists and got an `integrity=`; the
+ *    `build/integrity.json` map was written.
+ *  - 1 — `build/index.html` is missing or unreadable.
+ *  - 2 — a target asset cannot be read.
+ *  - 99 — unexpected runtime error.
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -136,7 +156,21 @@ async function main() {
 	const out = resolve(buildDir, 'integrity.json');
 	await writeFile(indexPath, rewritten, 'utf8');
 	await writeFile(out, JSON.stringify(integrityMap, null, 2), 'utf8');
-	console.log(`add-sri: wrote ${Object.keys(integrityMap).length} integrity entries to ${out}`);
+
+	// Verify the integrity map was written. Read it back and
+	// check the entry count matches the in-memory map. This is
+	// a defence-in-depth check for a flaky write; `writeFile`
+	// already throws on failure, but a partial write would
+	// otherwise pass silently.
+	const written = JSON.parse(await readFile(out, 'utf8'));
+	const expected = Object.keys(integrityMap).length;
+	if (Object.keys(written).length !== expected) {
+		console.error(
+			`add-sri: integrity map mismatch — wrote ${expected} entries but read back ${Object.keys(written).length} from ${out}`
+		);
+		process.exit(2);
+	}
+	console.log(`add-sri: wrote ${expected} integrity entries to ${out} (verified by re-read)`);
 }
 
 main().catch((err) => {

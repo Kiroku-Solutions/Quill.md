@@ -1,5 +1,6 @@
 <!--
-	Wizard — first-run template setup (FR-11 / UC-5).
+	Wizard — first-run template setup (FR-11 / UC-5, sub-phase 6H
+	re-skin).
 
 	Triggered when the home page's "Open local folder" flow detects a
 	missing `.nomad.md/config.json` — see `+page.svelte`. The route is
@@ -20,12 +21,18 @@
 	  1. `writeWizardSetup(adapter, selectedIds, { overwriteConfig: true })`
 	  2. Re-load config + templates through the stores
 	  3. `goto('/local')` — the user is now on the main surface.
+
+	Sub-phase 6H replaces the daisyUI-only markup with the 6B primitives
+	(Card, Button, Alert, Badge, Radio, Checkbox) + 6A tokens. Logic is
+	unchanged.
 -->
 <script lang="ts">
 	import { getStores } from '$lib/state';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
+	import { Alert, Badge, Button, Card, Checkbox, Radio, Tooltip } from '$lib/ui';
+	import { t } from '$lib/ui/strings';
 	import { BUILT_IN_TEMPLATES } from '$lib/services/built-in-templates';
 	import { writeWizardSetup } from '$lib/services/wizard';
 
@@ -63,7 +70,7 @@
 	async function apply(): Promise<void> {
 		const adapter = stores.mode.localAdapter;
 		if (!adapter) {
-			applyError = 'No local folder is open. Use "Open local folder" on the home page.';
+			applyError = t('wizard.noFolder');
 			return;
 		}
 		isApplying = true;
@@ -86,140 +93,135 @@
 	}
 </script>
 
-<div class="min-h-screen flex flex-col bg-base-100 text-base-content">
-	<header class="navbar bg-base-200 shadow-sm px-6">
-		<a href={resolve('/')} class="text-lg font-bold tracking-tight">nomad.md</a>
-		<span class="badge badge-info badge-sm ml-3">First-run setup</span>
+<div class="flex min-h-screen flex-col bg-base-100 text-base-content">
+	<div
+		aria-label={t('modeBadge.firstRunSetup')}
+		class="sticky top-0 z-30 flex h-[var(--topbar-height)] items-center gap-3 border-b border-base-300 bg-base-200 px-6"
+	>
+		<a
+			href={resolve('/')}
+			class="flex items-baseline gap-2 font-bold tracking-tight hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
+			aria-label={t('app.homeAria')}
+		>
+			<span class="text-lg">{t('app.name')}</span>
+			<span class="text-xs opacity-60">{t('app.version')}</span>
+		</a>
+		<Badge variant="primary" size="sm">{t('modeBadge.firstRunSetup')}</Badge>
 		<div class="flex-1"></div>
-		<button type="button" class="btn btn-ghost btn-sm" onclick={cancel}>Cancel</button>
-	</header>
+		<Button variant="ghost" size="sm" onclick={cancel}>{t('wizard.cancel')}</Button>
+	</div>
 
-	<main class="flex-1 px-6 py-10">
-		<div class="max-w-3xl mx-auto space-y-8">
+	<div class="flex-1 px-6 py-10">
+		<div class="mx-auto flex max-w-3xl flex-col gap-8">
 			<section>
-				<h1 class="text-2xl font-semibold">Set up your issue tracker</h1>
-				<p class="opacity-80 mt-2">
-					Your folder does not have a <code>.nomad.md/</code> configuration yet. Pick a path below to
-					get started. You can edit or add templates later from the Settings panel.
-				</p>
+				<h1 class="text-2xl font-semibold">{t('wizard.headTitle')}</h1>
+				<p class="mt-2 opacity-80">{t('wizard.headBody')}</p>
 			</section>
 
-			<section class="space-y-3">
-				<h2 class="text-lg font-semibold">1. Choose how to set up templates</h2>
-				<label
-					class="card bg-base-200 cursor-pointer"
-					class:ring-2={path === 'builtin'}
-					class:ring-primary={path === 'builtin'}
-				>
-					<div class="card-body">
-						<div class="flex items-start gap-3">
-							<input
-								type="radio"
-								class="radio radio-primary mt-1"
-								checked={path === 'builtin'}
-								onchange={() => (path = 'builtin')}
-							/>
-							<div>
-								<div class="font-medium">Use built-in templates</div>
-								<div class="text-sm opacity-70">
-									Pick from the four bundled issue types: Epic, User Story, Task, Bug. Recommended
-									for most projects.
-								</div>
-							</div>
-						</div>
-					</div>
-				</label>
+			<section class="flex flex-col gap-3">
+				<h2 class="text-lg font-semibold">{t('wizard.step1Title')}</h2>
 
-				<label
-					class="card bg-base-200 cursor-not-allowed opacity-60"
-					title="Coming soon — the in-app template editor is a future step"
-				>
-					<div class="card-body">
+				<Card compact class="cursor-pointer">
+					<label class="flex cursor-pointer items-start gap-3">
+						<Radio
+							name="wizard-path"
+							value="builtin"
+							checked={path === 'builtin'}
+							label=""
+							ariaLabel={t('wizard.builtinAria')}
+							onchange={() => (path = 'builtin')}
+						/>
+						<div class="flex-1">
+							<div class="font-medium">{t('wizard.builtinTitle')}</div>
+							<div class="text-sm opacity-70">{t('wizard.builtinBody')}</div>
+						</div>
+					</label>
+				</Card>
+
+				<Tooltip text={t('wizard.customTooltip')} position="top">
+					<Card compact class="cursor-not-allowed opacity-60">
 						<div class="flex items-start gap-3">
-							<input
-								type="radio"
-								class="radio radio-primary mt-1"
+							<Radio
+								name="wizard-path"
+								value="custom"
 								checked={path === 'custom'}
-								onchange={() => (path = 'custom')}
+								label=""
+								ariaLabel={t('wizard.customAria')}
 								disabled
 							/>
-							<div>
-								<div class="font-medium">Create your own</div>
-								<div class="text-sm opacity-70">
-									Author one or more templates from scratch (coming soon). You can also add
-									templates later from Settings.
-								</div>
+							<div class="flex-1">
+								<div class="font-medium">{t('wizard.customTitle')}</div>
+								<div class="text-sm opacity-70">{t('wizard.customBody')}</div>
 							</div>
 						</div>
-					</div>
-				</label>
+					</Card>
+				</Tooltip>
 			</section>
 
 			{#if path === 'builtin'}
-				<section class="space-y-3">
-					<h2 class="text-lg font-semibold">2. Pick the templates you need</h2>
-					<p class="text-sm opacity-70">
-						Select at least one. Selected templates are written to
-						<code>.nomad.md/templates/</code> verbatim.
-					</p>
-					<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-						{#each BUILT_IN_TEMPLATES as t (t.id)}
-							<label
-								class="card bg-base-200 cursor-pointer"
-								class:ring-2={selected.has(t.id)}
-								class:ring-primary={selected.has(t.id)}
-							>
-								<div class="card-body p-4">
-									<div class="flex items-start gap-3">
-										<input
-											type="checkbox"
-											class="checkbox checkbox-primary mt-1"
-											checked={selected.has(t.id)}
-											onchange={() => toggle(t.id)}
+				<section class="flex flex-col gap-3" data-testid="wizard-template-picker">
+					<h2 class="text-lg font-semibold">{t('wizard.step2Title')}</h2>
+					<p class="text-sm opacity-70">{t('wizard.step2Body')}</p>
+					<div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+						{#each BUILT_IN_TEMPLATES as tmpl (tmpl.id)}
+							{@const isPicked = selected.has(tmpl.id)}
+							<div data-testid="wizard-template-{tmpl.id}">
+								<Card compact>
+									<label class="flex cursor-pointer items-start gap-3">
+										<Checkbox
+											checked={isPicked}
+											label=""
+											ariaLabel={t('wizard.selectTemplateAria', { name: tmpl.name })}
+											onchange={() => toggle(tmpl.id)}
 										/>
-										<div>
-											<div class="font-medium flex items-center gap-2">
+										<div class="flex-1">
+											<div class="flex items-center gap-2 font-medium">
 												<span
-													class="inline-block w-3 h-3 rounded-full"
-													style="background-color: {t.color}"
+													class="inline-block h-3 w-3 rounded-full"
+													style="background-color: {tmpl.color}"
+													aria-hidden="true"
 												></span>
-												{t.name}
+												{tmpl.name}
 											</div>
-											<div class="text-xs opacity-70 mt-1">
-												{t.fields.length} fields · {t.sections.length} sections
+											<div class="mt-1 text-xs opacity-70">
+												{t('wizard.templateFields', { n: tmpl.fields.length })} ·
+												{t('wizard.templateSections', { n: tmpl.sections.length })}
 											</div>
 										</div>
-									</div>
-								</div>
-							</label>
+									</label>
+								</Card>
+							</div>
 						{/each}
 					</div>
 				</section>
 			{/if}
 
 			{#if applyError}
-				<div role="alert" class="alert alert-error">
-					<span>Failed to write the wizard setup: {applyError}</span>
-				</div>
+				<Alert variant="error">
+					<span>{t('wizard.applyError', { msg: applyError })}</span>
+				</Alert>
 			{/if}
 
 			<div class="flex items-center gap-3">
-				<button
-					type="button"
-					class="btn btn-primary"
-					disabled={!canApply}
-					title={canApply
-						? 'Write the selected templates to .nomad.md/'
-						: 'Select at least one template to continue'}
-					onclick={apply}
+				<Tooltip
+					text={canApply ? t('wizard.applyTooltip') : t('wizard.applyTooltipDisabled')}
+					position="top"
 				>
-					{isApplying ? 'Applying…' : 'Apply and continue'}
-				</button>
-				<button type="button" class="btn btn-ghost" onclick={cancel}>Cancel</button>
+					<Button
+						variant="primary"
+						disabled={!canApply}
+						loading={isApplying}
+						onclick={apply}
+						data-testid="wizard-apply"
+					>
+						{isApplying ? t('wizard.applying') : t('wizard.applyButton')}
+					</Button>
+				</Tooltip>
+				<Button variant="ghost" onclick={cancel}>{t('wizard.cancel')}</Button>
 				<span class="ml-auto text-xs opacity-60">
-					Selected: {selected.size} · Required: ≥1
+					{t('wizard.summary', { selected: selected.size })}
 				</span>
 			</div>
 		</div>
-	</main>
+	</div>
 </div>

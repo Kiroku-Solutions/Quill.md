@@ -18,7 +18,7 @@
 
 // ─── Mode ─────────────────────────────────────────────────────────────────
 export type { Mode, ModeStore, RemoteCredentials } from './mode.svelte.ts';
-export { createModeStore } from './mode.svelte.ts';
+export { createModeStore, RemotePatRequiredError } from './mode.svelte.ts';
 
 // ─── Config ───────────────────────────────────────────────────────────────
 export type { ConfigStatus, ConfigStore } from './config.svelte.ts';

@@ -17,6 +17,25 @@
 			is canonical; this <meta> is the case where the host strips headers.
 		-->
 		<meta name="referrer" content="no-referrer" />
+		<!--
+			No-flash theme bootstrap (FR-14). Runs synchronously before the
+			body renders, so the .dark class is set in time for the first
+			paint. The script is small enough to keep the CSP `script-src
+			'self' 'unsafe-inline'` (or, in 6L, we add a nonce — the script
+			body is the only inline JS in the project).
+		-->
+		<script>
+			(function () {
+				try {
+					var stored = localStorage.getItem('nomad.md.theme');
+					var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+					var dark = stored === 'dark' || (stored == null && prefersDark);
+					if (dark) document.documentElement.classList.add('dark');
+				} catch (e) {
+					/* fail silently; the +layout.svelte onMount will retry. */
+				}
+			})();
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
