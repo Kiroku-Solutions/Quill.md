@@ -7,3 +7,15 @@ bun.lockb
 
 # Miscellaneous
 /static/
+/coverage/
+
+# Markdown docs that embed TypeScript code blocks. The tailwindcss Prettier
+# plugin tries to parse TS-looking identifiers as Tailwind classes and
+# chokes. These files are hand-formatted (tables, ASCII alignment, etc.) —
+# consistent with the pre-existing lint warning on docs/ers.md.
+docs/architecture-strategy.md
+docs/step-4-implementation-plan.md
+docs/requirements-audit.md
+docs/step-4-day-1-verification.md
+docs/step-4-day-1-audit.md
+docs/step-4-day-1-master.md

@@ -49,7 +49,8 @@ export function stripIntegrityHashLine(text: string): string {
  * Returns `true` only when the stored value is well-formed and matches.
  */
 export async function verifyIntegrity(storedIntegrityHash: string, text: string): Promise<boolean> {
-	if (typeof storedIntegrityHash !== 'string' || !storedIntegrityHash.startsWith(HASH_PREFIX)) return false;
+	if (typeof storedIntegrityHash !== 'string' || !storedIntegrityHash.startsWith(HASH_PREFIX))
+		return false;
 	const expected = await computeIntegrityHash(stripIntegrityHashLine(text));
 	return expected === storedIntegrityHash;
 }
