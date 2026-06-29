@@ -4,6 +4,19 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
+		<!--
+			Defence-in-depth fallback for `frame-ancestors 'none'` in case the
+			static host strips CSP headers. Chromium honours this directive via
+			<meta http-equiv>; the other directives in static/_headers are the
+			canonical source of truth. See SECURITY.md §"Content Security Policy".
+		-->
+		<meta http-equiv="Content-Security-Policy" content="frame-ancestors 'none';" />
+		<!--
+			Referrer fallback: every outbound request the page initiates should
+			omit the Referer header. The header-based policy in static/_headers
+			is canonical; this <meta> is the case where the host strips headers.
+		-->
+		<meta name="referrer" content="no-referrer" />
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

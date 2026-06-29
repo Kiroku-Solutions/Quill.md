@@ -32,17 +32,17 @@ describe('MemoryFsAdapter — constructor & seed', () => {
 	it('seeds initial files and creates parent directories', () => {
 		const fs = new MemoryFsAdapter({
 			files: {
-				'.agnostic-issuer/config.json': '{"statuses":[]}',
-				'.agnostic-issuer/issues/0001-first.md': '# first'
+				'.nomad.md/config.json': '{"statuses":[]}',
+				'.nomad.md/issues/0001-first.md': '# first'
 			}
 		});
 		const snap = fs.snapshot();
-		expect(snap.files['.agnostic-issuer/config.json']).toBe('{"statuses":[]}');
-		expect(snap.files['.agnostic-issuer/issues/0001-first.md']).toBe('# first');
+		expect(snap.files['.nomad.md/config.json']).toBe('{"statuses":[]}');
+		expect(snap.files['.nomad.md/issues/0001-first.md']).toBe('# first');
 		// The root + two ancestor directories should be registered.
 		expect(snap.directories).toContain('.');
-		expect(snap.directories).toContain('.agnostic-issuer');
-		expect(snap.directories).toContain('.agnostic-issuer/issues');
+		expect(snap.directories).toContain('.nomad.md');
+		expect(snap.directories).toContain('.nomad.md/issues');
 	});
 
 	it('reset() clears state and re-applies the new seed', () => {
@@ -276,7 +276,7 @@ describe('MemoryFsAdapter — snapshot()', () => {
 describe('MemoryFsAdapter — integration with loadIssues (service layer)', () => {
 	/**
 	 * Verifies that the adapter fulfils the contract the service layer expects:
-	 * loadIssues() reads every *.md file under .agnostic-issuer/issues/, parses
+	 * loadIssues() reads every *.md file under .nomad.md/issues/, parses
 	 * it via parseIssueFile(), and returns LoadedIssue[]. The fixture below is
 	 * the ERS Appendix B.6 example verbatim — same id, same sections, same
 	 * frontmatter layout.
@@ -318,14 +318,14 @@ After submitting valid credentials, the user is redirected to a
 <!-- [SECTION_END: Steps to reproduce] -->
 `;
 
-		await fs.writeTextFile('.agnostic-issuer/issues/0042-fix-login-redirect.md', ersExample);
+		await fs.writeTextFile('.nomad.md/issues/0042-fix-login-redirect.md', ersExample);
 
 		const issues = await loadIssues(fs);
 
 		expect(issues).toHaveLength(1);
 		const loaded = issues[0];
 		expect(loaded).toBeDefined();
-		expect(loaded?.sourcePath).toBe('.agnostic-issuer/issues/0042-fix-login-redirect.md');
+		expect(loaded?.sourcePath).toBe('.nomad.md/issues/0042-fix-login-redirect.md');
 
 		const issue = loaded?.issue;
 		expect(issue?.id).toBe(42);
@@ -360,7 +360,7 @@ After submitting valid credentials, the user is redirected to a
 	});
 
 	it('returns an empty list when the issues directory is missing', async () => {
-		// Fresh filesystem — no .agnostic-issuer/issues/ at all.
+		// Fresh filesystem — no .nomad.md/issues/ at all.
 		const fs = new MemoryFsAdapter();
 		const issues = await loadIssues(fs);
 		expect(issues).toEqual([]);
@@ -385,9 +385,9 @@ content for ${title}
 <!-- [SECTION_END: Description] -->
 `;
 
-		await fs.writeTextFile('.agnostic-issuer/issues/0001-first.md', mkIssue(1, 'first'));
-		await fs.writeTextFile('.agnostic-issuer/issues/0002-second.md', mkIssue(2, 'second'));
-		await fs.writeTextFile('.agnostic-issuer/issues/0003-third.md', mkIssue(3, 'third'));
+		await fs.writeTextFile('.nomad.md/issues/0001-first.md', mkIssue(1, 'first'));
+		await fs.writeTextFile('.nomad.md/issues/0002-second.md', mkIssue(2, 'second'));
+		await fs.writeTextFile('.nomad.md/issues/0003-third.md', mkIssue(3, 'third'));
 
 		const issues = await loadIssues(fs);
 		expect(issues.map((i) => i.issue.id)).toEqual([1, 2, 3]);

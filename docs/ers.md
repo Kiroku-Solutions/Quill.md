@@ -1,13 +1,13 @@
-# Engineering Requirements Specification — AgnosticIssuer
+# Engineering Requirements Specification — nomad\.md
 
-| Field       | Value                     |
-| ----------- | ------------------------- |
-| Document ID | `ERS-AGNOSTIC-ISSUER-001` |
-| Version     | 1.0.0                     |
-| Status      | Draft                     |
-| Date        | 2026-06-20                |
-| Author      | Jose                      |
-| Project     | AgnosticIssuer            |
+| Field       | Value              |
+| ----------- | ------------------ |
+| Document ID | `ERS-NOMAD-MD-001` |
+| Version     | 1.0.0              |
+| Status      | Draft              |
+| Date        | 2026-06-20         |
+| Author      | Jose               |
+| Project     | nomad\.md          |
 
 ---
 
@@ -30,7 +30,7 @@
 
 ### 1.1 Purpose
 
-This Engineering Requirements Specification (ERS) describes the functional and non-functional requirements, architecture, and data model of **AgnosticIssuer**, a client-side-only web application that allows developers to author, manage, and browse project issues that are stored directly in the source repository as plain Markdown files with a custom frontmatter-and-section format.
+This Engineering Requirements Specification (ERS) describes the functional and non-functional requirements, architecture, and data model of **nomad\.md**, a client-side-only web application that allows developers to author, manage, and browse project issues that are stored directly in the source repository as plain Markdown files with a custom frontmatter-and-section format.
 
 The goal of the project is to remove the dependency on third-party issue trackers (e.g. GitHub Issues, Jira, Linear) for small to mid-sized projects whose source of truth is already a Git repository, while preserving a workflow that feels like editing local files in a purpose-built editor.
 
@@ -40,8 +40,8 @@ The goal of the project is to remove the dependency on third-party issue tracker
 
 - A single-page web application built with SvelteKit (`adapter-static`) that runs entirely in the user's browser. There is no server-side component, no API endpoint, and no telemetry.
 - A **Local Edit Mode** that reads and writes issue files inside a user-selected local folder through the File System Access API (FSA).
-- A **Remote Read-Only Mode** that uses `isomorphic-git` to perform a partial clone of the user's Git repository (only the `.agnostic-issuer/` subtree), reads issue files, and renders them without ever writing to the remote.
-- A configuration and template system that lives inside the same repository under `.agnostic-issuer/`, allowing each project to define its own issue types, fields, sections, statuses, labels, and workflow columns.
+- A **Remote Read-Only Mode** that uses `isomorphic-git` to perform a partial clone of the user's Git repository (only the `.nomad.md/` subtree), reads issue files, and renders them without ever writing to the remote.
+- A configuration and template system that lives inside the same repository under `.nomad.md/`, allowing each project to define its own issue types, fields, sections, statuses, labels, and workflow columns.
 - Three views over the issue set: a tabular **List view**, a **Kanban** board, and a **Gantt** timeline.
 - A filter bar that combines multiple criteria (type, status, assignee, label, free text, date range).
 
@@ -57,8 +57,8 @@ The goal of the project is to remove the dependency on third-party issue tracker
 | SPA            | Single-Page Application.                                                                                                        |
 | Frontmatter    | The YAML metadata block at the top of a Markdown file, delimited by `---`.                                                      |
 | Section marker | An HTML comment pair of the form `<!-- [SECTION_START: name] -->` and `<!-- [SECTION_END: name] -->`.                           |
-| Template       | A JSON file under `.agnostic-issuer/templates/` describing the fields and sections of one issue type.                           |
-| Issue          | A single Markdown file under `.agnostic-issuer/issues/`, with a frontmatter header and a body of section-delimited Markdown.    |
+| Template       | A JSON file under `.nomad.md/templates/` describing the fields and sections of one issue type.                                  |
+| Issue          | A single Markdown file under `.nomad.md/issues/`, with a frontmatter header and a body of section-delimited Markdown.           |
 | Partial clone  | A clone of a Git repository that fetches only a specified subtree of the working tree, rather than the full repository history. |
 | LightningFS    | An IndexedDB-backed virtual filesystem used by `isomorphic-git` in the browser.                                                 |
 
@@ -87,7 +87,7 @@ The goal of the project is to remove the dependency on third-party issue tracker
 
 ### 2.1 Product Perspective
 
-AgnosticIssuer is a **purely client-side web application**. It is delivered as a static asset bundle (HTML, CSS, JavaScript) and can be hosted on any static file host (e.g. GitHub Pages, Netlify, Cloudflare Pages, S3). It does not require any backend service to function; the user's browser is the only runtime.
+nomad\.md is a **purely client-side web application**. It is delivered as a static asset bundle (HTML, CSS, JavaScript) and can be hosted on any static file host (e.g. GitHub Pages, Netlify, Cloudflare Pages, S3). It does not require any backend service to function; the user's browser is the only runtime.
 
 The application interacts with two external resources only:
 
@@ -103,16 +103,16 @@ The application exposes two operating modes. The user picks one at the home scre
 #### 2.2.1 Local Edit Mode
 
 - On first use, the user is prompted to select a local folder via `showDirectoryPicker()`.
-- The application expects the folder to contain a `.agnostic-issuer/` directory (see [Section 6](#6-data-model)). If it does not, the application runs the **First-Run Template Setup wizard** (FR-11).
-- After the wizard finishes, the application reads `.agnostic-issuer/config.json` and `.agnostic-issuer/templates/*.json` to construct the issue-type schema and the workflow configuration.
-- The application reads the issue files in `.agnostic-issuer/issues/`, presents them through the available views, and supports full CRUD: create, edit, delete, and reorder (via Kanban drag).
+- The application expects the folder to contain a `.nomad.md/` directory (see [Section 6](#6-data-model)). If it does not, the application runs the **First-Run Template Setup wizard** (FR-11).
+- After the wizard finishes, the application reads `.nomad.md/config.json` and `.nomad.md/templates/*.json` to construct the issue-type schema and the workflow configuration.
+- The application reads the issue files in `.nomad.md/issues/`, presents them through the available views, and supports full CRUD: create, edit, delete, and reorder (via Kanban drag).
 - All writes are performed through the FSA `FileSystemFileHandle` obtained at folder selection. The user is responsible for committing and pushing the changes through their own Git workflow.
 - The folder handle is **persisted** across sessions through the FSA permission model (`requestPermission({ mode: 'readwrite' })`). On startup, the application attempts to re-acquire the handle silently; if permission is denied or revoked, the user is prompted again. A "Switch folder" affordance in the UI allows the user to open a different folder at any time without losing the original handle (which is kept in memory but inactive until selected again).
 
 #### 2.2.2 Remote Read-Only Mode
 
 - The user enters a repository URL (HTTPS), a branch (default: the repository's default branch), and a PAT (required for private repositories; optional for public ones, depending on the provider's rate limit policy).
-- The application uses `isomorphic-git` to perform a **partial clone** of the repository, fetching **only the `.agnostic-issuer/` subtree** (FR-12). It does not download the rest of the repository.
+- The application uses `isomorphic-git` to perform a **partial clone** of the repository, fetching **only the `.nomad.md/` subtree** (FR-12). It does not download the rest of the repository.
 - The fetched tree is materialized into a LightningFS instance backed by IndexedDB. The cache is keyed by repository URL + branch.
 - The application then behaves identically to Local Edit Mode, **except that all write operations are disabled**. Kanban drag-and-drop is rendered but inert; the editor is read-only; the "New issue" button is hidden.
 - The PAT is held in memory only and is dropped when the user navigates away from the Remote Mode screen or closes the tab.
@@ -132,12 +132,12 @@ The target user is a **software developer** who:
 - **C-2 (No remote writes):** The application MUST NOT push to, create branches on, open pull requests on, or otherwise modify any remote Git repository. The user is fully responsible for version control.
 - **C-3 (Local-mode browser support):** Local Edit Mode is only available on browsers that implement FSA. This is, at the time of writing, Chromium-based browsers. Firefox and Safari are unsupported for Local Edit Mode but remain supported for Remote Read-Only Mode.
 - **C-4 (Permission re-grant):** FSA permission may be revoked by the user or by the browser between sessions. The application MUST handle the resulting `NotAllowedError` gracefully and re-prompt.
-- **C-5 (CORS):** The Git Smart HTTP protocol is not, in general, CORS-friendly on public providers. The application MUST work through a CORS proxy. The default proxy is the public `https://cors.isomorphic-git.org`. Users may configure a custom proxy in `.agnostic-issuer/config.json` (FR-12, [Section 6.3](#63-config-file)).
+- **C-5 (CORS):** The Git Smart HTTP protocol is not, in general, CORS-friendly on public providers. The application MUST work through a CORS proxy. The default proxy is the public `https://cors.isomorphic-git.org`. Users may configure a custom proxy in `.nomad.md/config.json` (FR-12, [Section 6.3](#63-config-file)).
 - **C-6 (Token hygiene):** The PAT MUST NOT be persisted, logged, transmitted to any non-provider endpoint, or exposed in URLs. The CORS proxy sees the token via the `Authorization` header, which is acceptable as long as the proxy URL is one the user trusts (the default proxy is documented as a public, free service).
 
 ### 2.5 Assumptions and Dependencies
 
-- **A-1:** The repository the user selects already has a `.agnostic-issuer/` directory. If not, the wizard (FR-11) creates the scaffolding. The application does not assume any other structure.
+- **A-1:** The repository the user selects already has a `.nomad.md/` directory. If not, the wizard (FR-11) creates the scaffolding. The application does not assume any other structure.
 - **A-2:** The user's PAT has `read` scope (and, for write-protected remote browsing, `repo` scope on GitHub or `read_repository` on GitLab).
 - **A-3:** `isomorphic-git`, `LightningFS`, and the CORS proxy remain available. The application MUST degrade gracefully if the proxy is offline (show a clear error, not a silent failure).
 - **A-4:** The user is online for Remote Read-Only Mode. Local Edit Mode is fully offline-capable.
@@ -153,24 +153,24 @@ Requirements are uniquely identified with a prefix (`FR-` for functional, `NFR-`
 
 #### FR-1: Issue file parsing and serialization
 
-The application MUST be able to parse any file under `.agnostic-issuer/issues/` that conforms to the **Issue file format** (see [Section 6.1](#61-issue-file)) and MUST be able to serialize the in-memory representation back to a byte-identical or semantically equivalent file. The round-trip MUST preserve the order of frontmatter keys, the order of sections, and the Markdown body of each section. Whitespace differences inside Markdown are tolerated.
+The application MUST be able to parse any file under `.nomad.md/issues/` that conforms to the **Issue file format** (see [Section 6.1](#61-issue-file)) and MUST be able to serialize the in-memory representation back to a byte-identical or semantically equivalent file. The round-trip MUST preserve the order of frontmatter keys, the order of sections, and the Markdown body of each section. Whitespace differences inside Markdown are tolerated.
 
 #### FR-2: Template loading and editor rendering
 
-The application MUST read all files under `.agnostic-issuer/templates/` whose name matches `<type>.json` and MUST use them to construct the issue-type schema. The editor for any given issue MUST render a form generated from the issue's `issue_type` field: scalar fields become inputs, `longtext` fields and `sections` become Markdown editors, and relation fields render as multi-select chips. Field order in the form MUST follow the ascending order of each field's `id` (see [Section 6.2.1](#621-fields)).
+The application MUST read all files under `.nomad.md/templates/` whose name matches `<type>.json` and MUST use them to construct the issue-type schema. The editor for any given issue MUST render a form generated from the issue's `issue_type` field: scalar fields become inputs, `longtext` fields and `sections` become Markdown editors, and relation fields render as multi-select chips. Field order in the form MUST follow the ascending order of each field's `id` (see [Section 6.2.1](#621-fields)).
 
 #### FR-3: Configuration loading
 
-The application MUST read `.agnostic-issuer/config.json` at startup in both operating modes. The configuration supplies the list of statuses, the Kanban column mapping, the Gantt grouping, the label catalog, the user catalog, and the CORS proxy URL. If the file is missing or malformed, the application MUST display an actionable error.
+The application MUST read `.nomad.md/config.json` at startup in both operating modes. The configuration supplies the list of statuses, the Kanban column mapping, the Gantt grouping, the label catalog, the user catalog, and the CORS proxy URL. If the file is missing or malformed, the application MUST display an actionable error.
 
 #### FR-4: Issue CRUD in Local Edit Mode
 
 In Local Edit Mode, the application MUST support:
 
-- **Create** — generate a new issue file from a chosen template, slugify the title, and write the file under `.agnostic-issuer/issues/`. The filename MUST follow the convention `<id>-<slug>.md` (see [Section 6.1.1](#611-filename)).
+- **Create** — generate a new issue file from a chosen template, slugify the title, and write the file under `.nomad.md/issues/`. The filename MUST follow the convention `<id>-<slug>.md` (see [Section 6.1.1](#611-filename)).
 - **Read** — list, filter, and view any issue in the folder.
 - **Update** — edit any field or section and save back to the same file.
-- **Delete** — move the file to a trash location (`.agnostic-issuer/.trash/<timestamp>-<id>-<slug>.md`) and present an "Empty trash" command.
+- **Delete** — move the file to a trash location (`.nomad.md/.trash/<timestamp>-<id>-<slug>.md`) and present an "Empty trash" command.
 
 The folder handle MUST be persisted across sessions (C-4). A "Switch folder" action MUST be available at all times from the main toolbar. The previously active handle MUST be retained (inactive) and selectable from a "Recent folders" list.
 
@@ -179,7 +179,7 @@ The folder handle MUST be persisted across sessions (C-4). A "Switch folder" act
 In Remote Read-Only Mode, the application MUST:
 
 - Accept a repository URL, a branch, and a PAT.
-- Perform a partial clone limited to the `.agnostic-issuer/` subtree (see FR-12).
+- Perform a partial clone limited to the `.nomad.md/` subtree (see FR-12).
 - Cache the clone in IndexedDB (key: `<url>|<branch>`).
 - Render the issues through all three views, **read-only**.
 - Hide or disable any UI affordance that would lead to a write (`New issue`, `Save`, `Delete`, Kanban drag).
@@ -250,10 +250,10 @@ Remote Read-Only Mode MUST cache the partial clone in IndexedDB through Lightnin
 
 #### FR-11: First-run template setup wizard
 
-When the application detects that `.agnostic-issuer/` is missing from the selected folder (Local Mode) or the cloned subtree (Remote Mode, **read-only inspection**), it MUST present a setup wizard with two mutually exclusive paths:
+When the application detects that `.nomad.md/` is missing from the selected folder (Local Mode) or the cloned subtree (Remote Mode, **read-only inspection**), it MUST present a setup wizard with two mutually exclusive paths:
 
-1. **"Use built-in templates"** — a checklist of the four built-in templates: `Epic`, `User Story`, `Task`, `Bug`. The user selects one or more via checkboxes. Selected templates are written into `.agnostic-issuer/templates/` verbatim from the bundle shipped with the application (see [Appendix C](#appendix-c-built-in-template-bundle)).
-2. **"Create your own"** — the user authors one or more templates from scratch through the in-app template editor. Each template is written into `.agnostic-issuer/templates/` as it is saved. The editor MAY be opened multiple times to create multiple templates in a session.
+1. **"Use built-in templates"** — a checklist of the four built-in templates: `Epic`, `User Story`, `Task`, `Bug`. The user selects one or more via checkboxes. Selected templates are written into `.nomad.md/templates/` verbatim from the bundle shipped with the application (see [Appendix C](#appendix-c-built-in-template-bundle)).
+2. **"Create your own"** — the user authors one or more templates from scratch through the in-app template editor. Each template is written into `.nomad.md/templates/` as it is saved. The editor MAY be opened multiple times to create multiple templates in a session.
 
 The wizard MUST also generate a default `config.json` if none is present, seeding it with the standard status set (Open, In progress, In review, Done, Closed) and the default Kanban column set.
 
@@ -267,7 +267,7 @@ The application MUST:
 
 - Read `config.remote.cors_proxy` (default: `https://cors.isomorphic-git.org`) before performing any remote operation.
 - Expose a settings field where the user can override the URL at runtime; the override is persisted back to `config.json` on save.
-- Use `isomorphic-git`'s partial-clone capabilities to fetch **only the `.agnostic-issuer/` subtree** of the repository. Concretely: a shallow fetch with `singleBranch: true`, `depth: 1`, and `refspec: 'refs/heads/<branch>:refs/remotes/origin/<branch>'`, followed by a tree walk that descends only into `.agnostic-issuer/`. Objects outside this path MUST NOT be downloaded.
+- Use `isomorphic-git`'s partial-clone capabilities to fetch **only the `.nomad.md/` subtree** of the repository. Concretely: a shallow fetch with `singleBranch: true`, `depth: 1`, and `refspec: 'refs/heads/<branch>:refs/remotes/origin/<branch>'`, followed by a tree walk that descends only into `.nomad.md/`. Objects outside this path MUST NOT be downloaded.
 - Display a banner during the fetch that names the configured proxy and a one-line warning that the proxy operator can see the request, including the `Authorization` header.
 
 #### FR-13: Markdown rendering
@@ -276,7 +276,7 @@ The application MUST render Markdown sections through `marked`, sanitize the res
 
 #### FR-14: Theme
 
-The application MUST support a light theme and a dark theme, with the default following the user's `prefers-color-scheme`. The theme is implemented through Tailwind's `dark:` variant. The theme preference is stored in `localStorage` under `agnostic-issuer.theme`.
+The application MUST support a light theme and a dark theme, with the default following the user's `prefers-color-scheme`. The theme is implemented through Tailwind's `dark:` variant. The theme preference is stored in `localStorage` under `nomad-md.theme`.
 
 #### FR-15: Issue integrity hash and tamper warning
 
@@ -297,7 +297,7 @@ The application MUST compute and persist a content hash of every issue file in o
 
 - On load, the application re-computes the hash over the canonical serialization of the file (with the stored `integrity_hash` field stripped) and compares it to the stored value.
 - If the comparison fails, OR if the `integrity_hash` field is missing, OR if its value does not start with `sha256:`, the application MUST set a non-blocking `integrity_warning` flag on the in-memory issue.
-- The editor MUST display a visible warning banner on the affected issue, with the following copy: "This file was modified outside AgnosticIssuer. The contents can still be edited and saved from this view, but please review for unintended changes (e.g. broken `id`, `relations`, or section markers)."
+- The editor MUST display a visible warning banner on the affected issue, with the following copy: "This file was modified outside nomad\.md. The contents can still be edited and saved from this view, but please review for unintended changes (e.g. broken `id`, `relations`, or section markers)."
 - The warning is purely informational. The user MUST still be able to open, read, edit, and save the issue through the web app. On the next save performed through the web app, the hash is recomputed, the `integrity_warning` flag is cleared, and the warning banner disappears.
 - The application MUST NOT block saves, refuse to render, or delete the issue solely on the basis of an integrity warning.
 
@@ -313,7 +313,7 @@ The application MUST compute and persist a content hash of every issue file in o
 - The List view MUST render 1,000 issues with the filter bar and sort controls interactive in under 500 ms on a 2020-era laptop.
 - The Kanban view MUST handle 500 issues across 5 columns without frame drops during drag.
 - The Gantt view MUST render 200 bars and their dependency arrows in under 200 ms.
-- Remote Read-Only Mode's initial fetch (cold cache) MUST complete in under 10 s for repositories where `.agnostic-issuer/` is under 5 MB on disk.
+- Remote Read-Only Mode's initial fetch (cold cache) MUST complete in under 10 s for repositories where `.nomad.md/` is under 5 MB on disk.
 
 #### NFR-2: Security
 
@@ -480,8 +480,8 @@ The application supports any provider that exposes the Git Smart HTTP protocol w
 
 ### 5.5 Folder Handle Lifecycle
 
-1. User clicks "Open local folder" → `showDirectoryPicker({ id: 'agnostic-issuer-folder', mode: 'readwrite' })`.
-2. The handle is stored in IndexedDB under `agnostic-issuer.handle` (the browser enforces that the handle can only be re-acquired with the same origin and `id`).
+1. User clicks "Open local folder" → `showDirectoryPicker({ id: 'nomad-md-folder', mode: 'readwrite' })`.
+2. The handle is stored in IndexedDB under `nomad-md.handle` (the browser enforces that the handle can only be re-acquired with the same origin and `id`).
 3. On subsequent visits, the app reads the handle, calls `queryPermission({ mode: 'readwrite' })`, and if granted, proceeds silently. If not, it calls `requestPermission({ mode: 'readwrite' })` and only then proceeds.
 4. If permission is denied, the user is taken back to the home screen with a non-blocking error.
 5. The "Switch folder" command opens a new picker and replaces the active handle; the previous handle is moved to the "Recent folders" list (capped at 5 entries).
@@ -490,10 +490,10 @@ The application supports any provider that exposes the Git Smart HTTP protocol w
 
 ## 6. Data Model
 
-All persistent state lives inside the repository itself, under `.agnostic-issuer/`. The convention is:
+All persistent state lives inside the repository itself, under `.nomad.md/`. The convention is:
 
 ```
-.agnostic-issuer/
+.nomad.md/
 ├── config.json
 ├── templates/
 │   ├── epic.json
@@ -543,7 +543,7 @@ The frontmatter is a single YAML mapping. Recognized keys are listed in [Section
 | `author`               | string          | yes      | User id of the creator.                                                                           |
 | `creation_date`        | date (ISO 8601) | yes      | Date of creation, set automatically.                                                              |
 | `updated_date`         | date (ISO 8601) | yes      | Date of the last save.                                                                            |
-| `issue_type`           | string          | yes      | The id of a template under `.agnostic-issuer/templates/`.                                         |
+| `issue_type`           | string          | yes      | The id of a template under `.nomad.md/templates/`.                                                |
 | `status`               | string          | yes      | The id of an entry in `config.statuses`.                                                          |
 | `assignee`             | string \| null  | no       | User id of the assignee, or `null` for unassigned.                                                |
 | `labels`               | string[]        | no       | List of label ids.                                                                                |
@@ -622,7 +622,7 @@ After submitting valid credentials, the user is redirected to a
 
 ### 6.2 Template File
 
-Templates live at `.agnostic-issuer/templates/<type>.json`. They declare the schema for one issue type.
+Templates live at `.nomad.md/templates/<type>.json`. They declare the schema for one issue type.
 
 #### 6.2.1 Fields
 
@@ -807,7 +807,7 @@ Each entry in `sections` has:
 
 ### 6.4 Built-in Template Bundle
 
-The application ships with four built-in templates (see [Appendix C](#appendix-c-built-in-template-bundle)). They are bundled as a single JSON file at build time and offered through the first-run wizard (FR-11). Selecting one writes it verbatim into `.agnostic-issuer/templates/`.
+The application ships with four built-in templates (see [Appendix C](#appendix-c-built-in-template-bundle)). They are bundled as a single JSON file at build time and offered through the first-run wizard (FR-11). Selecting one writes it verbatim into `.nomad.md/templates/`.
 
 ---
 
@@ -817,17 +817,17 @@ The application ships with four built-in templates (see [Appendix C](#appendix-c
 
 1. The user clicks "Open local folder" on the home screen.
 2. The browser shows a directory picker; the user picks a folder.
-3. The application inspects the folder. It finds `.agnostic-issuer/` and `config.json` and `templates/`. The wizard is skipped.
-4. The application loads `config.json` and the four templates, and lists the issues in `.agnostic-issuer/issues/`.
+3. The application inspects the folder. It finds `.nomad.md/` and `config.json` and `templates/`. The wizard is skipped.
+4. The application loads `config.json` and the four templates, and lists the issues in `.nomad.md/issues/`.
 5. The user clicks "New issue" and selects "Bug" from the dropdown.
 6. The editor renders the Bug form. The user fills in `title`, `severity`, `priority`, `assignee`, and the two obligatory sections.
-7. The user clicks "Save". The application validates (FR-8), slugifies the title, picks the next `id`, and writes `.agnostic-issuer/issues/0043-fix-the-thing.md`.
+7. The user clicks "Save". The application validates (FR-8), slugifies the title, picks the next `id`, and writes `.nomad.md/issues/0043-fix-the-thing.md`.
 
 ### UC-2: Browse a remote repository read-only
 
 1. The user clicks "Browse remote repository" on the home screen.
 2. The user enters the URL `https://github.com/acme/widgets`, the branch `main`, and a PAT.
-3. The application uses `isomorphic-git` with the configured CORS proxy to fetch the `.agnostic-issuer/` subtree only.
+3. The application uses `isomorphic-git` with the configured CORS proxy to fetch the `.nomad.md/` subtree only.
 4. The fetched tree is cached in IndexedDB and rendered in the List view.
 5. The user can switch to the Kanban view (drag is inert) and the Gantt view (read-only).
 6. The user can also click "Refresh" to re-fetch.
@@ -848,10 +848,10 @@ The application ships with four built-in templates (see [Appendix C](#appendix-c
 
 ### UC-5: Run the first-run template setup wizard
 
-1. The user opens a folder that does not yet contain `.agnostic-issuer/`.
+1. The user opens a folder that does not yet contain `.nomad.md/`.
 2. The wizard offers two paths: "Use built-in templates" and "Create your own".
 3. The user picks "Use built-in templates", checks `Bug` and `User Story`, and clicks "Apply".
-4. The application writes `.agnostic-issuer/templates/bug.json`, `.agnostic-issuer/templates/user-story.json`, and a default `config.json`.
+4. The application writes `.nomad.md/templates/bug.json`, `.nomad.md/templates/user-story.json`, and a default `config.json`.
 5. The user is taken to the main view, which is now populated with two issue types and the standard workflow.
 
 ### UC-6: Switch between local folders
@@ -874,14 +874,14 @@ Each requirement is matched with one or more testable conditions. Conditions are
 | FR-2  | Given a template, the editor renders one input per field, in ascending `id` order. `longtext` fields and `sections` are rendered as Markdown editors.                                                                                                          |
 | FR-3  | Given a missing or malformed `config.json`, the application shows an actionable error and refuses to start.                                                                                                                                                    |
 | FR-4  | Create, read, update, delete operations succeed against a real local folder in a Chromium browser. The folder handle is restored across page reloads. "Switch folder" works.                                                                                   |
-| FR-5  | A partial clone of a public GitHub repository with `.agnostic-issuer/` completes in under 10 s on a 2020-era laptop with a cold cache. The PAT does not appear in any log or URL.                                                                              |
+| FR-5  | A partial clone of a public GitHub repository with `.nomad.md/` completes in under 10 s on a 2020-era laptop with a cold cache. The PAT does not appear in any log or URL.                                                                                     |
 | FR-6  | List view renders 1,000 issues in under 500 ms. Kanban supports drag-and-drop in Local Mode and is read-only in Remote Mode. Gantt renders 200 bars + dependency arrows in under 200 ms.                                                                       |
 | FR-7  | All filter predicates are combinable with AND. The active filter set survives a page reload.                                                                                                                                                                   |
 | FR-8  | Saving an issue with an empty obligatory field or empty obligatory section is blocked with a per-field error message.                                                                                                                                          |
 | FR-9  | Cycles in `parent`/`child` and `blocks`/`depends_on` are detected and refused. Cycles in `relates_to` are allowed.                                                                                                                                             |
 | FR-10 | Reloading Remote Read-Only Mode for a previously-cloned URL+branch reuses the cache and does not re-fetch objects that are already in IndexedDB.                                                                                                               |
-| FR-11 | On a folder without `.agnostic-issuer/`, the wizard appears. Both paths ("Use built-in templates" and "Create your own") are functional. At least one template is required to exit the wizard.                                                                 |
-| FR-12 | A custom CORS proxy URL is read from `config.json` and used for the next fetch. The default is `https://cors.isomorphic-git.org` and is used when no override is present. The fetched objects are limited to the `.agnostic-issuer/` subtree.                  |
+| FR-11 | On a folder without `.nomad.md/`, the wizard appears. Both paths ("Use built-in templates" and "Create your own") are functional. At least one template is required to exit the wizard.                                                                        |
+| FR-12 | A custom CORS proxy URL is read from `config.json` and used for the next fetch. The default is `https://cors.isomorphic-git.org` and is used when no override is present. The fetched objects are limited to the `.nomad.md/` subtree.                         |
 | FR-13 | Markdown sections render correctly. Code blocks are syntax-highlighted. A `<script>` tag in a section is stripped by the sanitizer.                                                                                                                            |
 | FR-14 | Light and dark themes render correctly. The theme preference persists across reloads.                                                                                                                                                                          |
 | FR-15 | Saving an issue writes a `sha256:` hash into the `integrity_hash` field. Re-loading a manually edited file produces a warning banner. The user can still edit and save the file; the warning is cleared on the next save performed through the web app.        |
@@ -1199,7 +1199,7 @@ After submitting valid credentials, the user is redirected to a
 
 ### Appendix C: Built-in Template Bundle
 
-The application ships with the following four templates in a bundle, accessible to the first-run wizard (FR-11). They are stored as a single JSON file at build time and copied verbatim into the user's `.agnostic-issuer/templates/` directory when selected.
+The application ships with the following four templates in a bundle, accessible to the first-run wizard (FR-11). They are stored as a single JSON file at build time and copied verbatim into the user's `.nomad.md/templates/` directory when selected.
 
 | Template id  | Name       | Icon           | Color     | Default status |
 | ------------ | ---------- | -------------- | --------- | -------------- |
@@ -1230,13 +1230,13 @@ git.fetch({
 
 git.checkout({
   fs, dir: '/repo', ref: branch,
-  filepaths: ['.agnostic-issuer'],
+  filepaths: ['.nomad.md'],
 })
 
-// The local FS is now populated with .agnostic-issuer/** and nothing else.
+// The local FS is now populated with .nomad.md/** and nothing else.
 ```
 
-The `filepaths` option (or the equivalent tree-walk filter) is the mechanism by which the application fetches only the `.agnostic-issuer/` subtree. If the underlying `isomorphic-git` version does not yet support `filepaths`, the application falls back to a manual tree walk: it lists the tree at the root, descends only into `.agnostic-issuer/`, and copies the matching objects to the local FS.
+The `filepaths` option (or the equivalent tree-walk filter) is the mechanism by which the application fetches only the `.nomad.md/` subtree. If the underlying `isomorphic-git` version does not yet support `filepaths`, the application falls back to a manual tree walk: it lists the tree at the root, descends only into `.nomad.md/`, and copies the matching objects to the local FS.
 
 ---
 

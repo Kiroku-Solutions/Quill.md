@@ -36,9 +36,9 @@
  * `remote-git` module, which uses the lower-level `logRaw` path that
  * still redacts by the brand.
  */
-export const PAT_BRAND: unique symbol = Symbol('agnostic-issuer:pat');
-export const PROXY_URL_BRAND: unique symbol = Symbol('agnostic-issuer:proxy-url');
-export const SAFE_HTML_BRAND: unique symbol = Symbol('agnostic-issuer:safe-html');
+export const PAT_BRAND: unique symbol = Symbol('nomad-md:pat');
+export const PROXY_URL_BRAND: unique symbol = Symbol('nomad-md:proxy-url');
+export const SAFE_HTML_BRAND: unique symbol = Symbol('nomad-md:safe-html');
 
 export type Pat = string & { readonly [PAT_BRAND]: true };
 
@@ -68,12 +68,12 @@ export type SafeHtml = string & { readonly [SAFE_HTML_BRAND]: true };
  * Trade-off: the set holds references to the branded strings, preventing
  * GC. For the PAT and ProxyUrl cases this is fine — these are short-lived
  * (the PAT is dropped when `fetchSubtree` returns; the proxy URL is a
- * module-level constant). For `SafeHtml` we don't need a registry because
- * the renderer wraps the result in a `WeakRef`-friendly shape.
+ * module-level constant). `SafeHtml` is purely a compile-time guard; the
+ * renderer is the only consumer and inspects values through the brand type
+ * alone, so no runtime registry is kept (removed in t1-state-types-layout).
  */
 const PAT_REGISTRY = new Set<string>();
 const PROXY_REGISTRY = new Set<string>();
-const SAFE_HTML_REGISTRY = new Set<string>();
 
 /** Brand a string as a PAT. Only the remote-git module should call this. */
 export function brandPat(value: string): Pat {
@@ -89,7 +89,6 @@ export function brandProxyUrl(value: string): ProxyUrl {
 
 /** Brand a string as sanitised HTML. Only the renderer module should call this. */
 export function brandSafeHtml(value: string): SafeHtml {
-	SAFE_HTML_REGISTRY.add(value);
 	return value as SafeHtml;
 }
 
@@ -101,11 +100,6 @@ export function isBrandedPat(value: unknown): value is Pat {
 /** Runtime check for a {@link ProxyUrl} value. */
 export function isBrandedProxy(value: unknown): value is ProxyUrl {
 	return typeof value === 'string' && PROXY_REGISTRY.has(value);
-}
-
-/** Runtime check for a {@link SafeHtml} value. */
-export function isSafeHtml(value: unknown): value is SafeHtml {
-	return typeof value === 'string' && SAFE_HTML_REGISTRY.has(value);
 }
 
 // ─── Redaction ───────────────────────────────────────────────────────────────
@@ -142,14 +136,21 @@ function redactValue(value: unknown): unknown {
  * Heuristic detector for accidental PAT-shaped strings in unbranded values.
  * Keeps us safe even if a developer types `console.log(someString)` instead
  * of using the brand.
+ *
+ * The patterns are anchored to a substring, not to start-of-string, so a
+ * token buried inside `Authorization: Bearer <token>` is still caught. The
+ * `g` + `s` flags allow the regex to span lines and match anywhere in the
+ * input — defence in depth at the cost of a slightly higher false-positive
+ * rate (an actual `ghp_`+36-character run in a log line is overwhelmingly
+ * likely to be a token).
  */
 function looksLikePat(value: string): boolean {
 	// GitHub classic: 40 hex chars
-	if (/^[a-f0-9]{40}$/i.test(value)) return true;
+	if (/[a-f0-9]{40}/i.test(value)) return true;
 	// GitHub fine-grained: ghp_, gho_, ghu_, ghs_, ghr_ + 36 alnum
-	if (/^(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36,}$/.test(value)) return true;
+	if (/(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36,}/.test(value)) return true;
 	// GitLab: glpat- + 20 alnum
-	if (/^glpat-[A-Za-z0-9_-]{20,}$/.test(value)) return true;
+	if (/glpat-[A-Za-z0-9_-]{20,}/.test(value)) return true;
 	return false;
 }
 
@@ -206,6 +207,13 @@ export function logRaw(level: LogLevel, ...parts: ReadonlyArray<unknown>): void 
 }
 
 function formatParts(parts: ReadonlyArray<unknown>): string {
+	// `redactValue` only inspects the *outermost* level of an object — it
+	// does not recurse into nested properties. To catch the audit-flagged
+	// case where a caller logs `{ headers: { Authorization: 'ghp_…' } }`
+	// (which would otherwise be emitted verbatim by JSON.stringify), we
+	// use a `replacer` that walks every value and runs `redactValue` on it.
+	const replacer = (_key: string, value: unknown): unknown => redactValue(value);
+
 	const redacted = parts.map(redactValue);
 	const isPrim = (v: unknown): v is string | number | boolean | bigint | null | undefined =>
 		v === null || (typeof v !== 'object' && typeof v !== 'function');
@@ -214,9 +222,13 @@ function formatParts(parts: ReadonlyArray<unknown>): string {
 			.map((v) => (v === null ? 'null' : v === undefined ? 'undefined' : String(v)))
 			.join(' ');
 	}
-	// Mixed/object payload → JSON. Throws on circular refs, which is what we
-	// want (it surfaces accidental sensitive-object logging at the call site).
-	return JSON.stringify(redacted);
+	// Mixed/object payload → JSON. The `replacer` recurses into every
+	// nested value so a PAT-shaped string buried inside an object property
+	// is still caught. We use a `toJSON` that throws on circular refs
+	// (matches the previous behaviour — surfaces accidental sensitive-
+	// object logging at the call site).
+	const json = JSON.stringify(redacted, replacer);
+	return json ?? '[unserialisable]';
 }
 
 function dispatch(level: LogLevel, message: string): void {

@@ -1,21 +1,23 @@
-# sv
+# nomad\.md
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A markdown-based, local-first issue tracker that travels with your repository.
 
-## Creating a project
+## Tech Stack
 
-If you're seeing this, you've probably already done this step. Congrats!
+Built with SvelteKit \+ Svelte 5, powered by [`sv`](https://github.com/sveltejs/cli).
+
+## Developing
 
 ```sh
-# create a new project
-npx sv create my-app
+pnpm install
+pnpm dev
 ```
 
-To recreate this project with the same configuration:
+## Building
 
 ```sh
-# recreate this project
-pnpm dlx sv@0.16.1 create --template minimal --types ts --add prettier eslint tailwindcss="plugins:typography" vitest="usages:unit,component" --install pnpm AgnosticIssuer
+pnpm build
+pnpm preview
 ```
 
 ## Developing

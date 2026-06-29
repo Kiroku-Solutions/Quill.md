@@ -1,12 +1,26 @@
 /**
  * The minimal filesystem contract the service layer needs.
  *
- * Both the FSA-backed implementation (step 4) and the in-memory test mock
- * implement this interface. Paths are POSIX-style and relative to the adapter
- * root, e.g. `.agnostic-issuer/config.json`.
+ * Split into two interfaces so the type system can enforce the read-only /
+ * read-write distinction at every consumer:
  *
- * The service layer treats the adapter as opaque: it never sees a
- * `FileSystemDirectoryHandle` or any other browser-specific type.
+ *  - {@link ReadOnlyDirectoryAdapter} — used by Remote Read-Only Mode and by
+ *    any read-only consumer (Kanban / List / Gantt views read from this).
+ *  - {@link WritableDirectoryAdapter} — extends the read-only surface with
+ *    the three mutating verbs needed by Local Edit Mode.
+ *  - {@link DirectoryAdapter} — the original unified interface, kept as a
+ *    type alias for `WritableDirectoryAdapter` so existing service code that
+ *    does not yet discriminate continues to compile.
+ *
+ * Both the FSA-backed implementation (step 4) and the in-memory test mock
+ * implement the writable surface. The remote (`isomorphic-git` + LightningFS)
+ * adapter implements only the read-only surface — Remote Mode never writes
+ * (ERS C-2).
+ *
+ * Paths are POSIX-style and relative to the adapter root, e.g.
+ * `.nomad.md/config.json`. The service layer treats the adapter as opaque:
+ * it never sees a `FileSystemDirectoryHandle` or any other browser-specific
+ * type.
  *
  * ## Contract
  *
@@ -48,13 +62,33 @@ export interface DirectoryEntry {
 	kind: 'file' | 'directory';
 }
 
-export interface DirectoryAdapter {
+/**
+ * Read-only filesystem surface. Implemented by every adapter, including the
+ * remote adapter (which implements ONLY this interface — Remote Mode is
+ * strictly read-only per ERS C-2).
+ */
+export interface ReadOnlyDirectoryAdapter {
 	readTextFile(path: string): Promise<string>;
-	writeTextFile(path: string, contents: string): Promise<void>;
 	listDirectory(path: string): Promise<DirectoryEntry[]>;
+}
+
+/**
+ * Writable filesystem surface. Implemented by `MemoryFsAdapter` (tests) and
+ * `LocalFsAdapter` (FSA). NOT implemented by the remote adapter.
+ */
+export interface WritableDirectoryAdapter extends ReadOnlyDirectoryAdapter {
+	writeTextFile(path: string, contents: string): Promise<void>;
 	removeFile(path: string): Promise<void>;
 	moveFile(from: string, to: string): Promise<void>;
 }
+
+/**
+ * Backwards-compatible alias. New code should prefer
+ * {@link WritableDirectoryAdapter} when it actually mutates and
+ * {@link ReadOnlyDirectoryAdapter} when it doesn't — the split is what makes
+ * the remote adapter's read-only contract a compile-time fact, not a cast.
+ */
+export type DirectoryAdapter = WritableDirectoryAdapter;
 
 /**
  * Normalize a relative POSIX path into its parent directory and the leaf name.

@@ -6,3 +6,5 @@ export * from './validator.ts';
 export * from './config-loader.ts';
 export * from './template-loader.ts';
 export * from './issue-loader.ts';
+export * from './issue-saver.ts';
+export * from './issue-trash.ts';

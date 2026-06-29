@@ -1,7 +1,7 @@
 /**
  * Tests for `config-loader.ts`.
  *
- * The config loader is the entry-point for `.agnostic-issuer/config.json`.
+ * The config loader is the entry-point for `.nomad.md/config.json`.
  * Coverage targets:
  *  - Happy path: a well-formed config returns the parsed object.
  *  - Missing file: an actionable error points at the path.
@@ -30,7 +30,7 @@ describe('loadConfig — happy path', () => {
 	let fs: MemoryFsAdapter;
 	beforeEach(async () => {
 		fs = new MemoryFsAdapter();
-		await fs.writeTextFile('.agnostic-issuer/config.json', VALID_CONFIG);
+		await fs.writeTextFile('.nomad.md/config.json', VALID_CONFIG);
 	});
 
 	it('returns the parsed object', async () => {
@@ -53,13 +53,13 @@ describe('loadConfig — error paths', () => {
 
 	it('throws on malformed JSON', async () => {
 		const fs = new MemoryFsAdapter();
-		await fs.writeTextFile('.agnostic-issuer/config.json', '{ not json');
+		await fs.writeTextFile('.nomad.md/config.json', '{ not json');
 		await expect(loadConfig(fs)).rejects.toThrow(/Malformed JSON/);
 	});
 
 	it('throws when the top-level value is not an object', async () => {
 		const fs = new MemoryFsAdapter();
-		await fs.writeTextFile('.agnostic-issuer/config.json', '"a string"');
+		await fs.writeTextFile('.nomad.md/config.json', '"a string"');
 		await expect(loadConfig(fs)).rejects.toThrow(/must be a JSON object/);
 	});
 
@@ -67,7 +67,7 @@ describe('loadConfig — error paths', () => {
 		const fs = new MemoryFsAdapter();
 		const bad = { ...JSON.parse(VALID_CONFIG) } as Record<string, unknown>;
 		delete bad['statuses'];
-		await fs.writeTextFile('.agnostic-issuer/config.json', JSON.stringify(bad));
+		await fs.writeTextFile('.nomad.md/config.json', JSON.stringify(bad));
 		await expect(loadConfig(fs)).rejects.toThrow(/statuses/);
 	});
 
@@ -75,7 +75,7 @@ describe('loadConfig — error paths', () => {
 		const fs = new MemoryFsAdapter();
 		const bad = { ...JSON.parse(VALID_CONFIG) } as Record<string, unknown>;
 		delete bad['default_status'];
-		await fs.writeTextFile('.agnostic-issuer/config.json', JSON.stringify(bad));
+		await fs.writeTextFile('.nomad.md/config.json', JSON.stringify(bad));
 		await expect(loadConfig(fs)).rejects.toThrow(/default_status/);
 	});
 
@@ -83,7 +83,7 @@ describe('loadConfig — error paths', () => {
 		const fs = new MemoryFsAdapter();
 		const bad = { ...JSON.parse(VALID_CONFIG) } as Record<string, unknown>;
 		delete bad['labels'];
-		await fs.writeTextFile('.agnostic-issuer/config.json', JSON.stringify(bad));
+		await fs.writeTextFile('.nomad.md/config.json', JSON.stringify(bad));
 		await expect(loadConfig(fs)).rejects.toThrow(/labels/);
 	});
 
@@ -91,7 +91,7 @@ describe('loadConfig — error paths', () => {
 		const fs = new MemoryFsAdapter();
 		const bad = { ...JSON.parse(VALID_CONFIG) } as Record<string, unknown>;
 		delete bad['users'];
-		await fs.writeTextFile('.agnostic-issuer/config.json', JSON.stringify(bad));
+		await fs.writeTextFile('.nomad.md/config.json', JSON.stringify(bad));
 		await expect(loadConfig(fs)).rejects.toThrow(/users/);
 	});
 
@@ -99,7 +99,7 @@ describe('loadConfig — error paths', () => {
 		const fs = new MemoryFsAdapter();
 		const bad = { ...JSON.parse(VALID_CONFIG) } as Record<string, unknown>;
 		delete bad['kanban'];
-		await fs.writeTextFile('.agnostic-issuer/config.json', JSON.stringify(bad));
+		await fs.writeTextFile('.nomad.md/config.json', JSON.stringify(bad));
 		await expect(loadConfig(fs)).rejects.toThrow(/kanban/);
 	});
 
@@ -107,7 +107,7 @@ describe('loadConfig — error paths', () => {
 		const fs = new MemoryFsAdapter();
 		const bad = { ...JSON.parse(VALID_CONFIG) } as Record<string, unknown>;
 		delete bad['gantt'];
-		await fs.writeTextFile('.agnostic-issuer/config.json', JSON.stringify(bad));
+		await fs.writeTextFile('.nomad.md/config.json', JSON.stringify(bad));
 		await expect(loadConfig(fs)).rejects.toThrow(/gantt/);
 	});
 
@@ -115,7 +115,7 @@ describe('loadConfig — error paths', () => {
 		const fs = new MemoryFsAdapter();
 		const bad = { ...JSON.parse(VALID_CONFIG) } as Record<string, unknown>;
 		delete bad['remote'];
-		await fs.writeTextFile('.agnostic-issuer/config.json', JSON.stringify(bad));
+		await fs.writeTextFile('.nomad.md/config.json', JSON.stringify(bad));
 		await expect(loadConfig(fs)).rejects.toThrow(/remote/);
 	});
 
@@ -125,7 +125,7 @@ describe('loadConfig — error paths', () => {
 		const kanban = { ...(bad['kanban'] as Record<string, unknown>) };
 		delete kanban['columns'];
 		bad['kanban'] = kanban;
-		await fs.writeTextFile('.agnostic-issuer/config.json', JSON.stringify(bad));
+		await fs.writeTextFile('.nomad.md/config.json', JSON.stringify(bad));
 		await expect(loadConfig(fs)).rejects.toThrow(/kanban\.columns/);
 	});
 
@@ -135,7 +135,7 @@ describe('loadConfig — error paths', () => {
 		const gantt = { ...(bad['gantt'] as Record<string, unknown>) };
 		delete gantt['group_by'];
 		bad['gantt'] = gantt;
-		await fs.writeTextFile('.agnostic-issuer/config.json', JSON.stringify(bad));
+		await fs.writeTextFile('.nomad.md/config.json', JSON.stringify(bad));
 		await expect(loadConfig(fs)).rejects.toThrow(/gantt\.group_by/);
 	});
 
@@ -145,14 +145,14 @@ describe('loadConfig — error paths', () => {
 		const remote = { ...(bad['remote'] as Record<string, unknown>) };
 		delete remote['cors_proxy'];
 		bad['remote'] = remote;
-		await fs.writeTextFile('.agnostic-issuer/config.json', JSON.stringify(bad));
+		await fs.writeTextFile('.nomad.md/config.json', JSON.stringify(bad));
 		await expect(loadConfig(fs)).rejects.toThrow(/remote\.cors_proxy/);
 	});
 
 	it('throws when default_status is the empty string', async () => {
 		const fs = new MemoryFsAdapter();
 		const bad = { ...JSON.parse(VALID_CONFIG), default_status: '' };
-		await fs.writeTextFile('.agnostic-issuer/config.json', JSON.stringify(bad));
+		await fs.writeTextFile('.nomad.md/config.json', JSON.stringify(bad));
 		await expect(loadConfig(fs)).rejects.toThrow(/default_status/);
 	});
 });

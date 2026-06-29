@@ -1,11 +1,11 @@
 {
-	"name": "agnosticissuer",
+	"name": "nomad-md",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
-		"build": "vite build",
+		"build": "vite build && node scripts/add-sri.mjs",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -14,10 +14,17 @@
 		"format": "prettier --write .",
 		"test:unit": "vitest",
 		"test": "vitest --run",
-		"coverage": "vitest --run --coverage"
+		"coverage": "vitest --run --coverage",
+		"sri": "node scripts/add-sri.mjs"
 	},
 	"engines": {
 		"node": ">=20"
+	},
+	"pnpm": {
+		"overrides": {
+			"cookie": "^0.7.0",
+			"js-yaml": "^4.2.0"
+		}
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
@@ -54,7 +61,6 @@
 		"@isomorphic-git/lightning-fs": "^4.6.2",
 		"@lucide/svelte": "^1.21.0",
 		"dompurify": "^3.4.11",
-		"gray-matter": "^4.0.3",
 		"isomorphic-git": "^1.38.5",
 		"js-yaml": "^4.2.0",
 		"marked": "^18.0.5"

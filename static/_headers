@@ -1,0 +1,53 @@
+# Transport-layer security headers for nomad.md
+# ─────────────────────────────────────────────────
+# This file is consumed by Netlify, Cloudflare Pages, and (with translation)
+# any static host that supports the `_headers` format. GitHub Pages does not
+# honour `_headers`; deploy the equivalent via a `<meta http-equiv>` block in
+# `src/app.html` (we ship a `frame-ancestors` fallback there) and via the
+# static-host-specific config (e.g. `_redirects` for SPA fallback).
+#
+# Policy choices:
+#  - `default-src 'self'` — strict default; only same-origin by default.
+#  - `script-src 'self'` — no inline scripts, no eval. The Svelte 5 / Vite
+#    production build does not inject inline scripts at the time of writing;
+#    if a future change needs one, add its SHA-256 here (not 'unsafe-inline').
+#  - `style-src 'self' 'unsafe-inline'` — Tailwind 4 + Svelte's component-
+#    scoped styles rely on inline `style="..."` for a few transitions. The
+#    long-term goal is hashed nonces (see SECURITY.md); `unsafe-inline` is
+#    documented as a temporary relaxation.
+#  - `img-src 'self' data: blob:` — Markdown rendering and inline image
+#    previews.
+#  - `connect-src 'self' https://cors.isomorphic-git.org` — Remote Mode's
+#    CORS proxy. `self` is required for SvelteKit's data fetching (in our
+#    build, no fetches run on this host, but the directive is harmless and
+#    future-proof).
+#  - `object-src 'none'` — defence-in-depth against <object> / <embed>.
+#  - `base-uri 'self'` — no <base> injection.
+#  - `frame-ancestors 'none'` — clickjacking defence (the `<meta>` fallback
+#    in app.html is the case the host strips headers).
+#  - `form-action 'self'` — only same-origin form submissions.
+#  - `require-trusted-types-for 'script'` — opt the app into Trusted Types;
+#    the renderer + DOMPurify policy (`'nomad-md'`) is the documented sink.
+#
+# Strict-Transport-Security: enables HTTPS-only mode for 2 years plus
+# subdomains. The `preload` directive is only effective after submission to
+# the HSTS preload list; ships commented out by default.
+# Referrer-Policy: no-referrer — the URL bar never leaks the current path.
+# Permissions-Policy: every common sensor / API denied by default.
+# Cross-Origin-Opener-Policy: same-origin — process isolation.
+# Cross-Origin-Embedder-Policy: require-corp — required for SharedArrayBuffer
+# (the jsdom renderer test path relies on it) and isolates the page.
+# X-Content-Type-Options: nosniff — prevents MIME-type sniffing.
+
+/
+	Strict-Transport-Security: max-age=63072000; includeSubDomains
+	X-Content-Type-Options: nosniff
+	Referrer-Policy: no-referrer
+	Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=(), payment=(), usb=(), serial=(), bluetooth=(), midi=()
+	Cross-Origin-Opener-Policy: same-origin
+	Cross-Origin-Embedder-Policy: require-corp
+	Cross-Origin-Resource-Policy: same-origin
+	Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://cors.isomorphic-git.org; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; require-trusted-types-for 'script'; trusted-types nomad-md dompurify default
+
+/_app/immutable/*
+	Cache-Control: public, max-age=31536000, immutable

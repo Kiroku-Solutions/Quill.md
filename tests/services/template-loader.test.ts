@@ -68,7 +68,7 @@ describe('loadTemplates — happy path', () => {
 	});
 
 	it('exposes the canonical TEMPLATES_DIRECTORY', () => {
-		expect(TEMPLATES_DIRECTORY).toBe('.agnostic-issuer/templates');
+		expect(TEMPLATES_DIRECTORY).toBe('.nomad.md/templates');
 	});
 });
 

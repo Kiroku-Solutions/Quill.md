@@ -1,8 +1,8 @@
-import type { DirectoryAdapter } from '../adapters/directory-adapter.ts';
+import type { ReadOnlyDirectoryAdapter } from '../adapters/directory-adapter.ts';
 import type { FieldType, Template } from '../types/index.ts';
 import { FIELD_TYPES } from '../types/index.ts';
 
-const TEMPLATES_DIR = '.agnostic-issuer/templates';
+const TEMPLATES_DIR = '.nomad.md/templates';
 
 const VALID_FIELD_TYPES: ReadonlySet<FieldType> = new Set<FieldType>(FIELD_TYPES);
 
@@ -50,6 +50,14 @@ function assertTemplate(value: unknown, filename: string): Template {
 		if (f['options'] !== undefined && !Array.isArray(f['options'])) {
 			throw new Error(`${filename}: fields[${i}].options must be an array if present`);
 		}
+		// ERS §3.1 FR-2: select / multi-select fields MUST have an `options`
+		// array. The previous loader silently accepted a `select` field with
+		// no options, which made the editor crash on render. Closing that gap.
+		if ((f['type'] === 'select' || f['type'] === 'multi-select') && !Array.isArray(f['options'])) {
+			throw new Error(
+				`${filename}: fields[${i}] (type "${f['type']}") must include a non-empty "options" array`
+			);
+		}
 	}
 
 	if (!Array.isArray(v['sections'])) {
@@ -78,19 +86,19 @@ function assertTemplate(value: unknown, filename: string): Template {
 }
 
 /**
- * Load every `*.json` file under `.agnostic-issuer/templates/`.
+ * Load every `*.json` file under `.nomad.md/templates/`.
  *
  * Malformed templates abort the load with an actionable error (the editor
  * cannot function without a schema).
  */
-export async function loadTemplates(adapter: DirectoryAdapter): Promise<Template[]> {
+export async function loadTemplates(adapter: ReadOnlyDirectoryAdapter): Promise<Template[]> {
 	let entries;
 	try {
 		entries = await adapter.listDirectory(TEMPLATES_DIR);
 	} catch (cause) {
 		throw new Error(
 			`Could not list ${TEMPLATES_DIR}: ${(cause as Error).message}. ` +
-				'Make sure the selected folder contains an AgnosticIssuer setup.',
+				'Make sure the selected folder contains a nomad.md setup.',
 			{ cause }
 		);
 	}

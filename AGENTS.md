@@ -1,6 +1,6 @@
 # AGENTS.md
 
-AgnosticIssuer is a SvelteKit + Svelte 5 client-side web app for managing repository-stored issues. Full spec: `docs/ers.md` (skim it before making scope changes — it defines Local Edit Mode, Remote Read-Only Mode via `isomorphic-git`, three views, and the `.agnostic-issuer/` config tree).
+nomad\.md is a SvelteKit \+ Svelte 5 client-side web app for managing repository-stored issues. Full spec: `docs/ers.md` (skim it before making scope changes — it defines Local Edit Mode, Remote Read-Only Mode via `isomorphic-git`, three views, and the `.nomad.md/` config tree).
 
 ## Stack
 
@@ -60,4 +60,5 @@ ESLint flat config disables `no-undef` (TypeScript handles it) and runs `eslint-
 - Don't write `export let` or use `<slot>`; the project is runes-only.
 - Don't add a `tailwind.config.js` — Tailwind 4 is configured via `@import 'tailwindcss'` / `@plugin` directives in `src/routes/layout.css`.
 - Don't put browser-targeted component tests in `src/lib/server/**` (they'll be skipped).
+- **Tests for code gated on `isIndexedDBAvailable()` / `isFsaAvailable()` / `isWebCryptoAvailable()` must run in the `client` project AND be excluded from the `server` project's include list.** `feature-detect` returns `false` in Node (no `window`), so any `openDb()` / `showDirectoryPicker()` / `crypto.subtle` call in those files will reject on every invocation. Mirror the `tests/adapters/handle-store.test.ts` pattern.
 - Don't add style rules to ESLint; Prettier owns formatting and is wired last in the flat config.

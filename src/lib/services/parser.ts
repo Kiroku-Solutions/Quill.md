@@ -1,4 +1,3 @@
-import matter from 'gray-matter';
 import type {
 	Issue,
 	IssueSection,
@@ -9,6 +8,7 @@ import type {
 } from '../types/index.ts';
 import { FIELD_TO_YAML } from '../types/index.ts';
 import { computeIntegrityHash, stripIntegrityHashLine } from './integrity.ts';
+import { parseFrontmatter } from './frontmatter.ts';
 
 const SYSTEM_KEY_SET: ReadonlySet<string> = new Set(Object.values(FIELD_TO_YAML));
 
@@ -138,7 +138,7 @@ function asStringArray(value: unknown): string[] {
  * (per ERS §3.1 FR-15).
  */
 export async function parseIssueFile(text: string, sourcePath: string): Promise<LoadedIssue> {
-	const parsed = matter(text);
+	const parsed = parseFrontmatter(text);
 	const fm = (parsed.data ?? {}) as Record<string, unknown>;
 
 	const integrityHashRaw = fm['integrity_hash'];
@@ -160,7 +160,7 @@ export async function parseIssueFile(text: string, sourcePath: string): Promise<
 		duration: toNumberOrNull(fm['duration']),
 		integrityHash,
 		customFields: extractCustomFields(fm),
-		sections: parseSections(parsed.content ?? ''),
+		sections: parseSections(parsed.content),
 		integrityWarning: false
 	};
 

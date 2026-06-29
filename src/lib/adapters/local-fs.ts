@@ -71,8 +71,29 @@ export class LocalFsAdapter implements DirectoryAdapter {
 	// Construction
 	// ---------------------------------------------------------------------------
 
-	/** Constructor is private — obtain instances via {@link LocalFsAdapter.pick}. */
-	private constructor(private readonly handle: FileSystemDirectoryHandle) {}
+	/** Constructor — also exposed via {@link LocalFsAdapter.pick} for the picker UX. */
+	constructor(private readonly handle: FileSystemDirectoryHandle) {}
+
+	/**
+	 * Read-only access to the wrapped handle. Required so the picker UX
+	 * (which calls {@link LocalFsAdapter.pick}) can hand the handle to
+	 * the mode store's `openLocalFolder` after a successful pick, where
+	 * the store's adapter factory re-wraps it via `createLocalAdapter`.
+	 * The handle is browser-managed; we never mutate it.
+	 */
+	get directoryHandle(): FileSystemDirectoryHandle {
+		return this.handle;
+	}
+
+	/**
+	 * Bind a pre-acquired `FileSystemDirectoryHandle` to a new
+	 * `LocalFsAdapter`. Used by the mode store to wire a handle that
+	 * `bootstrap()` restored from IndexedDB into the same adapter shape
+	 * that `pick()` would return.
+	 */
+	static fromHandle(handle: FileSystemDirectoryHandle): LocalFsAdapter {
+		return new LocalFsAdapter(handle);
+	}
 
 	/**
 	 * Open the native directory picker and return a `LocalFsAdapter`
@@ -91,7 +112,7 @@ export class LocalFsAdapter implements DirectoryAdapter {
 			// The `id` lets the browser remember the user's choice per origin,
 			// so subsequent calls skip the picker and re-request permission.
 			handle = await window.showDirectoryPicker({
-				id: 'agnostic-issuer-folder',
+				id: 'nomad-md-folder',
 				mode: 'readwrite'
 			});
 		} catch (cause) {
@@ -130,7 +151,7 @@ export class LocalFsAdapter implements DirectoryAdapter {
 	 */
 	async requestPermission(): Promise<PermissionState> {
 		try {
-			return this.handle.requestPermission({ mode: 'readwrite' }) as Promise<PermissionState>;
+			return await this.handle.requestPermission({ mode: 'readwrite' });
 		} catch (cause) {
 			if (cause instanceof DOMException && cause.name === 'AbortError') {
 				throw new FsaPermissionError(this.handle.name, cause);

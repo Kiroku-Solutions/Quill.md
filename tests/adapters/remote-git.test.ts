@@ -30,10 +30,17 @@ import {
 	DEFAULT_DEPTH,
 	SUBTREE,
 	brandCacheKey,
+	detectFetchFilterSupport,
 	fetchSubtree,
+	isBranch,
 	isCacheKey,
 	isPat,
+	isRepoUrl,
+	isSha,
 	makeCacheKey,
+	registerBranch,
+	registerRepoUrl,
+	registerSha,
 	type Branch,
 	type CacheKey,
 	type RepoUrl,
@@ -42,8 +49,8 @@ import {
 import { AdapterError, RemoteAuthError, RemoteFetchError } from '$lib/adapters/errors';
 
 describe('public constants', () => {
-	it('SUBTREE is ".agnostic-issuer"', () => {
-		expect(SUBTREE).toBe('.agnostic-issuer');
+	it('SUBTREE is ".nomad.md"', () => {
+		expect(SUBTREE).toBe('.nomad.md');
 	});
 
 	it('DEFAULT_DEPTH is 1 (ERS Appendix D)', () => {
@@ -57,7 +64,7 @@ describe('public constants', () => {
 
 describe('makeCacheKey', () => {
 	it('produces "<url>|<branch>|<sha>"', () => {
-		const url = 'https://github.com/agnostic-issuer/test' as RepoUrl;
+		const url = 'https://github.com/nomad-md/test' as RepoUrl;
 		const branch = 'main' as Branch;
 		const sha = 'a'.repeat(40) as Sha;
 		expect(makeCacheKey(url, branch, sha)).toBe(`${url}|${branch}|${sha}`);
@@ -130,6 +137,119 @@ describe('CacheKey branding', () => {
 		expect(() =>
 			brandCacheKey('https://github.com/x/y|has spaces|0123456789abcdef0123456789abcdef01234567')
 		).toThrow(RemoteFetchError);
+	});
+
+	it('brandCacheKey rejects a <script> payload in the SHA segment with RemoteFetchError', () => {
+		// Cybersecurity-audit.md:340 — the previous implementation
+		// accepted "any string past the first `|`" which let an XSS
+		// payload through into the bounded registry and the
+		// LightningFS database name.
+		expect(() =>
+			brandCacheKey('https://github.com/foo/bar|main|<script>alert(1)</script>')
+		).toThrow(RemoteFetchError);
+	});
+
+	it('brandCacheKey rejects a SHA segment that is too short with RemoteFetchError', () => {
+		expect(() => brandCacheKey('https://github.com/foo/bar|main|short')).toThrow(RemoteFetchError);
+	});
+
+	it('brandCacheKey accepts a SHA segment that contains uppercase hex characters', () => {
+		// SHA_RE is `/^[a-f0-9]{40}$/i` (case-insensitive). The cache
+		// key shape must therefore accept a 40-char uppercase hex SHA
+		// verbatim — the lowercase normalisation happens inside
+		// `brandSha`, but `brandCacheKey` validates against the regex
+		// directly so it does not mutate the input.
+		const uppercaseSha = 'A'.repeat(40);
+		const key = brandCacheKey(`https://github.com/foo/bar|main|${uppercaseSha}`);
+		expect(key).toBe(`https://github.com/foo/bar|main|${uppercaseSha}`);
+		expect(isCacheKey(key)).toBe(true);
+	});
+});
+
+describe('detectFetchFilterSupport', () => {
+	it('returns the documented { exclude, partial, filter, relative } shape', () => {
+		const support = detectFetchFilterSupport();
+		// The shape is part of the public contract; assert each key
+		// is a boolean so consumers can rely on it.
+		expect(typeof support.exclude).toBe('boolean');
+		expect(typeof support.partial).toBe('boolean');
+		expect(typeof support.filter).toBe('boolean');
+		expect(typeof support.relative).toBe('boolean');
+		// No extra fields leak out of the support probe.
+		expect(Object.keys(support).sort()).toEqual(['exclude', 'filter', 'partial', 'relative']);
+	});
+});
+
+describe('RepoUrl / Branch / Sha brand registries (FIFO at REMOTE_BRAND_REGISTRY_LIMIT)', () => {
+	// The registries are module-level `Set<string>` instances. We
+	// probe them through the type guards (which check `registry.has`)
+	// rather than the registry constants themselves (which are not
+	// exported — the type guard is the public read API).
+
+	it('isRepoUrl / isBranch / isSha return true for values just registered', () => {
+		const url = 'https://github.com/registry-check/repo-url' as string;
+		const branch = 'registry-check-branch' as string;
+		const sha = 'f'.repeat(40);
+		registerRepoUrl(url);
+		registerBranch(branch);
+		registerSha(sha);
+		expect(isRepoUrl(url)).toBe(true);
+		expect(isBranch(branch)).toBe(true);
+		expect(isSha(sha)).toBe(true);
+	});
+
+	it('isRepoUrl returns false for unregistered URLs', () => {
+		expect(isRepoUrl('https://github.com/never-seen/before')).toBe(false);
+	});
+
+	it('isBranch returns false for unregistered branch names', () => {
+		expect(isBranch('never-seen-branch')).toBe(false);
+	});
+
+	it('isSha returns false for unregistered (or non-SHA) values', () => {
+		expect(isSha('not-a-sha')).toBe(false);
+		expect(isSha('z'.repeat(40))).toBe(false);
+		// brandSha rejects non-40-char hex with RemoteFetchError, so
+		// we can never register a 39-char SHA. isSha returns false
+		// for any string that is not in the registry.
+		expect(isSha('a'.repeat(39))).toBe(false);
+	});
+
+	it('FIFO eviction: inserting REMOTE_BRAND_REGISTRY_LIMIT + 1 values evicts the oldest', () => {
+		// We use 201 (limit + 1) because REMOTE_BRAND_REGISTRY_LIMIT
+		// is 200. The first value we insert should be evicted; the
+		// 201st should be present. The test relies on Set's
+		// insertion-order preservation: every value we register
+		// stays at the back of the Set, so a value that was just
+		// inserted is the newest. The Set has no public `delete`
+		// API, so we probe via `isRepoUrl` only.
+		//
+		// NOTE: this test depends on REMOTE_BRAND_REGISTRY_LIMIT
+		// being 200. If the limit changes, update the LIMIT
+		// constant below.
+		const LIMIT = 200;
+		// Unique-per-run suffix so this test does not collide with
+		// values left over by other test files in the same process.
+		const uniqueSuffix = Math.random().toString(36).slice(2);
+		// First insert LIMIT distinct URLs to fill the registry
+		// (it may already have entries, but adding more brings it
+		// to the cap). Then insert one more — that triggers the
+		// FIFO eviction.
+		for (let i = 0; i < LIMIT; i += 1) {
+			registerRepoUrl(`https://github.com/fifo-evict/${uniqueSuffix}-${i}`);
+		}
+		// The next insertion must evict the oldest entry. Because
+		// Set preserves insertion order and every value we just
+		// registered is newer than anything that may have been
+		// left in the registry by earlier tests, the value at
+		// index 0 of our batch is the one that gets evicted.
+		const firstBatchEntry = `https://github.com/fifo-evict/${uniqueSuffix}-0`;
+		const lastBatchEntry = `https://github.com/fifo-evict/${uniqueSuffix}-last`;
+		registerRepoUrl(lastBatchEntry);
+		// The oldest of the LIMIT we just inserted is now gone.
+		expect(isRepoUrl(firstBatchEntry)).toBe(false);
+		// The most recent insertion is present.
+		expect(isRepoUrl(lastBatchEntry)).toBe(true);
 	});
 });
 

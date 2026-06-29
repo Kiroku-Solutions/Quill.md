@@ -1,0 +1,16 @@
+# https://www.vanta.com/.well-known/security.txt
+# (draft-foudil-securitytxt-05)
+
+Contact: mailto:security@nomad-md.example
+Expires: 2027-12-31T23:59:59Z
+Preferred-Languages: en
+Canonical: https://nomad-md.example/.well-known/security.txt
+
+# We accept vulnerability reports via email. Please include:
+#  - Title + short description
+#  - Steps to reproduce
+#  - Impact assessment
+#  - Affected versions / commit SHA
+#
+# We aim to acknowledge within 48 hours and triage within 7 days.
+# No bug-bounty programme at v0; recognition via the project README.
