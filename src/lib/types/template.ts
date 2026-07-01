@@ -40,6 +40,10 @@ export interface TemplateField {
 	options?: string[];
 	options_source?: string;
 	allow_cycle?: boolean;
+	// If undefined or empty, any category is allowed.
+	// Keys are template IDs, values are array of allowed relation types.
+	// If a category has an empty array [], all relation types are allowed for that category.
+	allowed_targets?: Record<string, string[]>;
 }
 
 /** A single section declaration on a template (ERS §6.2.2). */

@@ -50,22 +50,26 @@ export interface WizardSetupOptions {
  */
 export async function writeWizardSetup(
 	adapter: WritableDirectoryAdapter,
-	templateIds: readonly string[],
+	templatesToProcess: readonly (string | Template)[],
 	options: WizardSetupOptions = {}
 ): Promise<readonly Template[]> {
-	if (templateIds.length === 0) {
+	if (templatesToProcess.length === 0) {
 		throw new Error('At least one template must be selected (FR-11)');
 	}
 
 	// Resolve templates in declaration order so the on-disk order is
 	// stable across runs.
 	const tpls: Template[] = [];
-	for (const id of templateIds) {
-		const t = getBuiltInTemplate(id);
-		if (!t) {
-			throw new Error(`Unknown built-in template: ${id}`);
+	for (const item of templatesToProcess) {
+		if (typeof item === 'string') {
+			const t = getBuiltInTemplate(item);
+			if (!t) {
+				throw new Error(`Unknown built-in template: ${item}`);
+			}
+			tpls.push(t);
+		} else {
+			tpls.push(item);
 		}
-		tpls.push(t);
 	}
 
 	const overwriteConfig = options.overwriteConfig ?? false;

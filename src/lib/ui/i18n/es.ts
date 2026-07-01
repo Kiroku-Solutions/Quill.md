@@ -25,7 +25,7 @@ export const es: Translations = {
 		permanentDelete: 'eliminar permanentemente',
 		trashDirectory: '.quill.md/.trash/',
 		remoteSessionExpired: 'Sesión remota expirada — inicia sesión nuevamente para actualizar.',
-		issueCount: (params: Params) => `${params.n} problema${params.n === 1 ? '' : 's'}`,
+		issueCount: (params: Params) => `${params.n} elemento${params.n === 1 ? '' : 's'}`,
 		dirtyCount: (params: Params) => `${params.n} sin guardar`,
 		validationErrors: (params: Params) =>
 			`${params.n} error${params.n === 1 ? '' : 'es'} de validación`,
@@ -59,12 +59,14 @@ export const es: Translations = {
 	leftrail: {
 		ariaLabel: 'Navegación',
 		viewsHeading: 'Vistas',
+		trackersHeading: 'Categorías',
 		planningHeading: 'Planificación',
 		filtersHeading: 'Filtros',
 		view: {
 			list: 'Lista',
 			kanban: 'Kanban',
 			gantt: 'Gantt',
+			graph: 'Grafo',
 			backlog: 'Backlog',
 			sprint: 'Planificador Sprint'
 		},
@@ -80,7 +82,7 @@ export const es: Translations = {
 
 	integrity: {
 		bannerBody: (params: Params) =>
-			`${params.n} archivo${params.n === 1 ? '' : 's'} de problema modificado fuera de quill.md — revisa antes de guardar.`,
+			`${params.n} archivo${params.n === 1 ? '' : 's'} modificado fuera de quill.md — revisa antes de guardar.`,
 		editorWarning:
 			'Este archivo fue modificado fuera de quill.md. Revisa el contenido antes de guardar — el id, relaciones y marcadores de sección podrían haber cambiado.',
 		dismissAria: 'Ocultar advertencia de integridad'
@@ -88,14 +90,14 @@ export const es: Translations = {
 
 	home: {
 		heroTitle: 'quill.md',
-		heroSubtitle: 'Problemas que viajan con tu repositorio',
+		heroSubtitle: 'La gestión que viaja con tu repositorio',
 		chooseModeAria: 'Elige un modo',
 		openLocalTitle: 'Abrir una carpeta local',
 		openLocalBody:
-			'Elige una carpeta en tu máquina para editar problemas guardados en .quill.md/. Requiere un navegador basado en Chromium.',
+			'Elige una carpeta en tu máquina para editar elementos guardados en .quill.md/. Requiere un navegador basado en Chromium.',
 		openLocalButton: 'Abrir carpeta local',
 		openRemoteTitle: 'Explorar un repositorio remoto',
-		openRemoteBody: 'Acceso de solo lectura a problemas alojados en cualquier proveedor de Git.',
+		openRemoteBody: 'Acceso de solo lectura a elementos alojados en cualquier proveedor de Git.',
 		openRemoteButton: 'Abrir remoto',
 		remoteUrlPlaceholder: 'https://github.com/owner/repo',
 		remoteBranchPlaceholder: 'main',
@@ -118,8 +120,8 @@ export const es: Translations = {
 				body: 'Abre una carpeta en tu máquina que ya tenga (o vaya a tener) un directorio .quill.md/.'
 			},
 			browse: {
-				title: 'Explora tus problemas',
-				body: 'Ve la lista, vista kanban, o diagrama de gantt de cada problema. Filtra, busca, y abre uno para leerlo.'
+				title: 'Explora tus elementos',
+				body: 'Ve la lista, vista kanban, o diagrama de gantt de cada elemento. Filtra, busca, y abre uno para leerlo.'
 			},
 			edit: {
 				title: 'Edita y guarda',
@@ -129,7 +131,7 @@ export const es: Translations = {
 	},
 
 	localToolbar: {
-		newIssue: '+ Nuevo problema',
+		newIssue: '+ Nuevo',
 		importIssue: 'Importar .md',
 		importIssueFailed: (params: Params) => `Error al importar: ${params.msg}`,
 		refresh: '↻ Refrescar',
@@ -141,7 +143,7 @@ export const es: Translations = {
 	},
 
 	remoteToolbar: {
-		view: (params: Params) => `${params.n} problema${params.n === 1 ? '' : 's'} (solo lectura)`,
+		view: (params: Params) => `${params.n} elemento${params.n === 1 ? '' : 's'} (solo lectura)`,
 		signOut: 'Cerrar sesión',
 		lastFetchedAria: (params: Params) => `Última sincronización ${params.label}`,
 		lastFetched: (params: Params) => `Última sincronización: ${params.label}`,
@@ -158,8 +160,8 @@ export const es: Translations = {
 	},
 
 	newIssueModal: {
-		title: 'Nuevo problema',
-		closeAria: 'Cerrar diálogo de nuevo problema',
+		title: 'Nuevo elemento',
+		closeAria: 'Cerrar diálogo de nuevo elemento',
 		searchPlaceholder: 'Buscar tipos…',
 		noMatch: (params: Params) => `Ningún tipo coincide con "${params.q}".`,
 		fieldCount: (params: Params) => `${params.n} campo${params.n === 1 ? '' : 's'}`,
@@ -196,11 +198,11 @@ export const es: Translations = {
 
 	formFields: {
 		issueTypeDisabledNote:
-			'El tipo de problema no se puede cambiar después de creado — crea un nuevo problema en su lugar.',
+			'El tipo de elemento no se puede cambiar después de creado — crea uno nuevo en su lugar.',
 		assigneePlaceholder: 'Sin asignar',
 		selectPlaceholder: 'Seleccionar…',
-		noIssues: 'No hay problemas',
-		changeTypeTitle: '¿Cambiar tipo de problema?',
+		noIssues: 'No hay elementos',
+		changeTypeTitle: '¿Cambiar tipo de elemento?',
 		changeTypeBody: (params: Params) =>
 			`Cambiar de "${params.old}" a "${params.new}" recargará el editor con la nueva plantilla. Los cambios no guardados se perderán.`,
 		changeTypeConfirm: 'Cambiar tipo',
@@ -248,15 +250,17 @@ export const es: Translations = {
 		emptyTrash: (params: Params) =>
 			`Vaciar papelera${Number(params.n) > 0 ? ` (${params.n})` : ''}`,
 		emptyTrashLocalTooltip: 'Vaciar la carpeta local .quill.md/.trash/',
-		emptyTrashSignInTooltip: 'Abre una carpeta local para habilitar esto'
+		emptyTrashSignInTooltip: 'Abre una carpeta local para habilitar esto',
+		templatesHeading: 'Categorías (Plantillas)',
+		newTemplate: '+ Nueva'
 	},
 
 	list: {
 		countPill: (params: Params) =>
-			`${params.filtered} de ${params.total} problema${params.total === 1 ? '' : 's'}`,
+			`${params.filtered} de ${params.total} elemento${params.total === 1 ? '' : 's'}`,
 		sortLabel: (params: Params) => `Ordenar: ${params.key} (${params.dir})`,
-		rowAria: (params: Params) => `Abrir problema ${params.id}: ${params.title}`,
-		empty: 'No hay problemas que coincidan con el filtro actual.',
+		rowAria: (params: Params) => `Abrir elemento ${params.id}: ${params.title}`,
+		empty: 'No hay elementos que coincidan con el filtro actual.',
 		headers: {
 			id: 'id',
 			title: 'título',
@@ -269,28 +273,28 @@ export const es: Translations = {
 	},
 
 	kanban: {
-		cardAria: (params: Params) => `Problema ${params.id}: ${params.title} en columna ${params.col}`,
-		readOnlyTooltip: 'Solo lectura — abre este problema localmente para cambiar su estado',
+		cardAria: (params: Params) => `Elemento ${params.id}: ${params.title} en columna ${params.col}`,
+		readOnlyTooltip: 'Solo lectura — abre este elemento localmente para cambiar su estado',
 		pickedUp: (params: Params) =>
-			`Problema ${params.id} recogido. Usa las flechas para mover, Espacio o Enter para soltar, Escape para cancelar.`,
-		dropped: (params: Params) => `Problema ${params.id} soltado en columna ${params.col}`,
-		cancelled: (params: Params) => `Movimiento cancelado para el problema ${params.id}.`,
-		activateHint: 'Presiona F2 para abrir el editor de problemas'
+			`Elemento ${params.id} recogido. Usa las flechas para mover, Espacio o Enter para soltar, Escape para cancelar.`,
+		dropped: (params: Params) => `Elemento ${params.id} soltado en columna ${params.col}`,
+		cancelled: (params: Params) => `Movimiento cancelado para el elemento ${params.id}.`,
+		activateHint: 'Presiona F2 para abrir el editor'
 	},
 
 	gantt: {
-		emptyTitle: 'Aún no hay problemas programados',
-		emptyBody: 'Añade fechas de inicio y fin a los problemas en el Editor para verlos en el Gantt.',
+		emptyTitle: 'Aún no hay elementos programados',
+		emptyBody: 'Añade fechas de inicio y fin a los elementos en el Editor para verlos en el Gantt.',
 		ariaLabel: 'Línea de tiempo Gantt',
 		roleDescription: 'línea de tiempo gantt',
-		barAria: (params: Params) => `Problema ${params.id}: ${params.title}`,
+		barAria: (params: Params) => `Elemento ${params.id}: ${params.title}`,
 		barDescription: (params: Params) =>
 			`Estado ${params.status}, tipo ${params.type}, grupo ${params.group}. ` +
 			`Inicia ${params.start ?? 'desconocido'}, ` +
 			(params.end ? `termina ${params.end}.` : `duración ${params.duration ?? '?'} días.`),
 		truncation: '…',
 		fallbackSummary: 'Respaldo textual (accesibilidad NFR-4)',
-		fallbackEmpty: 'No hay problemas que coincidan con el filtro actual.',
+		fallbackEmpty: 'No hay elementos que coincidan con el filtro actual.',
 		fallbackNotScheduled: 'No programado',
 		fallbackHeaders: {
 			id: 'id',
@@ -323,7 +327,7 @@ export const es: Translations = {
 	},
 
 	wizard: {
-		headTitle: 'Configura tu rastreador de problemas',
+		headTitle: 'Configura tu proyecto',
 		headBody:
 			'Tu carpeta aún no tiene una configuración .quill.md/. Elige una ruta abajo para comenzar. Puedes editar o agregar plantillas más tarde desde Ajustes.',
 		step1Title: '1. Elige cómo configurar plantillas',
@@ -332,12 +336,12 @@ export const es: Translations = {
 			'Selecciona al menos una. Las plantillas seleccionadas se escriben en .quill.md/templates/ textualmente.',
 		builtinTitle: 'Usar plantillas integradas',
 		builtinBody:
-			'Elige de los seis tipos de problemas incluidos: Epic, Caso de Uso, Historia de Usuario, Tarea, Bug, Sprint. Recomendado para la mayoría.',
+			'Elige de los seis tipos de elementos incluidos: Epic, Caso de Uso, Historia de Usuario, Tarea, Bug, Sprint. Recomendado para la mayoría.',
 		builtinAria: 'Usar plantillas integradas',
 		customTitle: 'Crear la tuya propia',
 		customBody:
-			'Crea una o más plantillas desde cero (próximamente). También puedes agregar plantillas después desde Ajustes.',
-		customAria: 'Crear tus propias plantillas (próximamente)',
+			'Crea tu propia categoría desde cero usando el nuevo Editor Visual. Define los íconos, colores y campos que necesites.',
+		customAria: 'Crear tus propias plantillas',
 		customTooltip: 'Próximamente — el editor de plantillas en la app es un paso futuro',
 		applyButton: 'Aplicar y continuar',
 		applyTooltip: 'Escribir las plantillas seleccionadas en .quill.md/',
@@ -371,11 +375,74 @@ export const es: Translations = {
 		noUnassigned: '¡Todas las historias de usuario están asignadas a Sprints!',
 		unassignedHeader: 'Historias de Usuario Sin Asignar',
 		storiesInSprint: 'Historias en Sprint',
-		noSprints: 'Aún no hay Sprints creados. ¡Crea un problema Sprint para empezar!',
+		noSprints: 'Aún no hay Sprints creados. ¡Crea un elemento Sprint para empezar!',
 		emptySprint: 'Este sprint no tiene historias. ¡Vincula algunas abajo!',
 		readyToPlan: 'Listo para Planificar',
 		needsRefinement: 'Requiere Refinamiento (Falta Epic)',
 		linkDisabledTooltip:
 			'Esta historia debe estar vinculada a una Epic antes de poder asignarse a un Sprint.'
+	},
+	templateEditor: {
+		preview: 'Vista Previa',
+		unnamed: 'Categoría Sin Nombre',
+		fieldsBadge: 'Campos',
+		basicInfo: 'Información Básica',
+		nameLabel: 'Nombre de la Categoría',
+		idLabel: 'ID del Sistema',
+		idHint: 'Identificador único en disco (solo minúsculas y guiones).',
+		appearance: 'Apariencia Visual',
+		icon: 'Ícono Representativo',
+		color: 'Color de Énfasis',
+		customColor: 'Color Personalizado',
+		fieldsTitle: 'Campos de Datos',
+		fieldsSubtitle: 'Atributos específicos que quieres registrar para este tipo de elemento.',
+		addField: 'Añadir Campo',
+		fieldName: 'Nombre del Campo',
+		fieldType: 'Tipo de Dato',
+		required: 'Obligatorio',
+		key: 'Key',
+		options: 'Opciones del Selector',
+		optionsHint: 'Ingresa las opciones separadas por coma.',
+		noFields: 'No has añadido ningún campo dinámico todavía.',
+		sectionsTitle: 'Bloques de Contenido',
+		sectionsSubtitle: 'Secciones de texto largo o descripciones que conforman el elemento.',
+		addSection: 'Añadir Sección',
+		types: {
+			text: 'Texto Corto',
+			longtext: 'Texto Largo',
+			date: 'Fecha',
+			number: 'Número',
+			select: 'Selección Única',
+			'multi-select': 'Selección Múltiple',
+			user: 'Usuario',
+			relations: 'Relaciones'
+		},
+		typesHelp: 'Información de tipos de dato',
+		typesHelpText:
+			'• Texto Corto: Para nombres o títulos cortos.\n• Texto Largo: Para descripciones o detalles extensos.\n• Fecha: Selector de calendario.\n• Número: Cantidades, estimaciones o métricas.\n• Selección Única/Múltiple: Etiquetas y categorías predefinidas.\n• Usuario: Asignar a miembros del equipo.\n• Relaciones: Bloqueos o dependencias con otros elementos.',
+		basicHelp: '¿Qué es la información básica?',
+		basicHelpText: 'El Nombre es cómo verás tu categoría en los menús (ej. "Caso de Uso"). El ID del Sistema es el identificador único en disco; se usa internamente y no debe cambiar una vez creado.',
+		appearanceHelp: '¿Para qué sirve la apariencia?',
+		appearanceHelpText: 'El ícono y el color permitirán identificar visualmente los elementos de esta categoría en los tableros Kanban, diagramas Gantt y listas.',
+		fieldsHelp: '¿Qué son los campos de datos?',
+		fieldsHelpText: 'Los campos son propiedades específicas (metadatos) que quieres registrar para este elemento (ej. Prioridad, Puntos de Esfuerzo, o Fecha Límite). Aparecerán en el panel derecho del elemento.',
+		sectionsHelp: '¿Qué son los bloques de contenido?',
+		sectionsHelpText: 'Son las áreas principales de texto libre donde puedes escribir Markdown. Útiles para secciones como "Criterios de Aceptación", "Contexto" o "Pasos para reproducir". Aparecerán en el cuerpo central del elemento.',
+		loadExample: 'Cargar Ejemplo Muestra',
+		example: {
+			name: 'Incidente Crítico',
+			f1: 'Prioridad',
+			f2: 'Fecha del Evento',
+			f3: 'Reportado Por',
+			f4: 'Sistemas Afectados',
+			s1: 'Descripción del Fallo',
+			s2: 'Pasos para Reproducir',
+			s3: 'Plan de Mitigación'
+		},
+		relationsConfig: 'Restricciones de Relación',
+		allowedTargets: 'Categorías Permitidas',
+		allowedTargetsHint: 'Si no marcas ninguna, se permitirá vincular con cualquier elemento.',
+		allowedRelationTypes: 'Tipos de Relación Permitidos',
+		allowedRelationTypesHint: 'Si no marcas ninguno, se permitirán todos los tipos (Padre, Hijo, Bloquea, etc.).'
 	}
 };

@@ -21,6 +21,10 @@
 	import type { Theme } from '$lib/state/theme.svelte';
 	import EmptyTrashModal from './EmptyTrashModal.svelte';
 	import RecentFoldersList from './RecentFoldersList.svelte';
+	import TemplateEditor from './TemplateEditor.svelte';
+	import TopBar from './TopBar.svelte';
+	import { saveTemplate } from '$lib/services/template-writer';
+	import type { Template } from '$lib/types/index';
 
 	const stores = getStores();
 	const open = $derived(stores.ui.settingsOpen);
@@ -45,6 +49,7 @@
 	let emptyTrashOpen = $state(false);
 	let clearCacheBusy = $state(false);
 	let clearCacheStatus = $state<{ kind: 'success' | 'error'; message: string } | null>(null);
+	let editorOpen = $state(false);
 
 	async function readTrashCount(): Promise<void> {
 		const adapter = stores.mode.localAdapter;
@@ -99,6 +104,18 @@
 			};
 		} finally {
 			clearCacheBusy = false;
+		}
+	}
+
+	async function onSaveTemplate(t: Template): Promise<void> {
+		const adapter = stores.mode.localAdapter;
+		if (!adapter) return;
+		try {
+			await saveTemplate(adapter, t, true);
+			await stores.templates.load();
+			editorOpen = false;
+		} catch (e) {
+			console.error('Failed to save template', e);
 		}
 	}
 </script>
@@ -212,6 +229,23 @@
 				</Card>
 			</section>
 
+			<section class="mt-6 flex flex-col gap-2" data-testid="settings-templates">
+				<h3 class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center justify-between">
+					<span>{t('settings.templatesHeading')}</span>
+					<Button variant="secondary" size="sm" class="h-6 text-xs px-2" onclick={() => (editorOpen = true)} disabled={!localAdapter}>
+						{t('settings.newTemplate')}
+					</Button>
+				</h3>
+				<div class="flex flex-col gap-2 mt-2">
+					{#each stores.templates.templates as tmpl}
+						<Card compact class="flex items-center gap-3 px-3 py-2">
+							<span class="w-3 h-3 rounded-full" style="background-color: {tmpl.color}"></span>
+							<span class="text-sm font-medium">{tmpl.name}</span>
+						</Card>
+					{/each}
+				</div>
+			</section>
+
 			<section class="mt-6 flex flex-col gap-3" data-testid="settings-commands">
 				<h3 class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
 					{t('settings.commandsHeading')}
@@ -279,4 +313,15 @@
 		onclose={() => (emptyTrashOpen = false)}
 		onemptied={onEmptied}
 	/>
+{/if}
+
+{#if editorOpen}
+	<div class="fixed inset-0 z-[100] bg-background flex flex-col">
+		<TopBar mode="editor" onCancel={() => (editorOpen = false)} />
+		
+		<!-- Editor Body -->
+		<div class="flex-1 p-4 sm:p-8 overflow-y-auto">
+			<TemplateEditor onsave={onSaveTemplate} oncancel={() => (editorOpen = false)} />
+		</div>
+	</div>
 {/if}

@@ -37,13 +37,14 @@
 	import { getStores } from '$lib/state';
 	import Bird from '$lib/assets/Bird.svg';
 
-	export type ShellMode = 'home' | 'local' | 'remote' | 'wizard';
+	export type ShellMode = 'home' | 'local' | 'remote' | 'wizard' | 'editor';
 
 	type Props = {
 		mode: ShellMode;
+		onCancel?: () => void;
 	};
 
-	let { mode }: Props = $props();
+	let { mode, onCancel }: Props = $props();
 
 	const stores = getStores();
 
@@ -60,6 +61,8 @@
 				// The 6B Badge primitive does not ship an `info` variant;
 				// the closest semantic match is `primary` (active flow).
 				return { label: t('modeBadge.setup'), variant: 'primary' as const };
+			case 'editor':
+				return { label: t('settings.newTemplate'), variant: 'primary' as const };
 			default:
 				return { label: t('modeBadge.home'), variant: 'ghost' as const };
 		}
@@ -72,8 +75,12 @@
 		stores.ui.toggleSettings();
 	}
 
-	function cancelWizard(): void {
-		void goto(resolve('/'));
+	function handleCancel(): void {
+		if (onCancel) {
+			onCancel();
+		} else {
+			void goto(resolve('/'));
+		}
 	}
 </script>
 
@@ -144,8 +151,8 @@
 			</IconButton>
 		</Tooltip>
 	{:else}
-		<Button variant="ghost" size="sm" onclick={cancelWizard} data-testid="topbar-wizard-cancel">
-			{t('wizard.cancel')}
+		<Button variant="ghost" size="sm" onclick={handleCancel} data-testid="topbar-wizard-cancel">
+			{t('common.cancel')}
 		</Button>
 	{/if}
 </header>

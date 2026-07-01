@@ -35,6 +35,8 @@
 	import { t } from '$lib/ui/strings';
 	import { BUILT_IN_TEMPLATES } from '$lib/services/built-in-templates';
 	import { writeWizardSetup } from '$lib/services/wizard';
+	import TemplateEditor from '$lib/components/TemplateEditor.svelte';
+	import type { Template } from '$lib/types/index';
 
 	const stores = getStores();
 
@@ -76,8 +78,30 @@
 		isApplying = true;
 		applyError = null;
 		try {
+			// If path is custom, we shouldn't be in this general apply function 
+			// without passing the custom templates, but we can handle it via a separate flow.
 			await writeWizardSetup(adapter, [...selected], { overwriteConfig: true });
 			// Re-load the affected stores so the UI reflects the new files.
+			await Promise.all([stores.config.load(), stores.templates.load()]);
+			await stores.issues.load();
+			await goto(resolve('/local'));
+		} catch (cause) {
+			applyError = (cause as Error).message;
+		} finally {
+			isApplying = false;
+		}
+	}
+
+	async function applyCustomTemplate(t: Template): Promise<void> {
+		const adapter = stores.mode.localAdapter;
+		if (!adapter) {
+			applyError = t('wizard.noFolder');
+			return;
+		}
+		isApplying = true;
+		applyError = null;
+		try {
+			await writeWizardSetup(adapter, [t], { overwriteConfig: true });
 			await Promise.all([stores.config.load(), stores.templates.load()]);
 			await stores.issues.load();
 			await goto(resolve('/local'));
@@ -121,24 +145,22 @@
 					</label>
 				</Card>
 
-				<Tooltip text={t('wizard.customTooltip')} position="top">
-					<Card compact class="cursor-not-allowed opacity-60">
-						<div class="flex items-start gap-3">
-							<Radio
-								name="wizard-path"
-								value="custom"
-								checked={path === 'custom'}
-								label=""
-								ariaLabel={t('wizard.customAria')}
-								disabled
-							/>
-							<div class="flex-1">
-								<div class="font-medium">{t('wizard.customTitle')}</div>
-								<div class="text-sm opacity-70">{t('wizard.customBody')}</div>
-							</div>
+				<Card compact class="cursor-pointer">
+					<label class="flex cursor-pointer items-start gap-3">
+						<Radio
+							name="wizard-path"
+							value="custom"
+							checked={path === 'custom'}
+							label=""
+							ariaLabel={t('wizard.customAria')}
+							onchange={() => (path = 'custom')}
+						/>
+						<div class="flex-1">
+							<div class="font-medium">{t('wizard.customTitle')}</div>
+							<div class="text-sm opacity-70">{t('wizard.customBody')}</div>
 						</div>
-					</Card>
-				</Tooltip>
+					</label>
+				</Card>
 			</section>
 
 			{#if path === 'builtin'}
@@ -179,32 +201,43 @@
 				</section>
 			{/if}
 
+			{#if path === 'custom'}
+				<div class="mt-4 border-t border-border/50 pt-8">
+					<TemplateEditor 
+						onsave={applyCustomTemplate} 
+						oncancel={() => (path = 'builtin')} 
+					/>
+				</div>
+			{/if}
+
 			{#if applyError}
 				<Alert variant="error">
 					<span>{t('wizard.applyError', { msg: applyError })}</span>
 				</Alert>
 			{/if}
 
-			<div class="flex items-center gap-3">
-				<Tooltip
-					text={canApply ? t('wizard.applyTooltip') : t('wizard.applyTooltipDisabled')}
-					position="top"
-				>
-					<Button
-						variant="primary"
-						disabled={!canApply}
-						loading={isApplying}
-						onclick={apply}
-						data-testid="wizard-apply"
+			{#if path === 'builtin'}
+				<div class="flex items-center gap-3">
+					<Tooltip
+						text={canApply ? t('wizard.applyTooltip') : t('wizard.applyTooltipDisabled')}
+						position="top"
 					>
-						{isApplying ? t('wizard.applying') : t('wizard.applyButton')}
-					</Button>
-				</Tooltip>
-				<Button variant="ghost" onclick={cancel}>{t('wizard.cancel')}</Button>
-				<span class="ml-auto text-xs opacity-60">
-					{t('wizard.summary', { selected: selected.size })}
-				</span>
-			</div>
+						<Button
+							variant="primary"
+							disabled={!canApply}
+							loading={isApplying}
+							onclick={apply}
+							data-testid="wizard-apply"
+						>
+							{isApplying ? t('wizard.applying') : t('wizard.applyButton')}
+						</Button>
+					</Tooltip>
+					<Button variant="ghost" onclick={cancel}>{t('wizard.cancel')}</Button>
+					<span class="ml-auto text-xs opacity-60">
+						{t('wizard.summary', { selected: selected.size })}
+					</span>
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>
