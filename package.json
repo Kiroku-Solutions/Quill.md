@@ -66,8 +66,14 @@
 		"async-lock": "^1.4.1",
 		"buffer": "^6.0.3",
 		"dompurify": "^3.4.11",
+		"graphology": "^0.26.0",
+		"graphology-layout": "^0.6.1",
+		"graphology-layout-forceatlas2": "^0.10.1",
+		"graphology-types": "^0.24.8",
+		"idb": "^8.0.3",
 		"isomorphic-git": "^1.38.5",
 		"js-yaml": "^4.2.0",
-		"marked": "^18.0.5"
+		"marked": "^18.0.5",
+		"sigma": "^3.0.3"
 	}
 }

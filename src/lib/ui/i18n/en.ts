@@ -24,7 +24,7 @@ export const en = {
 		permanentDelete: 'permanently delete',
 		trashDirectory: '.quill.md/.trash/',
 		remoteSessionExpired: 'Remote session expired — sign in again to refresh.',
-		issueCount: (params: Params) => `${params.n} issue${params.n === 1 ? '' : 's'}`,
+		issueCount: (params: Params) => `${params.n} item${params.n === 1 ? '' : 's'}`,
 		dirtyCount: (params: Params) => `${params.n} dirty`,
 		validationErrors: (params: Params) =>
 			`${params.n} validation ${params.n === 1 ? 'error' : 'errors'}`,
@@ -58,12 +58,14 @@ export const en = {
 	leftrail: {
 		ariaLabel: 'Navigation',
 		viewsHeading: 'Views',
+		trackersHeading: 'Categories',
 		planningHeading: 'Planning',
 		filtersHeading: 'Filters',
 		view: {
 			list: 'List',
 			kanban: 'Kanban',
 			gantt: 'Gantt',
+			graph: 'Graph',
 			backlog: 'Backlog',
 			sprint: 'Sprint Planner'
 		},
@@ -79,7 +81,7 @@ export const en = {
 
 	integrity: {
 		bannerBody: (params: Params) =>
-			`${params.n} ${params.n === 1 ? 'issue file' : 'issue files'} modified outside quill.md — review before saving.`,
+			`${params.n} ${params.n === 1 ? 'file' : 'files'} modified outside quill.md — review before saving.`,
 		editorWarning:
 			'This file was modified outside quill.md. Review the contents before saving — id, relations, and section markers may have drifted.',
 		dismissAria: 'Dismiss integrity warning'
@@ -87,14 +89,14 @@ export const en = {
 
 	home: {
 		heroTitle: 'quill.md',
-		heroSubtitle: 'Issues that travel with your repo',
+		heroSubtitle: 'Items that travel with your repo',
 		chooseModeAria: 'Choose a mode',
 		openLocalTitle: 'Open a local folder',
 		openLocalBody:
-			'Pick a folder on your machine to edit issues stored under .quill.md/. Requires a Chromium-based browser.',
+			'Pick a folder on your machine to edit items stored under .quill.md/. Requires a Chromium-based browser.',
 		openLocalButton: 'Open local folder',
 		openRemoteTitle: 'Browse a remote repository',
-		openRemoteBody: 'Read-only access to issues hosted on any Git provider.',
+		openRemoteBody: 'Read-only access to items hosted on any Git provider.',
 		openRemoteButton: 'Open remote',
 		remoteUrlPlaceholder: 'https://github.com/owner/repo',
 		remoteBranchPlaceholder: 'main',
@@ -118,8 +120,8 @@ export const en = {
 				body: 'Open a folder on your machine that already has (or will hold) a .quill.md/ directory.'
 			},
 			browse: {
-				title: 'Browse your issues',
-				body: 'See the list, kanban, or gantt view of every issue the folder holds. Filter, search, and open one to read it.'
+				title: 'Browse your items',
+				body: 'See the list, kanban, or gantt view of every item the folder holds. Filter, search, and open one to read it.'
 			},
 			edit: {
 				title: 'Edit and save',
@@ -129,7 +131,7 @@ export const en = {
 	},
 
 	localToolbar: {
-		newIssue: '+ New issue',
+		newIssue: '+ New',
 		importIssue: 'Import .md',
 		importIssueFailed: (params: Params) => `Failed to import: ${params.msg}`,
 		refresh: '↻ Refresh',
@@ -141,7 +143,7 @@ export const en = {
 	},
 
 	remoteToolbar: {
-		view: (params: Params) => `${params.n} ${params.n === 1 ? 'issue' : 'issues'} (read-only)`,
+		view: (params: Params) => `${params.n} ${params.n === 1 ? 'item' : 'items'} (read-only)`,
 		signOut: 'Sign out',
 		lastFetchedAria: (params: Params) => `Last fetched ${params.label}`,
 		lastFetched: (params: Params) => `Last fetched: ${params.label}`,
@@ -158,8 +160,8 @@ export const en = {
 	},
 
 	newIssueModal: {
-		title: 'New issue',
-		closeAria: 'Close new-issue dialog',
+		title: 'New item',
+		closeAria: 'Close new-item dialog',
 		searchPlaceholder: 'Search types…',
 		noMatch: (params: Params) => `No types match "${params.q}".`,
 		fieldCount: (params: Params) => `${params.n} field${params.n === 1 ? '' : 's'}`,
@@ -196,11 +198,11 @@ export const en = {
 
 	formFields: {
 		issueTypeDisabledNote:
-			'Issue type cannot be changed after creation — create a new issue instead.',
+			'Item type cannot be changed after creation — create a new one instead.',
 		assigneePlaceholder: 'Unassigned',
 		selectPlaceholder: 'Select…',
-		noIssues: 'No issues',
-		changeTypeTitle: 'Change issue type?',
+		noIssues: 'No items',
+		changeTypeTitle: 'Change item type?',
 		changeTypeBody: (params: Params) =>
 			`Switching from "${params.old}" to "${params.new}" will reload the editor with the new template. Unsaved changes will be lost.`,
 		changeTypeConfirm: 'Change type',
@@ -247,15 +249,17 @@ export const en = {
 		clearCacheSignInTooltip: 'Sign in to a remote repository to enable this',
 		emptyTrash: (params: Params) => `Empty trash${Number(params.n) > 0 ? ` (${params.n})` : ''}`,
 		emptyTrashLocalTooltip: 'Empty the local .quill.md/.trash/ folder',
-		emptyTrashSignInTooltip: 'Open a local folder to enable this'
+		emptyTrashSignInTooltip: 'Open a local folder to enable this',
+		templatesHeading: 'Categories (Templates)',
+		newTemplate: '+ New'
 	},
 
 	list: {
 		countPill: (params: Params) =>
-			`${params.filtered} of ${params.total} ${params.total === 1 ? 'issue' : 'issues'}`,
+			`${params.filtered} of ${params.total} ${params.total === 1 ? 'item' : 'items'}`,
 		sortLabel: (params: Params) => `Sort: ${params.key} (${params.dir})`,
-		rowAria: (params: Params) => `Open issue ${params.id}: ${params.title}`,
-		empty: 'No issues match the current filter.',
+		rowAria: (params: Params) => `Open item ${params.id}: ${params.title}`,
+		empty: 'No items match the current filter.',
 		headers: {
 			id: 'id',
 			title: 'title',
@@ -268,28 +272,28 @@ export const en = {
 	},
 
 	kanban: {
-		cardAria: (params: Params) => `Issue ${params.id}: ${params.title} in column ${params.col}`,
-		readOnlyTooltip: 'Read-only — open this issue locally to change its status',
+		cardAria: (params: Params) => `Item ${params.id}: ${params.title} in column ${params.col}`,
+		readOnlyTooltip: 'Read-only — open this item locally to change its status',
 		pickedUp: (params: Params) =>
-			`Picked up issue ${params.id}. Use arrow keys to move, Space or Enter to drop, Escape to cancel.`,
-		dropped: (params: Params) => `Dropped issue ${params.id} in column ${params.col}`,
-		cancelled: (params: Params) => `Cancelled move of issue ${params.id}.`,
-		activateHint: 'Press F2 to open the issue editor'
+			`Picked up item ${params.id}. Use arrow keys to move, Space or Enter to drop, Escape to cancel.`,
+		dropped: (params: Params) => `Dropped item ${params.id} in column ${params.col}`,
+		cancelled: (params: Params) => `Cancelled move of item ${params.id}.`,
+		activateHint: 'Press F2 to open the editor'
 	},
 
 	gantt: {
-		emptyTitle: 'No issues are scheduled yet',
-		emptyBody: 'Add start and end dates to issues in the Editor to see them on the Gantt.',
+		emptyTitle: 'No items are scheduled yet',
+		emptyBody: 'Add start and end dates to items in the Editor to see them on the Gantt.',
 		ariaLabel: 'Gantt timeline',
 		roleDescription: 'gantt timeline',
-		barAria: (params: Params) => `Issue ${params.id}: ${params.title}`,
+		barAria: (params: Params) => `Item ${params.id}: ${params.title}`,
 		barDescription: (params: Params) =>
 			`Status ${params.status}, type ${params.type}, group ${params.group}. ` +
 			`Starts ${params.start ?? 'unknown'}, ` +
 			(params.end ? `ends ${params.end}.` : `duration ${params.duration ?? '?'} days.`),
 		truncation: '…',
 		fallbackSummary: 'Textual fallback (NFR-4 accessibility)',
-		fallbackEmpty: 'No issues match the current filter.',
+		fallbackEmpty: 'No items match the current filter.',
 		fallbackNotScheduled: 'Not scheduled',
 		fallbackHeaders: {
 			id: 'id',
@@ -322,7 +326,7 @@ export const en = {
 	},
 
 	wizard: {
-		headTitle: 'Set up your issue tracker',
+		headTitle: 'Set up your tracker',
 		headBody:
 			'Your folder does not have a .quill.md/ configuration yet. Pick a path below to get started. You can edit or add templates later from the Settings panel.',
 		step1Title: '1. Choose how to set up templates',
@@ -331,12 +335,12 @@ export const en = {
 			'Select at least one. Selected templates are written to .quill.md/templates/ verbatim.',
 		builtinTitle: 'Use built-in templates',
 		builtinBody:
-			'Pick from the six bundled issue types: Epic, Use Case, User Story, Task, Bug, Sprint. Recommended for most projects.',
+			'Pick from the six bundled types: Epic, Use Case, User Story, Task, Bug, Sprint. Recommended for most projects.',
 		builtinAria: 'Use built-in templates',
 		customTitle: 'Create your own',
 		customBody:
-			'Author one or more templates from scratch (coming soon). You can also add templates later from Settings.',
-		customAria: 'Create your own templates (coming soon)',
+			'Author your own category from scratch using the Visual Editor. Define the icons, colors, and fields you need.',
+		customAria: 'Create your own templates',
 		customTooltip: 'Coming soon — the in-app template editor is a future step',
 		applyButton: 'Apply and continue',
 		applyTooltip: 'Write the selected templates to .quill.md/',
@@ -370,12 +374,75 @@ export const en = {
 		noUnassigned: 'All user stories are assigned to Sprints!',
 		unassignedHeader: 'Unassigned User Stories',
 		storiesInSprint: 'Stories in Sprint',
-		noSprints: 'No Sprints created yet. Create a Sprint issue to start planning!',
+		noSprints: 'No Sprints created yet. Create a Sprint item to start planning!',
 		emptySprint: 'This sprint has no stories. Link some below!',
 		readyToPlan: 'Ready to Plan',
 		needsRefinement: 'Requires Refinement (Missing Epic)',
 		linkDisabledTooltip:
 			'This story must be linked to an Epic before it can be assigned to a Sprint.'
+	},
+	templateEditor: {
+		preview: 'Preview',
+		unnamed: 'Unnamed Category',
+		fieldsBadge: 'Fields',
+		basicInfo: 'Basic Info',
+		nameLabel: 'Category Name',
+		idLabel: 'System ID',
+		idHint: 'Unique identifier on disk (lowercase and hyphens only).',
+		appearance: 'Visual Appearance',
+		icon: 'Representative Icon',
+		color: 'Accent Color',
+		customColor: 'Custom Color',
+		fieldsTitle: 'Data Fields',
+		fieldsSubtitle: 'Specific attributes you want to track for this item type.',
+		addField: 'Add Field',
+		fieldName: 'Field Name',
+		fieldType: 'Data Type',
+		required: 'Required',
+		key: 'Key',
+		options: 'Selector Options',
+		optionsHint: 'Enter options separated by comma.',
+		noFields: 'You have not added any dynamic fields yet.',
+		sectionsTitle: 'Content Blocks',
+		sectionsSubtitle: 'Long text sections or descriptions that make up the item.',
+		addSection: 'Add Section',
+		types: {
+			text: 'Short Text',
+			longtext: 'Long Text',
+			date: 'Date',
+			number: 'Number',
+			select: 'Single Select',
+			'multi-select': 'Multi Select',
+			user: 'User',
+			relations: 'Relations'
+		},
+		typesHelp: 'Data types information',
+		typesHelpText:
+			'• Short Text: For names or brief titles.\n• Long Text: For extensive descriptions or details.\n• Date: Calendar picker.\n• Number: Quantities, estimates or metrics.\n• Single/Multi Select: Predefined labels and categories.\n• User: Assign to team members.\n• Relations: Blockers or dependencies with other items.',
+		basicHelp: 'What is basic info?',
+		basicHelpText: 'The Name is what you see in the UI (e.g. "Use Case"). The System ID is the unique identifier on disk; it is used internally and should not change once created.',
+		appearanceHelp: 'What is appearance for?',
+		appearanceHelpText: 'The icon and color will visually identify items of this category across the Kanban boards, Gantt charts, and lists.',
+		fieldsHelp: 'What are data fields?',
+		fieldsHelpText: 'Fields are specific properties (metadata) you want to track for this item (e.g. Priority, Story Points, or Due Date). They will appear on the right sidebar of the item.',
+		sectionsHelp: 'What are content blocks?',
+		sectionsHelpText: 'These are the main free-text Markdown areas. Useful for sections like "Acceptance Criteria", "Context" or "Steps to reproduce". They will appear in the main body of the item.',
+		loadExample: 'Load Sample Example',
+		example: {
+			name: 'Critical Incident',
+			f1: 'Priority',
+			f2: 'Event Date',
+			f3: 'Reported By',
+			f4: 'Affected Systems',
+			s1: 'Failure Description',
+			s2: 'Steps to Reproduce',
+			s3: 'Mitigation Plan'
+		},
+		relationsConfig: 'Relation Constraints',
+		allowedTargets: 'Allowed Categories',
+		allowedTargetsHint: 'If none are checked, linking with any item will be allowed.',
+		allowedRelationTypes: 'Allowed Relation Types',
+		allowedRelationTypesHint: 'If none are checked, all types (Parent, Child, Blocks, etc.) will be allowed.'
 	}
 };
 

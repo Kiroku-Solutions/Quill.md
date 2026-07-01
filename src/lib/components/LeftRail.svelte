@@ -39,7 +39,8 @@
 	const viewTabs = $derived([
 		{ id: 'list', label: t('leftrail.view.list') },
 		{ id: 'kanban', label: t('leftrail.view.kanban') },
-		{ id: 'gantt', label: t('leftrail.view.gantt') }
+		{ id: 'gantt', label: t('leftrail.view.gantt') },
+		{ id: 'graph', label: t('leftrail.view.graph') }
 	] as const);
 
 	const warningCount = $derived(stores.issues.integrityWarnings.length);
@@ -53,8 +54,8 @@
 	}
 
 	function onViewChange(id: string): void {
-		if (id === 'list' || id === 'kanban' || id === 'gantt') {
-			stores.view.setView(id);
+		if (id === 'list' || id === 'kanban' || id === 'gantt' || id === 'graph') {
+			stores.view.setView(id as any);
 			closeMobileNav();
 		}
 	}
@@ -121,6 +122,32 @@
 		</div>
 
 		<Tabs tabs={viewTabs} value={stores.view.view} onchange={onViewChange} class="w-full" />
+
+		{#if stores.templates.templates.length > 0}
+			<h2 class="mt-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+				{t('leftrail.trackersHeading')}
+			</h2>
+			<div class="flex flex-col gap-1">
+				{#each stores.templates.templates as tmpl (tmpl.id)}
+					{@const active = stores.view.view === 'list' && stores.filter.filter.type === tmpl.id}
+					<button
+						type="button"
+						class="flex items-center justify-start gap-2 py-2 px-3 rounded-md text-sm font-semibold transition-colors duration-[var(--motion-fast)] ease-out cursor-pointer {active
+							? 'bg-primary text-primary-foreground'
+							: 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
+						onclick={() => { 
+							stores.view.setView('list'); 
+							stores.filter.clear(); 
+							stores.filter.set({ type: tmpl.id }); 
+							closeMobileNav(); 
+						}}
+					>
+						<span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: {tmpl.color}"></span>
+						<span class="truncate">{tmpl.name}</span>
+					</button>
+				{/each}
+			</div>
+		{/if}
 
 		<h2 class="mt-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
 			{t('leftrail.planningHeading')}

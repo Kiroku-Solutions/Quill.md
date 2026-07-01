@@ -15,7 +15,7 @@
 	import { Modal, Button } from '$lib/ui';
 	import { RELATION_TYPES, type Issue, type Relation, type TemplateField } from '$lib/types';
 
-	type Option = { id: string; name: string };
+	type Option = { id: string; name: string; type?: string };
 
 	const { editor, issues, templates, config } = getStores();
 
@@ -92,11 +92,15 @@
 		return li ? li.issue.title : `#${id}`;
 	}
 
-	function relationOptions(): Option[] {
+	function relationOptions(field: TemplateField): Option[] {
 		if (!issue) return [];
 		const out: Option[] = [];
 		for (const li of issues.byId.values()) {
-			if (li.issue.id !== issue.id) out.push({ id: String(li.issue.id), name: li.issue.title });
+			if (li.issue.id !== issue.id) {
+				if (!field.allowed_targets || Object.keys(field.allowed_targets).length === 0 || li.issue.issueType in field.allowed_targets) {
+					out.push({ id: String(li.issue.id), name: li.issue.title, type: li.issue.issueType });
+				}
+			}
 		}
 		return out;
 	}
@@ -410,20 +414,21 @@
 					})()}
 					<div id={fid} class="flex flex-col gap-3 border rounded-md border-border p-3 {err ? 'border-error ring-1 ring-error' : ''}">
 						{#each currentRelations as rel (rel.id)}
+							{@const relTargetIssueType = issues.byId.get(rel.id)?.issue.issueType}
+							{@const allowedRelTypes = (relTargetIssueType && field.allowed_targets && relTargetIssueType in field.allowed_targets && field.allowed_targets[relTargetIssueType].length > 0)
+								? field.allowed_targets[relTargetIssueType]
+								: RELATION_TYPES}
 							<div class="flex items-center gap-2">
-								<div class="relative w-1/3 min-w-[120px]">
+								<div class="flex-1 min-w-0">
 									<select
 										class="w-full appearance-none bg-surface text-foreground rounded border border-border pl-2 pr-6 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
 										value={rel.type}
 										onchange={(e) => changeRelationType(rel.id, e.currentTarget.value)}
 									>
-										{#each RELATION_TYPES as rType}
+										{#each allowedRelTypes as rType}
 											<option value={rType}>{t(`formFields.relationTypes.${rType}`)}</option>
 										{/each}
 									</select>
-									<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-muted-foreground">
-										<svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-									</div>
 								</div>
 								<span class="text-sm font-medium text-foreground truncate flex-1" title={relationTitle(rel.id)}>
 									{relationTitle(rel.id)}
@@ -439,27 +444,14 @@
 							</div>
 						{/each}
 
-						<div class="flex items-center gap-2 mt-1 border-t border-border pt-3">
-							<div class="relative w-1/3 min-w-[120px]">
+						<div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center mt-1 border-t border-border pt-3">
+							<div class="flex-1 min-w-0 relative w-full sm:w-auto">
 								<select
-									class="w-full appearance-none bg-background text-foreground rounded border border-border pl-2 pr-6 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
-									bind:value={newRelationType}
-								>
-									{#each RELATION_TYPES as rType}
-										<option value={rType}>{t(`formFields.relationTypes.${rType}`)}</option>
-									{/each}
-								</select>
-								<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-muted-foreground">
-									<svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-								</div>
-							</div>
-							<div class="relative flex-1">
-								<select
-									class="w-full appearance-none bg-background text-foreground rounded border border-border pl-2 pr-6 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+									class="w-full appearance-none bg-background text-foreground rounded border border-border pl-2 pr-8 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
 									bind:value={newRelationId}
 								>
 									<option value="">{t('formFields.selectPlaceholder')}</option>
-									{#each relationOptions() as opt}
+									{#each relationOptions(field) as opt}
 										<option value={opt.id}>{opt.name}</option>
 									{/each}
 								</select>
@@ -467,6 +459,27 @@
 									<svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
 								</div>
 							</div>
+
+							{#if newRelationId}
+								{@const targetIssueType = issues.byId.get(Number(newRelationId))?.issue.issueType}
+								{@const allowedRelTypesForNew = (targetIssueType && field.allowed_targets && targetIssueType in field.allowed_targets && field.allowed_targets[targetIssueType].length > 0)
+									? field.allowed_targets[targetIssueType]
+									: RELATION_TYPES}
+								<div class="flex-1 min-w-0 relative w-full sm:w-auto">
+									<select
+										class="w-full appearance-none bg-background text-foreground rounded border border-border pl-2 pr-8 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+										bind:value={newRelationType}
+									>
+										{#each allowedRelTypesForNew as rType}
+											<option value={rType}>{t(`formFields.relationTypes.${rType}`)}</option>
+										{/each}
+									</select>
+									<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-muted-foreground">
+										<svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+									</div>
+								</div>
+							{/if}
+
 							<button
 								type="button"
 								class="px-3 py-1.5 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors text-xs font-bold shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
