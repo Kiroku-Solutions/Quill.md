@@ -130,17 +130,17 @@
 
 	<ThemeToggle />
 
-	{#if mode !== 'wizard'}
-		<Tooltip text={t('topbar.settingsTooltip')} position="bottom">
-			<IconButton
-				label={t('topbar.openSettings')}
-				onclick={toggleSettings}
-				data-testid="topbar-settings"
-			>
-				<Settings class="h-5 w-5" aria-hidden="true" />
-			</IconButton>
-		</Tooltip>
-	{:else}
+	<Tooltip text={t('topbar.settingsTooltip')} position="bottom">
+		<IconButton
+			label={t('topbar.openSettings')}
+			onclick={toggleSettings}
+			data-testid="topbar-settings"
+		>
+			<Settings class="h-5 w-5" aria-hidden="true" />
+		</IconButton>
+	</Tooltip>
+
+	{#if mode === 'wizard'}
 		<Button variant="ghost" size="sm" onclick={handleCancel} data-testid="topbar-wizard-cancel">
 			{t('common.cancel')}
 		</Button>
