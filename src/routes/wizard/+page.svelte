@@ -31,9 +31,12 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { Alert, Button, Card, Checkbox, Radio, Tooltip } from '$lib/ui';
+	import { Alert, Button, Card, Radio, Tooltip } from '$lib/ui';
 	import { t } from '$lib/ui/strings';
-	import { BUILT_IN_TEMPLATES } from '$lib/services/built-in-templates';
+	import { i18n } from '$lib/ui/i18n/store.svelte';
+	import { FRAMEWORK_PRESETS } from '$lib/services/framework-presets';
+	import { FRAMEWORK_PRESETS_ES } from '$lib/services/framework-presets.es';
+	import { defaultConfig } from '$lib/services/built-in-templates';
 	import { writeWizardSetup } from '$lib/services/wizard';
 	import TemplateEditor from '$lib/components/TemplateEditor.svelte';
 	import type { Template } from '$lib/types/index';
@@ -42,24 +45,13 @@
 
 	type Path = 'builtin' | 'custom';
 	let path = $state<Path>('builtin');
-	let selected = $state<ReadonlySet<string>>(new Set());
+	let selectedPresetId = $state<string | null>(null);
 	let isApplying = $state(false);
 	let applyError = $state<string | null>(null);
 
-	const canApply = $derived(path === 'builtin' && selected.size > 0 && !isApplying);
+	const activePresets = $derived(i18n.locale === 'es' ? FRAMEWORK_PRESETS_ES : FRAMEWORK_PRESETS);
 
-	function toggle(id: string): void {
-		// `selected` is reassigned wholesale on every change (immutable-set
-		// pattern), so the Svelte 5 reactivity fires on the assignment, not
-		// on the inner add/delete. The local `new Set(selected)` is just a
-		// shallow copy used to derive the next snapshot; it never escapes
-		// this function, so a plain `Set` is correct here.
-		// eslint-disable-next-line svelte/prefer-svelte-reactivity
-		const next = new Set(selected);
-		if (next.has(id)) next.delete(id);
-		else next.add(id);
-		selected = next;
-	}
+	const canApply = $derived(path === 'builtin' && selectedPresetId !== null && !isApplying);
 
 	onMount(() => {
 		// If the wizard is opened without a bound local adapter, send
@@ -75,12 +67,13 @@
 			applyError = t('wizard.noFolder');
 			return;
 		}
+		const preset = activePresets.find(p => p.id === selectedPresetId);
+		if (!preset) return;
+
 		isApplying = true;
 		applyError = null;
 		try {
-			// If path is custom, we shouldn't be in this general apply function 
-			// without passing the custom templates, but we can handle it via a separate flow.
-			await writeWizardSetup(adapter, [...selected], { overwriteConfig: true });
+			await writeWizardSetup(adapter, preset.templates, { overwriteConfig: true, config: preset.config });
 			// Re-load the affected stores so the UI reflects the new files.
 			await Promise.all([stores.config.load(), stores.templates.load()]);
 			await stores.issues.load();
@@ -92,7 +85,7 @@
 		}
 	}
 
-	async function applyCustomTemplate(t: Template): Promise<void> {
+	async function applyCustomTemplate(tmpl: Template): Promise<void> {
 		const adapter = stores.mode.localAdapter;
 		if (!adapter) {
 			applyError = t('wizard.noFolder');
@@ -101,7 +94,7 @@
 		isApplying = true;
 		applyError = null;
 		try {
-			await writeWizardSetup(adapter, [t], { overwriteConfig: true });
+			await writeWizardSetup(adapter, [tmpl], { overwriteConfig: true, config: defaultConfig() });
 			await Promise.all([stores.config.load(), stores.templates.load()]);
 			await stores.issues.load();
 			await goto(resolve('/local'));
@@ -119,7 +112,7 @@
 
 <div class="flex min-h-screen flex-col bg-background text-foreground">
 	<div class="flex-1 px-6 py-10">
-		<div class="mx-auto flex max-w-3xl flex-col gap-8">
+		<div class="mx-auto flex max-w-4xl flex-col gap-8">
 			<section>
 				<h1 class="text-2xl font-semibold">{t('wizard.headTitle')}</h1>
 				<p class="mt-2 opacity-80">{t('wizard.headBody')}</p>
@@ -168,29 +161,27 @@
 					<h2 class="text-lg font-semibold">{t('wizard.step2Title')}</h2>
 					<p class="text-sm opacity-70">{t('wizard.step2Body')}</p>
 					<div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-						{#each BUILT_IN_TEMPLATES as tmpl (tmpl.id)}
-							{@const isPicked = selected.has(tmpl.id)}
-							<div data-testid="wizard-template-{tmpl.id}">
-								<Card compact>
-									<label class="flex cursor-pointer items-start gap-3">
-										<Checkbox
-											checked={isPicked}
+						{#each activePresets as preset (preset.id)}
+							<div data-testid="wizard-preset-{preset.id}">
+								<Card compact class="h-full">
+									<label class="flex cursor-pointer items-start gap-3 h-full">
+										<Radio
+											name="preset"
+											value={preset.id}
+											checked={selectedPresetId === preset.id}
 											label=""
-											ariaLabel={t('wizard.selectTemplateAria', { name: tmpl.name })}
-											onchange={() => toggle(tmpl.id)}
+											ariaLabel={t('wizard.selectFrameworkAria', { name: preset.name })}
+											onchange={() => (selectedPresetId = preset.id)}
 										/>
 										<div class="flex-1">
-											<div class="flex items-center gap-2 font-medium">
-												<span
-													class="inline-block h-3 w-3 rounded-full"
-													style="background-color: {tmpl.color}"
-													aria-hidden="true"
-												></span>
-												{tmpl.name}
+											<div class="font-medium">
+												{preset.name}
 											</div>
-											<div class="mt-1 text-xs opacity-70">
-												{t('wizard.templateFields', { n: tmpl.fields.length })} ·
-												{t('wizard.templateSections', { n: tmpl.sections.length })}
+											<div class="mt-1 text-xs opacity-70 leading-relaxed line-clamp-3" title={preset.description}>
+												{preset.description}
+											</div>
+											<div class="mt-3 text-xs font-semibold opacity-60">
+												{t('wizard.frameworkIncludes', { templates: preset.templates.length, statuses: preset.config.statuses.length })}
 											</div>
 										</div>
 									</label>
@@ -233,9 +224,6 @@
 						</Button>
 					</Tooltip>
 					<Button variant="ghost" onclick={cancel}>{t('wizard.cancel')}</Button>
-					<span class="ml-auto text-xs opacity-60">
-						{t('wizard.summary', { selected: selected.size })}
-					</span>
 				</div>
 			{/if}
 		</div>

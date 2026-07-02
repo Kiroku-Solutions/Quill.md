@@ -200,7 +200,7 @@ export function createFilterStore(): FilterStore {
 		const next: FilterState = {};
 		for (const key of SCALAR_KEYS) {
 			const value = normalize(params.get(key));
-			if (value !== undefined) next[key] = value;
+			if (value !== undefined) (next as any)[key] = value;
 		}
 		for (const field of DATE_FIELDS) {
 			const from = normalize(params.get(`${field}_from`), true);

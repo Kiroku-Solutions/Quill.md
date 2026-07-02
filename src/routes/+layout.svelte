@@ -99,7 +99,11 @@
 	// `ShellMode` to AppShell. The store's `mode.mode` only distinguishes
 	// home / local / remote; wizard detection is URL-based.
 	const currentMode = $derived<ShellMode>(
-		$page.url.pathname.startsWith('/wizard') ? 'wizard' : mode.mode
+		$page.url.pathname.startsWith('/wizard')
+			? 'wizard'
+			: $page.url.pathname === '/'
+				? 'home'
+				: mode.mode
 	);
 
 	// Synchronize the HTML class with the theme store continuously.

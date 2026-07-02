@@ -3,8 +3,8 @@
 	import { Button, Card } from '$lib/ui';
 	import IconPicker from './IconPicker.svelte';
 	import ColorPicker from './ColorPicker.svelte';
-	import type { Template, TemplateField, TemplateSection, FieldType } from '$lib/types/index.ts';
-	import { FIELD_TYPES, RELATION_TYPES } from '$lib/types/index.ts';
+	import type { Template, TemplateField, TemplateSection, FieldType } from '$lib/types/index';
+	import { FIELD_TYPES, RELATION_TYPES } from '$lib/types/index';
 	import * as Icons from '@lucide/svelte';
 	import { slide, fade } from 'svelte/transition';
 	import { getStores } from '$lib/state';
@@ -179,7 +179,8 @@
 <div class="flex flex-col gap-8 w-full max-w-5xl mx-auto pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
 	
 	<!-- Header / Preview Card -->
-	<Card class="overflow-hidden border-2 transition-colors duration-300 shadow-lg" style="border-color: {color}40;">
+	<div style="border-color: {color}40;" class="rounded-xl">
+		<Card class="overflow-hidden border-2 transition-colors duration-300 shadow-lg border-transparent">
 		<div class="bg-surface/30 p-6 sm:p-8 flex items-center gap-6 relative overflow-hidden">
 			<!-- Decorative background blob -->
 			<div class="absolute -right-10 -top-10 w-40 h-40 rounded-full blur-3xl opacity-20 transition-colors duration-500" style="background-color: {color};"></div>
@@ -212,6 +213,7 @@
 			</div>
 		</div>
 	</Card>
+	</div>
 
 	<!-- Main Form -->
 	<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -433,7 +435,7 @@
 															<span class="text-[10px] text-muted-foreground uppercase tracking-wider">{t('templateEditor.allowedRelationTypes')}</span>
 															<div class="flex flex-wrap gap-2 mt-1">
 																{#each RELATION_TYPES as rType}
-																	{@const checked = field.allowed_targets[tmpl.id].includes(rType)}
+																{@const checked = field.allowed_targets?.[tmpl.id]?.includes(rType) ?? false}
 																	<label class="flex items-center gap-1.5 text-[11px] cursor-pointer bg-background border {checked ? 'border-primary ring-1 ring-primary' : 'border-border'} px-2 py-1 rounded">
 																		<input type="checkbox" class="sr-only" checked={checked} onchange={() => toggleAllowedRelationType(field, tmpl.id, rType)} />
 																		{t(`formFields.relationTypes.${rType}`)}

@@ -462,7 +462,7 @@
 	{/each}
 </div>
 
-{#snippet columnSet(group)}
+{#snippet columnSet(group: { id: string, title: string })}
 	{#each columns as col (col.id)}
 		{@const colCards = groupedCards[group.id]?.[col.id] ?? []}
 		{@const isDropTarget = dropTargetId === `${group.id}:${col.id}` && draggedId !== null}

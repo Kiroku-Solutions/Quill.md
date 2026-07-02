@@ -155,7 +155,7 @@ function buildStub(opts: {
 			toggle: () => {}
 		},
 		ui: {
-			settingsOpen: false,
+			settingsOpen: false, mobileNavOpen: false, openMobileNav: () => {}, closeMobileNav: () => {}, toggleMobileNav: () => {},
 			openSettings: () => {},
 			closeSettings: () => {},
 			toggleSettings: () => {},

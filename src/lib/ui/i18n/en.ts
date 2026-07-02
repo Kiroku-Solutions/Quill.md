@@ -330,29 +330,27 @@ export const en = {
 		headBody:
 			'Your folder does not have a .quill.md/ configuration yet. Pick a path below to get started. You can edit or add templates later from the Settings panel.',
 		step1Title: '1. Choose how to set up templates',
-		step2Title: '2. Pick the templates you need',
+		step2Title: '2. Pick a framework preset',
 		step2Body:
-			'Select at least one. Selected templates are written to .quill.md/templates/ verbatim.',
-		builtinTitle: 'Use built-in templates',
+			'Select one of the 20 industry-standard frameworks. The preset will install the complete set of categories and statuses.',
+		builtinTitle: 'Use a framework preset',
 		builtinBody:
-			'Pick from the six bundled types: Epic, Use Case, User Story, Task, Bug, Sprint. Recommended for most projects.',
-		builtinAria: 'Use built-in templates',
+			'Pick from state-of-the-art agile frameworks like Scrum, Kanban, XP, or SAFe. Recommended for most projects.',
+		builtinAria: 'Use a framework preset',
 		customTitle: 'Create your own',
 		customBody:
 			'Author your own category from scratch using the Visual Editor. Define the icons, colors, and fields you need.',
 		customAria: 'Create your own templates',
 		customTooltip: 'Coming soon — the in-app template editor is a future step',
 		applyButton: 'Apply and continue',
-		applyTooltip: 'Write the selected templates to .quill.md/',
-		applyTooltipDisabled: 'Select at least one template to continue',
+		applyTooltip: 'Write the selected framework to .quill.md/',
+		applyTooltipDisabled: 'Select a framework preset to continue',
 		applying: 'Applying…',
 		cancel: 'Cancel',
 		noFolder: 'No local folder is open. Use "Open local folder" on the home page.',
 		applyError: (params: Params) => `Failed to write the wizard setup: ${params.msg}`,
-		summary: (params: Params) => `Selected: ${params.selected} · Required: ≥1`,
-		selectTemplateAria: (params: Params) => `Select ${params.name}`,
-		templateFields: (params: Params) => `${params.n} fields`,
-		templateSections: (params: Params) => `${params.n} sections`
+		selectFrameworkAria: (params: Params) => `Select framework ${params.name}`,
+		frameworkIncludes: (params: Params) => `Includes ${params.templates} templates · ${params.statuses} statuses`
 	},
 	sprint: {
 		progress: 'Sprint Progress',

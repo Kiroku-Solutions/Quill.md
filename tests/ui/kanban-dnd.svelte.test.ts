@@ -226,7 +226,7 @@ function buildStub(issues: readonly Issue[], mode: 'local' | 'remote'): StoreGra
 			toggle: () => {}
 		},
 		ui: {
-			settingsOpen: false,
+			settingsOpen: false, mobileNavOpen: false, openMobileNav: () => {}, closeMobileNav: () => {}, toggleMobileNav: () => {},
 			openSettings: () => {},
 			closeSettings: () => {},
 			toggleSettings: () => {},
@@ -376,7 +376,7 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 		expect(firstCard?.getAttribute('aria-pressed')).toBe('true');
 		// Live region should announce the pickup.
 		const live = document.querySelector<HTMLElement>('[data-testid="kanban-live"]');
-		expect(live?.textContent ?? '').toMatch(/Picked up issue 1/);
+		expect(live?.textContent ?? '').toMatch(/Picked up item 1/);
 	});
 
 	it('drops a lifted card on a second Space and announces the drop', async () => {
@@ -398,7 +398,7 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 
 		expect(firstCard?.getAttribute('data-lifted')).toBe('false');
 		const live = document.querySelector<HTMLElement>('[data-testid="kanban-live"]');
-		expect(live?.textContent ?? '').toMatch(/Dropped issue 1 in column open/);
+		expect(live?.textContent ?? '').toMatch(/Dropped item 1 in column open/);
 		// No cross-column move → no store update.
 		expect(updateCalls).toEqual([]);
 	});
@@ -427,7 +427,7 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 		// The lifted flag is cleared on the implicit drop.
 		expect(firstCard?.getAttribute('data-lifted')).toBe('false');
 		const live = document.querySelector<HTMLElement>('[data-testid="kanban-live"]');
-		expect(live?.textContent ?? '').toMatch(/Dropped issue 1 in column in_progress/);
+		expect(live?.textContent ?? '').toMatch(/Dropped item 1 in column in_progress/);
 	});
 
 	it('cancels a pickup on Escape and announces the cancellation', async () => {
@@ -449,7 +449,7 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 		// No store update from a cancelled pickup.
 		expect(updateCalls).toEqual([]);
 		const live = document.querySelector<HTMLElement>('[data-testid="kanban-live"]');
-		expect(live?.textContent ?? '').toMatch(/Cancelled move of issue 1/);
+		expect(live?.textContent ?? '').toMatch(/Cancelled move of item 1/);
 	});
 
 	it('opens the editor on F2 (the WAI-ARIA activate verb)', async () => {

@@ -331,29 +331,27 @@ export const es: Translations = {
 		headBody:
 			'Tu carpeta aún no tiene una configuración .quill.md/. Elige una ruta abajo para comenzar. Puedes editar o agregar plantillas más tarde desde Ajustes.',
 		step1Title: '1. Elige cómo configurar plantillas',
-		step2Title: '2. Elige las plantillas que necesites',
+		step2Title: '2. Elige un framework',
 		step2Body:
-			'Selecciona al menos una. Las plantillas seleccionadas se escriben en .quill.md/templates/ textualmente.',
-		builtinTitle: 'Usar plantillas integradas',
+			'Selecciona uno de los 20 frameworks estándar de la industria. Se instalará el conjunto completo de categorías y estados.',
+		builtinTitle: 'Usar un framework',
 		builtinBody:
-			'Elige de los seis tipos de elementos incluidos: Epic, Caso de Uso, Historia de Usuario, Tarea, Bug, Sprint. Recomendado para la mayoría.',
-		builtinAria: 'Usar plantillas integradas',
+			'Elige de entre los frameworks ágiles como Scrum, Kanban, XP, o SAFe. Recomendado para la mayoría.',
+		builtinAria: 'Usar un framework',
 		customTitle: 'Crear la tuya propia',
 		customBody:
 			'Crea tu propia categoría desde cero usando el nuevo Editor Visual. Define los íconos, colores y campos que necesites.',
 		customAria: 'Crear tus propias plantillas',
 		customTooltip: 'Próximamente — el editor de plantillas en la app es un paso futuro',
 		applyButton: 'Aplicar y continuar',
-		applyTooltip: 'Escribir las plantillas seleccionadas en .quill.md/',
-		applyTooltipDisabled: 'Selecciona al menos una plantilla para continuar',
+		applyTooltip: 'Escribir el framework seleccionado en .quill.md/',
+		applyTooltipDisabled: 'Selecciona un framework para continuar',
 		applying: 'Aplicando…',
 		cancel: 'Cancelar',
 		noFolder: 'No hay carpeta local abierta. Usa "Abrir carpeta local" en el inicio.',
 		applyError: (params: Params) => `Error al escribir la configuración: ${params.msg}`,
-		summary: (params: Params) => `Seleccionadas: ${params.selected} · Requeridas: ≥1`,
-		selectTemplateAria: (params: Params) => `Seleccionar ${params.name}`,
-		templateFields: (params: Params) => `${params.n} campos`,
-		templateSections: (params: Params) => `${params.n} secciones`
+		selectFrameworkAria: (params: Params) => `Seleccionar framework ${params.name}`,
+		frameworkIncludes: (params: Params) => `Incluye ${params.templates} plantillas · ${params.statuses} estados`
 	},
 	sprint: {
 		progress: 'Progreso del Sprint',

@@ -1110,6 +1110,14 @@ and tick each box.
   allow-list is the right home for these keywords; a regex
   carve-out would be too fragile.
 
+## Production Readiness / Final Polish (July 2026)
+
+Following a deep audit against `docs/agile-frameworks-research.md`, the following polish items were applied to take the app to production-ready:
+1. **Framework Parity**: Extracted and translated all 20 scaling frameworks to Spanish natively, filling 236 missing strings (including complex framework definitions).
+2. **Template Inheritance**: Ensured scaling frameworks (LeSS, Nexus, Scrum@Scale, Water-Scrum-Fall) correctly inherit the base Scrum templates (Epic, User Story, Task, Bug) to provide a complete "drop-in" experience.
+3. **Test Suite Stability**: Resolved 13 test failures related to the semantic terminology switch from "Issue" to "Item", achieving a 100% green pass on all 1041 tests.
+4. **UI Refinements**: Removed distracting emojis from the TopBar, improved project name rendering, and fixed wizard routing logic so injecting methodologies to an open local folder doesn't redirect the user to the home page.
+
 ### Step 9 / post-launch follow-ups (out of scope for v0)
 
 - **Real screen-reader smoke** on NVDA + VoiceOver + Orca

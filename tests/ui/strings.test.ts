@@ -35,7 +35,7 @@ describe('t helper + STRINGS map', () => {
 			expect(t('app.name')).toBe('Quill.md');
 			expect(t('app.version')).toBe('v0.0.1');
 			expect(t('home.heroTitle')).toBe('quill.md');
-			expect(t('home.heroSubtitle')).toBe('Issues that travel with your repo');
+			expect(t('home.heroSubtitle')).toBe('Items that travel with your repo');
 		});
 
 		it('reads the editor surface (form/write/preview tab labels)', () => {
@@ -45,7 +45,7 @@ describe('t helper + STRINGS map', () => {
 		});
 
 		it('reads the wizard surface (titles + step copy)', () => {
-			expect(t('wizard.headTitle')).toBe('Set up your issue tracker');
+			expect(t('wizard.headTitle')).toBe('Set up your tracker');
 			expect(t('wizard.step1Title')).toBe('1. Choose how to set up templates');
 			expect(t('wizard.applyButton')).toBe('Apply and continue');
 		});
@@ -82,19 +82,19 @@ describe('t helper + STRINGS map', () => {
 		});
 
 		it('pluralises correctly for n=1 vs n!=1', () => {
-			expect(t('common.issueCount', { n: 1 })).toBe('1 issue');
-			expect(t('common.issueCount', { n: 5 })).toBe('5 issues');
+			expect(t('common.issueCount', { n: 1 })).toBe('1 item');
+			expect(t('common.issueCount', { n: 5 })).toBe('5 items');
 			expect(t('common.dirtyCount', { n: 1 })).toBe('1 dirty');
 			expect(t('common.dirtyCount', { n: 0 })).toBe('0 dirty');
 		});
 
 		it('substitutes multiple named placeholders', () => {
 			expect(t('kanban.cardAria', { id: 42, title: 'Fix login', col: 'open' })).toBe(
-				'Issue 42: Fix login in column open'
+				'Item 42: Fix login in column open'
 			);
-			expect(t('gantt.barAria', { id: 7, title: 'Spec the API' })).toBe('Issue 7: Spec the API');
-			expect(t('list.countPill', { filtered: 3, total: 10 })).toBe('3 of 10 issues');
-			expect(t('list.countPill', { filtered: 1, total: 1 })).toBe('1 of 1 issue');
+			expect(t('gantt.barAria', { id: 7, title: 'Spec the API' })).toBe('Item 7: Spec the API');
+			expect(t('list.countPill', { filtered: 3, total: 10 })).toBe('3 of 10 items');
+			expect(t('list.countPill', { filtered: 1, total: 1 })).toBe('1 of 1 item');
 		});
 	});
 

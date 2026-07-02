@@ -114,24 +114,14 @@
 
 	<Badge variant={badge.variant} size="sm">{badge.label}</Badge>
 
-	{#if indicatorText}
-		<span
-			class="ml-2 max-w-xs truncate text-sm opacity-80"
-			title={indicatorText}
-			data-testid="topbar-indicator"
-		>
-			{indicatorText}
-		</span>
-	{/if}
-
-	{#if productGoal}
-		<div class="hidden md:flex flex-1 items-center justify-center mx-4">
+	{#if indicatorText && indicatorText !== 'null'}
+		<div class="hidden md:flex flex-1 items-center justify-center mx-4 min-w-0">
 			<span
-				class="text-sm text-foreground/80 font-medium truncate max-w-lg bg-base-200/50 px-3 py-1 rounded-full border border-border"
-				title="Product Goal: {productGoal}"
-				data-testid="topbar-product-goal"
+				class="text-base text-foreground font-semibold truncate"
+				title={indicatorText}
+				data-testid="topbar-project-name"
 			>
-				🎯 {productGoal}
+				{indicatorText}
 			</span>
 		</div>
 	{:else}

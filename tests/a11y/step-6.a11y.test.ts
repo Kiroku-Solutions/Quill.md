@@ -178,7 +178,7 @@ function buildStub(opts: {
 	recentHandles?: HandleRecord[];
 	issues?: LoadedIssue[];
 	activeEditorId?: number | null;
-	settingsOpen?: boolean;
+	settingsOpen?: boolean; mobileNavOpen?: boolean;
 }): StoreGraph {
 	const loaded = opts.issues ?? [];
 	const integrityWarnings = Array.from({ length: opts.integrityCount ?? 0 }, (_, i) => ({
@@ -295,7 +295,7 @@ function buildStub(opts: {
 			toggle: () => {}
 		},
 		ui: {
-			get settingsOpen() {
+			mobileNavOpen: false, openMobileNav: () => {}, closeMobileNav: () => {}, toggleMobileNav: () => {}, get settingsOpen() {
 				return opts.settingsOpen ?? false;
 			},
 			openSettings: () => {},

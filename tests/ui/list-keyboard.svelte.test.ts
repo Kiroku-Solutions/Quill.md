@@ -164,7 +164,7 @@ function buildStub(issues: readonly Issue[]): StoreGraph {
 			toggle: () => {}
 		},
 		ui: {
-			settingsOpen: false,
+			settingsOpen: false, mobileNavOpen: false, openMobileNav: () => {}, closeMobileNav: () => {}, toggleMobileNav: () => {},
 			openSettings: () => {},
 			closeSettings: () => {},
 			toggleSettings: () => {},

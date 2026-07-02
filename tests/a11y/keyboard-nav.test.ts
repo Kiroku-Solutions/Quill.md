@@ -232,7 +232,7 @@ function buildStub(opts: {
 		view: { view: 'list', setView: () => {} },
 		theme: { preference: 'light', theme: 'light', setTheme: () => {}, toggle: () => {} },
 		ui: {
-			settingsOpen: false,
+			settingsOpen: false, mobileNavOpen: false, openMobileNav: () => {}, closeMobileNav: () => {}, toggleMobileNav: () => {},
 			openSettings: () => {},
 			closeSettings: () => {},
 			toggleSettings: () => {},
@@ -280,8 +280,8 @@ describe('Step 6 — keyboard-only walkthrough (NFR-4)', () => {
 		expect(document.activeElement).toBe(btn.element());
 		await userEvent.keyboard('{Enter}');
 
-		// The modal mounts with a heading "New issue" once open.
-		await expect.element(page.getByRole('heading', { name: 'New issue' })).toBeInTheDocument();
+		// The modal mounts with a heading "New item" once open.
+		await expect.element(page.getByRole('heading', { name: 'New item' })).toBeInTheDocument();
 	});
 
 	it('FilterBar search input is reachable and the search filter mutates the store', async () => {

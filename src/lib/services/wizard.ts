@@ -21,7 +21,7 @@
 
 import type { WritableDirectoryAdapter } from '../adapters/directory-adapter.ts';
 import type { Config, Template } from '../types/index.ts';
-import { BUILT_IN_TEMPLATES, defaultConfig, getBuiltInTemplate } from './built-in-templates.ts';
+import { defaultConfig } from './built-in-templates.ts';
 
 const CONFIG_PATH = '.quill.md/config.json';
 const TEMPLATES_DIR = '.quill.md/templates';
@@ -32,9 +32,7 @@ export interface WizardSetupOptions {
 	/** When `true`, overwrite existing template files. Defaults to `false`. */
 	readonly overwriteTemplates?: boolean;
 	/**
-	 * Optional custom config. Defaults to {@link defaultConfig}.
-	 * Ignored if `overwriteConfig` is false and a config file already
-	 * exists on disk (we leave the existing file alone).
+	 * Required config to write if `overwriteConfig` is true or if config does not exist.
 	 */
 	readonly config?: Config;
 }
@@ -50,26 +48,11 @@ export interface WizardSetupOptions {
  */
 export async function writeWizardSetup(
 	adapter: WritableDirectoryAdapter,
-	templatesToProcess: readonly (string | Template)[],
+	templatesToProcess: readonly Template[],
 	options: WizardSetupOptions = {}
 ): Promise<readonly Template[]> {
 	if (templatesToProcess.length === 0) {
 		throw new Error('At least one template must be selected (FR-11)');
-	}
-
-	// Resolve templates in declaration order so the on-disk order is
-	// stable across runs.
-	const tpls: Template[] = [];
-	for (const item of templatesToProcess) {
-		if (typeof item === 'string') {
-			const t = getBuiltInTemplate(item);
-			if (!t) {
-				throw new Error(`Unknown built-in template: ${item}`);
-			}
-			tpls.push(t);
-		} else {
-			tpls.push(item);
-		}
 	}
 
 	const overwriteConfig = options.overwriteConfig ?? false;
@@ -77,19 +60,33 @@ export async function writeWizardSetup(
 
 	// 1. Write config.json (unless preserving an existing one).
 	if (overwriteConfig || !(await exists(adapter, CONFIG_PATH))) {
-		const cfg = options.config ?? defaultConfig();
-		await adapter.writeTextFile(CONFIG_PATH, JSON.stringify(cfg, null, '\t') + '\n');
+		if (!options.config) {
+			throw new Error('Config is required when writing a new setup');
+		}
+
+		const base = defaultConfig();
+		const finalConfig: Config = {
+			...base,
+			...options.config,
+			kanban: options.config.kanban || { columns: options.config.statuses.map((s) => s.id) },
+			gantt: options.config.gantt || base.gantt,
+			remote: options.config.remote || base.remote,
+			labels: options.config.labels || base.labels,
+			users: options.config.users || base.users
+		};
+
+		await adapter.writeTextFile(CONFIG_PATH, JSON.stringify(finalConfig, null, '\t') + '\n');
 	}
 
 	// 2. Write each selected template (skipping existing ones unless
 	//    `overwriteTemplates` is set).
-	for (const t of tpls) {
+	for (const t of templatesToProcess) {
 		const path = `${TEMPLATES_DIR}/${t.id}.json`;
 		if (!overwriteTemplates && (await exists(adapter, path))) continue;
 		await adapter.writeTextFile(path, JSON.stringify(t, null, '\t') + '\n');
 	}
 
-	return tpls;
+	return templatesToProcess;
 }
 
 /**
@@ -105,10 +102,3 @@ async function exists(adapter: WritableDirectoryAdapter, path: string): Promise<
 		return false;
 	}
 }
-
-/**
- * Convenience: re-export the built-in template bundle for callers that
- * want the same list the wizard uses (e.g. an export from the
- * services barrel).
- */
-export { BUILT_IN_TEMPLATES };

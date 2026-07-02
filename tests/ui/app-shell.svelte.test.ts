@@ -182,7 +182,7 @@ function buildStub(opts: { integrityCount: number; activeHandleName?: string }):
 			toggle: () => {}
 		},
 		ui: {
-			settingsOpen: false,
+			settingsOpen: false, mobileNavOpen: false, openMobileNav: () => {}, closeMobileNav: () => {}, toggleMobileNav: () => {},
 			openSettings: () => {},
 			closeSettings: () => {},
 			toggleSettings: () => {},
