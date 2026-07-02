@@ -41,7 +41,7 @@ async function generateMockWorkspace(preset: typeof FRAMEWORK_PRESETS_ES[0]) {
 	
 	// Helper to get a template (Top, Mid, Low fallback)
 	const getTmpl = (index: number) => templates[Math.min(index, templates.length - 1)].id;
-	const statuses = preset.config.statuses.map(s => s.name);
+	const statuses = preset.config.statuses.map(s => s.id);
 	const getStatus = (index: number) => statuses[index % statuses.length];
 
 	let nextId = 1;

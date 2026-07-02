@@ -120,7 +120,7 @@ async function generateMockGraph(
 	if (templates.length === 0) return;
 	
 	const issues: Issue[] = [];
-	const statuses = config.statuses.map((s) => s.name);
+	const statuses = config.statuses.map((s) => s.id);
 	const getStatus = (index: number) => statuses[index % statuses.length];
 
 	let nextId = 1;
