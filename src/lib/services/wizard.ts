@@ -117,45 +117,56 @@ async function generateMockGraph(
 	config: Config,
 	templates: readonly Template[]
 ): Promise<void> {
+	if (templates.length === 0) return;
+	
 	const issues: Issue[] = [];
-	const getTmpl = (index: number) => templates[Math.min(index, templates.length - 1)].id;
 	const statuses = config.statuses.map((s) => s.name);
 	const getStatus = (index: number) => statuses[index % statuses.length];
 
 	let nextId = 1;
-	const roots = [1, 2, 3].map((i) => {
+	const levels: Issue[][] = [];
+
+	// Level 0 (Roots)
+	const roots: Issue[] = [];
+	for (let i = 0; i < 2; i++) {
 		const id = nextId++;
-		return createMockIssue(id, `Iniciativa Estratégica ${i}`, getTmpl(0), getStatus(id));
-	});
+		roots.push(createMockIssue(id, `${templates[0].name} ${i+1}`, templates[0].id, getStatus(id)));
+	}
+	levels.push(roots);
 
-	const mids: Issue[] = [];
-	for (const root of roots) {
-		for (let i = 1; i <= 2; i++) {
-			const id = nextId++;
-			const child = createMockIssue(id, `Trabajo de Nivel Medio ${root.id}-${i}`, getTmpl(1), getStatus(id));
-			link(root, child, 'child');
-			mids.push(child);
+	// Levels 1 to N-1
+	for (let i = 1; i < templates.length; i++) {
+		const currentLevel: Issue[] = [];
+		const parents = levels[i - 1];
+		for (const parent of parents) {
+			for (let j = 0; j < 2; j++) {
+				const id = nextId++;
+				const child = createMockIssue(id, `${templates[i].name} ${parent.id}-${j+1}`, templates[i].id, getStatus(id));
+				link(parent, child, 'child');
+				currentLevel.push(child);
+			}
 		}
+		levels.push(currentLevel);
 	}
 
-	const leaves: Issue[] = [];
-	for (const mid of mids) {
-		for (let i = 1; i <= 2; i++) {
-			const id = nextId++;
-			const child = createMockIssue(id, `Tarea o Defecto ${mid.id}-${i}`, getTmpl(2), getStatus(id));
-			link(mid, child, 'child');
-			leaves.push(child);
-		}
+	// Cross-hierarchy dependencies
+	if (levels.length > 0) {
+		const leaves = levels[levels.length - 1];
+		if (leaves.length >= 2) link(leaves[0], leaves[leaves.length - 1], 'blocks');
+		if (leaves.length >= 4) link(leaves[1], leaves[2], 'depends_on');
+	}
+	
+	if (levels.length > 1) {
+		const mids = levels[Math.floor(levels.length / 2)];
+		if (mids.length >= 2) link(mids[0], mids[mids.length - 1], 'relates_to');
 	}
 
-	link(leaves[0], leaves[1], 'blocks');
-	link(leaves[2], leaves[3], 'depends_on');
-	link(mids[0], mids[2], 'relates_to');
-	link(roots[0], roots[1], 'relates_to');
-	link(leaves[4], leaves[5], 'blocks');
-	link(leaves[6], leaves[5], 'depends_on');
+	if (levels.length > 2) {
+		const highMids = levels[1];
+		if (highMids.length >= 2) link(highMids[0], highMids[1], 'relates_to');
+	}
 
-	issues.push(...roots, ...mids, ...leaves);
+	issues.push(...levels.flat());
 
 	for (const issue of issues) {
 		const serialized = await serializeIssue(issue);
