@@ -17,7 +17,8 @@
 		"test:unit": "vitest",
 		"test": "vitest --run",
 		"coverage": "vitest --run --coverage",
-		"sri": "node scripts/add-sri.mjs"
+		"sri": "node scripts/add-sri.mjs",
+		"generate:mocks": "tsx scripts/generate-mock-graph.ts"
 	},
 	"engines": {
 		"node": ">=20"
