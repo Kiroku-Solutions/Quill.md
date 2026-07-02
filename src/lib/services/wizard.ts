@@ -84,6 +84,21 @@ export async function writeWizardSetup(
 
 	// 2. Write each selected template (skipping existing ones unless
 	//    `overwriteTemplates` is set).
+	if (overwriteTemplates) {
+		try {
+			const existingTemplates = await adapter.listDirectory(TEMPLATES_DIR);
+			const newTemplateIds = new Set(templatesToProcess.map(t => `${t.id}.json`));
+			
+			for (const entry of existingTemplates) {
+				if (entry.kind === 'file' && entry.name.endsWith('.json') && !newTemplateIds.has(entry.name)) {
+					await adapter.removeFile(`${TEMPLATES_DIR}/${entry.name}`);
+				}
+			}
+		} catch {
+			// Ignore if directory doesn't exist
+		}
+	}
+
 	for (const t of templatesToProcess) {
 		const path = `${TEMPLATES_DIR}/${t.id}.json`;
 		if (!overwriteTemplates && (await exists(adapter, path))) continue;
@@ -92,6 +107,19 @@ export async function writeWizardSetup(
 
 	// 3. Generate mock data if requested
 	if (options.generateMockData && options.config) {
+		// If generating mock data, try to clear old mock issues to avoid clutter
+		if (overwriteTemplates) {
+			try {
+				const existingIssues = await adapter.listDirectory('.quill.md/issues');
+				for (const entry of existingIssues) {
+					if (entry.kind === 'file' && entry.name.endsWith('.md')) {
+						await adapter.removeFile(`.quill.md/issues/${entry.name}`);
+					}
+				}
+			} catch {
+				// Ignore
+			}
+		}
 		await generateMockGraph(adapter, options.config, templatesToProcess);
 	}
 
