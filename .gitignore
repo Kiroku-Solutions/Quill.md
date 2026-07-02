@@ -40,3 +40,4 @@ vite.config.ts.timestamp-*
 .kiroku-ai/
 GEMINI.md
 # <<< kiroku-ai managed <<<
+docs/research

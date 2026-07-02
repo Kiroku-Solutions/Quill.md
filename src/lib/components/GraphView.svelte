@@ -1,225 +1,241 @@
 <script lang="ts">
 	import { getStores } from '$lib/state';
-	import { onMount, onDestroy } from 'svelte';
-	import { IconButton } from '$lib/ui';
-	import Maximize from '@lucide/svelte/icons/maximize';
-	import ZoomIn from '@lucide/svelte/icons/zoom-in';
-	import ZoomOut from '@lucide/svelte/icons/zoom-out';
-	import Play from '@lucide/svelte/icons/play';
-	import Pause from '@lucide/svelte/icons/pause';
+	import { onMount, untrack } from 'svelte';
+	const { issues, editor, templates, filter, theme } = getStores();
 	
-	// Graphology & Sigma
-	import Graph from 'graphology';
-	import { Sigma } from 'sigma';
-	import { circular } from 'graphology-layout';
-	import FA2LayoutSupervisor from 'graphology-layout-forceatlas2/worker';
-	import forceAtlas2 from 'graphology-layout-forceatlas2';
-	import { persistedLayout } from '$lib/services/graph-persistence';
-	
-	const { issues, editor, templates } = getStores();
-
 	let container: HTMLDivElement | undefined = $state();
-	let sigma: Sigma | undefined;
-	let fa2: FA2LayoutSupervisor | undefined;
-	let isSimulating = $state(true);
+	let graph: any;
+	let is3D = $state(true);
+
+	function buildGraphData() {
+		let nodes: any[] = [];
+		let links: any[] = [];
+
+		const filteredIssues = Array.from(issues.byId.values()).filter((li) => {
+				const f = filter.filter;
+				if (f.status && li.issue.status !== f.status) return false;
+				if (f.type && li.issue.issueType !== f.type) return false;
+				if (f.q) {
+					const needle = f.q.toLowerCase();
+					if (
+						!li.issue.title.toLowerCase().includes(needle) &&
+						!li.issue.sections.some((s) => s.markdown.toLowerCase().includes(needle))
+					) {
+						return false;
+					}
+				}
+				return true;
+			});
+
+			const validNodeIds = new Set(filteredIssues.map(li => String(li.issue.id)));
+			const groupBy = filter.filter.groupBy ?? 'none';
+			
+			let groupNodes: import('$lib/types').LoadedIssue[] = [];
+			if (groupBy === 'epic') {
+				groupNodes = Array.from(issues.byId.values()).filter(li => li.issue.issueType === 'epic');
+			} else if (groupBy === 'sprint') {
+				groupNodes = Array.from(issues.byId.values()).filter(li => li.issue.issueType === 'sprint');
+			}
+
+			for (const li of filteredIssues) {
+				const issue = li.issue;
+				const tmpl = templates.byType.get(issue.issueType);
+				
+				let color: string | undefined = tmpl?.color || '#888888';
+				let groupId: string | undefined = undefined;
+				
+				if (groupBy !== 'none') {
+					if (issue.issueType === groupBy) {
+						groupId = String(issue.id);
+						color = undefined; // Auto-color by group
+					} else {
+						const relatedGroup = groupNodes.find(g => 
+							issue.relations.some(r => r.id === g.issue.id) || 
+							g.issue.relations.some(r => r.id === issue.id)
+						);
+						if (relatedGroup) {
+							groupId = String(relatedGroup.issue.id);
+							color = undefined; // Auto-color by group
+						} else {
+							groupId = 'unassigned';
+							color = '#3f3f46'; // Dim for unassigned
+						}
+					}
+				}
+
+				nodes.push({
+					id: String(issue.id),
+					name: issue.title,
+					color,
+					groupId
+				});
+				
+				for (const rel of issue.relations) {
+					const targetId = String(rel.id);
+					if (validNodeIds.has(targetId)) {
+						links.push({ source: String(issue.id), target: targetId, name: rel.type });
+					}
+				}
+		}
+
+		// Calculate sizes based on connection degree
+		const degrees = new Map<string, number>();
+		for (const link of links) {
+			degrees.set(link.source, (degrees.get(link.source) || 0) + 1);
+			degrees.set(link.target, (degrees.get(link.target) || 0) + 1);
+		}
+
+		for (const node of nodes) {
+			const deg = degrees.get(node.id) || 0;
+			// Base volume is 3. Each connection adds 1.5 to volume.
+			// The library calculates radius = cbrt(val), so volume grows linearly with connections.
+			node.val = 3 + (deg * 1.5);
+		}
+
+		return { nodes, links };
+	}
 
 	$effect(() => {
 		void issues.issues;
+		void filter.filter;
 		
-		if (!sigma) return;
-		buildGraph();
+		if (graph) {
+			graph.graphData(buildGraphData());
+		}
+	});
+	
+	// Effect to update link colors dynamically when the theme changes
+	$effect(() => {
+		if (graph) {
+			const linkColor = theme.theme === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.7)';
+			graph.linkColor(() => linkColor);
+		}
 	});
 
-	function buildGraph() {
-		if (!sigma) return;
-		const graph = sigma.getGraph();
-		graph.clear();
-		
-		// Add nodes
-		for (const li of issues.issues) {
-			const issue = li.issue;
-			const tmpl = templates.byType.get(issue.issueType);
-			const radius = issue.issueType === 'sprint' ? 14 : (issue.issueType === 'epic' ? 12 : 8);
-			
-			graph.addNode(String(issue.id), {
-				x: Math.random() * 100,
-				y: Math.random() * 100,
-				size: radius,
-				label: issue.title.length > 20 ? issue.title.substring(0, 20) + '...' : issue.title,
-				color: tmpl?.color || '#888888'
-			});
-		}
-		
-		// Add edges
-		for (const li of issues.issues) {
-			const issue = li.issue;
-			for (const rel of issue.relations) {
-				if (graph.hasNode(String(issue.id)) && graph.hasNode(String(rel.id))) {
-					if (!graph.hasEdge(String(issue.id), String(rel.id))) {
-						graph.addEdge(String(issue.id), String(rel.id), {
-							type: 'arrow',
-							size: 2,
-							color: '#666666'
-						});
-					}
-				}
-			}
-		}
-		
-		if (graph.order > 0) {
-			persistedLayout.load('global-graph').then((cached) => {
-				if (cached && Object.keys(cached).length > 0) {
-					graph.forEachNode((node) => {
-						if (cached[node]) {
-							graph.setNodeAttribute(node, 'x', cached[node].x);
-							graph.setNodeAttribute(node, 'y', cached[node].y);
-						}
-					});
-				} else {
-					circular.assign(graph, { scale: 300 });
-				}
-				
-				if (fa2) {
-					fa2.kill();
-				}
-				
-				const settings = forceAtlas2.inferSettings(graph);
-				settings.gravity = 1;
-				settings.scalingRatio = 10;
-				
-				fa2 = new FA2LayoutSupervisor(graph, { settings });
-				if (isSimulating) {
-					fa2.start();
-				}
-			});
-		}
-	}
-
-	onMount(() => {
+	$effect(() => {
 		if (!container) return;
 		
-		const graph = new Graph({ type: 'directed' });
+		const currentIs3D = is3D;
+		let currentGraph: any = null;
+		let mounted = true;
 		
-		sigma = new Sigma(graph, container, {
-			renderEdgeLabels: false,
-			defaultEdgeType: 'arrow',
-			labelDensity: 0.07,
-			labelGridCellSize: 60,
-			labelRenderedSizeThreshold: 12,
-			minCameraRatio: 0.1,
-			maxCameraRatio: 4,
-		});
-		
-		buildGraph();
-		
-		// Click to open editor
-		sigma.on('clickNode', ({ node }) => {
-			editor.open(Number(node));
-		});
-
-		// Drag logic
-		let draggedNode: string | null = null;
-		
-		sigma.on('downNode', (e) => {
-			isSimulating = false;
-			if (fa2) fa2.stop();
-			draggedNode = e.node;
-			sigma?.getGraph().setNodeAttribute(draggedNode, 'highlighted', true);
-		});
-		
-		sigma.getMouseCaptor().on('mousemovebody', (e) => {
-			if (!draggedNode || !sigma) return;
-			const pos = sigma.viewportToGraph(e);
-			sigma.getGraph().setNodeAttribute(draggedNode, 'x', pos.x);
-			sigma.getGraph().setNodeAttribute(draggedNode, 'y', pos.y);
-			e.preventSigmaDefault();
-			e.original.preventDefault();
-			e.original.stopPropagation();
-		});
-		
-		sigma.getMouseCaptor().on('mouseup', () => {
-			if (draggedNode && sigma) {
-				sigma.getGraph().removeNodeAttribute(draggedNode, 'highlighted');
-				draggedNode = null;
+		untrack(() => {
+			if (graph && graph._destructor) {
+				graph._destructor();
+				graph = null;
+			}
+			if (container) {
+				container.innerHTML = '';
 			}
 		});
-		
-		let saveHandle: number;
-		const scheduleSave = () => {
-			clearTimeout(saveHandle);
-			saveHandle = window.setTimeout(() => {
-				if (!sigma) return;
-				const positions: Record<string, {x: number, y: number}> = {};
-				sigma.getGraph().forEachNode((node, attrs) => {
-					positions[node] = { x: attrs.x, y: attrs.y };
-				});
-				persistedLayout.save('global-graph', positions);
-			}, 2000);
+
+		const initGraph = async () => {
+			const data = untrack(() => buildGraphData());
+			
+			// Initial theme check
+			const linkColorStr = theme.theme === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.7)';
+			
+			if (currentIs3D) {
+				const module = await import('3d-force-graph');
+				const ForceGraph3D = module.default;
+				if (!mounted) return;
+				
+				currentGraph = (ForceGraph3D as any)()(container)
+					.nodeLabel('name')
+					.nodeColor((n: any) => n.color || undefined)
+					.nodeAutoColorBy('groupId')
+					.nodeVal('val')
+					.linkColor(() => linkColorStr)
+					.linkDirectionalArrowLength(3.5)
+					.linkDirectionalArrowRelPos(1)
+					.backgroundColor('#00000000')
+					.onNodeClick((node: any) => {
+						if (!node.id.startsWith('debug-')) {
+							editor.open(Number(node.id));
+						}
+					});
+			} else {
+				const module = await import('force-graph');
+				const ForceGraph2D = module.default;
+				if (!mounted) return;
+				
+				currentGraph = (ForceGraph2D as any)()(container)
+					.nodeLabel('name')
+					.nodeColor((n: any) => n.color || undefined)
+					.nodeAutoColorBy('groupId')
+					.nodeVal('val')
+					.linkColor(() => linkColorStr)
+					.linkDirectionalArrowLength(3.5)
+					.linkDirectionalArrowRelPos(1)
+					.onNodeClick((node: any) => {
+						if (!node.id.startsWith('debug-')) {
+							editor.open(Number(node.id));
+						}
+					});
+			}
+			
+			currentGraph.graphData(data);
+			
+			if (container) {
+				currentGraph.width(container.clientWidth);
+				currentGraph.height(container.clientHeight);
+			}
+			
+			untrack(() => {
+				graph = currentGraph;
+			});
 		};
-		sigma.on('afterRender', scheduleSave);
+		
+		initGraph();
 
 		return () => {
-			clearTimeout(saveHandle);
-			if (fa2) fa2.kill();
-			if (sigma) sigma.kill();
+			mounted = false;
+			if (currentGraph && currentGraph._destructor) {
+				currentGraph._destructor();
+			}
 		};
 	});
 
-	function zoomIn() { 
-		if (!sigma) return;
-		const c = sigma.getCamera();
-		c.animatedZoom({ factor: 1.5, duration: 300 });
-	}
-	
-	function zoomOut() { 
-		if (!sigma) return;
-		const c = sigma.getCamera();
-		c.animatedUnzoom({ factor: 1.5, duration: 300 });
-	}
-	
-	function fitView() { 
-		if (!sigma) return;
-		sigma.getCamera().animatedReset({ duration: 300 });
-	}
-	
-	function toggleSimulation() {
-		isSimulating = !isSimulating;
-		if (isSimulating) {
-			fa2?.start();
-		} else {
-			fa2?.stop();
-		}
-	}
+	onMount(() => {
+		let resizeObserver: ResizeObserver | null = null;
+		
+		// Use a small timeout to ensure container is bound
+		setTimeout(() => {
+			if (container) {
+				resizeObserver = new ResizeObserver(() => {
+					if (container && graph) {
+						graph.width(container.clientWidth);
+						graph.height(container.clientHeight);
+					}
+				});
+				resizeObserver.observe(container as Element);
+			}
+		}, 0);
+		
+		return () => {
+			if (resizeObserver) resizeObserver.disconnect();
+		};
+	});
 </script>
 
-<div class="relative w-full h-full bg-surface overflow-hidden" bind:this={container}>
-	<!-- Controls -->
-	<div class="absolute bottom-6 right-6 flex flex-col gap-2 bg-background/80 backdrop-blur border border-border p-1.5 rounded-lg shadow-sm z-10">
-		<IconButton label={isSimulating ? "Pausar Física" : "Reanudar Física"} onclick={toggleSimulation}>
-			{#if isSimulating}
-				<Pause size={18} class="text-primary" />
-			{:else}
-				<Play size={18} class="text-muted-foreground" />
-			{/if}
-		</IconButton>
-		<div class="h-[1px] w-full bg-border/50 my-1"></div>
-		<IconButton label="Acercar" onclick={zoomIn}>
-			<ZoomIn size={18} class="text-muted-foreground" />
-		</IconButton>
-		<IconButton label="Alejar" onclick={zoomOut}>
-			<ZoomOut size={18} class="text-muted-foreground" />
-		</IconButton>
-		<IconButton label="Centrar Vista" onclick={fitView}>
-			<Maximize size={18} class="text-muted-foreground" />
-		</IconButton>
+<div class="relative w-full h-full bg-surface overflow-hidden">
+	<div bind:this={container} class="w-full h-full"></div>
+	
+
+	<!-- 2D/3D Toggle -->
+	<div class="absolute bottom-6 right-6 flex items-center gap-2 bg-background/80 backdrop-blur border border-border p-2 rounded-lg shadow-sm z-10">
+		<span class="text-[11px] font-bold uppercase tracking-widest {is3D ? 'text-muted-foreground' : 'text-primary'}">2D</span>
+		<button 
+			type="button" 
+			class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+			onclick={() => is3D = !is3D}
+			aria-pressed={is3D}
+		>
+			<span class="sr-only">Toggle 3D mode</span>
+			<span aria-hidden="true" class="pointer-events-none absolute h-full w-full rounded-md bg-transparent"></span>
+			<span aria-hidden="true" class="pointer-events-none mx-auto h-4 w-9 rounded-full {is3D ? 'bg-primary' : 'bg-muted-foreground'} transition-colors duration-200 ease-in-out"></span>
+			<span aria-hidden="true" class="pointer-events-none absolute left-0 inline-block h-5 w-5 transform rounded-full border border-border bg-background shadow ring-0 transition-transform duration-200 ease-in-out {is3D ? 'translate-x-4' : 'translate-x-0'}"></span>
+		</button>
+		<span class="text-[11px] font-bold uppercase tracking-widest {is3D ? 'text-primary' : 'text-muted-foreground'}">3D</span>
 	</div>
 </div>
-
-<style>
-	:global(.sigma-mouse) {
-		cursor: grab;
-	}
-	:global(.sigma-mouse:active) {
-		cursor: grabbing;
-	}
-</style>
