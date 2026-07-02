@@ -20,8 +20,10 @@
  */
 
 import type { WritableDirectoryAdapter } from '../adapters/directory-adapter.ts';
-import type { Config, Template } from '../types/index.ts';
+import type { Config, Template, Issue, Relation } from '../types/index.ts';
 import { defaultConfig } from './built-in-templates.ts';
+import { serializeIssue } from './serializer.ts';
+import { buildIssueFilename } from './slugs.ts';
 
 const CONFIG_PATH = '.quill.md/config.json';
 const TEMPLATES_DIR = '.quill.md/templates';
@@ -35,6 +37,8 @@ export interface WizardSetupOptions {
 	 * Required config to write if `overwriteConfig` is true or if config does not exist.
 	 */
 	readonly config?: Config;
+	/** When `true`, generate 21 inter-connected mock items for debugging. */
+	readonly generateMockData?: boolean;
 }
 
 /**
@@ -86,6 +90,11 @@ export async function writeWizardSetup(
 		await adapter.writeTextFile(path, JSON.stringify(t, null, '\t') + '\n');
 	}
 
+	// 3. Generate mock data if requested
+	if (options.generateMockData && options.config) {
+		await generateMockGraph(adapter, options.config, templatesToProcess);
+	}
+
 	return templatesToProcess;
 }
 
@@ -100,5 +109,99 @@ async function exists(adapter: WritableDirectoryAdapter, path: string): Promise<
 		return true;
 	} catch {
 		return false;
+	}
+}
+
+async function generateMockGraph(
+	adapter: WritableDirectoryAdapter,
+	config: Config,
+	templates: readonly Template[]
+): Promise<void> {
+	const issues: Issue[] = [];
+	const getTmpl = (index: number) => templates[Math.min(index, templates.length - 1)].id;
+	const statuses = config.statuses.map((s) => s.name);
+	const getStatus = (index: number) => statuses[index % statuses.length];
+
+	let nextId = 1;
+	const roots = [1, 2, 3].map((i) => {
+		const id = nextId++;
+		return createMockIssue(id, `Iniciativa Estratégica ${i}`, getTmpl(0), getStatus(id));
+	});
+
+	const mids: Issue[] = [];
+	for (const root of roots) {
+		for (let i = 1; i <= 2; i++) {
+			const id = nextId++;
+			const child = createMockIssue(id, `Trabajo de Nivel Medio ${root.id}-${i}`, getTmpl(1), getStatus(id));
+			link(root, child, 'child');
+			mids.push(child);
+		}
+	}
+
+	const leaves: Issue[] = [];
+	for (const mid of mids) {
+		for (let i = 1; i <= 2; i++) {
+			const id = nextId++;
+			const child = createMockIssue(id, `Tarea o Defecto ${mid.id}-${i}`, getTmpl(2), getStatus(id));
+			link(mid, child, 'child');
+			leaves.push(child);
+		}
+	}
+
+	link(leaves[0], leaves[1], 'blocks');
+	link(leaves[2], leaves[3], 'depends_on');
+	link(mids[0], mids[2], 'relates_to');
+	link(roots[0], roots[1], 'relates_to');
+	link(leaves[4], leaves[5], 'blocks');
+	link(leaves[6], leaves[5], 'depends_on');
+
+	issues.push(...roots, ...mids, ...leaves);
+
+	for (const issue of issues) {
+		const serialized = await serializeIssue(issue);
+		const filename = buildIssueFilename(issue.id, issue.title);
+		await adapter.writeTextFile(`.quill.md/issues/${filename}`, serialized);
+	}
+}
+
+function createMockIssue(id: number, title: string, type: string, status: string): Issue {
+	return {
+		id,
+		title,
+		author: 'Generador Automático',
+		creationDate: new Date().toISOString().split('T')[0],
+		updatedDate: new Date().toISOString().split('T')[0],
+		issueType: type,
+		status,
+		assignee: null,
+		labels: ['mock', 'auto-generado'],
+		relations: [],
+		startDate: null,
+		endDate: null,
+		duration: null,
+		sprintId: null,
+		estimate: null,
+		integrityHash: null,
+		customFields: {},
+		sections: [
+			{ name: 'Descripción', markdown: 'Este es un elemento generado automáticamente para probar la vista de grafos 3D y Gantt.' },
+			{ name: 'Criterios de Aceptación', markdown: '- [ ] Verificar conexiones.\n- [ ] Validar rendering.' }
+		],
+		integrityWarning: false
+	};
+}
+
+function link(from: Issue, to: Issue, type: Relation['type']) {
+	from.relations.push({ type, id: to.id });
+	if (type === 'child') {
+		to.relations.push({ type: 'parent', id: from.id });
+	} else if (type === 'parent') {
+		to.relations.push({ type: 'child', id: from.id });
+	} else if (type === 'blocks') {
+		to.relations.push({ type: 'depends_on', id: from.id });
+	} else if (type === 'depends_on') {
+		to.relations.push({ type: 'blocks', id: from.id });
+	} else if (type === 'relates_to') {
+		to.relations.push({ type: 'relates_to', id: from.id });
 	}
 }
