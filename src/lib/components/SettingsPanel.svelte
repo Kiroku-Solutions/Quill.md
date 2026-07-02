@@ -7,6 +7,8 @@
 	field is `readonly`; the writer is a follow-up.
 -->
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { getStores } from '$lib/state';
 	import { Button, Card, IconButton, Input, Tooltip } from '$lib/ui';
 	import { t } from '$lib/ui/strings';
@@ -230,12 +232,19 @@
 			</section>
 
 			<section class="mt-6 flex flex-col gap-2" data-testid="settings-templates">
-				<h3 class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center justify-between">
-					<span>{t('settings.templatesHeading')}</span>
-					<Button variant="secondary" size="sm" class="h-6 text-xs px-2" onclick={() => (editorOpen = true)} disabled={!localAdapter}>
-						{t('settings.newTemplate')}
-					</Button>
-				</h3>
+				<div class="flex items-center justify-between">
+					<h3 class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center justify-between">
+						<span>{t('settings.templatesHeading')}</span>
+					</h3>
+					<div class="flex items-center gap-2">
+						<Button variant="secondary" size="sm" class="h-6 text-xs px-2" onclick={() => { stores.ui.closeSettings(); goto(resolve('/wizard')); }} disabled={!localAdapter} data-testid="settings-wizard-btn">
+							Wizard
+						</Button>
+						<Button variant="secondary" size="sm" class="h-6 text-xs px-2" onclick={() => (editorOpen = true)} disabled={!localAdapter}>
+							{t('settings.newTemplate')}
+						</Button>
+					</div>
+				</div>
 				<div class="flex flex-col gap-2 mt-2">
 					{#each stores.templates.templates as tmpl}
 						<Card compact class="flex items-center gap-3 px-3 py-2">
