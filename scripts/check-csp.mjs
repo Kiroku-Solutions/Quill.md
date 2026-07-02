@@ -137,6 +137,31 @@ const ALLOWLIST = [
 		matcher: 'Function(`binder`',
 		pattern: 'Function()',
 		note: 'pako inflate fast path; gated behind option.fast, never invoked by isomorphic-git.'
+	},
+	{
+		matcher: 'Function(`bodies`,',
+		pattern: 'Function()',
+		note: '3d-force-graph physics engine (d3-force/force-graph) performance loop.'
+	},
+	{
+		matcher: 'Function(`options`,',
+		pattern: 'Function()',
+		note: '3d-force-graph physics options compiler.'
+	},
+	{
+		matcher: '{Body:r}=Function(n)()',
+		pattern: 'Function()',
+		note: '3d-force-graph internal JIT generation.'
+	},
+	{
+		matcher: 'return Function(t)()',
+		pattern: 'Function()',
+		note: '3d-force-graph internal JIT fallback.'
+	},
+	{
+		matcher: 'Function(`return this`)()',
+		pattern: 'Function()',
+		note: 'Standard global object polyfill used by three.js/d3-force.'
 	}
 ];
 
