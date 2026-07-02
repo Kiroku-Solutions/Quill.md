@@ -193,19 +193,23 @@ function rewriteHeadersNonce(headers, nonce) {
  */
 function stampInlineScriptNonce(html, nonce) {
 	const re = /<script\b([^>]*)>/g;
-	const m = re.exec(html);
-	if (!m) {
+	const matches = [...html.matchAll(re)];
+	if (matches.length === 0) {
 		console.error(
 			'add-sri: no <script> element found in build/index.html — ' +
-				'cannot stamp the no-flash theme bootstrap with a nonce.'
+				'cannot stamp scripts with a nonce.'
 		);
 		process.exit(3);
 	}
-	const fullTag = m[0];
-	const attrs = m[1] ?? '';
-	const stripped = attrs.replace(/\s*nonce="[^"]*"/g, '').replace(/\s+$/, '');
-	const stamped = `<script${stripped} nonce="${nonce}">`;
-	return { html: html.replace(fullTag, stamped), stamped: true };
+	let result = html;
+	for (const m of matches) {
+		const fullTag = m[0];
+		const attrs = m[1] ?? '';
+		const stripped = attrs.replace(/\s*nonce="[^"]*"/g, '').replace(/\s+$/, '');
+		const stamped = `<script${stripped} nonce="${nonce}">`;
+		result = result.replace(fullTag, stamped);
+	}
+	return { html: result, stamped: true };
 }
 
 async function main() {
