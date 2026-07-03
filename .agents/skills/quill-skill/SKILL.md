@@ -60,6 +60,10 @@ If prioritizing a backlog, map priorities to the MoSCoW standard in the status/c
 - Use `parentId` to properly nest Stories under Epics.
 - Use Markdown body injection to declare advanced dependencies if the MCP schema limits you. (e.g., writing "Blocks: #ID" in the description if needed, though native `relations` are preferred).
 
+**E. Diagrams and UML**
+- The project natively supports Mermaid.js for UML diagrams.
+- If the user provides flowcharts, sequence diagrams, or UML images, you MUST translate them into ```mermaid code blocks within the issue description so they can be rendered correctly in the web view.
+
 ## Execution Protocol
 
 Whenever invoked for project planning, execute this exact Chain of Thought:

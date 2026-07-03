@@ -14,6 +14,14 @@
 	import { renderMarkdown } from '$lib/adapters/renderer';
 	import { t } from '$lib/ui/strings';
 	import Skeleton from '$lib/ui/Skeleton.svelte';
+	import mermaid from 'mermaid';
+	import { tick } from 'svelte';
+
+	mermaid.initialize({
+		startOnLoad: false,
+		securityLevel: 'strict',
+		theme: 'default'
+	});
 
 	type Props = { markdown: string };
 
@@ -23,6 +31,7 @@
 	let html = $state('');
 	let rendering = $state(true);
 	let seeded = $state(false);
+	let container = $state<HTMLElement>();
 
 	// Seed the debounced cell with the initial prop value. Avoid
 	// `$state(markdown)` — `$state(prop)` only captures the initial
@@ -49,7 +58,31 @@
 		(async () => {
 			try {
 				const out = await renderMarkdown(src, 'comment');
-				if (!cancelled) html = out;
+				if (!cancelled) {
+					html = out;
+					await tick();
+					if (!cancelled && container) {
+						const nodes = container.querySelectorAll('code.language-mermaid');
+						for (const node of nodes) {
+							const pre = node.parentElement;
+							if (pre && pre.tagName === 'PRE') {
+								const div = document.createElement('div');
+								div.className = 'mermaid';
+								div.textContent = node.textContent;
+								pre.replaceWith(div);
+							}
+						}
+						if (nodes.length > 0) {
+							try {
+								await mermaid.run({
+									nodes: container.querySelectorAll('.mermaid')
+								});
+							} catch (e) {
+								console.error('Mermaid render failed', e);
+							}
+						}
+					}
+				}
 			} catch {
 				if (!cancelled) html = t('markdown.renderFailed');
 			} finally {
@@ -64,7 +97,7 @@
 	const isLoading = $derived(markdown !== debounced || rendering);
 </script>
 
-<div class="prose max-w-none" data-testid="markdown-preview">
+<div bind:this={container} class="prose max-w-none" data-testid="markdown-preview">
 	{#if isLoading}
 		<div class="flex flex-col gap-2" data-testid="markdown-preview-loading">
 			<Skeleton width="w-3/4" height="h-6" />
