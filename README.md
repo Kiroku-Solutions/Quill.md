@@ -1,5 +1,9 @@
 # quill\.md
 
+[![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/License-PolyForm%20Noncommercial%201.0.0-blue.svg)](https://polyformproject.org/licenses/noncommercial/1.0.0)
+[![Svelte v5](https://img.shields.io/badge/Svelte-v5-%23FF3E00.svg?logo=svelte)](https://svelte.dev/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+
 A markdown-based, local-first issue tracker that travels with your repository.
 
 ## Capabilities
@@ -42,3 +46,25 @@ npm run build
 # Start the server (pass the path to your repository root)
 node dist/index.js "C:\path\to\your\repo"
 ```
+
+## Community
+
+- **Contributing**: Please read our [Contributing Guide](./CONTRIBUTING.md) to learn about our development process, tech stack rules, and how to submit pull requests.
+- **Code of Conduct**: We expect all contributors to adhere to our [Code of Conduct](./CODE_OF_CONDUCT.md).
+- **Security**: For reporting vulnerabilities, see our [Security Policy](./SECURITY.md).
+
+## License & Trademark
+
+This project is licensed under the **PolyForm Noncommercial License 1.0.0**. 
+
+You are free to:
+- Use this software for your own personal or internal projects.
+- Self-host the software on your own servers for non-commercial purposes.
+- Modify the source code for your own non-commercial use.
+
+You may **NOT**:
+- Use this software for any commercial purpose (e.g., selling it, offering it as a SaaS product, or using it to directly generate revenue).
+- Remove the copyright notices.
+- Distribute forks or modified versions using the "quill.md" name, logos, or branding (which are trademarks of Kiroku Solutions).
+
+See the [LICENSE](./LICENSE) file for the full text of the license.
