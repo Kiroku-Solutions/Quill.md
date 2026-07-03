@@ -48,7 +48,6 @@
 	let selectedPresetId = $state<string | null>(null);
 	let isApplying = $state(false);
 	let applyError = $state<string | null>(null);
-	let generateMockData = $state(false);
 
 	const activePresets = $derived(i18n.locale === 'es' ? FRAMEWORK_PRESETS_ES : FRAMEWORK_PRESETS);
 
@@ -74,7 +73,7 @@
 		isApplying = true;
 		applyError = null;
 		try {
-			await writeWizardSetup(adapter, preset.templates, { overwriteConfig: true, overwriteTemplates: true, config: preset.config, generateMockData });
+			await writeWizardSetup(adapter, preset.templates, { overwriteConfig: true, overwriteTemplates: true, config: preset.config });
 			// Re-load the affected stores so the UI reflects the new files.
 			await Promise.all([stores.config.load(), stores.templates.load()]);
 			await stores.issues.load();
@@ -210,11 +209,6 @@
 
 			{#if path === 'builtin'}
 				<div class="mt-4 flex flex-col gap-4">
-					<label class="flex cursor-pointer items-center gap-3 w-fit">
-						<input type="checkbox" class="checkbox checkbox-sm checkbox-primary rounded-sm" bind:checked={generateMockData} />
-						<span class="text-sm font-medium">Inject mock data (21 interconnected nodes for debugging views)</span>
-					</label>
-
 					<div class="flex items-center gap-3">
 						<Tooltip
 							text={canApply ? t('wizard.applyTooltip') : t('wizard.applyTooltipDisabled')}
