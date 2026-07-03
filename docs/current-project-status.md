@@ -1137,5 +1137,12 @@ Following a deep audit against `docs/agile-frameworks-research.md`, the followin
 - **Live `RUN_LIVE_TESTS=1` remote-git integration** (Step 4
   carry-over). The fixture is in place but the live test is
   skipped by default.
-- **In-app template editor** (the wizard's "Create your own"
-  path is currently disabled).
+	path is currently disabled).
+
+## Extended Capabilities (July 2026)
+
+Following the core production readiness, the application has been extended with an AI integration and improved setup UX:
+
+1. **Standalone MCP Server (`quill-mcp-server/`)**: Built a fully functional Model Context Protocol server using the Anthropic SDK. This enables AI tools (Claude Desktop, Cursor) to directly read, list, and create markdown issues inside a local `.quill.md` folder. It uses standard `stdio` transport, Zod schema validation, and mimics Quill's internal JSON/YAML serialization.
+2. **Dynamic Mock Generation**: The Wizard now supports generating deep, interconnected mock graphs based dynamically on whatever methodology is selected (Scrum, SAFe, Spotify, etc.), correctly utilizing hierarchical parent-child relationships and cross-linking logic for realistic dataset simulations during development.
+3. **Wizard Cleanup Protocol**: Switching between methodologies via the Wizard now automatically purges orphaned template JSON files and legacy mock issues to maintain a clean UI and prevent category clashes in the Kanban view.
