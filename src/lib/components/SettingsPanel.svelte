@@ -237,9 +237,7 @@
 						<span>{t('settings.templatesHeading')}</span>
 					</h3>
 					<div class="flex items-center gap-2">
-						<Button variant="secondary" size="sm" class="h-6 text-xs px-2" onclick={() => { stores.ui.closeSettings(); goto(resolve('/wizard')); }} disabled={!localAdapter} data-testid="settings-wizard-btn">
-							Wizard
-						</Button>
+
 						<Button variant="secondary" size="sm" class="h-6 text-xs px-2" onclick={() => (editorOpen = true)} disabled={!localAdapter}>
 							{t('settings.newTemplate')}
 						</Button>
