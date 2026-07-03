@@ -30,7 +30,8 @@ export const es: Translations = {
 		validationErrors: (params: Params) =>
 			`${params.n} error${params.n === 1 ? '' : 'es'} de validación`,
 		integrityReview: (params: Params) =>
-			`${params.n} advertencia${params.n === 1 ? '' : 's'} de integridad`
+			`${params.n} advertencia${params.n === 1 ? '' : 's'} de integridad`,
+		fullscreen: 'Pantalla completa'
 	},
 
 	app: {

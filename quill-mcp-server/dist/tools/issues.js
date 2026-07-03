@@ -66,7 +66,7 @@ export async function readIssue(issueId) {
         };
     }
 }
-export async function createIssue(title, issueType, status, description, parentId) {
+export async function createIssue(title, issueType, status, sections, relations, customFields) {
     const issuesDir = getIssuesDir();
     try {
         // Generate new ID
@@ -81,6 +81,10 @@ export async function createIssue(title, issueType, status, description, parentI
             }
         }
         const newId = maxId + 1;
+        const issueSections = Object.entries(sections).map(([name, markdown]) => ({
+            name,
+            markdown
+        }));
         const issue = {
             id: newId,
             title,
@@ -91,19 +95,17 @@ export async function createIssue(title, issueType, status, description, parentI
             status,
             assignee: null,
             labels: ['ai-generated'],
-            relations: parentId ? [{ type: 'child', id: parentId }] : [],
+            relations: relations || [],
             startDate: null,
             endDate: null,
             duration: null,
             sprintId: null,
             estimate: null,
             integrityHash: null,
-            customFields: {},
-            sections: [
-                { name: 'Description', markdown: description }
-            ]
+            customFields: customFields || {},
+            sections: issueSections
         };
-        const serialized = serializeIssue(issue);
+        const serialized = await serializeIssue(issue);
         const filename = buildIssueFilename(issue.id, issue.title);
         await fs.mkdir(issuesDir, { recursive: true });
         await fs.writeFile(path.join(issuesDir, filename), serialized);

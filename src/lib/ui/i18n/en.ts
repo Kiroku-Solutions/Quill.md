@@ -29,7 +29,8 @@ export const en = {
 		validationErrors: (params: Params) =>
 			`${params.n} validation ${params.n === 1 ? 'error' : 'errors'}`,
 		integrityReview: (params: Params) =>
-			`${params.n} integrity ${params.n === 1 ? 'warning' : 'warnings'}`
+			`${params.n} integrity ${params.n === 1 ? 'warning' : 'warnings'}`,
+		fullscreen: 'Fullscreen'
 	},
 
 	app: {

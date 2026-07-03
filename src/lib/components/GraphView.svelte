@@ -11,21 +11,42 @@
 		let nodes: any[] = [];
 		let links: any[] = [];
 
-		const filteredIssues = Array.from(issues.byId.values()).filter((li) => {
-				const f = filter.filter;
-				if (f.status && li.issue.status !== f.status) return false;
-				if (f.type && li.issue.issueType !== f.type) return false;
-				if (f.q) {
-					const needle = f.q.toLowerCase();
-					if (
-						!li.issue.title.toLowerCase().includes(needle) &&
-						!li.issue.sections.some((s) => s.markdown.toLowerCase().includes(needle))
-					) {
-						return false;
-					}
+		const allIssues = Array.from(issues.byId.values());
+		const matchedIssues = allIssues.filter((li) => {
+			const f = filter.filter;
+			if (f.status && li.issue.status !== f.status) return false;
+			if (f.type && li.issue.issueType !== f.type) return false;
+			if (f.q) {
+				const needle = f.q.toLowerCase();
+				if (
+					!li.issue.title.toLowerCase().includes(needle) &&
+					!li.issue.sections.some((s) => s.markdown.toLowerCase().includes(needle))
+				) {
+					return false;
 				}
-				return true;
-			});
+			}
+			return true;
+		});
+
+		const filteredSet = new Set(matchedIssues);
+		const f = filter.filter;
+		const hasActiveFilter = !!(f.status || f.type || f.q);
+
+		if (hasActiveFilter) {
+			for (const li of matchedIssues) {
+				for (const rel of li.issue.relations) {
+					const target = issues.byId.get(Number(rel.id));
+					if (target) filteredSet.add(target);
+				}
+			}
+			for (const li of allIssues) {
+				if (li.issue.relations.some((r) => matchedIssues.some((m) => m.issue.id === Number(r.id)))) {
+					filteredSet.add(li);
+				}
+			}
+		}
+
+		const filteredIssues = Array.from(filteredSet);
 
 			const validNodeIds = new Set(filteredIssues.map(li => String(li.issue.id)));
 			const groupBy = filter.filter.groupBy ?? 'none';
@@ -219,7 +240,7 @@
 </script>
 
 <div class="relative w-full h-full bg-surface overflow-hidden">
-	<div bind:this={container} class="w-full h-full"></div>
+	<div bind:this={container} class="absolute inset-0"></div>
 	
 
 	<!-- 2D/3D Toggle -->

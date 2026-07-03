@@ -1,39 +1,49 @@
 import yaml from 'js-yaml';
-export function serializeIssue(issue) {
+import crypto from 'node:crypto';
+export async function serializeIssue(issue) {
     const frontmatter = {
         id: issue.id,
         title: issue.title,
         author: issue.author,
-        creationDate: issue.creationDate,
-        updatedDate: issue.updatedDate,
-        issueType: issue.issueType,
+        creation_date: issue.creationDate,
+        updated_date: issue.updatedDate,
+        issue_type: issue.issueType,
         status: issue.status,
         assignee: issue.assignee,
         labels: issue.labels,
         relations: issue.relations,
     };
     if (issue.startDate !== null)
-        frontmatter.startDate = issue.startDate;
+        frontmatter.start_date = issue.startDate;
     if (issue.endDate !== null)
-        frontmatter.endDate = issue.endDate;
+        frontmatter.end_date = issue.endDate;
     if (issue.duration !== null)
         frontmatter.duration = issue.duration;
     if (issue.sprintId !== null)
-        frontmatter.sprintId = issue.sprintId;
+        frontmatter.sprint_id = issue.sprintId;
     if (issue.estimate !== null)
         frontmatter.estimate = issue.estimate;
     if (Object.keys(issue.customFields).length > 0) {
-        frontmatter.customFields = issue.customFields;
+        frontmatter.custom_fields = issue.customFields;
     }
-    // Placeholder for hash
-    frontmatter.integrityHash = issue.integrityHash || null;
-    const yamlStr = yaml.dump(frontmatter, { lineWidth: -1 });
-    let mdStr = `---\n${yamlStr}---\n`;
+    // Generate the YAML without integrity_hash first
+    const yamlStrWithoutHash = yaml.dump(frontmatter, { lineWidth: -1 });
+    let mdStrWithoutHash = `---\n${yamlStrWithoutHash}---\n`;
     for (let i = 0; i < issue.sections.length; i++) {
         const sec = issue.sections[i];
-        mdStr += `\n# ${sec.name}\n\n${sec.markdown}\n`;
+        mdStrWithoutHash += `\n<!-- [SECTION_START: ${sec.name}] -->\n\n${sec.markdown}\n\n<!-- [SECTION_END: ${sec.name}] -->\n`;
     }
-    return mdStr;
+    // Compute integrity hash using SHA-256 hex digest of the string
+    const hash = crypto.createHash('sha256').update(mdStrWithoutHash, 'utf8').digest('hex');
+    frontmatter.integrity_hash = `sha256:${hash}`;
+    // Now dump it with the hash included
+    const finalYamlStr = yaml.dump(frontmatter, { lineWidth: -1 });
+    let finalMdStr = `---\n${finalYamlStr}---\n`;
+    for (let i = 0; i < issue.sections.length; i++) {
+        const sec = issue.sections[i];
+        finalMdStr += `\n<!-- [SECTION_START: ${sec.name}] -->\n\n${sec.markdown}\n\n<!-- [SECTION_END: ${sec.name}] -->\n`;
+    }
+    return finalMdStr;
 }
 export function buildIssueFilename(id, title) {
     const safeTitle = title

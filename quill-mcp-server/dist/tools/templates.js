@@ -11,8 +11,39 @@ export async function createTemplate(templateJsonStr) {
         if (!template.id || !template.name) {
             throw new Error('Template must have at least an "id" and a "name" field');
         }
-        const filename = `${template.id}.json`;
         await fs.mkdir(templatesDir, { recursive: true });
+        // Color collision detection
+        const existingTemplates = (await fs.readdir(templatesDir)).filter(f => f.endsWith('.json'));
+        const usedColors = new Set();
+        let existingColorForThisId = undefined;
+        for (const f of existingTemplates) {
+            try {
+                const content = await fs.readFile(path.join(templatesDir, f), 'utf-8');
+                const t = JSON.parse(content);
+                if (t.id === template.id) {
+                    existingColorForThisId = t.color?.toLowerCase();
+                }
+                else if (t.color) {
+                    usedColors.add(t.color.toLowerCase());
+                }
+            }
+            catch (e) {
+                // Ignore unparseable files
+            }
+        }
+        const proposedColor = template.color?.toLowerCase();
+        if (!proposedColor || (usedColors.has(proposedColor) && proposedColor !== existingColorForThisId)) {
+            const distinctColors = [
+                "#ef4444", "#f97316", "#f59e0b", "#eab308", "#84cc16", "#22c55e", "#10b981", "#14b8a6", "#06b6d4",
+                "#0ea5e9", "#3b82f6", "#6366f1", "#8b5cf6", "#a855f7", "#d946ef", "#ec4899", "#f43f5e"
+            ];
+            let newColor = distinctColors.find(c => !usedColors.has(c));
+            if (!newColor) {
+                newColor = "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+            }
+            template.color = newColor;
+        }
+        const filename = `${template.id}.json`;
         // Formatting JSON nicely
         await fs.writeFile(path.join(templatesDir, filename), JSON.stringify(template, null, '\t') + '\n');
         return {

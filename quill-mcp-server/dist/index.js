@@ -3,9 +3,15 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { listIssues, readIssue, createIssue } from "./tools/issues.js";
 import { createTemplate } from "./tools/templates.js";
+import { initPreset } from "./tools/init.js";
 const server = new McpServer({
     name: "quill-mcp-server",
     version: "1.0.0"
+});
+server.tool("quill_init_preset", "Initializes a Quill.md project with a base preset (e.g. 'scrum'). Creates config.json and base templates.", {
+    presetId: z.string().describe("The ID of the preset to initialize (e.g. 'scrum')")
+}, async ({ presetId }) => {
+    return await initPreset(presetId);
 });
 server.tool("quill_list_issues", "Lists all issues in the local Quill.md repository.", async () => {
     return await listIssues();
@@ -19,10 +25,11 @@ server.tool("quill_create_issue", "Creates a new issue in the Quill.md repositor
     title_text: z.string().describe("The title of the issue"),
     issueType: z.string().describe("The type of issue (e.g. epic, story, task)"),
     status: z.string().describe("The status (e.g. open, in-progress, done)"),
-    description: z.string().describe("The full markdown description"),
-    parentId: z.number().optional().describe("Optional ID of the parent issue (for hierarchy)"),
-}, async ({ title_text, issueType, status, description, parentId }) => {
-    return await createIssue(title_text, issueType, status, description, parentId);
+    sections: z.record(z.string()).describe("A dictionary mapping section names to their markdown content"),
+    relations: z.array(z.object({ type: z.string(), id: z.number() })).optional().describe("Array of relations to other issues"),
+    customFields: z.record(z.any()).optional().describe("Optional dictionary for custom fields")
+}, async ({ title_text, issueType, status, sections, relations, customFields }) => {
+    return await createIssue(title_text, issueType, status, sections, relations, customFields);
 });
 server.tool("quill_create_template", "Creates a new issue template in the Quill.md repository. Pass the complete JSON definition of the template as a string.", {
     templateJson: z.string().describe("The JSON string representing the template object (must include at least 'id' and 'name')"),
