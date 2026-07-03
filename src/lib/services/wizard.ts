@@ -101,4 +101,14 @@ export async function writeWizardSetup(
 		await adapter.writeTextFile(path, JSON.stringify(t, null, '\t') + '\n');
 	}
 
+	return templatesToProcess;
+}
+
+async function exists(adapter: WritableDirectoryAdapter, path: string): Promise<boolean> {
+	try {
+		await adapter.readTextFile(path);
+		return true;
+	} catch {
+		return false;
+	}
 }
