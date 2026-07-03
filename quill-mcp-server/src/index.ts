@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { listIssues, readIssue, createIssue } from "./tools/issues.js";
+import { createTemplate } from "./tools/templates.js";
 
 const server = new McpServer({
   name: "quill-mcp-server",
@@ -39,6 +40,17 @@ server.tool(
   },
   async ({ title_text, issueType, status, description, parentId }) => {
     return await createIssue(title_text, issueType, status, description, parentId);
+  }
+);
+
+server.tool(
+  "quill_create_template",
+  "Creates a new issue template in the Quill.md repository. Pass the complete JSON definition of the template as a string.",
+  {
+    templateJson: z.string().describe("The JSON string representing the template object (must include at least 'id' and 'name')"),
+  },
+  async ({ templateJson }) => {
+    return await createTemplate(templateJson);
   }
 );
 
