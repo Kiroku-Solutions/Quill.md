@@ -74,7 +74,7 @@
 		isApplying = true;
 		applyError = null;
 		try {
-			await writeWizardSetup(adapter, preset.templates, { overwriteConfig: true, config: preset.config, generateMockData });
+			await writeWizardSetup(adapter, preset.templates, { overwriteConfig: true, overwriteTemplates: true, config: preset.config, generateMockData });
 			// Re-load the affected stores so the UI reflects the new files.
 			await Promise.all([stores.config.load(), stores.templates.load()]);
 			await stores.issues.load();
@@ -95,7 +95,7 @@
 		isApplying = true;
 		applyError = null;
 		try {
-			await writeWizardSetup(adapter, [tmpl], { overwriteConfig: true, config: defaultConfig() });
+			await writeWizardSetup(adapter, [tmpl], { overwriteConfig: true, overwriteTemplates: true, config: defaultConfig() });
 			await Promise.all([stores.config.load(), stores.templates.load()]);
 			await stores.issues.load();
 			await goto(resolve('/local'));
