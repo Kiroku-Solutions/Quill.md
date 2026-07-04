@@ -553,6 +553,15 @@ export async function fetchSubtree(options: FetchOptions): Promise<FetchResult> 
 	}
 
 	const sha = await resolveBranchTip({ fs, branch });
+
+	// fetch() updates the remote-tracking branch but does not checkout files to the
+	// working directory. We must check out the tree so the adapter can read them.
+	try {
+		await git.checkout({ fs, dir: '/', ref: `refs/remotes/origin/${branch}`, force: true });
+	} catch (cause) {
+		throw new RemoteFetchError(`Failed to checkout ${branch}`, { cause });
+	}
+
 	const cacheKey = makeCacheKey(repoUrl, branch, sha);
 
 	const adapter = buildReadonlyAdapter({ fs, branch, subtree: SUBTREE });
@@ -661,7 +670,9 @@ export async function clearCacheForUrl(url: RepoUrl, branch: Branch): Promise<vo
 async function resolveBranchTip(args: { fs: LightningFS; branch: Branch }): Promise<Sha> {
 	const { fs, branch } = args;
 	try {
-		const sha = await git.resolveRef({ fs, dir: '/', ref: branch });
+		// fetch() defaults to placing the fetched branch in the remote-tracking namespace
+		const remoteRef = `refs/remotes/origin/${branch}`;
+		const sha = await git.resolveRef({ fs, dir: '/', ref: remoteRef });
 		return brandSha(sha);
 	} catch (cause) {
 		throw new RemoteFetchError(`Cannot resolve branch tip for ${branch}`, { cause });
