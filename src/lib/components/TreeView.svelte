@@ -163,7 +163,7 @@
 
 			currentGraph = (ForceGraph2D as any)()(container)
 				.dagMode('td') // Top-Down DAG mode
-				.dagLevelDistance(60)
+				.dagLevelDistance(90)
 				.nodeLabel('name')
 				.nodeColor((n: any) => n.color || undefined)
 				.nodeAutoColorBy('groupId')
@@ -176,6 +176,14 @@
 						editor.open(Number(node.id));
 					}
 				});
+
+			// Spread out nodes to prevent the tight vertical string
+			if (currentGraph.d3Force('charge')) {
+				currentGraph.d3Force('charge').strength(-400).distanceMax(400);
+			}
+			if (currentGraph.d3Force('link')) {
+				currentGraph.d3Force('link').distance(60);
+			}
 
 			currentGraph.graphData(data);
 
