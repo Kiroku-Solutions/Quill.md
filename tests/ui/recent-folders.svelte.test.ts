@@ -83,6 +83,7 @@ function buildStub(opts: { recentHandles: HandleRecord[] }): StoreGraph {
 			activeHandle: null,
 			recentHandles: opts.recentHandles,
 			hasRemoteCredentials: false,
+			remoteUrl: null,
 			proxyWarning: null,
 			lastFetchedAt: null,
 			localAdapter: null,

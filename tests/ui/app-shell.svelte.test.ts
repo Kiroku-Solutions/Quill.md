@@ -99,6 +99,7 @@ function buildStub(opts: { integrityCount: number; activeHandleName?: string }):
 					: null,
 			recentHandles: [],
 			hasRemoteCredentials: false,
+			remoteUrl: null,
 			proxyWarning: null,
 			lastFetchedAt: null,
 			localAdapter: null,

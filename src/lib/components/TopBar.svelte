@@ -49,7 +49,21 @@
 	const stores = getStores();
 
 	const folderName = $derived(mode === 'local' ? (stores.mode.activeHandle?.name ?? null) : null);
-	const repoLabel = $derived(mode === 'remote' ? t('topbar.remoteRepository') : null);
+	
+	function parseRepoName(url: string | null): string | null {
+		if (!url) return null;
+		try {
+			const pathname = new URL(url).pathname;
+			const parts = pathname.split('/').filter(Boolean);
+			const last = parts.length > 0 ? parts[parts.length - 1] : null;
+			return last ? last.replace(/\.git$/, '') : url;
+		} catch {
+			const match = url.match(/([^/:]+)(?:\.git)?$/);
+			return match ? match[1] : url;
+		}
+	}
+
+	const repoLabel = $derived(mode === 'remote' ? (parseRepoName(stores.mode.remoteUrl) ?? t('topbar.remoteRepository')) : null);
 
 	const badge = $derived.by(() => {
 		switch (mode) {

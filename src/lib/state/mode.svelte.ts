@@ -96,6 +96,8 @@ export interface ModeStore {
 	 * consistent with the adapter it is reading through.
 	 */
 	readonly lastFetchedAt: number | null;
+	/** The URL of the currently active remote repository, if any. */
+	readonly remoteUrl: RepoUrl | null;
 	/** Writable adapter bound when a local folder handle is active. */
 	readonly localAdapter: WritableDirectoryAdapter | null;
 	/** Read-only adapter bound when a remote repository is open. */
@@ -501,6 +503,9 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 		},
 		get lastFetchedAt() {
 			return lastFetchedAt;
+		},
+		get remoteUrl() {
+			return _patScope?.url ?? null;
 		},
 		get localAdapter() {
 			return localAdapter;

@@ -55,7 +55,7 @@ import LightningFS from '@isomorphic-git/lightning-fs';
 import { brandPat, brandProxyUrl, debug, error, info, warn, isBrandedPat } from './_logger.ts';
 import { AdapterNotFoundError, RemoteAuthError, RemoteFetchError } from './errors.ts';
 import {
-	splitPath,
+	normalizePath,
 	type DirectoryEntry,
 	type ReadOnlyDirectoryAdapter
 } from './directory-adapter.ts';
@@ -694,17 +694,21 @@ function buildReadonlyAdapter(args: {
 	const { fs, subtree } = args;
 
 	function fullPath(rel: string): string {
-		// No `..` is allowed (security: prevent escaping the subtree).
-		const { parent, name } = splitPath(rel);
-		void parent;
-		void name;
-		// LightningFS expects forward slashes, no leading slash for the root.
-		const joined = rel === '.' || rel === '' ? subtree : `${subtree}/${rel}`;
-		// Defensive: re-check `..` is not present.
-		if (joined.split('/').includes('..')) {
+		let normalized: string;
+		try {
+			normalized = normalizePath(rel);
+		} catch (cause) {
+			throw new AdapterNotFoundError(rel, cause);
+		}
+
+		// Subtree gating (client-side partial clone simulation):
+		// the adapter only exposes the .quill.md/ directory.
+		if (normalized !== subtree && !normalized.startsWith(`${subtree}/`)) {
 			throw new AdapterNotFoundError(rel);
 		}
-		return joined;
+
+		// LightningFS paths must be absolute (leading slash).
+		return `/${normalized}`;
 	}
 
 	async function lfsReadTextFile(path: string): Promise<string> {

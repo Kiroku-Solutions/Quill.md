@@ -81,6 +81,7 @@ function buildStub(issues: readonly Issue[]): StoreGraph {
 			activeHandle: null,
 			recentHandles: [],
 			hasRemoteCredentials: false,
+			remoteUrl: null,
 			proxyWarning: null,
 			lastFetchedAt: null,
 			localAdapter: null,

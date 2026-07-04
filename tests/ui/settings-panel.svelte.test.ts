@@ -99,6 +99,7 @@ function buildStub(opts: {
 			activeHandle: null,
 			recentHandles: opts.recentHandles ?? [],
 			hasRemoteCredentials: false,
+			remoteUrl: null,
 			proxyWarning: null,
 			lastFetchedAt: null,
 			localAdapter: opts.hasLocalAdapter

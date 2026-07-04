@@ -187,6 +187,7 @@ function buildStub(opts: StubOpts = {}): StoreGraph {
 			activeHandle: null,
 			recentHandles: [],
 			hasRemoteCredentials: false,
+			remoteUrl: null,
 			proxyWarning: null,
 			lastFetchedAt: null,
 			localAdapter: null,

@@ -121,6 +121,7 @@ function buildStub(issues: readonly Issue[], mode: 'local' | 'remote'): StoreGra
 			activeHandle: null,
 			recentHandles: [],
 			hasRemoteCredentials: false,
+			remoteUrl: null,
 			proxyWarning: null,
 			lastFetchedAt: null,
 			localAdapter: null,
