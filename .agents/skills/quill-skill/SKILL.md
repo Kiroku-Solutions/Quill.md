@@ -33,6 +33,11 @@ When the user's workflow requires custom entities (e.g., `test-case`, `spike`, `
 - `color` (e.g., `"color": "#0ea5e9"`)
 - `default_status` (must match a valid status ID from the project config, e.g., `"default_status": "open"`)
 - `fields`: Define specific, typed dropdowns (e.g., `test_type`: Unit/E2E, `severity`: Low/High).
+  **CRITICAL**: You MUST also explicitly declare standard system fields in the `fields` array if you want them to be editable in the UI. If omitted, they will not be visible in the Form tab. ALWAYS include at minimum:
+  - `{ "id": 100, "key": "status", "name": "Status", "type": "select", "obligatory": true }`
+  - `{ "id": 101, "key": "assignee", "name": "Assignee", "type": "user", "obligatory": false }`
+  - `{ "id": 102, "key": "labels", "name": "Labels", "type": "multi-select", "obligatory": false, "options_source": "config.labels" }`
+  - `{ "id": 103, "key": "relations", "name": "Relations", "type": "relations", "obligatory": false }`
 - `sections`: MUST be an array of objects, NOT strings. Example:
   `[{"id": 1, "key": "preconditions", "name": "Preconditions", "obligatory": true, "default": ""}]`
 

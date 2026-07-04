@@ -1,23 +1,23 @@
 {
-  "name": "quill-mcp-server",
-  "version": "1.0.0",
-  "description": "MCP Server for interacting with local Quill.md repositories",
-  "type": "module",
-  "bin": {
-    "quill-mcp-server": "./dist/index.js"
-  },
-  "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.4",
-    "zod": "^3.23.8",
-    "js-yaml": "^4.1.0"
-  },
-  "devDependencies": {
-    "@types/js-yaml": "^4.0.9",
-    "@types/node": "^22.0.0",
-    "typescript": "^5.5.3"
-  }
+	"name": "quill-mcp-server",
+	"version": "1.0.0",
+	"description": "MCP Server for interacting with local Quill.md repositories",
+	"type": "module",
+	"bin": {
+		"quill-mcp-server": "./dist/index.js"
+	},
+	"scripts": {
+		"build": "tsc",
+		"start": "node dist/index.js"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.0.4",
+		"zod": "^3.23.8",
+		"js-yaml": "^4.1.0"
+	},
+	"devDependencies": {
+		"@types/js-yaml": "^4.0.9",
+		"@types/node": "^22.0.0",
+		"typescript": "^5.5.3"
+	}
 }

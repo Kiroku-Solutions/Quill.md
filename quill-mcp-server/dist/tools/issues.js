@@ -24,7 +24,7 @@ export async function listIssues() {
                         title: frontmatter.title,
                         issueType: frontmatter.issueType,
                         status: frontmatter.status,
-                        filename: file,
+                        filename: file
                     });
                 }
                 catch (e) {
@@ -33,13 +33,13 @@ export async function listIssues() {
             }
         }
         return {
-            content: [{ type: "text", text: JSON.stringify(issues, null, 2) }],
+            content: [{ type: 'text', text: JSON.stringify(issues, null, 2) }]
         };
     }
     catch (error) {
         return {
-            content: [{ type: "text", text: `Error reading issues: ${error.message}` }],
-            isError: true,
+            content: [{ type: 'text', text: `Error reading issues: ${error.message}` }],
+            isError: true
         };
     }
 }
@@ -47,22 +47,22 @@ export async function readIssue(issueId) {
     const issuesDir = getIssuesDir();
     try {
         const files = await fs.readdir(issuesDir);
-        const file = files.find(f => f.startsWith(`${issueId}-`) && f.endsWith('.md'));
+        const file = files.find((f) => f.startsWith(`${issueId}-`) && f.endsWith('.md'));
         if (!file) {
             return {
-                content: [{ type: "text", text: `Issue ID ${issueId} not found` }],
-                isError: true,
+                content: [{ type: 'text', text: `Issue ID ${issueId} not found` }],
+                isError: true
             };
         }
         const content = await fs.readFile(path.join(issuesDir, file), 'utf-8');
         return {
-            content: [{ type: "text", text: content }],
+            content: [{ type: 'text', text: content }]
         };
     }
     catch (error) {
         return {
-            content: [{ type: "text", text: `Error reading issue: ${error.message}` }],
-            isError: true,
+            content: [{ type: 'text', text: `Error reading issue: ${error.message}` }],
+            isError: true
         };
     }
 }
@@ -110,13 +110,18 @@ export async function createIssue(title, issueType, status, sections, relations,
         await fs.mkdir(issuesDir, { recursive: true });
         await fs.writeFile(path.join(issuesDir, filename), serialized);
         return {
-            content: [{ type: "text", text: `Successfully created issue ${newId}: ${filename}\n\n${serialized}` }],
+            content: [
+                {
+                    type: 'text',
+                    text: `Successfully created issue ${newId}: ${filename}\n\n${serialized}`
+                }
+            ]
         };
     }
     catch (error) {
         return {
-            content: [{ type: "text", text: `Error creating issue: ${error.message}` }],
-            isError: true,
+            content: [{ type: 'text', text: `Error creating issue: ${error.message}` }],
+            isError: true
         };
     }
 }

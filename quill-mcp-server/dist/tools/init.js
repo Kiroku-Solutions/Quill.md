@@ -12,49 +12,72 @@ export async function initPreset(presetId) {
         // Only 'scrum' is currently supported in this basic initialization, but we can map others later.
         // We provide a basic valid Scrum config.
         const config = {
-            product_goal: "Build and ship increments of value that meet the Definition of Done every Sprint.",
+            product_goal: 'Build and ship increments of value that meet the Definition of Done every Sprint.',
             definition_of_done: [
-                "Code is peer-reviewed and merged to the trunk.",
-                "Unit tests pass and coverage meets the team threshold."
+                'Code is peer-reviewed and merged to the trunk.',
+                'Unit tests pass and coverage meets the team threshold.'
             ],
             statuses: [
-                { id: "open", name: "Open", color: "#6b7280", category: "todo" },
-                { id: "ready", name: "Ready", color: "#0ea5e9", category: "todo" },
-                { id: "in_progress", name: "In progress", color: "#3b82f6", category: "doing" },
-                { id: "in_review", name: "In review", color: "#f59e0b", category: "doing" },
-                { id: "done", name: "Done", color: "#10b981", category: "done" }
+                { id: 'open', name: 'Open', color: '#6b7280', category: 'todo' },
+                { id: 'ready', name: 'Ready', color: '#0ea5e9', category: 'todo' },
+                { id: 'in_progress', name: 'In progress', color: '#3b82f6', category: 'doing' },
+                { id: 'in_review', name: 'In review', color: '#f59e0b', category: 'doing' },
+                { id: 'done', name: 'Done', color: '#10b981', category: 'done' }
             ],
-            default_status: "open",
+            default_status: 'open',
             labels: [],
             users: [],
-            kanban: { columns: ["open", "ready", "in_progress", "in_review", "done"] },
-            gantt: { group_by: "issue_type", default_view: "weeks" },
-            remote: { cors_proxy: "https://cors.isomorphic-git.org" }
+            kanban: { columns: ['open', 'ready', 'in_progress', 'in_review', 'done'] },
+            gantt: { group_by: 'issue_type', default_view: 'weeks' },
+            remote: { cors_proxy: 'https://cors.isomorphic-git.org' }
         };
         const epicTemplate = {
-            id: "epic", name: "Epic", icon: "book-open", color: "#8b5cf6", default_status: "open",
+            id: 'epic',
+            name: 'Epic',
+            icon: 'book-open',
+            color: '#8b5cf6',
+            default_status: 'open',
             fields: [],
             sections: [
-                { id: 1, key: "description", name: "Description", obligatory: true, default: "" },
-                { id: 2, key: "acceptance", name: "Acceptance criteria", obligatory: true, default: "" }
+                { id: 1, key: 'description', name: 'Description', obligatory: true, default: '' },
+                { id: 2, key: 'acceptance', name: 'Acceptance criteria', obligatory: true, default: '' }
             ]
         };
         const userStoryTemplate = {
-            id: "user-story", name: "User Story", icon: "book-open", color: "#3b82f6", default_status: "open",
+            id: 'user-story',
+            name: 'User Story',
+            icon: 'book-open',
+            color: '#3b82f6',
+            default_status: 'open',
             fields: [
-                { id: 1, key: "story_points", name: "Story points", type: "select", obligatory: true, options: ["1", "2", "3", "5", "8", "13", "21"] }
+                {
+                    id: 1,
+                    key: 'story_points',
+                    name: 'Story points',
+                    type: 'select',
+                    obligatory: true,
+                    options: ['1', '2', '3', '5', '8', '13', '21']
+                }
             ],
             sections: [
-                { id: 1, key: "user_story", name: "User story", obligatory: true, default: "**As a** ___\\n**I want** ___\\n**so that** ___." },
-                { id: 2, key: "acceptance", name: "Acceptance criteria", obligatory: true, default: "" }
+                {
+                    id: 1,
+                    key: 'user_story',
+                    name: 'User story',
+                    obligatory: true,
+                    default: '**As a** ___\\n**I want** ___\\n**so that** ___.'
+                },
+                { id: 2, key: 'acceptance', name: 'Acceptance criteria', obligatory: true, default: '' }
             ]
         };
         const taskTemplate = {
-            id: "task", name: "Task", icon: "check-square", color: "#10b981", default_status: "open",
+            id: 'task',
+            name: 'Task',
+            icon: 'check-square',
+            color: '#10b981',
+            default_status: 'open',
             fields: [],
-            sections: [
-                { id: 1, key: "description", name: "Description", obligatory: true, default: "" }
-            ]
+            sections: [{ id: 1, key: 'description', name: 'Description', obligatory: true, default: '' }]
         };
         await fs.mkdir(quillDir, { recursive: true });
         await fs.mkdir(templatesDir, { recursive: true });
@@ -64,12 +87,17 @@ export async function initPreset(presetId) {
         await fs.writeFile(path.join(templatesDir, 'user-story.json'), JSON.stringify(userStoryTemplate, null, 2));
         await fs.writeFile(path.join(templatesDir, 'task.json'), JSON.stringify(taskTemplate, null, 2));
         return {
-            content: [{ type: "text", text: `Successfully initialized preset ${presetId} in ${quillDir}` }]
+            content: [
+                {
+                    type: 'text',
+                    text: `Successfully initialized preset ${presetId} in ${quillDir}`
+                }
+            ]
         };
     }
     catch (error) {
         return {
-            content: [{ type: "text", text: `Error initializing preset: ${error.message}` }],
+            content: [{ type: 'text', text: `Error initializing preset: ${error.message}` }],
             isError: true
         };
     }

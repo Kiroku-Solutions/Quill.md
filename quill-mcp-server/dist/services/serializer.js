@@ -11,7 +11,7 @@ export async function serializeIssue(issue) {
         status: issue.status,
         assignee: issue.assignee,
         labels: issue.labels,
-        relations: issue.relations,
+        relations: issue.relations
     };
     if (issue.startDate !== null)
         frontmatter.start_date = issue.startDate;
