@@ -157,7 +157,7 @@
 								<div class="flex items-center gap-2">
 									<Milestone class="h-4 w-4 text-warning" />
 									<h4 class="font-display font-semibold text-foreground text-sm">
-										Sprint {sprint.customFields.sprint_number ?? sprint.id}
+										{sprint.title}
 									</h4>
 								</div>
 								<Badge variant="primary" size="sm">{sprint.status}</Badge>
@@ -208,7 +208,7 @@
 									onclick={() => openIssue(selectedSprint.id)}
 									class="text-left font-display font-bold text-foreground hover:opacity-85 text-lg cursor-pointer focus-visible:outline-none focus-visible:underline"
 								>
-									Sprint {selectedSprint.customFields.sprint_number ?? selectedSprint.id} · {selectedSprint.title}
+									{selectedSprint.title}
 								</button>
 							</div>
 							<Badge variant="primary">{selectedSprint.status}</Badge>

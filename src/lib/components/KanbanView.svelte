@@ -62,7 +62,7 @@
 			);
 			const definedGroups = sprintIssues.map((s) => ({
 				id: `sprint-${s.issue.id}`,
-				title: `Sprint ${s.issue.customFields?.sprint_number ?? s.issue.id} · ${s.issue.title}`,
+				title: s.issue.title,
 				match: (issue: import('$lib/types').Issue) =>
 					issue.relations.some((r) => r.id === s.issue.id) ||
 					s.issue.relations.some((r) => r.id === issue.id)

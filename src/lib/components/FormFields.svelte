@@ -162,7 +162,7 @@
 				.filter((i) => i.issueType === 'sprint')
 				.map((s) => ({
 					id: String(s.id),
-					name: `Sprint ${s.customFields.sprint_number ?? s.id}: ${s.title}`
+					name: s.title
 				}));
 		}
 		return (field.options ?? []).map((o) => ({ id: o, name: o }));
@@ -249,7 +249,7 @@
 						{t('sprint.progress')}
 					</h3>
 					<span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-warning/10 text-warning">
-						Sprint {issue.customFields.sprint_number ?? issue.id}
+						{issue.title}
 					</span>
 				</div>
 
