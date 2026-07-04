@@ -165,7 +165,7 @@
 
 			currentGraph = (ForceGraph2D as any)()(container)
 				.dagMode('td') // Top-Down DAG mode
-				.dagLevelDistance(50) // Reduced vertical dispersion
+				.dagLevelDistance(80) // More vertical breathing room
 				.linkColor(() => linkColorStr)
 				.linkCurvature(0.15) // Organic curves
 				.linkDirectionalArrowLength(3.5)
@@ -231,12 +231,15 @@
 
 			// Spread out horizontally to prevent overlap of the wide cards
 			if (currentGraph.d3Force('charge')) {
-				currentGraph.d3Force('charge').strength(-800).distanceMax(800);
+				currentGraph.d3Force('charge').strength(-2500); // Massive horizontal repulsion
 			}
 			if (currentGraph.d3Force('link')) {
-				currentGraph.d3Force('link').distance(40);
+				currentGraph.d3Force('link').distance(20);
 			}
 
+			// Apply an explicit collision force using a custom d3 force if needed, 
+			// but a massive charge is usually enough to keep them apart in DAG mode.
+			
 			currentGraph.graphData(data);
 
 			if (container) {
