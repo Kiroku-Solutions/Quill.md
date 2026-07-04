@@ -76,6 +76,44 @@ export async function createIssue(
 ) {
 	const issuesDir = getIssuesDir();
 	try {
+		// --- STRICT VALIDATION ---
+		const dir = process.argv[2] || process.cwd();
+		const templatePath = path.join(dir, '.quill.md', 'templates', `${issueType}.json`);
+		
+		let template: any;
+		try {
+			const templateContent = await fs.readFile(templatePath, 'utf-8');
+			template = JSON.parse(templateContent);
+		} catch (e) {
+			throw new Error(`Strict Validation Failed: Template for issue type '${issueType}' does not exist.`);
+		}
+
+		if (template.fields && Array.isArray(template.fields)) {
+			for (const field of template.fields) {
+				if (field.obligatory === true) {
+					if (field.key === 'status' && !status) {
+						throw new Error(`Strict Validation Failed: The system field 'status' is obligatory for '${issueType}'.`);
+					}
+					if (field.id > 0) {
+						if (!customFields || customFields[field.key] === undefined || customFields[field.key] === null || customFields[field.key] === '') {
+							throw new Error(`Strict Validation Failed: The custom field '${field.key}' is obligatory for '${issueType}'. You must provide it in the customFields parameter.`);
+						}
+					}
+				}
+			}
+		}
+
+		if (template.sections && Array.isArray(template.sections)) {
+			for (const section of template.sections) {
+				if (section.obligatory === true) {
+					if (!sections || sections[section.key] === undefined || sections[section.key].trim() === '') {
+						throw new Error(`Strict Validation Failed: The section '${section.key}' is obligatory for '${issueType}'. You must provide markdown content for it.`);
+					}
+				}
+			}
+		}
+		// --- END STRICT VALIDATION ---
+
 		// Generate new ID
 		let maxId = 0;
 		const files = await fs.readdir(issuesDir).catch(() => []);
