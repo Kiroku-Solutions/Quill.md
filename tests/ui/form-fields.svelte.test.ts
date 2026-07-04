@@ -284,7 +284,11 @@ function buildStub(opts: StubOpts = {}): StoreGraph {
 			toggle: () => {}
 		},
 		ui: {
-			settingsOpen: false, mobileNavOpen: false, openMobileNav: () => {}, closeMobileNav: () => {}, toggleMobileNav: () => {},
+			settingsOpen: false,
+			mobileNavOpen: false,
+			openMobileNav: () => {},
+			closeMobileNav: () => {},
+			toggleMobileNav: () => {},
 			openSettings: () => {},
 			closeSettings: () => {},
 			toggleSettings: () => {},

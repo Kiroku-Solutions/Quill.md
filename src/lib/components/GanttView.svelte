@@ -57,7 +57,9 @@
 
 	const groupsMatchList = $derived.by(() => {
 		if (globalGroupBy === 'sprint') {
-			const sprintIssues = Array.from(issues.byId.values()).filter((li) => li.issue.issueType === 'sprint');
+			const sprintIssues = Array.from(issues.byId.values()).filter(
+				(li) => li.issue.issueType === 'sprint'
+			);
 			const definedGroups = sprintIssues.map((s) => ({
 				id: `sprint-${s.issue.id}`,
 				title: `Sprint ${s.issue.customFields?.sprint_number ?? s.issue.id} · ${s.issue.title}`,
@@ -68,7 +70,9 @@
 			return [...definedGroups, { id: 'unassigned', title: 'Sin Asignar', match: () => true }];
 		}
 		if (globalGroupBy === 'epic') {
-			const epicIssues = Array.from(issues.byId.values()).filter((li) => li.issue.issueType === 'epic');
+			const epicIssues = Array.from(issues.byId.values()).filter(
+				(li) => li.issue.issueType === 'epic'
+			);
 			const definedGroups = epicIssues.map((e) => ({
 				id: `epic-${e.issue.id}`,
 				title: e.issue.title,
@@ -133,14 +137,18 @@
 			for (const li of dated) {
 				let k = 'unknown';
 				if (groupsMatchList) {
-					const g = groupsMatchList.find((g) => g.id !== 'unassigned' && g.match(li.issue)) || groupsMatchList[groupsMatchList.length - 1];
+					const g =
+						groupsMatchList.find((g) => g.id !== 'unassigned' && g.match(li.issue)) ||
+						groupsMatchList[groupsMatchList.length - 1];
 					if (g) k = g.title;
 				} else {
-					k = String((li.issue as unknown as Record<string, unknown>)[fallbackGroupBy] ?? 'unknown');
+					k = String(
+						(li.issue as unknown as Record<string, unknown>)[fallbackGroupBy] ?? 'unknown'
+					);
 				}
 				(groups.get(k) ?? groups.set(k, []).get(k)!).push(li);
 			}
-			
+
 			const out: Row[] = [];
 			if (groupsMatchList) {
 				for (const g of groupsMatchList) {

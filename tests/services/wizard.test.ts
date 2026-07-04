@@ -49,7 +49,10 @@ describe('writeWizardSetup — happy path', () => {
 	});
 
 	it('writes the config + every selected template', async () => {
-		const written = await writeWizardSetup(fs, [mockTemplates[0], mockTemplates[1]], { overwriteConfig: true, config: mockConfig });
+		const written = await writeWizardSetup(fs, [mockTemplates[0], mockTemplates[1]], {
+			overwriteConfig: true,
+			config: mockConfig
+		});
 		expect(written).toHaveLength(2);
 		expect(written.map((t) => t.id)).toEqual([mockTemplates[0].id, mockTemplates[1].id]);
 

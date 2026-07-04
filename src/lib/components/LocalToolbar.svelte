@@ -115,7 +115,7 @@
 			});
 			const file = await fileHandle.getFile();
 			const content = await file.text();
-			
+
 			const newId = await stores.issues.importIssue(content);
 			stores.editor.open(newId);
 		} catch (e) {
@@ -147,7 +147,13 @@
 		<Button variant="primary" size="sm" onclick={openNewIssue} data-testid="toolbar-new-issue">
 			{t('localToolbar.newIssue')}
 		</Button>
-		<Button variant="secondary" size="sm" loading={importing} onclick={handleImport} data-testid="toolbar-import-issue">
+		<Button
+			variant="secondary"
+			size="sm"
+			loading={importing}
+			onclick={handleImport}
+			data-testid="toolbar-import-issue"
+		>
 			{t('localToolbar.importIssue')}
 		</Button>
 	{/if}

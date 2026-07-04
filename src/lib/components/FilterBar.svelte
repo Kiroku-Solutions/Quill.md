@@ -104,7 +104,13 @@
 			<select
 				class="w-full appearance-none bg-background text-foreground rounded-md border border-border pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
 				value={groupBy}
-				onchange={(e) => update({ groupBy: (e.currentTarget.value as 'none' | 'sprint' | 'epic') === 'none' ? undefined : e.currentTarget.value as 'none' | 'sprint' | 'epic' })}
+				onchange={(e) =>
+					update({
+						groupBy:
+							(e.currentTarget.value as 'none' | 'sprint' | 'epic') === 'none'
+								? undefined
+								: (e.currentTarget.value as 'none' | 'sprint' | 'epic')
+					})}
 			>
 				<option value="none">Flat (Bajo Nivel)</option>
 				<option value="sprint">Group by Sprint</option>

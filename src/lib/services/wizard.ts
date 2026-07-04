@@ -83,10 +83,14 @@ export async function writeWizardSetup(
 	if (overwriteTemplates) {
 		try {
 			const existingTemplates = await adapter.listDirectory(TEMPLATES_DIR);
-			const newTemplateIds = new Set(templatesToProcess.map(t => `${t.id}.json`));
-			
+			const newTemplateIds = new Set(templatesToProcess.map((t) => `${t.id}.json`));
+
 			for (const entry of existingTemplates) {
-				if (entry.kind === 'file' && entry.name.endsWith('.json') && !newTemplateIds.has(entry.name)) {
+				if (
+					entry.kind === 'file' &&
+					entry.name.endsWith('.json') &&
+					!newTemplateIds.has(entry.name)
+				) {
 					await adapter.removeFile(`${TEMPLATES_DIR}/${entry.name}`);
 				}
 			}

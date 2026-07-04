@@ -57,7 +57,9 @@
 
 	const groups = $derived.by(() => {
 		if (groupBy === 'sprint') {
-			const sprintIssues = Array.from(issues.byId.values()).filter((li) => li.issue.issueType === 'sprint');
+			const sprintIssues = Array.from(issues.byId.values()).filter(
+				(li) => li.issue.issueType === 'sprint'
+			);
 			const definedGroups = sprintIssues.map((s) => ({
 				id: `sprint-${s.issue.id}`,
 				title: `Sprint ${s.issue.customFields?.sprint_number ?? s.issue.id} · ${s.issue.title}`,
@@ -68,7 +70,9 @@
 			return [...definedGroups, { id: 'unassigned', title: 'Sin Asignar', match: () => true }];
 		}
 		if (groupBy === 'epic') {
-			const epicIssues = Array.from(issues.byId.values()).filter((li) => li.issue.issueType === 'epic');
+			const epicIssues = Array.from(issues.byId.values()).filter(
+				(li) => li.issue.issueType === 'epic'
+			);
 			const definedGroups = epicIssues.map((e) => ({
 				id: `epic-${e.issue.id}`,
 				title: e.issue.title,
@@ -87,12 +91,14 @@
 			result[g.id] = {};
 			for (const col of columns) result[g.id][col.id] = [];
 		}
-		
+
 		for (const li of rows) {
-			const group = groupBy !== 'none'
-				? groups.find((g) => g.id !== 'unassigned' && g.match(li.issue)) || groups[groups.length - 1]
-				: groups[0];
-			
+			const group =
+				groupBy !== 'none'
+					? groups.find((g) => g.id !== 'unassigned' && g.match(li.issue)) ||
+						groups[groups.length - 1]
+					: groups[0];
+
 			if (group) {
 				const bucket = result[group.id][li.issue.status];
 				if (bucket) bucket.push(li);
@@ -338,7 +344,8 @@
 
 		let targetGroup = groups[0];
 		if (groupBy !== 'none') {
-			targetGroup = groups.find((g) => g.id !== 'unassigned' && g.match(li.issue)) || groups[groups.length - 1];
+			targetGroup =
+				groups.find((g) => g.id !== 'unassigned' && g.match(li.issue)) || groups[groups.length - 1];
 		}
 		if (!targetGroup) return;
 
@@ -442,7 +449,10 @@
 	{announcement}
 </div>
 
-<div class="flex flex-col gap-8 min-h-[calc(100vh-var(--topbar-height)-4rem)] p-6 overflow-y-auto bg-background" data-testid="kanban-view">
+<div
+	class="flex flex-col gap-8 min-h-[calc(100vh-var(--topbar-height)-4rem)] p-6 overflow-y-auto bg-background"
+	data-testid="kanban-view"
+>
 	{#each groups as group (group.id)}
 		{#if groupBy === 'none' || groupBy === undefined}
 			<div class="flex gap-6 overflow-x-auto pb-4">
@@ -450,8 +460,17 @@
 			</div>
 		{:else}
 			<details class="group/sprint bg-surface rounded-xl border border-border overflow-hidden" open>
-				<summary class="flex items-center gap-2 px-6 py-4 cursor-pointer hover:bg-surface-dark transition-colors font-bold text-foreground border-b border-border outline-none focus-visible:bg-surface-dark select-none list-none [&::-webkit-details-marker]:hidden">
-					<svg class="w-5 h-5 transition-transform group-open/sprint:rotate-90 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+				<summary
+					class="flex items-center gap-2 px-6 py-4 cursor-pointer hover:bg-surface-dark transition-colors font-bold text-foreground border-b border-border outline-none focus-visible:bg-surface-dark select-none list-none [&::-webkit-details-marker]:hidden"
+				>
+					<svg
+						class="w-5 h-5 transition-transform group-open/sprint:rotate-90 text-muted-foreground"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+						><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"
+						></path></svg
+					>
 					{group.title}
 				</summary>
 				<div class="flex gap-6 overflow-x-auto p-6 bg-background">
@@ -462,7 +481,7 @@
 	{/each}
 </div>
 
-{#snippet columnSet(group: { id: string, title: string })}
+{#snippet columnSet(group: { id: string; title: string })}
 	{#each columns as col (col.id)}
 		{@const colCards = groupedCards[group.id]?.[col.id] ?? []}
 		{@const isDropTarget = dropTargetId === `${group.id}:${col.id}` && draggedId !== null}

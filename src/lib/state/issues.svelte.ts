@@ -410,10 +410,10 @@ export function createIssuesStore(
 	async function importIssue(markdownContent: string): Promise<IssueId> {
 		const adapter = adapterProvider();
 		if (!adapter) throw new Error('Cannot import issue: no adapter bound');
-		
+
 		const loaded = await parseIssueFile(markdownContent, '.quill.md/issues/import.md');
 		const loadedIssue = loaded.issue;
-		
+
 		const created = await createIssue(
 			requireWritable(adapter),
 			{

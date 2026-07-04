@@ -40,7 +40,8 @@
 		{ id: 'list', label: t('leftrail.view.list') },
 		{ id: 'kanban', label: t('leftrail.view.kanban') },
 		{ id: 'gantt', label: t('leftrail.view.gantt') },
-		{ id: 'graph', label: t('leftrail.view.graph') }
+		{ id: 'graph', label: t('leftrail.view.graph') },
+		{ id: 'tree', label: t('leftrail.view.tree') }
 	] as const);
 
 	const warningCount = $derived(stores.issues.integrityWarnings.length);
@@ -54,7 +55,7 @@
 	}
 
 	function onViewChange(id: string): void {
-		if (id === 'list' || id === 'kanban' || id === 'gantt' || id === 'graph') {
+		if (id === 'list' || id === 'kanban' || id === 'gantt' || id === 'graph' || id === 'tree') {
 			stores.view.setView(id as any);
 			closeMobileNav();
 		}
@@ -101,7 +102,9 @@
 		data-testid="leftrail"
 		data-collapsed="false"
 		aria-label={t('leftrail.ariaLabel')}
-		class="fixed top-0 bottom-0 left-0 z-50 h-screen w-[var(--leftrail-width)] shrink-0 flex-col gap-4 border-r border-border bg-surface p-4 transition-transform duration-[var(--motion-base)] md:sticky md:top-[var(--topbar-height)] md:z-20 md:h-[calc(100vh-var(--topbar-height))] md:flex md:translate-x-0 {mobileOpen ? 'flex translate-x-0 shadow-2xl' : 'hidden -translate-x-full md:flex md:shadow-none'}"
+		class="fixed top-0 bottom-0 left-0 z-50 h-screen w-[var(--leftrail-width)] shrink-0 flex-col gap-4 border-r border-border bg-surface p-4 transition-transform duration-[var(--motion-base)] md:sticky md:top-[var(--topbar-height)] md:z-20 md:h-[calc(100vh-var(--topbar-height))] md:flex md:translate-x-0 {mobileOpen
+			? 'flex translate-x-0 shadow-2xl'
+			: 'hidden -translate-x-full md:flex md:shadow-none'}"
 	>
 		<div class="flex items-center gap-2 md:hidden">
 			<h2 class="flex-1 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
@@ -135,14 +138,15 @@
 						class="flex items-center justify-start gap-2 py-2 px-3 rounded-md text-sm font-semibold transition-colors duration-[var(--motion-fast)] ease-out cursor-pointer {active
 							? 'bg-primary text-primary-foreground'
 							: 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
-						onclick={() => { 
-							stores.view.setView('list'); 
-							stores.filter.clear(); 
-							stores.filter.set({ type: tmpl.id }); 
-							closeMobileNav(); 
+						onclick={() => {
+							stores.view.setView('list');
+							stores.filter.clear();
+							stores.filter.set({ type: tmpl.id });
+							closeMobileNav();
 						}}
 					>
-						<span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: {tmpl.color}"></span>
+						<span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: {tmpl.color}"
+						></span>
 						<span class="truncate">{tmpl.name}</span>
 					</button>
 				{/each}
@@ -159,7 +163,10 @@
 					.view.view === 'backlog'
 					? 'bg-primary text-primary-foreground'
 					: 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
-				onclick={() => { stores.view.setView('backlog'); closeMobileNav(); }}
+				onclick={() => {
+					stores.view.setView('backlog');
+					closeMobileNav();
+				}}
 			>
 				<span>{t('leftrail.view.backlog')}</span>
 			</button>
@@ -169,7 +176,10 @@
 					.view.view === 'sprint'
 					? 'bg-primary text-primary-foreground'
 					: 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
-				onclick={() => { stores.view.setView('sprint'); closeMobileNav(); }}
+				onclick={() => {
+					stores.view.setView('sprint');
+					closeMobileNav();
+				}}
 			>
 				<span>{t('leftrail.view.sprint')}</span>
 			</button>

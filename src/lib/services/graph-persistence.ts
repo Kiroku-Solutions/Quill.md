@@ -16,7 +16,7 @@ async function getDB() {
 			if (!db.objectStoreNames.contains(STORE_NAME)) {
 				db.createObjectStore(STORE_NAME, { keyPath: 'key' });
 			}
-		},
+		}
 	});
 }
 
@@ -39,7 +39,7 @@ export const persistedLayout = {
 	async load(key: string): Promise<Record<string, { x: number; y: number }> | null> {
 		try {
 			const db = await getDB();
-			const data = await db.get(STORE_NAME, key) as PersistedLayout | undefined;
+			const data = (await db.get(STORE_NAME, key)) as PersistedLayout | undefined;
 			return data ? data.positions : null;
 		} catch (e) {
 			console.warn('Failed to load graph layout from IndexedDB', e);

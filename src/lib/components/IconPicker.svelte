@@ -7,10 +7,30 @@
 
 	// S+ Tier preset icons
 	const PRESET_ICONS = [
-		'file-text', 'file', 'check-square', 'bug', 'flame', 'book-open', 
-		'milestone', 'zap', 'star', 'rocket', 'shield', 'target', 
-		'alert-triangle', 'lightbulb', 'compass', 'flag', 'activity',
-		'layers', 'box', 'cpu', 'database', 'globe', 'hash', 'heart'
+		'file-text',
+		'file',
+		'check-square',
+		'bug',
+		'flame',
+		'book-open',
+		'milestone',
+		'zap',
+		'star',
+		'rocket',
+		'shield',
+		'target',
+		'alert-triangle',
+		'lightbulb',
+		'compass',
+		'flag',
+		'activity',
+		'layers',
+		'box',
+		'cpu',
+		'database',
+		'globe',
+		'hash',
+		'heart'
 	];
 
 	function selectIcon(icon: string) {
@@ -18,7 +38,10 @@
 	}
 
 	function kebabToPascal(str: string) {
-		return str.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('');
+		return str
+			.split('-')
+			.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+			.join('');
 	}
 
 	function getLucideComponent(name: string) {
@@ -36,9 +59,9 @@
 			<button
 				type="button"
 				class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md transition-all duration-200
-					{isSelected 
-						? 'bg-primary text-primary-foreground shadow-md scale-110' 
-						: 'text-muted-foreground hover:bg-muted hover:text-foreground hover:scale-105'}"
+					{isSelected
+					? 'bg-primary text-primary-foreground shadow-md scale-110'
+					: 'text-muted-foreground hover:bg-muted hover:text-foreground hover:scale-105'}"
 				onclick={() => selectIcon(iconName)}
 				aria-label={iconName}
 				title={iconName}

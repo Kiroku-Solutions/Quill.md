@@ -56,14 +56,16 @@ node dist/index.js "C:\path\to\your\repo"
 
 ## License & Trademark
 
-This project is licensed under the **PolyForm Noncommercial License 1.0.0**. 
+This project is licensed under the **PolyForm Noncommercial License 1.0.0**.
 
 You are free to:
+
 - Use this software for your own personal or internal projects.
 - Self-host the software on your own servers for non-commercial purposes.
 - Modify the source code for your own non-commercial use.
 
 You may **NOT**:
+
 - Use this software for any commercial purpose (e.g., selling it, offering it as a SaaS product, or using it to directly generate revenue).
 - Remove the copyright notices.
 - Distribute forks or modified versions using the "quill.md" name, logos, or branding (which are trademarks of Kiroku Solutions).

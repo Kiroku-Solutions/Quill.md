@@ -5,43 +5,44 @@ import { FRAMEWORK_PRESETS } from '../src/lib/services/framework-presets.ts';
 const dictPath = path.resolve('scripts/es-dict.json');
 let esDict: Record<string, string> = {};
 if (fs.existsSync(dictPath)) {
-    esDict = JSON.parse(fs.readFileSync(dictPath, 'utf8'));
+	esDict = JSON.parse(fs.readFileSync(dictPath, 'utf8'));
 }
 
 const translate = (str: string) => {
-    if (!str) return str;
-    return esDict[str] && esDict[str].trim() !== "" ? esDict[str] : str;
+	if (!str) return str;
+	return esDict[str] && esDict[str].trim() !== '' ? esDict[str] : str;
 };
 
 // Deep clone to avoid mutating the original import if it's cached
 const presets = JSON.parse(JSON.stringify(FRAMEWORK_PRESETS));
 
 for (const preset of presets) {
-    preset.name = translate(preset.name);
-    if (preset.description) preset.description = translate(preset.description);
-    
-    if (preset.config) {
-        if (preset.config.product_goal) preset.config.product_goal = translate(preset.config.product_goal);
-        if (preset.config.definition_of_done) {
-            preset.config.definition_of_done = preset.config.definition_of_done.map(translate);
-        }
-        if (preset.config.statuses) {
-            for (const status of preset.config.statuses) {
-                status.name = translate(status.name);
-            }
-        }
-    }
-    
-    if (preset.templates) {
-        for (const tmpl of preset.templates) {
-            tmpl.name = translate(tmpl.name);
-            if (tmpl.fields) {
-                for (const field of tmpl.fields) {
-                    field.name = translate(field.name);
-                }
-            }
-        }
-    }
+	preset.name = translate(preset.name);
+	if (preset.description) preset.description = translate(preset.description);
+
+	if (preset.config) {
+		if (preset.config.product_goal)
+			preset.config.product_goal = translate(preset.config.product_goal);
+		if (preset.config.definition_of_done) {
+			preset.config.definition_of_done = preset.config.definition_of_done.map(translate);
+		}
+		if (preset.config.statuses) {
+			for (const status of preset.config.statuses) {
+				status.name = translate(status.name);
+			}
+		}
+	}
+
+	if (preset.templates) {
+		for (const tmpl of preset.templates) {
+			tmpl.name = translate(tmpl.name);
+			if (tmpl.fields) {
+				for (const field of tmpl.fields) {
+					field.name = translate(field.name);
+				}
+			}
+		}
+	}
 }
 
 const tsHeader = `/**
@@ -67,4 +68,3 @@ const tsFooter = `;\n`;
 const outputPath = path.resolve('src/lib/services/framework-presets.es.ts');
 fs.writeFileSync(outputPath, tsHeader + JSON.stringify(presets, null, '\t') + tsFooter);
 console.log('Generated framework-presets.es.ts successfully.');
-

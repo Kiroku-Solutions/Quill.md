@@ -21,7 +21,7 @@
 		'#84cc16', // lime 500
 		'#f59e0b', // amber 500
 		'#64748b', // slate 500
-		'#3f3f46', // zinc 700
+		'#3f3f46' // zinc 700
 	];
 
 	function selectColor(color: string) {
@@ -37,14 +37,25 @@
 			<button
 				type="button"
 				class="relative h-8 w-8 rounded-full shadow-sm transition-all duration-200
-					{isSelected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-110' : 'hover:scale-110'}"
+					{isSelected
+					? 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-110'
+					: 'hover:scale-110'}"
 				style="background-color: {color}"
 				onclick={() => selectColor(color)}
 				aria-label="Color {color}"
 			>
 				{#if isSelected}
 					<span class="absolute inset-0 flex items-center justify-center text-white drop-shadow-md">
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+						<svg
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="3"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
 							<polyline points="20 6 9 17 4 12"></polyline>
 						</svg>
 					</span>
@@ -52,9 +63,9 @@
 			</button>
 		{/each}
 		<div class="flex items-center ml-2 border-l border-border pl-4">
-			<input 
-				type="color" 
-				bind:value 
+			<input
+				type="color"
+				bind:value
 				class="h-8 w-8 cursor-pointer rounded overflow-hidden border-0 p-0"
 				title={t('templateEditor.customColor')}
 			/>

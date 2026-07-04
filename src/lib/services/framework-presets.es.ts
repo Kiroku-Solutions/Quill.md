@@ -13,6726 +13,6323 @@ export interface FrameworkPreset {
 	templates: Template[];
 }
 
-export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = 
-[
+export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 	{
-		"id": "scrum",
-		"name": "Scrum",
-		"description": "Scrum es el marco ágil predeterminado a nivel de equipo. Un equipo autogestionado (≤ 9) extrae trabajo de un Product Backlog ordenado por valor, se compromete con un Sprint Backlog dentro de un Sprint de duración fija (1–4 semanas, más a menudo 2), y termina con una Revisión (demo) y una Retrospectiva (inspeccionar y adaptar). Tres responsabilidades: Product Owner (valor), Scrum Master (proceso), Desarrolladores (construcción). Artefactos: Product Backlog, Sprint Backlog, Incremento; la Definición de Hecho (DoD) controla el Incremento. La *Guía Scrum* de 2020 eliminó el rol de \"Equipo de Desarrollo\" y lo fusionó con los Desarrolladores; el standup diario fue renombrado a \"Daily Scrum\" dejando la estructura a decisión del equipo.",
-		"config": {
-			"product_goal": "Construir y entregar incrementos de valor que cumplan la Definición de Hecho en cada Sprint.",
-			"definition_of_done": [
-				"El código es revisado por pares y fusionado en la rama principal.",
-				"Las pruebas unitarias pasan y la cobertura cumple el umbral del equipo.",
-				"Los criterios de aceptación de la historia de usuario se verifican de principio a fin.",
-				"La documentación se actualiza donde cambió el comportamiento visible para el usuario.",
-				"La compilación es desplegable a staging sin intervención manual."
+		id: 'scrum',
+		name: 'Scrum',
+		description:
+			'Scrum es el marco ágil predeterminado a nivel de equipo. Un equipo autogestionado (≤ 9) extrae trabajo de un Product Backlog ordenado por valor, se compromete con un Sprint Backlog dentro de un Sprint de duración fija (1–4 semanas, más a menudo 2), y termina con una Revisión (demo) y una Retrospectiva (inspeccionar y adaptar). Tres responsabilidades: Product Owner (valor), Scrum Master (proceso), Desarrolladores (construcción). Artefactos: Product Backlog, Sprint Backlog, Incremento; la Definición de Hecho (DoD) controla el Incremento. La *Guía Scrum* de 2020 eliminó el rol de "Equipo de Desarrollo" y lo fusionó con los Desarrolladores; el standup diario fue renombrado a "Daily Scrum" dejando la estructura a decisión del equipo.',
+		config: {
+			product_goal:
+				'Construir y entregar incrementos de valor que cumplan la Definición de Hecho en cada Sprint.',
+			definition_of_done: [
+				'El código es revisado por pares y fusionado en la rama principal.',
+				'Las pruebas unitarias pasan y la cobertura cumple el umbral del equipo.',
+				'Los criterios de aceptación de la historia de usuario se verifican de principio a fin.',
+				'La documentación se actualiza donde cambió el comportamiento visible para el usuario.',
+				'La compilación es desplegable a staging sin intervención manual.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "open",
-					"name": "Abierto (Product Backlog)",
-					"color": "#6b7280",
-					"category": "todo"
+					id: 'open',
+					name: 'Abierto (Product Backlog)',
+					color: '#6b7280',
+					category: 'todo'
 				},
 				{
-					"id": "ready",
-					"name": "Listo para Sprint",
-					"color": "#0ea5e9",
-					"category": "todo"
+					id: 'ready',
+					name: 'Listo para Sprint',
+					color: '#0ea5e9',
+					category: 'todo'
 				},
 				{
-					"id": "in_progress",
-					"name": "En progreso",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'in_progress',
+					name: 'En progreso',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "in_review",
-					"name": "En revisión",
-					"color": "#f59e0b",
-					"category": "doing"
+					id: 'in_review',
+					name: 'En revisión',
+					color: '#f59e0b',
+					category: 'doing'
 				},
 				{
-					"id": "done",
-					"name": "Hecho (Incremento del Sprint)",
-					"color": "#10b981",
-					"category": "done"
+					id: 'done',
+					name: 'Hecho (Incremento del Sprint)',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "closed",
-					"name": "Cerrado",
-					"color": "#22c55e",
-					"category": "done"
+					id: 'closed',
+					name: 'Cerrado',
+					color: '#22c55e',
+					category: 'done'
 				},
 				{
-					"id": "removed",
-					"name": "Removido (fuera del Sprint)",
-					"color": "#ef4444",
-					"category": "cancelled"
+					id: 'removed',
+					name: 'Removido (fuera del Sprint)',
+					color: '#ef4444',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "open",
-			"labels": [
+			default_status: 'open',
+			labels: [
 				{
-					"id": "tech-debt",
-					"name": "Tech debt",
-					"color": "#a3a3a3"
+					id: 'tech-debt',
+					name: 'Tech debt',
+					color: '#a3a3a3'
 				},
 				{
-					"id": "spike",
-					"name": "Spike",
-					"color": "#facc15"
+					id: 'spike',
+					name: 'Spike',
+					color: '#facc15'
 				},
 				{
-					"id": "blocked",
-					"name": "Blocked",
-					"color": "#ef4444"
+					id: 'blocked',
+					name: 'Blocked',
+					color: '#ef4444'
 				},
 				{
-					"id": "ux",
-					"name": "UX",
-					"color": "#a855f7"
+					id: 'ux',
+					name: 'UX',
+					color: '#a855f7'
 				},
 				{
-					"id": "compliance",
-					"name": "Compliance",
-					"color": "#0f766e"
+					id: 'compliance',
+					name: 'Compliance',
+					color: '#0f766e'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"open",
-					"ready",
-					"in_progress",
-					"in_review",
-					"done"
-				]
+			users: [],
+			kanban: {
+				columns: ['open', 'ready', 'in_progress', 'in_review', 'done']
 			},
-			"gantt": {
-				"group_by": "issue_type",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'issue_type',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "epic",
-				"name": "Épica",
-				"icon": "book-open",
-				"color": "#8b5cf6",
-				"default_status": "open",
-				"fields": [
+				id: 'epic',
+				name: 'Épica',
+				icon: 'book-open',
+				color: '#8b5cf6',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "business_value",
-						"name": "Valor de negocio",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"low",
-							"medium",
-							"high",
-							"critical"
-						]
+						id: 1,
+						key: 'business_value',
+						name: 'Valor de negocio',
+						type: 'select',
+						obligatory: true,
+						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						"id": 2,
-						"key": "target_release",
-						"name": "Lanzamiento objetivo",
-						"type": "text",
-						"obligatory": false
+						id: 2,
+						key: 'target_release',
+						name: 'Lanzamiento objetivo',
+						type: 'text',
+						obligatory: false
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "acceptance",
-						"name": "Acceptance criteria",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'acceptance',
+						name: 'Acceptance criteria',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "out_of_scope",
-						"name": "Out of scope",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'out_of_scope',
+						name: 'Out of scope',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "user-story",
-				"name": "Historia de Usuario",
-				"icon": "book-open",
-				"color": "#3b82f6",
-				"default_status": "open",
-				"fields": [
+				id: 'user-story',
+				name: 'Historia de Usuario',
+				icon: 'book-open',
+				color: '#3b82f6',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "story_points",
-						"name": "Puntos de historia",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"1",
-							"2",
-							"3",
-							"5",
-							"8",
-							"13",
-							"21"
-						]
+						id: 1,
+						key: 'story_points',
+						name: 'Puntos de historia',
+						type: 'select',
+						obligatory: true,
+						options: ['1', '2', '3', '5', '8', '13', '21']
 					},
 					{
-						"id": 2,
-						"key": "priority",
-						"name": "Prioridad",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"p0",
-							"p1",
-							"p2",
-							"p3"
-						]
+						id: 2,
+						key: 'priority',
+						name: 'Prioridad',
+						type: 'select',
+						obligatory: true,
+						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						"id": 3,
-						"key": "sprint",
-						"name": "Sprint",
-						"type": "text",
-						"obligatory": false
+						id: 3,
+						key: 'sprint',
+						name: 'Sprint',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "user_story",
-						"name": "User story",
-						"obligatory": true,
-						"default": "**As a** ___\n**I want** ___\n**so that** ___."
+						id: 1,
+						key: 'user_story',
+						name: 'User story',
+						obligatory: true,
+						default: '**As a** ___\n**I want** ___\n**so that** ___.'
 					},
 					{
-						"id": 2,
-						"key": "acceptance",
-						"name": "Acceptance criteria",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'acceptance',
+						name: 'Acceptance criteria',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "notes",
-						"name": "Notes & assumptions",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'notes',
+						name: 'Notes & assumptions',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "task",
-				"name": "Tarea",
-				"icon": "check-square",
-				"color": "#10b981",
-				"default_status": "open",
-				"fields": [
+				id: 'task',
+				name: 'Tarea',
+				icon: 'check-square',
+				color: '#10b981',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "estimate_hours",
-						"name": "Estimación (horas)",
-						"type": "number",
-						"obligatory": false
+						id: 1,
+						key: 'estimate_hours',
+						name: 'Estimación (horas)',
+						type: 'number',
+						obligatory: false
 					},
 					{
-						"id": 2,
-						"key": "priority",
-						"name": "Prioridad",
-						"type": "select",
-						"obligatory": false,
-						"options": [
-							"p0",
-							"p1",
-							"p2",
-							"p3"
-						]
+						id: 2,
+						key: 'priority',
+						name: 'Prioridad',
+						type: 'select',
+						obligatory: false,
+						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						"id": 3,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 3,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "definition_of_done",
-						"name": "Definition of done for this task",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'definition_of_done',
+						name: 'Definition of done for this task',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "bug",
-				"name": "Bug (Error)",
-				"icon": "bug",
-				"color": "#ef4444",
-				"default_status": "open",
-				"fields": [
+				id: 'bug',
+				name: 'Bug (Error)',
+				icon: 'bug',
+				color: '#ef4444',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "severity",
-						"name": "Severidad",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"low",
-							"medium",
-							"high",
-							"critical"
-						]
+						id: 1,
+						key: 'severity',
+						name: 'Severidad',
+						type: 'select',
+						obligatory: true,
+						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						"id": 2,
-						"key": "priority",
-						"name": "Prioridad",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"p0",
-							"p1",
-							"p2",
-							"p3"
-						]
+						id: 2,
+						key: 'priority',
+						name: 'Prioridad',
+						type: 'select',
+						obligatory: true,
+						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						"id": 3,
-						"key": "regression",
-						"name": "Regresión desde",
-						"type": "text",
-						"obligatory": false
+						id: 3,
+						key: 'regression',
+						name: 'Regresión desde',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "steps_to_reproduce",
-						"name": "Steps to reproduce",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'steps_to_reproduce',
+						name: 'Steps to reproduce',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "expected_actual",
-						"name": "Expected vs. actual",
-						"obligatory": true,
-						"default": ""
+						id: 3,
+						key: 'expected_actual',
+						name: 'Expected vs. actual',
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "kanban",
-		"name": "Kanban",
-		"description": "Kanban (Japonés: \"letrero\") es un método, no un proceso. Visualiza el trabajo como tarjetas que fluyen a través de columnas de un tablero, cada columna limitada por un límite explícito de Trabajo en Progreso (WIP), y optimiza para métricas de *flujo* (tiempo de ciclo, tiempo de entrega, rendimiento) en lugar de utilización. La *Guía Kanban* de 2021 condensa las \"Siete Cadencias\" y Prácticas Centrales de Anderson en 5 propiedades (visualizar, limitar el WIP, gestionar el flujo, hacer explícitas las políticas de proceso, implementar bucles de retroalimentación) más 6 prácticas. No hay roles prescritos, ni bloques de tiempo, ni estimaciones, y el equipo extrae el trabajo bajo demanda.",
-		"config": {
-			"product_goal": "Optimizar el flujo de trabajo del equipo con un tiempo de ciclo predecible y WIP limitado.",
-			"definition_of_done": [
-				"El ítem de trabajo es verificado de principio a fin por la persona que lo tomó.",
-				"La tarjeta cumple con la política de salida de la columna (definición de listo / hecho).",
-				"El lead time y cycle time se registran automáticamente."
+		id: 'kanban',
+		name: 'Kanban',
+		description:
+			'Kanban (Japonés: "letrero") es un método, no un proceso. Visualiza el trabajo como tarjetas que fluyen a través de columnas de un tablero, cada columna limitada por un límite explícito de Trabajo en Progreso (WIP), y optimiza para métricas de *flujo* (tiempo de ciclo, tiempo de entrega, rendimiento) en lugar de utilización. La *Guía Kanban* de 2021 condensa las "Siete Cadencias" y Prácticas Centrales de Anderson en 5 propiedades (visualizar, limitar el WIP, gestionar el flujo, hacer explícitas las políticas de proceso, implementar bucles de retroalimentación) más 6 prácticas. No hay roles prescritos, ni bloques de tiempo, ni estimaciones, y el equipo extrae el trabajo bajo demanda.',
+		config: {
+			product_goal:
+				'Optimizar el flujo de trabajo del equipo con un tiempo de ciclo predecible y WIP limitado.',
+			definition_of_done: [
+				'El ítem de trabajo es verificado de principio a fin por la persona que lo tomó.',
+				'La tarjeta cumple con la política de salida de la columna (definición de listo / hecho).',
+				'El lead time y cycle time se registran automáticamente.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "backlog",
-					"name": "Backlog",
-					"color": "#6b7280",
-					"category": "todo"
+					id: 'backlog',
+					name: 'Backlog',
+					color: '#6b7280',
+					category: 'todo'
 				},
 				{
-					"id": "ready",
-					"name": "Listo (para tomar)",
-					"color": "#0ea5e9",
-					"category": "todo"
+					id: 'ready',
+					name: 'Listo (para tomar)',
+					color: '#0ea5e9',
+					category: 'todo'
 				},
 				{
-					"id": "in_progress",
-					"name": "En progreso",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'in_progress',
+					name: 'En progreso',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "review",
-					"name": "Revisión",
-					"color": "#f59e0b",
-					"category": "doing"
+					id: 'review',
+					name: 'Revisión',
+					color: '#f59e0b',
+					category: 'doing'
 				},
 				{
-					"id": "blocked",
-					"name": "Bloqueado",
-					"color": "#ef4444",
-					"category": "doing"
+					id: 'blocked',
+					name: 'Bloqueado',
+					color: '#ef4444',
+					category: 'doing'
 				},
 				{
-					"id": "done",
-					"name": "Hecho",
-					"color": "#10b981",
-					"category": "done"
+					id: 'done',
+					name: 'Hecho',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "cancelled",
-					"name": "Cancelado",
-					"color": "#a3a3a3",
-					"category": "cancelled"
+					id: 'cancelled',
+					name: 'Cancelado',
+					color: '#a3a3a3',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "backlog",
-			"labels": [
+			default_status: 'backlog',
+			labels: [
 				{
-					"id": "expedite",
-					"name": "Expedite",
-					"color": "#ef4444"
+					id: 'expedite',
+					name: 'Expedite',
+					color: '#ef4444'
 				},
 				{
-					"id": "fixed-date",
-					"name": "Fixed date",
-					"color": "#f59e0b"
+					id: 'fixed-date',
+					name: 'Fixed date',
+					color: '#f59e0b'
 				},
 				{
-					"id": "standard",
-					"name": "Standard",
-					"color": "#0ea5e9"
+					id: 'standard',
+					name: 'Standard',
+					color: '#0ea5e9'
 				},
 				{
-					"id": "intangible",
-					"name": "Intangible",
-					"color": "#a855f7"
+					id: 'intangible',
+					name: 'Intangible',
+					color: '#a855f7'
 				},
 				{
-					"id": "wip-breach",
-					"name": "WIP limit breach",
-					"color": "#facc15"
+					id: 'wip-breach',
+					name: 'WIP limit breach',
+					color: '#facc15'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"backlog",
-					"ready",
-					"in_progress",
-					"review",
-					"done"
-				]
+			users: [],
+			kanban: {
+				columns: ['backlog', 'ready', 'in_progress', 'review', 'done']
 			},
-			"gantt": {
-				"group_by": "labels",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'labels',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "request",
-				"name": "Solicitud",
-				"icon": "inbox",
-				"color": "#0ea5e9",
-				"default_status": "backlog",
-				"fields": [
+				id: 'request',
+				name: 'Solicitud',
+				icon: 'inbox',
+				color: '#0ea5e9',
+				default_status: 'backlog',
+				fields: [
 					{
-						"id": 1,
-						"key": "class_of_service",
-						"name": "Clase de servicio",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"expedite",
-							"fixed-date",
-							"standard",
-							"intangible"
-						]
+						id: 1,
+						key: 'class_of_service',
+						name: 'Clase de servicio',
+						type: 'select',
+						obligatory: true,
+						options: ['expedite', 'fixed-date', 'standard', 'intangible']
 					},
 					{
-						"id": 2,
-						"key": "requestor",
-						"name": "Solicitante",
-						"type": "user",
-						"obligatory": false
+						id: 2,
+						key: 'requestor',
+						name: 'Solicitante',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 3,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 3,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					},
 					{
-						"id": 4,
-						"key": "cycle_time_h",
-						"name": "Tiempo de ciclo (h, calculado)",
-						"type": "number",
-						"obligatory": false
+						id: 4,
+						key: 'cycle_time_h',
+						name: 'Tiempo de ciclo (h, calculado)',
+						type: 'number',
+						obligatory: false
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "exit_criteria",
-						"name": "Exit criteria (DoD for this card)",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'exit_criteria',
+						name: 'Exit criteria (DoD for this card)',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "blockers",
-						"name": "Blockers (if any)",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'blockers',
+						name: 'Blockers (if any)',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "task",
-				"name": "Tarea",
-				"icon": "check-square",
-				"color": "#10b981",
-				"default_status": "backlog",
-				"fields": [
+				id: 'task',
+				name: 'Tarea',
+				icon: 'check-square',
+				color: '#10b981',
+				default_status: 'backlog',
+				fields: [
 					{
-						"id": 1,
-						"key": "class_of_service",
-						"name": "Clase de servicio",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"expedite",
-							"fixed-date",
-							"standard",
-							"intangible"
-						]
+						id: 1,
+						key: 'class_of_service',
+						name: 'Clase de servicio',
+						type: 'select',
+						obligatory: true,
+						options: ['expedite', 'fixed-date', 'standard', 'intangible']
 					},
 					{
-						"id": 2,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 2,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 3,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 3,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "definition_of_done",
-						"name": "Definition of done",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'definition_of_done',
+						name: 'Definition of done',
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "extreme-programming",
-		"name": "Extreme Programming",
-		"description": "XP es el marco ágil que prioriza las prácticas de ingeniería. Doce prácticas centrales en la primera edición (Juego de Planificación, Lanzamientos Pequeños, Metáfora, Diseño Simple, Pruebas, Refactorización, Programación en Parejas, Propiedad Colectiva, Integración Continua, Semana de 40 Horas, Cliente en el Sitio, Estándares de Codificación); la segunda edición las agrupa en 13 añadiendo *Coraje* e *Historias*. El Juego de Planificación produce historias de usuario, que se dividen en tareas de ingeniería; la estimación es en *semanas ideales de ingeniería* (una historia ≤ 2 semanas ideales). XP enfatiza la retroalimentación en tres niveles: pruebas unitarias, pruebas de aceptación, lanzamiento al cliente. La característica más distintiva frente a Scrum: el cliente en el sitio es *parte del equipo*, no un proxy del rol de product owner.",
-		"config": {
-			"product_goal": "Entregar software valioso a través de prácticas de ingeniería disciplinadas, ciclos de retroalimentación cortos y un cliente presente.",
-			"definition_of_done": [
-				"La historia está cubierta por una prueba de aceptación automatizada que pasa.",
-				"Todas las pruebas unitarias pasan; la cobertura cumple el umbral del equipo.",
-				"El código ha sido revisado en pares y fusionado a trunk (CI en verde).",
-				"La historia es demostrada al cliente in situ."
+		id: 'extreme-programming',
+		name: 'Extreme Programming',
+		description:
+			'XP es el marco ágil que prioriza las prácticas de ingeniería. Doce prácticas centrales en la primera edición (Juego de Planificación, Lanzamientos Pequeños, Metáfora, Diseño Simple, Pruebas, Refactorización, Programación en Parejas, Propiedad Colectiva, Integración Continua, Semana de 40 Horas, Cliente en el Sitio, Estándares de Codificación); la segunda edición las agrupa en 13 añadiendo *Coraje* e *Historias*. El Juego de Planificación produce historias de usuario, que se dividen en tareas de ingeniería; la estimación es en *semanas ideales de ingeniería* (una historia ≤ 2 semanas ideales). XP enfatiza la retroalimentación en tres niveles: pruebas unitarias, pruebas de aceptación, lanzamiento al cliente. La característica más distintiva frente a Scrum: el cliente en el sitio es *parte del equipo*, no un proxy del rol de product owner.',
+		config: {
+			product_goal:
+				'Entregar software valioso a través de prácticas de ingeniería disciplinadas, ciclos de retroalimentación cortos y un cliente presente.',
+			definition_of_done: [
+				'La historia está cubierta por una prueba de aceptación automatizada que pasa.',
+				'Todas las pruebas unitarias pasan; la cobertura cumple el umbral del equipo.',
+				'El código ha sido revisado en pares y fusionado a trunk (CI en verde).',
+				'La historia es demostrada al cliente in situ.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "open",
-					"name": "Abierto (Tarjeta de Historia)",
-					"color": "#6b7280",
-					"category": "todo"
+					id: 'open',
+					name: 'Abierto (Tarjeta de Historia)',
+					color: '#6b7280',
+					category: 'todo'
 				},
 				{
-					"id": "estimated",
-					"name": "Estimado (Juego de Historias)",
-					"color": "#0ea5e9",
-					"category": "todo"
+					id: 'estimated',
+					name: 'Estimado (Juego de Historias)',
+					color: '#0ea5e9',
+					category: 'todo'
 				},
 				{
-					"id": "committed",
-					"name": "Comprometido (Iteración)",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'committed',
+					name: 'Comprometido (Iteración)',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "in_progress",
-					"name": "En progreso",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'in_progress',
+					name: 'En progreso',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "acceptance",
-					"name": "Prueba de aceptación pasa",
-					"color": "#a855f7",
-					"category": "doing"
+					id: 'acceptance',
+					name: 'Prueba de aceptación pasa',
+					color: '#a855f7',
+					category: 'doing'
 				},
 				{
-					"id": "merged",
-					"name": "Fusionado (CI en verde)",
-					"color": "#10b981",
-					"category": "doing"
+					id: 'merged',
+					name: 'Fusionado (CI en verde)',
+					color: '#10b981',
+					category: 'doing'
 				},
 				{
-					"id": "done",
-					"name": "Hecho",
-					"color": "#22c55e",
-					"category": "done"
+					id: 'done',
+					name: 'Hecho',
+					color: '#22c55e',
+					category: 'done'
 				},
 				{
-					"id": "abandoned",
-					"name": "Abandonado",
-					"color": "#a3a3a3",
-					"category": "cancelled"
+					id: 'abandoned',
+					name: 'Abandonado',
+					color: '#a3a3a3',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "open",
-			"labels": [
+			default_status: 'open',
+			labels: [
 				{
-					"id": "spike",
-					"name": "Spike",
-					"color": "#facc15"
+					id: 'spike',
+					name: 'Spike',
+					color: '#facc15'
 				},
 				{
-					"id": "pair",
-					"name": "Pair programming",
-					"color": "#a855f7"
+					id: 'pair',
+					name: 'Pair programming',
+					color: '#a855f7'
 				},
 				{
-					"id": "refactor",
-					"name": "Refactor",
-					"color": "#0ea5e9"
+					id: 'refactor',
+					name: 'Refactor',
+					color: '#0ea5e9'
 				},
 				{
-					"id": "overtime-risk",
-					"name": "Overtime risk",
-					"color": "#ef4444"
+					id: 'overtime-risk',
+					name: 'Overtime risk',
+					color: '#ef4444'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"open",
-					"estimated",
-					"committed",
-					"in_progress",
-					"acceptance",
-					"merged",
-					"done"
-				]
+			users: [],
+			kanban: {
+				columns: ['open', 'estimated', 'committed', 'in_progress', 'acceptance', 'merged', 'done']
 			},
-			"gantt": {
-				"group_by": "issue_type",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'issue_type',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "story",
-				"name": "Historia de Usuario",
-				"icon": "book-open",
-				"color": "#3b82f6",
-				"default_status": "open",
-				"fields": [
+				id: 'story',
+				name: 'Historia de Usuario',
+				icon: 'book-open',
+				color: '#3b82f6',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "ideal_weeks",
-						"name": "Semanas ideales",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"0.5",
-							"1",
-							"2"
-						]
+						id: 1,
+						key: 'ideal_weeks',
+						name: 'Semanas ideales',
+						type: 'select',
+						obligatory: true,
+						options: ['0.5', '1', '2']
 					},
 					{
-						"id": 2,
-						"key": "risk",
-						"name": "Índice de riesgo",
-						"type": "select",
-						"obligatory": false,
-						"options": [
-							"0",
-							"1",
-							"2"
-						]
+						id: 2,
+						key: 'risk',
+						name: 'Índice de riesgo',
+						type: 'select',
+						obligatory: false,
+						options: ['0', '1', '2']
 					},
 					{
-						"id": 3,
-						"key": "volatility",
-						"name": "Volatilidad (probable a cambiar)",
-						"type": "select",
-						"obligatory": false,
-						"options": [
-							"low",
-							"medium",
-							"high"
-						]
+						id: 3,
+						key: 'volatility',
+						name: 'Volatilidad (probable a cambiar)',
+						type: 'select',
+						obligatory: false,
+						options: ['low', 'medium', 'high']
 					},
 					{
-						"id": 4,
-						"key": "assignee",
-						"name": "Propietario",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'assignee',
+						name: 'Propietario',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "user_story",
-						"name": "User story",
-						"obligatory": true,
-						"default": "**As a** ___\n**I want** ___\n**so that** ___."
+						id: 1,
+						key: 'user_story',
+						name: 'User story',
+						obligatory: true,
+						default: '**As a** ___\n**I want** ___\n**so that** ___.'
 					},
 					{
-						"id": 2,
-						"key": "acceptance_tests",
-						"name": "Acceptance tests (automated)",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'acceptance_tests',
+						name: 'Acceptance tests (automated)',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "conversation",
-						"name": "Conversation log",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'conversation',
+						name: 'Conversation log',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "task",
-				"name": "Tarea de Ingeniería",
-				"icon": "check-square",
-				"color": "#10b981",
-				"default_status": "open",
-				"fields": [
+				id: 'task',
+				name: 'Tarea de Ingeniería',
+				icon: 'check-square',
+				color: '#10b981',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "estimate_hours",
-						"name": "Horas ideales",
-						"type": "number",
-						"obligatory": true
+						id: 1,
+						key: 'estimate_hours',
+						name: 'Horas ideales',
+						type: 'number',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "assignee",
-						"name": "Voluntario",
-						"type": "user",
-						"obligatory": false
+						id: 2,
+						key: 'assignee',
+						name: 'Voluntario',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 3,
-						"key": "pair_with",
-						"name": "Emparejar con",
-						"type": "user",
-						"obligatory": false
+						id: 3,
+						key: 'pair_with',
+						name: 'Emparejar con',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "test_first",
-						"name": "Test-first note",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'test_first',
+						name: 'Test-first note',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "spike",
-				"name": "Spike",
-				"icon": "flame",
-				"color": "#facc15",
-				"default_status": "open",
-				"fields": [
+				id: 'spike',
+				name: 'Spike',
+				icon: 'flame',
+				color: '#facc15',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "timebox_hours",
-						"name": "Timebox (horas)",
-						"type": "number",
-						"obligatory": true
+						id: 1,
+						key: 'timebox_hours',
+						name: 'Timebox (horas)',
+						type: 'number',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "goal",
-						"name": "Pregunta a responder",
-						"type": "text",
-						"obligatory": true
+						id: 2,
+						key: 'goal',
+						name: 'Pregunta a responder',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "assignee",
-						"name": "Propietario del spike",
-						"type": "user",
-						"obligatory": false
+						id: 3,
+						key: 'assignee',
+						name: 'Propietario del spike',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "hypothesis",
-						"name": "Hypothesis",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'hypothesis',
+						name: 'Hypothesis',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "findings",
-						"name": "Findings (deliverable)",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'findings',
+						name: 'Findings (deliverable)',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "followups",
-						"name": "Follow-up stories",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'followups',
+						name: 'Follow-up stories',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "defect",
-				"name": "Defecto",
-				"icon": "bug",
-				"color": "#ef4444",
-				"default_status": "open",
-				"fields": [
+				id: 'defect',
+				name: 'Defecto',
+				icon: 'bug',
+				color: '#ef4444',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "failing_test",
-						"name": "Ruta de prueba que falla",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'failing_test',
+						name: 'Ruta de prueba que falla',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "severity",
-						"name": "Severidad",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"low",
-							"medium",
-							"high",
-							"critical"
-						]
+						id: 2,
+						key: 'severity',
+						name: 'Severidad',
+						type: 'select',
+						obligatory: true,
+						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						"id": 3,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 3,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "repro",
-						"name": "Reproduction",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'repro',
+						name: 'Reproduction',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "expected_actual",
-						"name": "Expected vs. actual",
-						"obligatory": true,
-						"default": ""
+						id: 3,
+						key: 'expected_actual',
+						name: 'Expected vs. actual',
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "lean-software-development",
-		"name": "Lean Software Development",
-		"description": "Lean es *filosofía* antes que marco de trabajo. Los Poppendieck tradujeron los siete principios del Sistema de Producción de Toyota: *Eliminar Desperdicio, Amplificar el Aprendizaje, Decidir lo más Tarde Posible, Entregar lo más Rápido Posible, Empoderar al Equipo, Incorporar la Integridad, Ver el Todo*, al software. Los siete desperdicios mapeados al software son: trabajo parcialmente hecho, características adicionales, reaprendizaje, traspasos, cambio de tareas, retrasos, defectos. No hay roles prescritos, ni bloques de tiempo, ni ceremonias; el artefacto es el *mapa de flujo de valor*.",
-		"config": {
-			"product_goal": "Entregar el máximo valor al cliente con el mínimo desperdicio optimizando todo el flujo de valor.",
-			"definition_of_done": [
-				"El ítem de valor es verificado por el cliente.",
-				"El ítem de desperdicio tiene una causa raíz y una contramedida.",
-				"Kaizen tiene métricas medibles antes/después."
+		id: 'lean-software-development',
+		name: 'Lean Software Development',
+		description:
+			'Lean es *filosofía* antes que marco de trabajo. Los Poppendieck tradujeron los siete principios del Sistema de Producción de Toyota: *Eliminar Desperdicio, Amplificar el Aprendizaje, Decidir lo más Tarde Posible, Entregar lo más Rápido Posible, Empoderar al Equipo, Incorporar la Integridad, Ver el Todo*, al software. Los siete desperdicios mapeados al software son: trabajo parcialmente hecho, características adicionales, reaprendizaje, traspasos, cambio de tareas, retrasos, defectos. No hay roles prescritos, ni bloques de tiempo, ni ceremonias; el artefacto es el *mapa de flujo de valor*.',
+		config: {
+			product_goal:
+				'Entregar el máximo valor al cliente con el mínimo desperdicio optimizando todo el flujo de valor.',
+			definition_of_done: [
+				'El ítem de valor es verificado por el cliente.',
+				'El ítem de desperdicio tiene una causa raíz y una contramedida.',
+				'Kaizen tiene métricas medibles antes/después.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "identified",
-					"name": "Identificado",
-					"color": "#6b7280",
-					"category": "todo"
+					id: 'identified',
+					name: 'Identificado',
+					color: '#6b7280',
+					category: 'todo'
 				},
 				{
-					"id": "analysing",
-					"name": "Analizando",
-					"color": "#0ea5e9",
-					"category": "doing"
+					id: 'analysing',
+					name: 'Analizando',
+					color: '#0ea5e9',
+					category: 'doing'
 				},
 				{
-					"id": "in_progress",
-					"name": "En progreso",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'in_progress',
+					name: 'En progreso',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "validating",
-					"name": "Validando",
-					"color": "#a855f7",
-					"category": "doing"
+					id: 'validating',
+					name: 'Validando',
+					color: '#a855f7',
+					category: 'doing'
 				},
 				{
-					"id": "done",
-					"name": "Hecho",
-					"color": "#10b981",
-					"category": "done"
+					id: 'done',
+					name: 'Hecho',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "rejected",
-					"name": "Rechazado (sin valor)",
-					"color": "#ef4444",
-					"category": "cancelled"
+					id: 'rejected',
+					name: 'Rechazado (sin valor)',
+					color: '#ef4444',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "identified",
-			"labels": [
+			default_status: 'identified',
+			labels: [
 				{
-					"id": "waste-partial",
-					"name": "Waste: partial work",
-					"color": "#a3a3a3"
+					id: 'waste-partial',
+					name: 'Waste: partial work',
+					color: '#a3a3a3'
 				},
 				{
-					"id": "waste-features",
-					"name": "Waste: extra features",
-					"color": "#a3a3a3"
+					id: 'waste-features',
+					name: 'Waste: extra features',
+					color: '#a3a3a3'
 				},
 				{
-					"id": "waste-relearning",
-					"name": "Waste: relearning",
-					"color": "#a3a3a3"
+					id: 'waste-relearning',
+					name: 'Waste: relearning',
+					color: '#a3a3a3'
 				},
 				{
-					"id": "waste-handoff",
-					"name": "Waste: handoff",
-					"color": "#a3a3a3"
+					id: 'waste-handoff',
+					name: 'Waste: handoff',
+					color: '#a3a3a3'
 				},
 				{
-					"id": "waste-switching",
-					"name": "Waste: task switching",
-					"color": "#a3a3a3"
+					id: 'waste-switching',
+					name: 'Waste: task switching',
+					color: '#a3a3a3'
 				},
 				{
-					"id": "waste-delays",
-					"name": "Waste: delays",
-					"color": "#a3a3a3"
+					id: 'waste-delays',
+					name: 'Waste: delays',
+					color: '#a3a3a3'
 				},
 				{
-					"id": "waste-defects",
-					"name": "Waste: defects",
-					"color": "#a3a3a3"
+					id: 'waste-defects',
+					name: 'Waste: defects',
+					color: '#a3a3a3'
 				},
 				{
-					"id": "muda",
-					"name": "Muda",
-					"color": "#ef4444"
+					id: 'muda',
+					name: 'Muda',
+					color: '#ef4444'
 				},
 				{
-					"id": "mura",
-					"name": "Mura (unevenness)",
-					"color": "#f59e0b"
+					id: 'mura',
+					name: 'Mura (unevenness)',
+					color: '#f59e0b'
 				},
 				{
-					"id": "muri",
-					"name": "Muri (overburden)",
-					"color": "#facc15"
+					id: 'muri',
+					name: 'Muri (overburden)',
+					color: '#facc15'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"identified",
-					"analysing",
-					"in_progress",
-					"validating",
-					"done"
-				]
+			users: [],
+			kanban: {
+				columns: ['identified', 'analysing', 'in_progress', 'validating', 'done']
 			},
-			"gantt": {
-				"group_by": "labels",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'labels',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "value-item",
-				"name": "Ítem de Valor",
-				"icon": "gem",
-				"color": "#10b981",
-				"default_status": "identified",
-				"fields": [
+				id: 'value-item',
+				name: 'Ítem de Valor',
+				icon: 'gem',
+				color: '#10b981',
+				default_status: 'identified',
+				fields: [
 					{
-						"id": 1,
-						"key": "value_stream",
-						"name": "Flujo de valor",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'value_stream',
+						name: 'Flujo de valor',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "value_score",
-						"name": "Valor para el cliente",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"trivial",
-							"minor",
-							"significant",
-							"major"
-						]
+						id: 2,
+						key: 'value_score',
+						name: 'Valor para el cliente',
+						type: 'select',
+						obligatory: true,
+						options: ['trivial', 'minor', 'significant', 'major']
 					},
 					{
-						"id": 3,
-						"key": "lead_time_days",
-						"name": "Lead time (días)",
-						"type": "number",
-						"obligatory": false
+						id: 3,
+						key: 'lead_time_days',
+						name: 'Lead time (días)',
+						type: 'number',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "assignee",
-						"name": "Propietario",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'assignee',
+						name: 'Propietario',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "value_to_customer",
-						"name": "Value to customer",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'value_to_customer',
+						name: 'Value to customer',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "waste-item",
-				"name": "Ítem de Desperdicio",
-				"icon": "trash-2",
-				"color": "#ef4444",
-				"default_status": "identified",
-				"fields": [
+				id: 'waste-item',
+				name: 'Ítem de Desperdicio',
+				icon: 'trash-2',
+				color: '#ef4444',
+				default_status: 'identified',
+				fields: [
 					{
-						"id": 1,
-						"key": "waste_type",
-						"name": "Tipo de desperdicio",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"partially-done-work",
-							"extra-features",
-							"relearning",
-							"handoffs",
-							"task-switching",
-							"delays",
-							"defects"
+						id: 1,
+						key: 'waste_type',
+						name: 'Tipo de desperdicio',
+						type: 'select',
+						obligatory: true,
+						options: [
+							'partially-done-work',
+							'extra-features',
+							'relearning',
+							'handoffs',
+							'task-switching',
+							'delays',
+							'defects'
 						]
 					},
 					{
-						"id": 2,
-						"key": "where_in_stream",
-						"name": "Etapa en flujo de valor",
-						"type": "text",
-						"obligatory": true
+						id: 2,
+						key: 'where_in_stream',
+						name: 'Etapa en flujo de valor',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 3,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "root_cause",
-						"name": "Root cause (5-Whys)",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'root_cause',
+						name: 'Root cause (5-Whys)',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "countermeasure",
-						"name": "Countermeasure",
-						"obligatory": true,
-						"default": ""
+						id: 3,
+						key: 'countermeasure',
+						name: 'Countermeasure',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "kaizen",
-				"name": "Kaizen",
-				"icon": "zap",
-				"color": "#a855f7",
-				"default_status": "identified",
-				"fields": [
+				id: 'kaizen',
+				name: 'Kaizen',
+				icon: 'zap',
+				color: '#a855f7',
+				default_status: 'identified',
+				fields: [
 					{
-						"id": 1,
-						"key": "metric_name",
-						"name": "Métrica a mejorar",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'metric_name',
+						name: 'Métrica a mejorar',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "baseline",
-						"name": "Valor base",
-						"type": "text",
-						"obligatory": true
+						id: 2,
+						key: 'baseline',
+						name: 'Valor base',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "target",
-						"name": "Valor objetivo",
-						"type": "text",
-						"obligatory": true
+						id: 3,
+						key: 'target',
+						name: 'Valor objetivo',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "assignee",
-						"name": "Patrocinador",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'assignee',
+						name: 'Patrocinador',
+						type: 'user',
+						obligatory: false
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "problem",
-						"name": "Problem statement",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'problem',
+						name: 'Problem statement',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "experiment",
-						"name": "Experiment (PDCA cycle)",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'experiment',
+						name: 'Experiment (PDCA cycle)',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "result",
-						"name": "Result & new baseline",
-						"obligatory": true,
-						"default": ""
+						id: 3,
+						key: 'result',
+						name: 'Result & new baseline',
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "feature-driven-development",
-		"name": "Feature-Driven Development (FDD)",
-		"description": "FDD es un proceso ágil de iteraciones cortas impulsado por modelos, construido alrededor de la *característica* (feature): una función pequeña valorada por el cliente expresada como `<acción> <resultado> <objeto>` (por ejemplo, \"Calcular el total de una venta\"). Cinco pasos de proceso secuenciales: **Desarrollar un Modelo General**, **Construir una Lista de Características**, **Planificar por Característica**, **Diseñar por Característica**, **Construir por Característica**, donde los dos primeros se realizan una vez y los tres últimos se repiten para cada lote de características de 2 semanas. La propiedad de las clases es el concepto más distintivo de FDD: un solo desarrollador es dueño de cada clase; las características son implementadas por equipos de características formados por los dueños de clases relevantes. Concebido originalmente en un proyecto bancario de 50 personas y 15 meses en Singapur; muy adecuado para equipos grandes en dominios complejos.",
-		"config": {
-			"product_goal": "Construir lo correcto correctamente planificando y haciendo seguimiento contra una lista jerárquica de características y un modelo de objetos de dominio.",
-			"definition_of_done": [
-				"El diseño de la característica pasa la inspección de diseño.",
-				"El código de la característica pasa la inspección de código por el Programador Jefe.",
-				"La característica está integrada en la compilación principal.",
-				"La característica se reporta como un hito de porcentaje completado."
+		id: 'feature-driven-development',
+		name: 'Feature-Driven Development (FDD)',
+		description:
+			'FDD es un proceso ágil de iteraciones cortas impulsado por modelos, construido alrededor de la *característica* (feature): una función pequeña valorada por el cliente expresada como `<acción> <resultado> <objeto>` (por ejemplo, "Calcular el total de una venta"). Cinco pasos de proceso secuenciales: **Desarrollar un Modelo General**, **Construir una Lista de Características**, **Planificar por Característica**, **Diseñar por Característica**, **Construir por Característica**, donde los dos primeros se realizan una vez y los tres últimos se repiten para cada lote de características de 2 semanas. La propiedad de las clases es el concepto más distintivo de FDD: un solo desarrollador es dueño de cada clase; las características son implementadas por equipos de características formados por los dueños de clases relevantes. Concebido originalmente en un proyecto bancario de 50 personas y 15 meses en Singapur; muy adecuado para equipos grandes en dominios complejos.',
+		config: {
+			product_goal:
+				'Construir lo correcto correctamente planificando y haciendo seguimiento contra una lista jerárquica de características y un modelo de objetos de dominio.',
+			definition_of_done: [
+				'El diseño de la característica pasa la inspección de diseño.',
+				'El código de la característica pasa la inspección de código por el Programador Jefe.',
+				'La característica está integrada en la compilación principal.',
+				'La característica se reporta como un hito de porcentaje completado.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "modelling",
-					"name": "Modelado",
-					"color": "#a855f7",
-					"category": "doing"
+					id: 'modelling',
+					name: 'Modelado',
+					color: '#a855f7',
+					category: 'doing'
 				},
 				{
-					"id": "listed",
-					"name": "Característica listada",
-					"color": "#6b7280",
-					"category": "todo"
+					id: 'listed',
+					name: 'Característica listada',
+					color: '#6b7280',
+					category: 'todo'
 				},
 				{
-					"id": "planned",
-					"name": "Planificado",
-					"color": "#0ea5e9",
-					"category": "todo"
+					id: 'planned',
+					name: 'Planificado',
+					color: '#0ea5e9',
+					category: 'todo'
 				},
 				{
-					"id": "designing",
-					"name": "Diseñando",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'designing',
+					name: 'Diseñando',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "building",
-					"name": "Construyendo",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'building',
+					name: 'Construyendo',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "inspecting",
-					"name": "Inspeccionando",
-					"color": "#f59e0b",
-					"category": "doing"
+					id: 'inspecting',
+					name: 'Inspeccionando',
+					color: '#f59e0b',
+					category: 'doing'
 				},
 				{
-					"id": "done",
-					"name": "Hecho",
-					"color": "#10b981",
-					"category": "done"
+					id: 'done',
+					name: 'Hecho',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "cancelled",
-					"name": "Cancelado",
-					"color": "#a3a3a3",
-					"category": "cancelled"
+					id: 'cancelled',
+					name: 'Cancelado',
+					color: '#a3a3a3',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "listed",
-			"labels": [
+			default_status: 'listed',
+			labels: [
 				{
-					"id": "chief",
-					"name": "Chief Programmer",
-					"color": "#a855f7"
+					id: 'chief',
+					name: 'Chief Programmer',
+					color: '#a855f7'
 				},
 				{
-					"id": "class-owner",
-					"name": "Class owner",
-					"color": "#0ea5e9"
+					id: 'class-owner',
+					name: 'Class owner',
+					color: '#0ea5e9'
 				},
 				{
-					"id": "subject-area",
-					"name": "Subject area",
-					"color": "#facc15"
+					id: 'subject-area',
+					name: 'Subject area',
+					color: '#facc15'
 				},
 				{
-					"id": "milestone",
-					"name": "Milestone",
-					"color": "#10b981"
+					id: 'milestone',
+					name: 'Milestone',
+					color: '#10b981'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"listed",
-					"planned",
-					"designing",
-					"building",
-					"inspecting",
-					"done"
-				]
+			users: [],
+			kanban: {
+				columns: ['listed', 'planned', 'designing', 'building', 'inspecting', 'done']
 			},
-			"gantt": {
-				"group_by": "issue_type",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'issue_type',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "domain-model",
-				"name": "Modelo de Dominio",
-				"icon": "shapes",
-				"color": "#a855f7",
-				"default_status": "modelling",
-				"fields": [
+				id: 'domain-model',
+				name: 'Modelo de Dominio',
+				icon: 'shapes',
+				color: '#a855f7',
+				default_status: 'modelling',
+				fields: [
 					{
-						"id": 1,
-						"key": "subject_area",
-						"name": "Área temática",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'subject_area',
+						name: 'Área temática',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "chief_architect",
-						"name": "Arquitecto Jefe",
-						"type": "user",
-						"obligatory": true
+						id: 2,
+						key: 'chief_architect',
+						name: 'Arquitecto Jefe',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 3,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "object_model",
-						"name": "Object model (UML colour class diagram)",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'object_model',
+						name: 'Object model (UML colour class diagram)',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "glossary",
-						"name": "Domain glossary",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'glossary',
+						name: 'Domain glossary',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "feature-set",
-				"name": "Conjunto de Características",
-				"icon": "layers",
-				"color": "#0ea5e9",
-				"default_status": "listed",
-				"fields": [
+				id: 'feature-set',
+				name: 'Conjunto de Características',
+				icon: 'layers',
+				color: '#0ea5e9',
+				default_status: 'listed',
+				fields: [
 					{
-						"id": 1,
-						"key": "subject_area",
-						"name": "Área temática",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'subject_area',
+						name: 'Área temática',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "owner",
-						"name": "Propietario del conjunto",
-						"type": "user",
-						"obligatory": true
+						id: 2,
+						key: 'owner',
+						name: 'Propietario del conjunto',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 3,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "milestones",
-						"name": "Milestones (step 3 output)",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'milestones',
+						name: 'Milestones (step 3 output)',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "feature",
-				"name": "Característica",
-				"icon": "square-stack",
-				"color": "#10b981",
-				"default_status": "listed",
-				"fields": [
+				id: 'feature',
+				name: 'Característica',
+				icon: 'square-stack',
+				color: '#10b981',
+				default_status: 'listed',
+				fields: [
 					{
-						"id": 1,
-						"key": "action",
-						"name": "Acción (verbo)",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'action',
+						name: 'Acción (verbo)',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "result",
-						"name": "Resultado",
-						"type": "text",
-						"obligatory": true
+						id: 2,
+						key: 'result',
+						name: 'Resultado',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "object",
-						"name": "Objeto",
-						"type": "text",
-						"obligatory": true
+						id: 3,
+						key: 'object',
+						name: 'Objeto',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "feature_set",
-						"name": "Conjunto de características",
-						"type": "text",
-						"obligatory": true
+						id: 4,
+						key: 'feature_set',
+						name: 'Conjunto de características',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 5,
-						"key": "chief_programmer",
-						"name": "Programador Jefe",
-						"type": "user",
-						"obligatory": true
+						id: 5,
+						key: 'chief_programmer',
+						name: 'Programador Jefe',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 6,
-						"key": "class_owners",
-						"name": "Dueños de clase (usuarios separados por comas)",
-						"type": "text",
-						"obligatory": true
+						id: 6,
+						key: 'class_owners',
+						name: 'Dueños de clase (usuarios separados por comas)',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 7,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 7,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "design_package",
-						"name": "Design package (sequence diagrams)",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'design_package',
+						name: 'Design package (sequence diagrams)',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "inspection_log",
-						"name": "Code inspection log",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'inspection_log',
+						name: 'Code inspection log',
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "crystal-family",
-		"name": "Familia Crystal",
-		"description": "Crystal es una *familia* de metodologías parametrizadas según el tamaño del equipo y la criticidad del proyecto: Crystal Clear (≤ 8 personas, \"cómodo\"), Crystal Yellow (hasta 20, \"más dinero\"), Crystal Orange (20–40, \"crítico\"), Crystal Red, Crystal Maroon para proyectos más grandes. La metodología es deliberadamente ligera en ceremonias; el mayor peso recae en (a) *personas*: comunicación cara a cara, idealmente co-ubicados; (b) *entrega*: incremental, frecuente; (c) *reflexión*: un \"Taller de Reflexión\" más o menos cada mes. Las cuatro propiedades son: *Entrega Frecuente, Mejora Reflexiva, Comunicación Osmótica, Seguridad Personal*. Crystal Clear es el miembro más adoptado; Crystal Orange está documentado en el libro de 2004.",
-		"config": {
-			"product_goal": "Entregar software funcionando frecuentemente, comunicarse osmóticamente y reflexionar cada ciclo.",
-			"definition_of_done": [
-				"El entregable está integrado y demostrado a un patrocinador.",
-				"El taller de reflexión actualiza el plan del siguiente ciclo.",
-				"Cada miembro del equipo está seguro para plantear cualquier inquietud."
+		id: 'crystal-family',
+		name: 'Familia Crystal',
+		description:
+			'Crystal es una *familia* de metodologías parametrizadas según el tamaño del equipo y la criticidad del proyecto: Crystal Clear (≤ 8 personas, "cómodo"), Crystal Yellow (hasta 20, "más dinero"), Crystal Orange (20–40, "crítico"), Crystal Red, Crystal Maroon para proyectos más grandes. La metodología es deliberadamente ligera en ceremonias; el mayor peso recae en (a) *personas*: comunicación cara a cara, idealmente co-ubicados; (b) *entrega*: incremental, frecuente; (c) *reflexión*: un "Taller de Reflexión" más o menos cada mes. Las cuatro propiedades son: *Entrega Frecuente, Mejora Reflexiva, Comunicación Osmótica, Seguridad Personal*. Crystal Clear es el miembro más adoptado; Crystal Orange está documentado en el libro de 2004.',
+		config: {
+			product_goal:
+				'Entregar software funcionando frecuentemente, comunicarse osmóticamente y reflexionar cada ciclo.',
+			definition_of_done: [
+				'El entregable está integrado y demostrado a un patrocinador.',
+				'El taller de reflexión actualiza el plan del siguiente ciclo.',
+				'Cada miembro del equipo está seguro para plantear cualquier inquietud.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "waiting",
-					"name": "Esperando",
-					"color": "#a3a3a3",
-					"category": "todo"
+					id: 'waiting',
+					name: 'Esperando',
+					color: '#a3a3a3',
+					category: 'todo'
 				},
 				{
-					"id": "next",
-					"name": "Siguiente",
-					"color": "#0ea5e9",
-					"category": "todo"
+					id: 'next',
+					name: 'Siguiente',
+					color: '#0ea5e9',
+					category: 'todo'
 				},
 				{
-					"id": "now",
-					"name": "Ahora",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'now',
+					name: 'Ahora',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "delivery",
-					"name": "Entrega",
-					"color": "#a855f7",
-					"category": "doing"
+					id: 'delivery',
+					name: 'Entrega',
+					color: '#a855f7',
+					category: 'doing'
 				},
 				{
-					"id": "done",
-					"name": "Hecho",
-					"color": "#10b981",
-					"category": "done"
+					id: 'done',
+					name: 'Hecho',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "dropped",
-					"name": "Descartado",
-					"color": "#ef4444",
-					"category": "cancelled"
+					id: 'dropped',
+					name: 'Descartado',
+					color: '#ef4444',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "next",
-			"labels": [
+			default_status: 'next',
+			labels: [
 				{
-					"id": "crystal-clear",
-					"name": "Crystal Clear (≤ 8)",
-					"color": "#0ea5e9"
+					id: 'crystal-clear',
+					name: 'Crystal Clear (≤ 8)',
+					color: '#0ea5e9'
 				},
 				{
-					"id": "crystal-yellow",
-					"name": "Crystal Yellow (≤ 20)",
-					"color": "#facc15"
+					id: 'crystal-yellow',
+					name: 'Crystal Yellow (≤ 20)',
+					color: '#facc15'
 				},
 				{
-					"id": "crystal-orange",
-					"name": "Crystal Orange (20–40)",
-					"color": "#f59e0b"
+					id: 'crystal-orange',
+					name: 'Crystal Orange (20–40)',
+					color: '#f59e0b'
 				},
 				{
-					"id": "critical",
-					"name": "Critical (D-class)",
-					"color": "#ef4444"
+					id: 'critical',
+					name: 'Critical (D-class)',
+					color: '#ef4444'
 				},
 				{
-					"id": "osmosis",
-					"name": "Osmotic communication",
-					"color": "#a855f7"
+					id: 'osmosis',
+					name: 'Osmotic communication',
+					color: '#a855f7'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"waiting",
-					"next",
-					"now",
-					"delivery",
-					"done"
-				]
+			users: [],
+			kanban: {
+				columns: ['waiting', 'next', 'now', 'delivery', 'done']
 			},
-			"gantt": {
-				"group_by": "labels",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'labels',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "feature-deliverable",
-				"name": "Entregable",
-				"icon": "package",
-				"color": "#a855f7",
-				"default_status": "next",
-				"fields": [
+				id: 'feature-deliverable',
+				name: 'Entregable',
+				icon: 'package',
+				color: '#a855f7',
+				default_status: 'next',
+				fields: [
 					{
-						"id": 1,
-						"key": "crystal_color",
-						"name": "Color de Crystal",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"crystal-clear",
-							"crystal-yellow",
-							"crystal-orange",
-							"crystal-red",
-							"crystal-maroon"
+						id: 1,
+						key: 'crystal_color',
+						name: 'Color de Crystal',
+						type: 'select',
+						obligatory: true,
+						options: [
+							'crystal-clear',
+							'crystal-yellow',
+							'crystal-orange',
+							'crystal-red',
+							'crystal-maroon'
 						]
 					},
 					{
-						"id": 2,
-						"key": "criticality",
-						"name": "Confort / Clase-D",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"C",
-							"D",
-							"E"
-						]
+						id: 2,
+						key: 'criticality',
+						name: 'Confort / Clase-D',
+						type: 'select',
+						obligatory: true,
+						options: ['C', 'D', 'E']
 					},
 					{
-						"id": 3,
-						"key": "assignee",
-						"name": "Propietario",
-						"type": "user",
-						"obligatory": false
+						id: 3,
+						key: 'assignee',
+						name: 'Propietario',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "delivery_plan",
-						"name": "Delivery plan (next release window)",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'delivery_plan',
+						name: 'Delivery plan (next release window)',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "reflection-action",
-				"name": "Acción de Reflexión",
-				"icon": "compass",
-				"color": "#0ea5e9",
-				"default_status": "next",
-				"fields": [
+				id: 'reflection-action',
+				name: 'Acción de Reflexión',
+				icon: 'compass',
+				color: '#0ea5e9',
+				default_status: 'next',
+				fields: [
 					{
-						"id": 1,
-						"key": "from_workshop",
-						"name": "Del taller",
-						"type": "date",
-						"obligatory": true
+						id: 1,
+						key: 'from_workshop',
+						name: 'Del taller',
+						type: 'date',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "owner",
-						"name": "Propietario",
-						"type": "user",
-						"obligatory": true
+						id: 2,
+						key: 'owner',
+						name: 'Propietario',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 3,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "action",
-						"name": "Action",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'action',
+						name: 'Action',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "success_metric",
-						"name": "How we'll know it worked",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'success_metric',
+						name: "How we'll know it worked",
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "dsdm-atern-agile-project-framework",
-		"name": "DSDM / Atern / Agile Project Framework",
-		"description": "DSDM es el método ágil *original* (1994–95), nacido de RAD. La marca \"Atern\" (2007+) renombró el ciclo de vida; el \"Agile Project Framework\" (APF, 2014) es el nombre público actual. Los ocho principios son: *Enfocarse en la Necesidad del Negocio, Entregar a Tiempo, Colaborar, Nunca Comprometer la Calidad, Construir Incrementalmente desde Cimientos Firmes, Desarrollar Iterativamente, Comunicarse Continua y Claramente, Demostrar Control*. Dos técnicas distintivas: *Priorización MoSCoW* (Must / Should / Could / Won't) y *Timeboxing* (costo fijo, tiempo fijo, calidad fija; solo el alcance es flexible). Tres fases del ciclo de vida: **Factibilidad**, **Fundamentos**, **Exploratorio** + **Ingeniería**, **Despliegue**. El rol del PM se conserva explícitamente (algo raro para un método ágil).",
-		"config": {
-			"product_goal": "Entregar la solución de negocio correcta a tiempo, con calidad fija y priorización MoSCoW explícita dentro de cada timebox.",
-			"definition_of_done": [
-				"El requisito cumple sus criterios de aceptación y se registra su prioridad MoSCoW.",
-				"La solución se revisa en un taller de revisión del timebox.",
-				"La evidencia de prueba se archiva con el entregable del timebox."
+		id: 'dsdm-atern-agile-project-framework',
+		name: 'DSDM / Atern / Agile Project Framework',
+		description:
+			'DSDM es el método ágil *original* (1994–95), nacido de RAD. La marca "Atern" (2007+) renombró el ciclo de vida; el "Agile Project Framework" (APF, 2014) es el nombre público actual. Los ocho principios son: *Enfocarse en la Necesidad del Negocio, Entregar a Tiempo, Colaborar, Nunca Comprometer la Calidad, Construir Incrementalmente desde Cimientos Firmes, Desarrollar Iterativamente, Comunicarse Continua y Claramente, Demostrar Control*. Dos técnicas distintivas: *Priorización MoSCoW* (Must / Should / Could / Won\'t) y *Timeboxing* (costo fijo, tiempo fijo, calidad fija; solo el alcance es flexible). Tres fases del ciclo de vida: **Factibilidad**, **Fundamentos**, **Exploratorio** + **Ingeniería**, **Despliegue**. El rol del PM se conserva explícitamente (algo raro para un método ágil).',
+		config: {
+			product_goal:
+				'Entregar la solución de negocio correcta a tiempo, con calidad fija y priorización MoSCoW explícita dentro de cada timebox.',
+			definition_of_done: [
+				'El requisito cumple sus criterios de aceptación y se registra su prioridad MoSCoW.',
+				'La solución se revisa en un taller de revisión del timebox.',
+				'La evidencia de prueba se archiva con el entregable del timebox.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "feasibility",
-					"name": "Factibilidad",
-					"color": "#a3a3a3",
-					"category": "doing"
+					id: 'feasibility',
+					name: 'Factibilidad',
+					color: '#a3a3a3',
+					category: 'doing'
 				},
 				{
-					"id": "foundations",
-					"name": "Fundamentos",
-					"color": "#0ea5e9",
-					"category": "doing"
+					id: 'foundations',
+					name: 'Fundamentos',
+					color: '#0ea5e9',
+					category: 'doing'
 				},
 				{
-					"id": "exploratory",
-					"name": "Exploratorio",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'exploratory',
+					name: 'Exploratorio',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "engineering",
-					"name": "Ingeniería",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'engineering',
+					name: 'Ingeniería',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "review",
-					"name": "Revisión del timebox",
-					"color": "#a855f7",
-					"category": "doing"
+					id: 'review',
+					name: 'Revisión del timebox',
+					color: '#a855f7',
+					category: 'doing'
 				},
 				{
-					"id": "deployed",
-					"name": "Desplegado",
-					"color": "#10b981",
-					"category": "done"
+					id: 'deployed',
+					name: 'Desplegado',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "dropped",
-					"name": "Won't (esta vez)",
-					"color": "#a3a3a3",
-					"category": "cancelled"
+					id: 'dropped',
+					name: "Won't (esta vez)",
+					color: '#a3a3a3',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "exploratory",
-			"labels": [
+			default_status: 'exploratory',
+			labels: [
 				{
-					"id": "must",
-					"name": "Must have",
-					"color": "#ef4444"
+					id: 'must',
+					name: 'Must have',
+					color: '#ef4444'
 				},
 				{
-					"id": "should",
-					"name": "Should have",
-					"color": "#f59e0b"
+					id: 'should',
+					name: 'Should have',
+					color: '#f59e0b'
 				},
 				{
-					"id": "could",
-					"name": "Could have",
-					"color": "#0ea5e9"
+					id: 'could',
+					name: 'Could have',
+					color: '#0ea5e9'
 				},
 				{
-					"id": "wont",
-					"name": "Won't (this time)",
-					"color": "#a3a3a3"
+					id: 'wont',
+					name: "Won't (this time)",
+					color: '#a3a3a3'
 				},
 				{
-					"id": "prototyping",
-					"name": "Prototyping",
-					"color": "#a855f7"
+					id: 'prototyping',
+					name: 'Prototyping',
+					color: '#a855f7'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"foundations",
-					"exploratory",
-					"engineering",
-					"review",
-					"deployed"
-				]
+			users: [],
+			kanban: {
+				columns: ['foundations', 'exploratory', 'engineering', 'review', 'deployed']
 			},
-			"gantt": {
-				"group_by": "issue_type",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'issue_type',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "requirement",
-				"name": "Requisito",
-				"icon": "list-checks",
-				"color": "#3b82f6",
-				"default_status": "exploratory",
-				"fields": [
+				id: 'requirement',
+				name: 'Requisito',
+				icon: 'list-checks',
+				color: '#3b82f6',
+				default_status: 'exploratory',
+				fields: [
 					{
-						"id": 1,
-						"key": "moscow",
-						"name": "Prioridad MoSCoW",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"must",
-							"should",
-							"could",
-							"wont"
-						]
+						id: 1,
+						key: 'moscow',
+						name: 'Prioridad MoSCoW',
+						type: 'select',
+						obligatory: true,
+						options: ['must', 'should', 'could', 'wont']
 					},
 					{
-						"id": 2,
-						"key": "timebox",
-						"name": "Timebox",
-						"type": "text",
-						"obligatory": false
+						id: 2,
+						key: 'timebox',
+						name: 'Timebox',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 3,
-						"key": "business_need",
-						"name": "Necesidad de negocio",
-						"type": "text",
-						"obligatory": true
+						id: 3,
+						key: 'business_need',
+						name: 'Necesidad de negocio',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "assignee",
-						"name": "Propietario",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'assignee',
+						name: 'Propietario',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "acceptance",
-						"name": "Acceptance criteria",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'acceptance',
+						name: 'Acceptance criteria',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "prototype_link",
-						"name": "Prototype / model link",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'prototype_link',
+						name: 'Prototype / model link',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "timebox",
-				"name": "Timebox",
-				"icon": "clock",
-				"color": "#a855f7",
-				"default_status": "exploratory",
-				"fields": [
+				id: 'timebox',
+				name: 'Timebox',
+				icon: 'clock',
+				color: '#a855f7',
+				default_status: 'exploratory',
+				fields: [
 					{
-						"id": 1,
-						"key": "start_date",
-						"name": "Inicio",
-						"type": "date",
-						"obligatory": true
+						id: 1,
+						key: 'start_date',
+						name: 'Inicio',
+						type: 'date',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "end_date",
-						"name": "Fin (fijo)",
-						"type": "date",
-						"obligatory": true
+						id: 2,
+						key: 'end_date',
+						name: 'Fin (fijo)',
+						type: 'date',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "phase",
-						"name": "Fase de ciclo de vida",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"feasibility",
-							"foundations",
-							"exploratory",
-							"engineering",
-							"deployment"
-						]
+						id: 3,
+						key: 'phase',
+						name: 'Fase de ciclo de vida',
+						type: 'select',
+						obligatory: true,
+						options: ['feasibility', 'foundations', 'exploratory', 'engineering', 'deployment']
 					},
 					{
-						"id": 4,
-						"key": "owner",
-						"name": "Líder de Timebox",
-						"type": "user",
-						"obligatory": true
+						id: 4,
+						key: 'owner',
+						name: 'Líder de Timebox',
+						type: 'user',
+						obligatory: true
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "objective",
-						"name": "Objective",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'objective',
+						name: 'Objective',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "scope_in",
-						"name": "Scope (Must + Should + Could)",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'scope_in',
+						name: 'Scope (Must + Should + Could)',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "scope_out",
-						"name": "Scope (Won't this time)",
-						"obligatory": true,
-						"default": ""
+						id: 3,
+						key: 'scope_out',
+						name: "Scope (Won't this time)",
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 4,
-						"key": "review_notes",
-						"name": "Timebox review notes",
-						"obligatory": false,
-						"default": ""
+						id: 4,
+						key: 'review_notes',
+						name: 'Timebox review notes',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "model",
-				"name": "Modelo",
-				"icon": "shapes",
-				"color": "#0ea5e9",
-				"default_status": "foundations",
-				"fields": [
+				id: 'model',
+				name: 'Modelo',
+				icon: 'shapes',
+				color: '#0ea5e9',
+				default_status: 'foundations',
+				fields: [
 					{
-						"id": 1,
-						"key": "workshop_date",
-						"name": "Fecha de taller",
-						"type": "date",
-						"obligatory": true
+						id: 1,
+						key: 'workshop_date',
+						name: 'Fecha de taller',
+						type: 'date',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "facilitator",
-						"name": "Facilitador",
-						"type": "user",
-						"obligatory": true
+						id: 2,
+						key: 'facilitator',
+						name: 'Facilitador',
+						type: 'user',
+						obligatory: true
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "model",
-						"name": "Model (diagram)",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'model',
+						name: 'Model (diagram)',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "decisions",
-						"name": "Decisions",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'decisions',
+						name: 'Decisions',
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "scrumban",
-		"name": "Scrumban",
-		"description": "Scrumban comenzó su vida como un estado transicional para equipos Scrum que pasaban a Kanban (ensayo de Corey Ladas en 2008). Rápidamente se estabilizó como su propio marco: *planifica cuando lo necesites, no en una cadencia fija*. Las cuatro mecánicas son: **sistema pull** (los ingenieros extraen de una cola Listo), **límites WIP** (por columna del tablero), **cola Listo** (búfer refinado entre el backlog y el trabajo activo), y **planificación bajo demanda** (la planificación se activa cuando la cola Listo cae por debajo de un umbral, típicamente 5–8 ítems por desarrollador). El método de planificación por cubos (1 año / 6 meses / 3 meses / actual) lleva el contexto estratégico a un flujo que de otra manera sería táctico.",
-		"config": {
-			"product_goal": "Mantener una cadencia de entrega continua y optimizada para el flujo, planificando a demanda cuando la cola de Listos se agote.",
-			"definition_of_done": [
-				"El ítem ha sido revisado por pares.",
-				"Todas las pruebas están en verde en la rama principal.",
-				"El ítem es demostrable de principio a fin."
+		id: 'scrumban',
+		name: 'Scrumban',
+		description:
+			'Scrumban comenzó su vida como un estado transicional para equipos Scrum que pasaban a Kanban (ensayo de Corey Ladas en 2008). Rápidamente se estabilizó como su propio marco: *planifica cuando lo necesites, no en una cadencia fija*. Las cuatro mecánicas son: **sistema pull** (los ingenieros extraen de una cola Listo), **límites WIP** (por columna del tablero), **cola Listo** (búfer refinado entre el backlog y el trabajo activo), y **planificación bajo demanda** (la planificación se activa cuando la cola Listo cae por debajo de un umbral, típicamente 5–8 ítems por desarrollador). El método de planificación por cubos (1 año / 6 meses / 3 meses / actual) lleva el contexto estratégico a un flujo que de otra manera sería táctico.',
+		config: {
+			product_goal:
+				'Mantener una cadencia de entrega continua y optimizada para el flujo, planificando a demanda cuando la cola de Listos se agote.',
+			definition_of_done: [
+				'El ítem ha sido revisado por pares.',
+				'Todas las pruebas están en verde en la rama principal.',
+				'El ítem es demostrable de principio a fin.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "bucket-12mo",
-					"name": "Cubo · 12 meses",
-					"color": "#a3a3a3",
-					"category": "todo"
+					id: 'bucket-12mo',
+					name: 'Cubo · 12 meses',
+					color: '#a3a3a3',
+					category: 'todo'
 				},
 				{
-					"id": "bucket-6mo",
-					"name": "Cubo · 6 meses",
-					"color": "#a3a3a3",
-					"category": "todo"
+					id: 'bucket-6mo',
+					name: 'Cubo · 6 meses',
+					color: '#a3a3a3',
+					category: 'todo'
 				},
 				{
-					"id": "bucket-3mo",
-					"name": "Cubo · 3 meses",
-					"color": "#0ea5e9",
-					"category": "todo"
+					id: 'bucket-3mo',
+					name: 'Cubo · 3 meses',
+					color: '#0ea5e9',
+					category: 'todo'
 				},
 				{
-					"id": "ready",
-					"name": "Listo (cola desencadenante)",
-					"color": "#22c55e",
-					"category": "todo"
+					id: 'ready',
+					name: 'Listo (cola desencadenante)',
+					color: '#22c55e',
+					category: 'todo'
 				},
 				{
-					"id": "in_progress",
-					"name": "En progreso",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'in_progress',
+					name: 'En progreso',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "review",
-					"name": "Revisión",
-					"color": "#f59e0b",
-					"category": "doing"
+					id: 'review',
+					name: 'Revisión',
+					color: '#f59e0b',
+					category: 'doing'
 				},
 				{
-					"id": "done",
-					"name": "Hecho",
-					"color": "#10b981",
-					"category": "done"
+					id: 'done',
+					name: 'Hecho',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "dropped",
-					"name": "Descartado",
-					"color": "#ef4444",
-					"category": "cancelled"
+					id: 'dropped',
+					name: 'Descartado',
+					color: '#ef4444',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "bucket-3mo",
-			"labels": [
+			default_status: 'bucket-3mo',
+			labels: [
 				{
-					"id": "feature",
-					"name": "Feature",
-					"color": "#3b82f6"
+					id: 'feature',
+					name: 'Feature',
+					color: '#3b82f6'
 				},
 				{
-					"id": "bug",
-					"name": "Bug",
-					"color": "#ef4444"
+					id: 'bug',
+					name: 'Bug',
+					color: '#ef4444'
 				},
 				{
-					"id": "chore",
-					"name": "Chore",
-					"color": "#a3a3a3"
+					id: 'chore',
+					name: 'Chore',
+					color: '#a3a3a3'
 				},
 				{
-					"id": "urgent",
-					"name": "Urgent",
-					"color": "#dc2626"
+					id: 'urgent',
+					name: 'Urgent',
+					color: '#dc2626'
 				},
 				{
-					"id": "trigger-met",
-					"name": "Planning trigger met",
-					"color": "#22c55e"
+					id: 'trigger-met',
+					name: 'Planning trigger met',
+					color: '#22c55e'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"ready",
-					"in_progress",
-					"review",
-					"done"
-				]
+			users: [],
+			kanban: {
+				columns: ['ready', 'in_progress', 'review', 'done']
 			},
-			"gantt": {
-				"group_by": "issue_type",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'issue_type',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "user-story",
-				"name": "Historia de Usuario",
-				"icon": "book-open",
-				"color": "#3b82f6",
-				"default_status": "open",
-				"fields": [
+				id: 'user-story',
+				name: 'Historia de Usuario',
+				icon: 'book-open',
+				color: '#3b82f6',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "story_points",
-						"name": "Puntos de historia",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"1",
-							"2",
-							"3",
-							"5",
-							"8",
-							"13",
-							"21"
-						]
+						id: 1,
+						key: 'story_points',
+						name: 'Puntos de historia',
+						type: 'select',
+						obligatory: true,
+						options: ['1', '2', '3', '5', '8', '13', '21']
 					},
 					{
-						"id": 2,
-						"key": "priority",
-						"name": "Prioridad",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"p0",
-							"p1",
-							"p2",
-							"p3"
-						]
+						id: 2,
+						key: 'priority',
+						name: 'Prioridad',
+						type: 'select',
+						obligatory: true,
+						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						"id": 3,
-						"key": "sprint",
-						"name": "Sprint",
-						"type": "text",
-						"obligatory": false
+						id: 3,
+						key: 'sprint',
+						name: 'Sprint',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "user_story",
-						"name": "User story",
-						"obligatory": true,
-						"default": "**As a** ___\n**I want** ___\n**so that** ___."
+						id: 1,
+						key: 'user_story',
+						name: 'User story',
+						obligatory: true,
+						default: '**As a** ___\n**I want** ___\n**so that** ___.'
 					},
 					{
-						"id": 2,
-						"key": "acceptance",
-						"name": "Acceptance criteria",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'acceptance',
+						name: 'Acceptance criteria',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "notes",
-						"name": "Notes & assumptions",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'notes',
+						name: 'Notes & assumptions',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "task",
-				"name": "Tarea",
-				"icon": "check-square",
-				"color": "#10b981",
-				"default_status": "open",
-				"fields": [
+				id: 'task',
+				name: 'Tarea',
+				icon: 'check-square',
+				color: '#10b981',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "estimate_hours",
-						"name": "Estimación (horas)",
-						"type": "number",
-						"obligatory": false
+						id: 1,
+						key: 'estimate_hours',
+						name: 'Estimación (horas)',
+						type: 'number',
+						obligatory: false
 					},
 					{
-						"id": 2,
-						"key": "priority",
-						"name": "Prioridad",
-						"type": "select",
-						"obligatory": false,
-						"options": [
-							"p0",
-							"p1",
-							"p2",
-							"p3"
-						]
+						id: 2,
+						key: 'priority',
+						name: 'Prioridad',
+						type: 'select',
+						obligatory: false,
+						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						"id": 3,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 3,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "definition_of_done",
-						"name": "Definition of done for this task",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'definition_of_done',
+						name: 'Definition of done for this task',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "feature",
-				"name": "Característica",
-				"icon": "gem",
-				"color": "#3b82f6",
-				"default_status": "bucket-3mo",
-				"fields": [
+				id: 'feature',
+				name: 'Característica',
+				icon: 'gem',
+				color: '#3b82f6',
+				default_status: 'bucket-3mo',
+				fields: [
 					{
-						"id": 1,
-						"key": "bucket",
-						"name": "Cubo",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"bucket-12mo",
-							"bucket-6mo",
-							"bucket-3mo",
-							"ready"
-						]
+						id: 1,
+						key: 'bucket',
+						name: 'Cubo',
+						type: 'select',
+						obligatory: true,
+						options: ['bucket-12mo', 'bucket-6mo', 'bucket-3mo', 'ready']
 					},
 					{
-						"id": 2,
-						"key": "value_score",
-						"name": "Puntaje de valor",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"low",
-							"medium",
-							"high",
-							"critical"
-						]
+						id: 2,
+						key: 'value_score',
+						name: 'Puntaje de valor',
+						type: 'select',
+						obligatory: true,
+						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						"id": 3,
-						"key": "size",
-						"name": "Tamaño",
-						"type": "select",
-						"obligatory": false,
-						"options": [
-							"S",
-							"M",
-							"L",
-							"XL"
-						]
+						id: 3,
+						key: 'size',
+						name: 'Tamaño',
+						type: 'select',
+						obligatory: false,
+						options: ['S', 'M', 'L', 'XL']
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "exit_criteria",
-						"name": "Ready-queue exit criteria",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'exit_criteria',
+						name: 'Ready-queue exit criteria',
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "shape-up",
-		"name": "Shape Up",
-		"description": "Shape Up es el método de desarrollo de productos de Basecamp. Tres fases: **Modelar (Shape)** (personas experimentadas definen el problema y una solución en el nivel correcto de abstracción: *suficientemente concreto para actuar, suficientemente abstracto para apropiarse*), **Apostar (Bet)** (la mesa de apuestas elige qué proyectos modelados financiar para el próximo ciclo de 6 semanas, fija el *apetito* —presupuesto de tiempo— y descarta el resto), **Construir (Build)** (un pequeño equipo integrado de diseñadores e ingenieros se apropia del proyecto, define tareas, construye rebanadas verticales, y entrega o cancela al final del ciclo). Dos reglas no negociables: (a) los proyectos tienen un *interruptor* — no hay extensiones; (b) el trabajo no se extrae de un backlog compartido. Los artefactos clave son el **Pitch** (el documento modelado) y el **Gráfico de Colina (Hill Chart)** (progreso conocido frente a desconocido).",
-		"config": {
-			"product_goal": "Entregar trabajo significativo en un ciclo fijo de 6 semanas, apostando a proyectos moldeados y eliminando el trabajo que supera el interruptor de circuito.",
-			"definition_of_done": [
-				"El pitch está moldeado al nivel correcto de abstracción.",
-				"La mesa de apuestas ha comprometido el apetito para el ciclo.",
-				"El equipo de construcción ha integrado de principio a fin y la característica está en producción.",
-				"La retro retrospectiva post-ciclo decide: mantener, eliminar o pitch v2 para el próximo ciclo."
+		id: 'shape-up',
+		name: 'Shape Up',
+		description:
+			'Shape Up es el método de desarrollo de productos de Basecamp. Tres fases: **Modelar (Shape)** (personas experimentadas definen el problema y una solución en el nivel correcto de abstracción: *suficientemente concreto para actuar, suficientemente abstracto para apropiarse*), **Apostar (Bet)** (la mesa de apuestas elige qué proyectos modelados financiar para el próximo ciclo de 6 semanas, fija el *apetito* —presupuesto de tiempo— y descarta el resto), **Construir (Build)** (un pequeño equipo integrado de diseñadores e ingenieros se apropia del proyecto, define tareas, construye rebanadas verticales, y entrega o cancela al final del ciclo). Dos reglas no negociables: (a) los proyectos tienen un *interruptor* — no hay extensiones; (b) el trabajo no se extrae de un backlog compartido. Los artefactos clave son el **Pitch** (el documento modelado) y el **Gráfico de Colina (Hill Chart)** (progreso conocido frente a desconocido).',
+		config: {
+			product_goal:
+				'Entregar trabajo significativo en un ciclo fijo de 6 semanas, apostando a proyectos moldeados y eliminando el trabajo que supera el interruptor de circuito.',
+			definition_of_done: [
+				'El pitch está moldeado al nivel correcto de abstracción.',
+				'La mesa de apuestas ha comprometido el apetito para el ciclo.',
+				'El equipo de construcción ha integrado de principio a fin y la característica está en producción.',
+				'La retro retrospectiva post-ciclo decide: mantener, eliminar o pitch v2 para el próximo ciclo.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "raw_idea",
-					"name": "Idea cruda",
-					"color": "#a3a3a3",
-					"category": "todo"
+					id: 'raw_idea',
+					name: 'Idea cruda',
+					color: '#a3a3a3',
+					category: 'todo'
 				},
 				{
-					"id": "shaping",
-					"name": "Moldeando",
-					"color": "#0ea5e9",
-					"category": "doing"
+					id: 'shaping',
+					name: 'Moldeando',
+					color: '#0ea5e9',
+					category: 'doing'
 				},
 				{
-					"id": "shaped",
-					"name": "Moldeado (listo para apostar)",
-					"color": "#22c55e",
-					"category": "todo"
+					id: 'shaped',
+					name: 'Moldeado (listo para apostar)',
+					color: '#22c55e',
+					category: 'todo'
 				},
 				{
-					"id": "bet",
-					"name": "Apostado (en ciclo)",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'bet',
+					name: 'Apostado (en ciclo)',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "building",
-					"name": "Construyendo",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'building',
+					name: 'Construyendo',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "cooldown",
-					"name": "Enfriamiento",
-					"color": "#a855f7",
-					"category": "doing"
+					id: 'cooldown',
+					name: 'Enfriamiento',
+					color: '#a855f7',
+					category: 'doing'
 				},
 				{
-					"id": "shipped",
-					"name": "Entregado",
-					"color": "#10b981",
-					"category": "done"
+					id: 'shipped',
+					name: 'Entregado',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "killed",
-					"name": "Eliminado (sin entrega)",
-					"color": "#ef4444",
-					"category": "cancelled"
+					id: 'killed',
+					name: 'Eliminado (sin entrega)',
+					color: '#ef4444',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "raw_idea",
-			"labels": [
+			default_status: 'raw_idea',
+			labels: [
 				{
-					"id": "small-batch",
-					"name": "Small batch (≤ 1 wk)",
-					"color": "#22c55e"
+					id: 'small-batch',
+					name: 'Small batch (≤ 1 wk)',
+					color: '#22c55e'
 				},
 				{
-					"id": "big-batch",
-					"name": "Big batch (1-2 wks)",
-					"color": "#facc15"
+					id: 'big-batch',
+					name: 'Big batch (1-2 wks)',
+					color: '#facc15'
 				},
 				{
-					"id": "r-and-d",
-					"name": "R&D cycle",
-					"color": "#a855f7"
+					id: 'r-and-d',
+					name: 'R&D cycle',
+					color: '#a855f7'
 				},
 				{
-					"id": "production",
-					"name": "Production cycle",
-					"color": "#3b82f6"
+					id: 'production',
+					name: 'Production cycle',
+					color: '#3b82f6'
 				},
 				{
-					"id": "uphill",
-					"name": "Uphill (figuring out)",
-					"color": "#ef4444"
+					id: 'uphill',
+					name: 'Uphill (figuring out)',
+					color: '#ef4444'
 				},
 				{
-					"id": "downhill",
-					"name": "Downhill (finishing)",
-					"color": "#10b981"
+					id: 'downhill',
+					name: 'Downhill (finishing)',
+					color: '#10b981'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"raw_idea",
-					"shaping",
-					"shaped",
-					"bet",
-					"building",
-					"cooldown",
-					"shipped"
-				]
+			users: [],
+			kanban: {
+				columns: ['raw_idea', 'shaping', 'shaped', 'bet', 'building', 'cooldown', 'shipped']
 			},
-			"gantt": {
-				"group_by": "issue_type",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'issue_type',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "pitch",
-				"name": "Pitch",
-				"icon": "lightbulb",
-				"color": "#a855f7",
-				"default_status": "raw_idea",
-				"fields": [
+				id: 'pitch',
+				name: 'Pitch',
+				icon: 'lightbulb',
+				color: '#a855f7',
+				default_status: 'raw_idea',
+				fields: [
 					{
-						"id": 1,
-						"key": "appetite",
-						"name": "Apetito (semanas)",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"small-batch",
-							"big-batch"
-						]
+						id: 1,
+						key: 'appetite',
+						name: 'Apetito (semanas)',
+						type: 'select',
+						obligatory: true,
+						options: ['small-batch', 'big-batch']
 					},
 					{
-						"id": 2,
-						"key": "shaper",
-						"name": "Moldeador (Shaper)",
-						"type": "user",
-						"obligatory": false
+						id: 2,
+						key: 'shaper',
+						name: 'Moldeador (Shaper)',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 3,
-						"key": "cycle_kind",
-						"name": "Tipo de ciclo",
-						"type": "select",
-						"obligatory": false,
-						"options": [
-							"r-and-d",
-							"production"
-						]
+						id: 3,
+						key: 'cycle_kind',
+						name: 'Tipo de ciclo',
+						type: 'select',
+						obligatory: false,
+						options: ['r-and-d', 'production']
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "problem",
-						"name": "Problem (one sentence)",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'problem',
+						name: 'Problem (one sentence)',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "appetite_why",
-						"name": "Appetite & why this size",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'appetite_why',
+						name: 'Appetite & why this size',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "solution",
-						"name": "Solution sketch / breadboard",
-						"obligatory": true,
-						"default": ""
+						id: 3,
+						key: 'solution',
+						name: 'Solution sketch / breadboard',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 4,
-						"key": "fat_marker",
-						"name": "Fat-marker sketches",
-						"obligatory": false,
-						"default": ""
+						id: 4,
+						key: 'fat_marker',
+						name: 'Fat-marker sketches',
+						obligatory: false,
+						default: ''
 					},
 					{
-						"id": 5,
-						"key": "rabbit_holes",
-						"name": "Rabbit holes",
-						"obligatory": false,
-						"default": ""
+						id: 5,
+						key: 'rabbit_holes',
+						name: 'Rabbit holes',
+						obligatory: false,
+						default: ''
 					},
 					{
-						"id": 6,
-						"key": "no_gos",
-						"name": "No-gos",
-						"obligatory": true,
-						"default": ""
+						id: 6,
+						key: 'no_gos',
+						name: 'No-gos',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "hill-chart-task",
-				"name": "Tarea del Hill Chart",
-				"icon": "mountain",
-				"color": "#0ea5e9",
-				"default_status": "building",
-				"fields": [
+				id: 'hill-chart-task',
+				name: 'Tarea del Hill Chart',
+				icon: 'mountain',
+				color: '#0ea5e9',
+				default_status: 'building',
+				fields: [
 					{
-						"id": 1,
-						"key": "pitch",
-						"name": "Pitch",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'pitch',
+						name: 'Pitch',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "hill_position",
-						"name": "Posición en la colina",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"uphill",
-							"downhill"
-						]
+						id: 2,
+						key: 'hill_position',
+						name: 'Posición en la colina',
+						type: 'select',
+						obligatory: true,
+						options: ['uphill', 'downhill']
 					},
 					{
-						"id": 3,
-						"key": "scope",
-						"name": "Alcance",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"on-scope",
-							"over-scope",
-							"trim"
-						]
+						id: 3,
+						key: 'scope',
+						name: 'Alcance',
+						type: 'select',
+						obligatory: true,
+						options: ['on-scope', 'over-scope', 'trim']
 					},
 					{
-						"id": 4,
-						"key": "owner",
-						"name": "Propietario",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'owner',
+						name: 'Propietario',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "safe-6-0",
-		"name": "SAFe 6.0",
-		"description": "SAFe 6.0 es el marco de escalado empresarial más adoptado (≈44% de las organizaciones según el 17º Estado de Ágil). El \"Big Picture\" apila cuatro configuraciones: **Esencial**, **Gran Solución**, **Portafolio**, **Completo**, sobre una base *Lean-Ágil*: una Mentalidad Lean-Ágil, cuatro Valores Centrales (Alineación, Mejora Implacable, Transparencia, Respeto por las Personas), seis Principios SAFe y la Hoja de Ruta de Implementación. La versión 6.0 introdujo el *Flujo de Valor de Agilidad Empresarial*, las *Ocho Propiedades de Flujo*, renombró roles y eventos, y agregó **Cultura de Aprendizaje Continuo** como competencia central. A nivel de equipo, SAFe es esencialmente SAFe-Scrum o SAFe-Kanban; las adiciones únicas de SAFe son el **Incremento de Programa (PI)** y el evento de **Planificación PI**.",
-		"config": {
-			"product_goal": "Entregar valor continuamente a través de Trenes de Liberación Ágil alineados a un Incremento de Programa trimestral.",
-			"definition_of_done": [
-				"La historia de usuario cumple los criterios de aceptación y se aplican prácticas de Calidad Incorporada.",
-				"La característica está integrada y demostrada en la Demo de la Solución.",
-				"Los objetivos del PI se revisan en Inspeccionar y Adaptar."
+		id: 'safe-6-0',
+		name: 'SAFe 6.0',
+		description:
+			'SAFe 6.0 es el marco de escalado empresarial más adoptado (≈44% de las organizaciones según el 17º Estado de Ágil). El "Big Picture" apila cuatro configuraciones: **Esencial**, **Gran Solución**, **Portafolio**, **Completo**, sobre una base *Lean-Ágil*: una Mentalidad Lean-Ágil, cuatro Valores Centrales (Alineación, Mejora Implacable, Transparencia, Respeto por las Personas), seis Principios SAFe y la Hoja de Ruta de Implementación. La versión 6.0 introdujo el *Flujo de Valor de Agilidad Empresarial*, las *Ocho Propiedades de Flujo*, renombró roles y eventos, y agregó **Cultura de Aprendizaje Continuo** como competencia central. A nivel de equipo, SAFe es esencialmente SAFe-Scrum o SAFe-Kanban; las adiciones únicas de SAFe son el **Incremento de Programa (PI)** y el evento de **Planificación PI**.',
+		config: {
+			product_goal:
+				'Entregar valor continuamente a través de Trenes de Liberación Ágil alineados a un Incremento de Programa trimestral.',
+			definition_of_done: [
+				'La historia de usuario cumple los criterios de aceptación y se aplican prácticas de Calidad Incorporada.',
+				'La característica está integrada y demostrada en la Demo de la Solución.',
+				'Los objetivos del PI se revisan en Inspeccionar y Adaptar.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "backlog",
-					"name": "Backlog",
-					"color": "#a3a3a3",
-					"category": "todo"
+					id: 'backlog',
+					name: 'Backlog',
+					color: '#a3a3a3',
+					category: 'todo'
 				},
 				{
-					"id": "analysis",
-					"name": "Análisis",
-					"color": "#0ea5e9",
-					"category": "doing"
+					id: 'analysis',
+					name: 'Análisis',
+					color: '#0ea5e9',
+					category: 'doing'
 				},
 				{
-					"id": "implementation",
-					"name": "Implementación",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'implementation',
+					name: 'Implementación',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "review",
-					"name": "Revisión",
-					"color": "#a855f7",
-					"category": "doing"
+					id: 'review',
+					name: 'Revisión',
+					color: '#a855f7',
+					category: 'doing'
 				},
 				{
-					"id": "demo",
-					"name": "Demostración de la Solución",
-					"color": "#f59e0b",
-					"category": "doing"
+					id: 'demo',
+					name: 'Demostración de la Solución',
+					color: '#f59e0b',
+					category: 'doing'
 				},
 				{
-					"id": "done",
-					"name": "Hecho",
-					"color": "#10b981",
-					"category": "done"
+					id: 'done',
+					name: 'Hecho',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "cancelled",
-					"name": "Cancelado",
-					"color": "#a3a3a3",
-					"category": "cancelled"
+					id: 'cancelled',
+					name: 'Cancelado',
+					color: '#a3a3a3',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "backlog",
-			"labels": [
+			default_status: 'backlog',
+			labels: [
 				{
-					"id": "pi-objective",
-					"name": "PI Objective",
-					"color": "#a855f7"
+					id: 'pi-objective',
+					name: 'PI Objective',
+					color: '#a855f7'
 				},
 				{
-					"id": "enabler",
-					"name": "Enabler",
-					"color": "#0ea5e9"
+					id: 'enabler',
+					name: 'Enabler',
+					color: '#0ea5e9'
 				},
 				{
-					"id": "architectural-runway",
-					"name": "Architectural Runway",
-					"color": "#facc15"
+					id: 'architectural-runway',
+					name: 'Architectural Runway',
+					color: '#facc15'
 				},
 				{
-					"id": "compliance",
-					"name": "Compliance",
-					"color": "#0f766e"
+					id: 'compliance',
+					name: 'Compliance',
+					color: '#0f766e'
 				},
 				{
-					"id": "wsjf",
-					"name": "WSJF",
-					"color": "#3b82f6"
+					id: 'wsjf',
+					name: 'WSJF',
+					color: '#3b82f6'
 				},
 				{
-					"id": "iteration-ip",
-					"name": "IP iteration",
-					"color": "#a3a3a3"
+					id: 'iteration-ip',
+					name: 'IP iteration',
+					color: '#a3a3a3'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"backlog",
-					"analysis",
-					"implementation",
-					"review",
-					"demo",
-					"done"
-				]
+			users: [],
+			kanban: {
+				columns: ['backlog', 'analysis', 'implementation', 'review', 'demo', 'done']
 			},
-			"gantt": {
-				"group_by": "issue_type",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'issue_type',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "strategic-theme",
-				"name": "Tema Estratégico",
-				"icon": "target",
-				"color": "#7c3aed",
-				"default_status": "backlog",
-				"fields": [
+				id: 'strategic-theme',
+				name: 'Tema Estratégico',
+				icon: 'target',
+				color: '#7c3aed',
+				default_status: 'backlog',
+				fields: [
 					{
-						"id": 1,
-						"key": "portfolio",
-						"name": "Portafolio",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'portfolio',
+						name: 'Portafolio',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "owner",
-						"name": "Dueño de Negocio",
-						"type": "user",
-						"obligatory": true
+						id: 2,
+						key: 'owner',
+						name: 'Dueño de Negocio',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 3,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "outcomes",
-						"name": "Desired business outcomes",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'outcomes',
+						name: 'Desired business outcomes',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "epic",
-				"name": "Épica",
-				"icon": "mountain",
-				"color": "#a855f7",
-				"default_status": "backlog",
-				"fields": [
+				id: 'epic',
+				name: 'Épica',
+				icon: 'mountain',
+				color: '#a855f7',
+				default_status: 'backlog',
+				fields: [
 					{
-						"id": 1,
-						"key": "epic_owner",
-						"name": "Dueño de Épica",
-						"type": "user",
-						"obligatory": true
+						id: 1,
+						key: 'epic_owner',
+						name: 'Dueño de Épica',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "wsjf_score",
-						"name": "Puntuación WSJF",
-						"type": "number",
-						"obligatory": false
+						id: 2,
+						key: 'wsjf_score',
+						name: 'Puntuación WSJF',
+						type: 'number',
+						obligatory: false
 					},
 					{
-						"id": 3,
-						"key": "art",
-						"name": "Tren de Liberación Ágil (ART)",
-						"type": "text",
-						"obligatory": false
+						id: 3,
+						key: 'art',
+						name: 'Tren de Liberación Ágil (ART)',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "lean_business_case",
-						"name": "Lean business case",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'lean_business_case',
+						name: 'Lean business case',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "capability",
-				"name": "Capacidad",
-				"icon": "cog",
-				"color": "#0ea5e9",
-				"default_status": "backlog",
-				"fields": [
+				id: 'capability',
+				name: 'Capacidad',
+				icon: 'cog',
+				color: '#0ea5e9',
+				default_status: 'backlog',
+				fields: [
 					{
-						"id": 1,
-						"key": "solution_train",
-						"name": "Tren de Solución",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'solution_train',
+						name: 'Tren de Solución',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "owner",
-						"name": "Dueño de Capacidad",
-						"type": "user",
-						"obligatory": true
+						id: 2,
+						key: 'owner',
+						name: 'Dueño de Capacidad',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 3,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "non_functional",
-						"name": "Non-functional requirements",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'non_functional',
+						name: 'Non-functional requirements',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "feature",
-				"name": "Característica",
-				"icon": "star",
-				"color": "#3b82f6",
-				"default_status": "backlog",
-				"fields": [
+				id: 'feature',
+				name: 'Característica',
+				icon: 'star',
+				color: '#3b82f6',
+				default_status: 'backlog',
+				fields: [
 					{
-						"id": 1,
-						"key": "art",
-						"name": "Tren de Liberación Ágil (ART)",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'art',
+						name: 'Tren de Liberación Ágil (ART)',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "wsjf",
-						"name": "Prioridad WSJF",
-						"type": "number",
-						"obligatory": false
+						id: 2,
+						key: 'wsjf',
+						name: 'Prioridad WSJF',
+						type: 'number',
+						obligatory: false
 					},
 					{
-						"id": 3,
-						"key": "acceptance",
-						"name": "Criterios de Aceptación (FIT)",
-						"type": "text",
-						"obligatory": true
+						id: 3,
+						key: 'acceptance',
+						name: 'Criterios de Aceptación (FIT)',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "owner",
-						"name": "Gerente de Producto",
-						"type": "user",
-						"obligatory": true
+						id: 4,
+						key: 'owner',
+						name: 'Gerente de Producto',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "design",
-						"name": "Design",
-						"obligatory": false,
-						"default": ""
+						id: 2,
+						key: 'design',
+						name: 'Design',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "enabler-story",
-				"name": "Historia Habilitadora",
-				"icon": "wrench",
-				"color": "#0f766e",
-				"default_status": "backlog",
-				"fields": [
+				id: 'enabler-story',
+				name: 'Historia Habilitadora',
+				icon: 'wrench',
+				color: '#0f766e',
+				default_status: 'backlog',
+				fields: [
 					{
-						"id": 1,
-						"key": "enabler_kind",
-						"name": "Tipo de Habilitador",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"architectural",
-							"infrastructure",
-							"compliance",
-							"exploration"
-						]
+						id: 1,
+						key: 'enabler_kind',
+						name: 'Tipo de Habilitador',
+						type: 'select',
+						obligatory: true,
+						options: ['architectural', 'infrastructure', 'compliance', 'exploration']
 					},
 					{
-						"id": 2,
-						"key": "feature",
-						"name": "Característica Padre",
-						"type": "text",
-						"obligatory": false
+						id: 2,
+						key: 'feature',
+						name: 'Característica Padre',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 3,
-						"key": "owner",
-						"name": "Propietario",
-						"type": "user",
-						"obligatory": false
+						id: 3,
+						key: 'owner',
+						name: 'Propietario',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "design",
-						"name": "Technical design",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'design',
+						name: 'Technical design',
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "large-scale-scrum",
-		"name": "Scrum a Gran Escala",
-		"description": "LeSS es el marco de escalado más minimalista: es \"Scrum aplicado a múltiples equipos que trabajan juntos en un producto\". Dos tamaños: **LeSS** (2–8 equipos) y **LeSS Huge** (8+ equipos, añade un Backlog de Producto de Área). La regla más importante: *un Dueño de Producto, un Backlog de Producto, una cadencia de Sprint*. No hay roles ni artefactos nuevos. Mecanismos de coordinación: Planificación del Sprint con todos los equipos en la misma sala, Refinamiento general del Backlog con el Dueño de Producto de Área (solo LeSS Huge), y un *Refinamiento del Backlog multi-equipo* que fuerza conversaciones entre equipos.",
-		"config": {
-			"product_goal": "Construir un producto con múltiples equipos, compartiendo un Dueño de Producto, un Backlog de Producto y una cadencia de Sprint.",
-			"definition_of_done": [
-				"La historia cumple con la Definición de Hecho (DoD) del equipo y está integrada en el producto general.",
-				"La historia es potencialmente entregable en el próximo lanzamiento.",
-				"Todos los equipos aceptan la integración."
+		id: 'large-scale-scrum',
+		name: 'Scrum a Gran Escala',
+		description:
+			'LeSS es el marco de escalado más minimalista: es "Scrum aplicado a múltiples equipos que trabajan juntos en un producto". Dos tamaños: **LeSS** (2–8 equipos) y **LeSS Huge** (8+ equipos, añade un Backlog de Producto de Área). La regla más importante: *un Dueño de Producto, un Backlog de Producto, una cadencia de Sprint*. No hay roles ni artefactos nuevos. Mecanismos de coordinación: Planificación del Sprint con todos los equipos en la misma sala, Refinamiento general del Backlog con el Dueño de Producto de Área (solo LeSS Huge), y un *Refinamiento del Backlog multi-equipo* que fuerza conversaciones entre equipos.',
+		config: {
+			product_goal:
+				'Construir un producto con múltiples equipos, compartiendo un Dueño de Producto, un Backlog de Producto y una cadencia de Sprint.',
+			definition_of_done: [
+				'La historia cumple con la Definición de Hecho (DoD) del equipo y está integrada en el producto general.',
+				'La historia es potencialmente entregable en el próximo lanzamiento.',
+				'Todos los equipos aceptan la integración.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "product_backlog",
-					"name": "Product Backlog",
-					"color": "#a3a3a3",
-					"category": "todo"
+					id: 'product_backlog',
+					name: 'Product Backlog',
+					color: '#a3a3a3',
+					category: 'todo'
 				},
 				{
-					"id": "refining",
-					"name": "Refinamiento (multi-equipo)",
-					"color": "#a855f7",
-					"category": "doing"
+					id: 'refining',
+					name: 'Refinamiento (multi-equipo)',
+					color: '#a855f7',
+					category: 'doing'
 				},
 				{
-					"id": "sprint_backlog",
-					"name": "Backlog del Sprint",
-					"color": "#0ea5e9",
-					"category": "todo"
+					id: 'sprint_backlog',
+					name: 'Backlog del Sprint',
+					color: '#0ea5e9',
+					category: 'todo'
 				},
 				{
-					"id": "in_progress",
-					"name": "En progreso",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'in_progress',
+					name: 'En progreso',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "review",
-					"name": "Revisión del Sprint (todos los equipos)",
-					"color": "#f59e0b",
-					"category": "doing"
+					id: 'review',
+					name: 'Revisión del Sprint (todos los equipos)',
+					color: '#f59e0b',
+					category: 'doing'
 				},
 				{
-					"id": "done",
-					"name": "Hecho",
-					"color": "#10b981",
-					"category": "done"
+					id: 'done',
+					name: 'Hecho',
+					color: '#10b981',
+					category: 'done'
 				}
 			],
-			"default_status": "product_backlog",
-			"labels": [
+			default_status: 'product_backlog',
+			labels: [
 				{
-					"id": "feature-team",
-					"name": "Feature team",
-					"color": "#3b82f6"
+					id: 'feature-team',
+					name: 'Feature team',
+					color: '#3b82f6'
 				},
 				{
-					"id": "component-team",
-					"name": "Component team (anti-pattern)",
-					"color": "#ef4444"
+					id: 'component-team',
+					name: 'Component team (anti-pattern)',
+					color: '#ef4444'
 				},
 				{
-					"id": "less-huge",
-					"name": "LeSS Huge",
-					"color": "#a855f7"
+					id: 'less-huge',
+					name: 'LeSS Huge',
+					color: '#a855f7'
 				},
 				{
-					"id": "apb",
-					"name": "Area Product Backlog",
-					"color": "#facc15"
+					id: 'apb',
+					name: 'Area Product Backlog',
+					color: '#facc15'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"product_backlog",
-					"refining",
-					"sprint_backlog",
-					"in_progress",
-					"review",
-					"done"
-				]
+			users: [],
+			kanban: {
+				columns: ['product_backlog', 'refining', 'sprint_backlog', 'in_progress', 'review', 'done']
 			},
-			"gantt": {
-				"group_by": "labels",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'labels',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "epic",
-				"name": "Épica",
-				"icon": "book-open",
-				"color": "#8b5cf6",
-				"default_status": "open",
-				"fields": [
+				id: 'epic',
+				name: 'Épica',
+				icon: 'book-open',
+				color: '#8b5cf6',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "business_value",
-						"name": "Valor de negocio",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"low",
-							"medium",
-							"high",
-							"critical"
-						]
+						id: 1,
+						key: 'business_value',
+						name: 'Valor de negocio',
+						type: 'select',
+						obligatory: true,
+						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						"id": 2,
-						"key": "target_release",
-						"name": "Lanzamiento objetivo",
-						"type": "text",
-						"obligatory": false
+						id: 2,
+						key: 'target_release',
+						name: 'Lanzamiento objetivo',
+						type: 'text',
+						obligatory: false
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "acceptance",
-						"name": "Acceptance criteria",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'acceptance',
+						name: 'Acceptance criteria',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "out_of_scope",
-						"name": "Out of scope",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'out_of_scope',
+						name: 'Out of scope',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "user-story",
-				"name": "Historia de Usuario",
-				"icon": "book-open",
-				"color": "#3b82f6",
-				"default_status": "open",
-				"fields": [
+				id: 'user-story',
+				name: 'Historia de Usuario',
+				icon: 'book-open',
+				color: '#3b82f6',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "story_points",
-						"name": "Puntos de historia",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"1",
-							"2",
-							"3",
-							"5",
-							"8",
-							"13",
-							"21"
-						]
+						id: 1,
+						key: 'story_points',
+						name: 'Puntos de historia',
+						type: 'select',
+						obligatory: true,
+						options: ['1', '2', '3', '5', '8', '13', '21']
 					},
 					{
-						"id": 2,
-						"key": "priority",
-						"name": "Prioridad",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"p0",
-							"p1",
-							"p2",
-							"p3"
-						]
+						id: 2,
+						key: 'priority',
+						name: 'Prioridad',
+						type: 'select',
+						obligatory: true,
+						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						"id": 3,
-						"key": "sprint",
-						"name": "Sprint",
-						"type": "text",
-						"obligatory": false
+						id: 3,
+						key: 'sprint',
+						name: 'Sprint',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "user_story",
-						"name": "User story",
-						"obligatory": true,
-						"default": "**As a** ___\n**I want** ___\n**so that** ___."
+						id: 1,
+						key: 'user_story',
+						name: 'User story',
+						obligatory: true,
+						default: '**As a** ___\n**I want** ___\n**so that** ___.'
 					},
 					{
-						"id": 2,
-						"key": "acceptance",
-						"name": "Acceptance criteria",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'acceptance',
+						name: 'Acceptance criteria',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "notes",
-						"name": "Notes & assumptions",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'notes',
+						name: 'Notes & assumptions',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "task",
-				"name": "Tarea",
-				"icon": "check-square",
-				"color": "#10b981",
-				"default_status": "open",
-				"fields": [
+				id: 'task',
+				name: 'Tarea',
+				icon: 'check-square',
+				color: '#10b981',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "estimate_hours",
-						"name": "Estimación (horas)",
-						"type": "number",
-						"obligatory": false
+						id: 1,
+						key: 'estimate_hours',
+						name: 'Estimación (horas)',
+						type: 'number',
+						obligatory: false
 					},
 					{
-						"id": 2,
-						"key": "priority",
-						"name": "Prioridad",
-						"type": "select",
-						"obligatory": false,
-						"options": [
-							"p0",
-							"p1",
-							"p2",
-							"p3"
-						]
+						id: 2,
+						key: 'priority',
+						name: 'Prioridad',
+						type: 'select',
+						obligatory: false,
+						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						"id": 3,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 3,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "definition_of_done",
-						"name": "Definition of done for this task",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'definition_of_done',
+						name: 'Definition of done for this task',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "bug",
-				"name": "Bug (Error)",
-				"icon": "bug",
-				"color": "#ef4444",
-				"default_status": "open",
-				"fields": [
+				id: 'bug',
+				name: 'Bug (Error)',
+				icon: 'bug',
+				color: '#ef4444',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "severity",
-						"name": "Severidad",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"low",
-							"medium",
-							"high",
-							"critical"
-						]
+						id: 1,
+						key: 'severity',
+						name: 'Severidad',
+						type: 'select',
+						obligatory: true,
+						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						"id": 2,
-						"key": "priority",
-						"name": "Prioridad",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"p0",
-							"p1",
-							"p2",
-							"p3"
-						]
+						id: 2,
+						key: 'priority',
+						name: 'Prioridad',
+						type: 'select',
+						obligatory: true,
+						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						"id": 3,
-						"key": "regression",
-						"name": "Regresión desde",
-						"type": "text",
-						"obligatory": false
+						id: 3,
+						key: 'regression',
+						name: 'Regresión desde',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "steps_to_reproduce",
-						"name": "Steps to reproduce",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'steps_to_reproduce',
+						name: 'Steps to reproduce',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "expected_actual",
-						"name": "Expected vs. actual",
-						"obligatory": true,
-						"default": ""
+						id: 3,
+						key: 'expected_actual',
+						name: 'Expected vs. actual',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "refinement",
-				"name": "Refinamiento del Backlog",
-				"icon": "scissors",
-				"color": "#a855f7",
-				"default_status": "refining",
-				"fields": [
+				id: 'refinement',
+				name: 'Refinamiento del Backlog',
+				icon: 'scissors',
+				color: '#a855f7',
+				default_status: 'refining',
+				fields: [
 					{
-						"id": 1,
-						"key": "for_area",
-						"name": "Por área (LeSS Huge)",
-						"type": "text",
-						"obligatory": false
+						id: 1,
+						key: 'for_area',
+						name: 'Por área (LeSS Huge)',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 2,
-						"key": "teams",
-						"name": "Equipos involucrados (separados por comas)",
-						"type": "text",
-						"obligatory": true
+						id: 2,
+						key: 'teams',
+						name: 'Equipos involucrados (separados por comas)',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "facilitator",
-						"name": "Facilitador",
-						"type": "user",
-						"obligatory": true
+						id: 3,
+						key: 'facilitator',
+						name: 'Facilitador',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "topic",
-						"name": "Topic / PBI to refine",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'topic',
+						name: 'Topic / PBI to refine',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "outcome",
-						"name": "Refinement outcome",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'outcome',
+						name: 'Refinement outcome',
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "nexus",
-		"name": "Nexus",
-		"description": "Nexus es la respuesta de Scrum.org para escalar Scrum a **3–9 equipos trabajando en un producto**. Es *aditivo* sobre Scrum: conserva los roles, eventos y artefactos, pero añade un *Equipo de Integración Nexus* (3 a 9 personas que se encargan de la integración), y reemplaza el caos de planificación multi-equipo con **Planificación de Sprint Nexus**, **Scrum Diario Nexus**, **Revisión de Sprint Nexus** y **Retrospectiva de Sprint Nexus**. Los nuevos artefactos: un **Objetivo Nexus**, un **Backlog de Sprint Nexus** y un **Backlog del Equipo de Integración Nexus**. Nexus no prescribe nada más, espera que los equipos llenen los vacíos con prácticas de XP / Kanban / DevOps.",
-		"config": {
-			"product_goal": "Integrar el trabajo a través de 3-9 equipos Scrum cada Sprint mediante un Equipo de Integración Nexus y un Objetivo Nexus compartido.",
-			"definition_of_done": [
-				"La historia de usuario está integrada con dependencias inter-equipos.",
-				"La Definición de Hecho (DoD) es consistente en todos los equipos.",
-				"El incremento integrado pasa el control de integración del Nexus Daily Scrum."
+		id: 'nexus',
+		name: 'Nexus',
+		description:
+			'Nexus es la respuesta de Scrum.org para escalar Scrum a **3–9 equipos trabajando en un producto**. Es *aditivo* sobre Scrum: conserva los roles, eventos y artefactos, pero añade un *Equipo de Integración Nexus* (3 a 9 personas que se encargan de la integración), y reemplaza el caos de planificación multi-equipo con **Planificación de Sprint Nexus**, **Scrum Diario Nexus**, **Revisión de Sprint Nexus** y **Retrospectiva de Sprint Nexus**. Los nuevos artefactos: un **Objetivo Nexus**, un **Backlog de Sprint Nexus** y un **Backlog del Equipo de Integración Nexus**. Nexus no prescribe nada más, espera que los equipos llenen los vacíos con prácticas de XP / Kanban / DevOps.',
+		config: {
+			product_goal:
+				'Integrar el trabajo a través de 3-9 equipos Scrum cada Sprint mediante un Equipo de Integración Nexus y un Objetivo Nexus compartido.',
+			definition_of_done: [
+				'La historia de usuario está integrada con dependencias inter-equipos.',
+				'La Definición de Hecho (DoD) es consistente en todos los equipos.',
+				'El incremento integrado pasa el control de integración del Nexus Daily Scrum.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "nexus_backlog",
-					"name": "Backlog de Nexus",
-					"color": "#a3a3a3",
-					"category": "todo"
+					id: 'nexus_backlog',
+					name: 'Backlog de Nexus',
+					color: '#a3a3a3',
+					category: 'todo'
 				},
 				{
-					"id": "team_backlog",
-					"name": "Backlog del Equipo",
-					"color": "#0ea5e9",
-					"category": "todo"
+					id: 'team_backlog',
+					name: 'Backlog del Equipo',
+					color: '#0ea5e9',
+					category: 'todo'
 				},
 				{
-					"id": "in_progress",
-					"name": "En progreso",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'in_progress',
+					name: 'En progreso',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "integration",
-					"name": "Integración (NIT)",
-					"color": "#a855f7",
-					"category": "doing"
+					id: 'integration',
+					name: 'Integración (NIT)',
+					color: '#a855f7',
+					category: 'doing'
 				},
 				{
-					"id": "review",
-					"name": "Revisión del Sprint Nexus",
-					"color": "#f59e0b",
-					"category": "doing"
+					id: 'review',
+					name: 'Revisión del Sprint Nexus',
+					color: '#f59e0b',
+					category: 'doing'
 				},
 				{
-					"id": "done",
-					"name": "Hecho (Incremento Integrado)",
-					"color": "#10b981",
-					"category": "done"
+					id: 'done',
+					name: 'Hecho (Incremento Integrado)',
+					color: '#10b981',
+					category: 'done'
 				}
 			],
-			"default_status": "nexus_backlog",
-			"labels": [
+			default_status: 'nexus_backlog',
+			labels: [
 				{
-					"id": "nit",
-					"name": "Nexus Integration Team",
-					"color": "#a855f7"
+					id: 'nit',
+					name: 'Nexus Integration Team',
+					color: '#a855f7'
 				},
 				{
-					"id": "integration-blocker",
-					"name": "Integration blocker",
-					"color": "#ef4444"
+					id: 'integration-blocker',
+					name: 'Integration blocker',
+					color: '#ef4444'
 				},
 				{
-					"id": "cross-team",
-					"name": "Cross-team dependency",
-					"color": "#0ea5e9"
+					id: 'cross-team',
+					name: 'Cross-team dependency',
+					color: '#0ea5e9'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"nexus_backlog",
-					"team_backlog",
-					"in_progress",
-					"integration",
-					"review",
-					"done"
-				]
+			users: [],
+			kanban: {
+				columns: ['nexus_backlog', 'team_backlog', 'in_progress', 'integration', 'review', 'done']
 			},
-			"gantt": {
-				"group_by": "issue_type",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'issue_type',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "epic",
-				"name": "Épica",
-				"icon": "book-open",
-				"color": "#8b5cf6",
-				"default_status": "open",
-				"fields": [
+				id: 'epic',
+				name: 'Épica',
+				icon: 'book-open',
+				color: '#8b5cf6',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "business_value",
-						"name": "Valor de negocio",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"low",
-							"medium",
-							"high",
-							"critical"
-						]
+						id: 1,
+						key: 'business_value',
+						name: 'Valor de negocio',
+						type: 'select',
+						obligatory: true,
+						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						"id": 2,
-						"key": "target_release",
-						"name": "Lanzamiento objetivo",
-						"type": "text",
-						"obligatory": false
+						id: 2,
+						key: 'target_release',
+						name: 'Lanzamiento objetivo',
+						type: 'text',
+						obligatory: false
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "acceptance",
-						"name": "Acceptance criteria",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'acceptance',
+						name: 'Acceptance criteria',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "out_of_scope",
-						"name": "Out of scope",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'out_of_scope',
+						name: 'Out of scope',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "user-story",
-				"name": "Historia de Usuario",
-				"icon": "book-open",
-				"color": "#3b82f6",
-				"default_status": "open",
-				"fields": [
+				id: 'user-story',
+				name: 'Historia de Usuario',
+				icon: 'book-open',
+				color: '#3b82f6',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "story_points",
-						"name": "Puntos de historia",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"1",
-							"2",
-							"3",
-							"5",
-							"8",
-							"13",
-							"21"
-						]
+						id: 1,
+						key: 'story_points',
+						name: 'Puntos de historia',
+						type: 'select',
+						obligatory: true,
+						options: ['1', '2', '3', '5', '8', '13', '21']
 					},
 					{
-						"id": 2,
-						"key": "priority",
-						"name": "Prioridad",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"p0",
-							"p1",
-							"p2",
-							"p3"
-						]
+						id: 2,
+						key: 'priority',
+						name: 'Prioridad',
+						type: 'select',
+						obligatory: true,
+						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						"id": 3,
-						"key": "sprint",
-						"name": "Sprint",
-						"type": "text",
-						"obligatory": false
+						id: 3,
+						key: 'sprint',
+						name: 'Sprint',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "user_story",
-						"name": "User story",
-						"obligatory": true,
-						"default": "**As a** ___\n**I want** ___\n**so that** ___."
+						id: 1,
+						key: 'user_story',
+						name: 'User story',
+						obligatory: true,
+						default: '**As a** ___\n**I want** ___\n**so that** ___.'
 					},
 					{
-						"id": 2,
-						"key": "acceptance",
-						"name": "Acceptance criteria",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'acceptance',
+						name: 'Acceptance criteria',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "notes",
-						"name": "Notes & assumptions",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'notes',
+						name: 'Notes & assumptions',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "task",
-				"name": "Tarea",
-				"icon": "check-square",
-				"color": "#10b981",
-				"default_status": "open",
-				"fields": [
+				id: 'task',
+				name: 'Tarea',
+				icon: 'check-square',
+				color: '#10b981',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "estimate_hours",
-						"name": "Estimación (horas)",
-						"type": "number",
-						"obligatory": false
+						id: 1,
+						key: 'estimate_hours',
+						name: 'Estimación (horas)',
+						type: 'number',
+						obligatory: false
 					},
 					{
-						"id": 2,
-						"key": "priority",
-						"name": "Prioridad",
-						"type": "select",
-						"obligatory": false,
-						"options": [
-							"p0",
-							"p1",
-							"p2",
-							"p3"
-						]
+						id: 2,
+						key: 'priority',
+						name: 'Prioridad',
+						type: 'select',
+						obligatory: false,
+						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						"id": 3,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 3,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "definition_of_done",
-						"name": "Definition of done for this task",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'definition_of_done',
+						name: 'Definition of done for this task',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "bug",
-				"name": "Bug (Error)",
-				"icon": "bug",
-				"color": "#ef4444",
-				"default_status": "open",
-				"fields": [
+				id: 'bug',
+				name: 'Bug (Error)',
+				icon: 'bug',
+				color: '#ef4444',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "severity",
-						"name": "Severidad",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"low",
-							"medium",
-							"high",
-							"critical"
-						]
+						id: 1,
+						key: 'severity',
+						name: 'Severidad',
+						type: 'select',
+						obligatory: true,
+						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						"id": 2,
-						"key": "priority",
-						"name": "Prioridad",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"p0",
-							"p1",
-							"p2",
-							"p3"
-						]
+						id: 2,
+						key: 'priority',
+						name: 'Prioridad',
+						type: 'select',
+						obligatory: true,
+						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						"id": 3,
-						"key": "regression",
-						"name": "Regresión desde",
-						"type": "text",
-						"obligatory": false
+						id: 3,
+						key: 'regression',
+						name: 'Regresión desde',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "steps_to_reproduce",
-						"name": "Steps to reproduce",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'steps_to_reproduce',
+						name: 'Steps to reproduce',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "expected_actual",
-						"name": "Expected vs. actual",
-						"obligatory": true,
-						"default": ""
+						id: 3,
+						key: 'expected_actual',
+						name: 'Expected vs. actual',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "integration-task",
-				"name": "Tarea de Integración",
-				"icon": "plug",
-				"color": "#a855f7",
-				"default_status": "integration",
-				"fields": [
+				id: 'integration-task',
+				name: 'Tarea de Integración',
+				icon: 'plug',
+				color: '#a855f7',
+				default_status: 'integration',
+				fields: [
 					{
-						"id": 1,
-						"key": "blocked_teams",
-						"name": "Equipos bloqueados (separados por comas)",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'blocked_teams',
+						name: 'Equipos bloqueados (separados por comas)',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "owner",
-						"name": "Dueño NIT",
-						"type": "user",
-						"obligatory": true
+						id: 2,
+						key: 'owner',
+						name: 'Dueño NIT',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 3,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "integration_plan",
-						"name": "Integration plan",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'integration_plan',
+						name: 'Integration plan',
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "scrum-scale",
-		"name": "Scrum@Scale",
-		"description": "Scrum@Scale es el escalado *orgánico* de Scrum. La unidad base es un equipo Scrum; el escalado se realiza replicando el rol del *Scrum Master* en un \"Scrum de Scrums\" (SoS) y el rol del *Dueño de Producto* en un \"Dueño de Producto Jefe\" + un \"MetaScrum\". Recursivo: SoS de SoS escala la función del Scrum Master; un foro de POs escala la función del Dueño de Producto. El Modelo de Referencia se divide en dos ciclos: el **Ciclo del Scrum Master** (eliminar impedimentos, mejorar calidad) y el **Ciclo del Dueño de Producto** (coordinar el backlog, planificación de lanzamientos).",
-		"config": {
-			"product_goal": "Escalar Scrum a través de un Scrum de Scrums (Ciclo SM) y un Chief Product Owner + MetaScrum (Ciclo PO).",
-			"definition_of_done": [
-				"El impedimento tiene un responsable explícito y una ruta de escalamiento explícita.",
-				"La acción de la reunión de escalado tiene una fecha objetivo y un responsable.",
-				"Los impedimentos que superan un SoS se añaden al backlog del siguiente SoS de SoS."
+		id: 'scrum-scale',
+		name: 'Scrum@Scale',
+		description:
+			'Scrum@Scale es el escalado *orgánico* de Scrum. La unidad base es un equipo Scrum; el escalado se realiza replicando el rol del *Scrum Master* en un "Scrum de Scrums" (SoS) y el rol del *Dueño de Producto* en un "Dueño de Producto Jefe" + un "MetaScrum". Recursivo: SoS de SoS escala la función del Scrum Master; un foro de POs escala la función del Dueño de Producto. El Modelo de Referencia se divide en dos ciclos: el **Ciclo del Scrum Master** (eliminar impedimentos, mejorar calidad) y el **Ciclo del Dueño de Producto** (coordinar el backlog, planificación de lanzamientos).',
+		config: {
+			product_goal:
+				'Escalar Scrum a través de un Scrum de Scrums (Ciclo SM) y un Chief Product Owner + MetaScrum (Ciclo PO).',
+			definition_of_done: [
+				'El impedimento tiene un responsable explícito y una ruta de escalamiento explícita.',
+				'La acción de la reunión de escalado tiene una fecha objetivo y un responsable.',
+				'Los impedimentos que superan un SoS se añaden al backlog del siguiente SoS de SoS.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "team_backlog",
-					"name": "Backlog del Equipo",
-					"color": "#a3a3a3",
-					"category": "todo"
+					id: 'team_backlog',
+					name: 'Backlog del Equipo',
+					color: '#a3a3a3',
+					category: 'todo'
 				},
 				{
-					"id": "in_progress",
-					"name": "En progreso",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'in_progress',
+					name: 'En progreso',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "review",
-					"name": "Revisión",
-					"color": "#f59e0b",
-					"category": "doing"
+					id: 'review',
+					name: 'Revisión',
+					color: '#f59e0b',
+					category: 'doing'
 				},
 				{
-					"id": "done",
-					"name": "Hecho",
-					"color": "#10b981",
-					"category": "done"
+					id: 'done',
+					name: 'Hecho',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "impediment",
-					"name": "Impedimento (abierto)",
-					"color": "#ef4444",
-					"category": "doing"
+					id: 'impediment',
+					name: 'Impedimento (abierto)',
+					color: '#ef4444',
+					category: 'doing'
 				},
 				{
-					"id": "escalated",
-					"name": "Escalado a SoSoS",
-					"color": "#a855f7",
-					"category": "doing"
+					id: 'escalated',
+					name: 'Escalado a SoSoS',
+					color: '#a855f7',
+					category: 'doing'
 				}
 			],
-			"default_status": "team_backlog",
-			"labels": [
+			default_status: 'team_backlog',
+			labels: [
 				{
-					"id": "sos",
-					"name": "Scrum of Scrums",
-					"color": "#3b82f6"
+					id: 'sos',
+					name: 'Scrum of Scrums',
+					color: '#3b82f6'
 				},
 				{
-					"id": "sosos",
-					"name": "SoS of SoS",
-					"color": "#a855f7"
+					id: 'sosos',
+					name: 'SoS of SoS',
+					color: '#a855f7'
 				},
 				{
-					"id": "metascrum",
-					"name": "MetaScrum",
-					"color": "#0ea5e9"
+					id: 'metascrum',
+					name: 'MetaScrum',
+					color: '#0ea5e9'
 				},
 				{
-					"id": "chief-po",
-					"name": "Chief Product Owner",
-					"color": "#facc15"
+					id: 'chief-po',
+					name: 'Chief Product Owner',
+					color: '#facc15'
 				},
 				{
-					"id": "chief-sm",
-					"name": "Chief Scrum Master",
-					"color": "#22c55e"
+					id: 'chief-sm',
+					name: 'Chief Scrum Master',
+					color: '#22c55e'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"team_backlog",
-					"in_progress",
-					"review",
-					"done"
-				]
+			users: [],
+			kanban: {
+				columns: ['team_backlog', 'in_progress', 'review', 'done']
 			},
-			"gantt": {
-				"group_by": "issue_type",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'issue_type',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "epic",
-				"name": "Épica",
-				"icon": "book-open",
-				"color": "#8b5cf6",
-				"default_status": "open",
-				"fields": [
+				id: 'epic',
+				name: 'Épica',
+				icon: 'book-open',
+				color: '#8b5cf6',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "business_value",
-						"name": "Valor de negocio",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"low",
-							"medium",
-							"high",
-							"critical"
-						]
+						id: 1,
+						key: 'business_value',
+						name: 'Valor de negocio',
+						type: 'select',
+						obligatory: true,
+						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						"id": 2,
-						"key": "target_release",
-						"name": "Lanzamiento objetivo",
-						"type": "text",
-						"obligatory": false
+						id: 2,
+						key: 'target_release',
+						name: 'Lanzamiento objetivo',
+						type: 'text',
+						obligatory: false
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "acceptance",
-						"name": "Acceptance criteria",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'acceptance',
+						name: 'Acceptance criteria',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "out_of_scope",
-						"name": "Out of scope",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'out_of_scope',
+						name: 'Out of scope',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "user-story",
-				"name": "Historia de Usuario",
-				"icon": "book-open",
-				"color": "#3b82f6",
-				"default_status": "open",
-				"fields": [
+				id: 'user-story',
+				name: 'Historia de Usuario',
+				icon: 'book-open',
+				color: '#3b82f6',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "story_points",
-						"name": "Puntos de historia",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"1",
-							"2",
-							"3",
-							"5",
-							"8",
-							"13",
-							"21"
-						]
+						id: 1,
+						key: 'story_points',
+						name: 'Puntos de historia',
+						type: 'select',
+						obligatory: true,
+						options: ['1', '2', '3', '5', '8', '13', '21']
 					},
 					{
-						"id": 2,
-						"key": "priority",
-						"name": "Prioridad",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"p0",
-							"p1",
-							"p2",
-							"p3"
-						]
+						id: 2,
+						key: 'priority',
+						name: 'Prioridad',
+						type: 'select',
+						obligatory: true,
+						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						"id": 3,
-						"key": "sprint",
-						"name": "Sprint",
-						"type": "text",
-						"obligatory": false
+						id: 3,
+						key: 'sprint',
+						name: 'Sprint',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "user_story",
-						"name": "User story",
-						"obligatory": true,
-						"default": "**As a** ___\n**I want** ___\n**so that** ___."
+						id: 1,
+						key: 'user_story',
+						name: 'User story',
+						obligatory: true,
+						default: '**As a** ___\n**I want** ___\n**so that** ___.'
 					},
 					{
-						"id": 2,
-						"key": "acceptance",
-						"name": "Acceptance criteria",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'acceptance',
+						name: 'Acceptance criteria',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "notes",
-						"name": "Notes & assumptions",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'notes',
+						name: 'Notes & assumptions',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "task",
-				"name": "Tarea",
-				"icon": "check-square",
-				"color": "#10b981",
-				"default_status": "open",
-				"fields": [
+				id: 'task',
+				name: 'Tarea',
+				icon: 'check-square',
+				color: '#10b981',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "estimate_hours",
-						"name": "Estimación (horas)",
-						"type": "number",
-						"obligatory": false
+						id: 1,
+						key: 'estimate_hours',
+						name: 'Estimación (horas)',
+						type: 'number',
+						obligatory: false
 					},
 					{
-						"id": 2,
-						"key": "priority",
-						"name": "Prioridad",
-						"type": "select",
-						"obligatory": false,
-						"options": [
-							"p0",
-							"p1",
-							"p2",
-							"p3"
-						]
+						id: 2,
+						key: 'priority',
+						name: 'Prioridad',
+						type: 'select',
+						obligatory: false,
+						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						"id": 3,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 3,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "definition_of_done",
-						"name": "Definition of done for this task",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'definition_of_done',
+						name: 'Definition of done for this task',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "bug",
-				"name": "Bug (Error)",
-				"icon": "bug",
-				"color": "#ef4444",
-				"default_status": "open",
-				"fields": [
+				id: 'bug',
+				name: 'Bug (Error)',
+				icon: 'bug',
+				color: '#ef4444',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "severity",
-						"name": "Severidad",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"low",
-							"medium",
-							"high",
-							"critical"
-						]
+						id: 1,
+						key: 'severity',
+						name: 'Severidad',
+						type: 'select',
+						obligatory: true,
+						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						"id": 2,
-						"key": "priority",
-						"name": "Prioridad",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"p0",
-							"p1",
-							"p2",
-							"p3"
-						]
+						id: 2,
+						key: 'priority',
+						name: 'Prioridad',
+						type: 'select',
+						obligatory: true,
+						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						"id": 3,
-						"key": "regression",
-						"name": "Regresión desde",
-						"type": "text",
-						"obligatory": false
+						id: 3,
+						key: 'regression',
+						name: 'Regresión desde',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "steps_to_reproduce",
-						"name": "Steps to reproduce",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'steps_to_reproduce',
+						name: 'Steps to reproduce',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "expected_actual",
-						"name": "Expected vs. actual",
-						"obligatory": true,
-						"default": ""
+						id: 3,
+						key: 'expected_actual',
+						name: 'Expected vs. actual',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "impediment",
-				"name": "Impedimento",
-				"icon": "octagon-x",
-				"color": "#ef4444",
-				"default_status": "impediment",
-				"fields": [
+				id: 'impediment',
+				name: 'Impedimento',
+				icon: 'octagon-x',
+				color: '#ef4444',
+				default_status: 'impediment',
+				fields: [
 					{
-						"id": 1,
-						"key": "team_reporter",
-						"name": "Equipo reportador",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'team_reporter',
+						name: 'Equipo reportador',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "escalation",
-						"name": "Escalamiento",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"team",
-							"sos",
-							"sosos"
-						]
+						id: 2,
+						key: 'escalation',
+						name: 'Escalamiento',
+						type: 'select',
+						obligatory: true,
+						options: ['team', 'sos', 'sosos']
 					},
 					{
-						"id": 3,
-						"key": "owner",
-						"name": "Propietario",
-						"type": "user",
-						"obligatory": true
+						id: 3,
+						key: 'owner',
+						name: 'Propietario',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "impact",
-						"name": "Impact",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'impact',
+						name: 'Impact',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "resolution",
-						"name": "Resolution",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'resolution',
+						name: 'Resolution',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "scaling-meeting-action",
-				"name": "Acción de Reunión de Escalado",
-				"icon": "list-tree",
-				"color": "#0ea5e9",
-				"default_status": "in_progress",
-				"fields": [
+				id: 'scaling-meeting-action',
+				name: 'Acción de Reunión de Escalado',
+				icon: 'list-tree',
+				color: '#0ea5e9',
+				default_status: 'in_progress',
+				fields: [
 					{
-						"id": 1,
-						"key": "forum",
-						"name": "Del foro",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"sos",
-							"sosos",
-							"metascrum",
-							"executive-scram"
-						]
+						id: 1,
+						key: 'forum',
+						name: 'Del foro',
+						type: 'select',
+						obligatory: true,
+						options: ['sos', 'sosos', 'metascrum', 'executive-scram']
 					},
 					{
-						"id": 2,
-						"key": "due_date",
-						"name": "Vence",
-						"type": "date",
-						"obligatory": true
+						id: 2,
+						key: 'due_date',
+						name: 'Vence',
+						type: 'date',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "owner",
-						"name": "Propietario",
-						"type": "user",
-						"obligatory": true
+						id: 3,
+						key: 'owner',
+						name: 'Propietario',
+						type: 'user',
+						obligatory: true
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "action",
-						"name": "Action",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'action',
+						name: 'Action',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "context",
-						"name": "Context",
-						"obligatory": false,
-						"default": ""
+						id: 2,
+						key: 'context',
+						name: 'Context',
+						obligatory: false,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "spotify-model",
-		"name": "Modelo Spotify",
-		"description": "El Modelo Spotify es un *conjunto de patrones* para escalar autonomía con alineación, no un marco de procesos. Las cuatro unidades: **Escuadrón (Squad)** (equipo multifuncional de 6–10 personas dueño de un viaje del cliente, *como una mini-startup*), **Tribu (Tribe)** (colección de escuadrones relacionados, limitada a ≈100), **Capítulo (Chapter)** (comunidad basada en disciplina dentro de una tribu), **Gremio (Guild)** (comunidad de interés voluntaria inter-tribus). El liderazgo es por un *trío*: líderes de diseño / producto / tecnología. Las planificaciones trimestrales (\"apuestas\") alinean a las tribus. El documento de 2012 advierte explícitamente contra la copia 1:1.",
-		"config": {
-			"product_goal": "Operar como una red de escuadrones autónomos, alineados a través de tribus, capítulos, gremios y apuestas trimestrales.",
-			"definition_of_done": [
-				"La iniciativa del escuadrón es propiedad de un Trío (Producto, Diseño, Tecnología).",
-				"La apuesta de la tribu ha sido registrada en la tabla de apuestas trimestrales.",
-				"La tarea del capítulo es aprobada por el Líder del Capítulo y el Líder de la Tribu."
+		id: 'spotify-model',
+		name: 'Modelo Spotify',
+		description:
+			'El Modelo Spotify es un *conjunto de patrones* para escalar autonomía con alineación, no un marco de procesos. Las cuatro unidades: **Escuadrón (Squad)** (equipo multifuncional de 6–10 personas dueño de un viaje del cliente, *como una mini-startup*), **Tribu (Tribe)** (colección de escuadrones relacionados, limitada a ≈100), **Capítulo (Chapter)** (comunidad basada en disciplina dentro de una tribu), **Gremio (Guild)** (comunidad de interés voluntaria inter-tribus). El liderazgo es por un *trío*: líderes de diseño / producto / tecnología. Las planificaciones trimestrales ("apuestas") alinean a las tribus. El documento de 2012 advierte explícitamente contra la copia 1:1.',
+		config: {
+			product_goal:
+				'Operar como una red de escuadrones autónomos, alineados a través de tribus, capítulos, gremios y apuestas trimestrales.',
+			definition_of_done: [
+				'La iniciativa del escuadrón es propiedad de un Trío (Producto, Diseño, Tecnología).',
+				'La apuesta de la tribu ha sido registrada en la tabla de apuestas trimestrales.',
+				'La tarea del capítulo es aprobada por el Líder del Capítulo y el Líder de la Tribu.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "backlog",
-					"name": "Backlog",
-					"color": "#a3a3a3",
-					"category": "todo"
+					id: 'backlog',
+					name: 'Backlog',
+					color: '#a3a3a3',
+					category: 'todo'
 				},
 				{
-					"id": "bet_open",
-					"name": "Apuesta abierta",
-					"color": "#0ea5e9",
-					"category": "todo"
+					id: 'bet_open',
+					name: 'Apuesta abierta',
+					color: '#0ea5e9',
+					category: 'todo'
 				},
 				{
-					"id": "bet_placed",
-					"name": "Apuesta realizada",
-					"color": "#22c55e",
-					"category": "doing"
+					id: 'bet_placed',
+					name: 'Apuesta realizada',
+					color: '#22c55e',
+					category: 'doing'
 				},
 				{
-					"id": "in_progress",
-					"name": "En progreso",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'in_progress',
+					name: 'En progreso',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "shipped",
-					"name": "Entregado",
-					"color": "#10b981",
-					"category": "done"
+					id: 'shipped',
+					name: 'Entregado',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "killed",
-					"name": "Eliminada",
-					"color": "#ef4444",
-					"category": "cancelled"
+					id: 'killed',
+					name: 'Eliminada',
+					color: '#ef4444',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "backlog",
-			"labels": [
+			default_status: 'backlog',
+			labels: [
 				{
-					"id": "squad",
-					"name": "Squad",
-					"color": "#3b82f6"
+					id: 'squad',
+					name: 'Squad',
+					color: '#3b82f6'
 				},
 				{
-					"id": "tribe",
-					"name": "Tribe",
-					"color": "#a855f7"
+					id: 'tribe',
+					name: 'Tribe',
+					color: '#a855f7'
 				},
 				{
-					"id": "chapter",
-					"name": "Chapter",
-					"color": "#0ea5e9"
+					id: 'chapter',
+					name: 'Chapter',
+					color: '#0ea5e9'
 				},
 				{
-					"id": "guild",
-					"name": "Guild",
-					"color": "#22c55e"
+					id: 'guild',
+					name: 'Guild',
+					color: '#22c55e'
 				},
 				{
-					"id": "trio",
-					"name": "Trio (P+D+T)",
-					"color": "#facc15"
+					id: 'trio',
+					name: 'Trio (P+D+T)',
+					color: '#facc15'
 				},
 				{
-					"id": "platform",
-					"name": "Platform squad",
-					"color": "#0f766e"
+					id: 'platform',
+					name: 'Platform squad',
+					color: '#0f766e'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"backlog",
-					"bet_open",
-					"bet_placed",
-					"in_progress",
-					"shipped"
-				]
+			users: [],
+			kanban: {
+				columns: ['backlog', 'bet_open', 'bet_placed', 'in_progress', 'shipped']
 			},
-			"gantt": {
-				"group_by": "labels",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'labels',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "squad-initiative",
-				"name": "Iniciativa de Escuadrón",
-				"icon": "rocket",
-				"color": "#3b82f6",
-				"default_status": "backlog",
-				"fields": [
+				id: 'squad-initiative',
+				name: 'Iniciativa de Escuadrón',
+				icon: 'rocket',
+				color: '#3b82f6',
+				default_status: 'backlog',
+				fields: [
 					{
-						"id": 1,
-						"key": "squad",
-						"name": "Escuadrón",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'squad',
+						name: 'Escuadrón',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "tribe",
-						"name": "Tribu",
-						"type": "text",
-						"obligatory": true
+						id: 2,
+						key: 'tribe',
+						name: 'Tribu',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "trio",
-						"name": "Líder del trío",
-						"type": "user",
-						"obligatory": true
+						id: 3,
+						key: 'trio',
+						name: 'Líder del trío',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "mission",
-						"name": "Misión a largo plazo",
-						"type": "text",
-						"obligatory": true
+						id: 4,
+						key: 'mission',
+						name: 'Misión a largo plazo',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "okrs",
-						"name": "Linked OKRs",
-						"obligatory": false,
-						"default": ""
+						id: 2,
+						key: 'okrs',
+						name: 'Linked OKRs',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "chapter-task",
-				"name": "Tarea de Capítulo",
-				"icon": "users",
-				"color": "#0ea5e9",
-				"default_status": "backlog",
-				"fields": [
+				id: 'chapter-task',
+				name: 'Tarea de Capítulo',
+				icon: 'users',
+				color: '#0ea5e9',
+				default_status: 'backlog',
+				fields: [
 					{
-						"id": 1,
-						"key": "chapter",
-						"name": "Capítulo",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'chapter',
+						name: 'Capítulo',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "chapter_lead",
-						"name": "Líder de capítulo",
-						"type": "user",
-						"obligatory": true
+						id: 2,
+						key: 'chapter_lead',
+						name: 'Líder de capítulo',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 3,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "standard",
-						"name": "Standard / guideline",
-						"obligatory": false,
-						"default": ""
+						id: 2,
+						key: 'standard',
+						name: 'Standard / guideline',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "guild-initiative",
-				"name": "Iniciativa de Gremio",
-				"icon": "network",
-				"color": "#22c55e",
-				"default_status": "backlog",
-				"fields": [
+				id: 'guild-initiative',
+				name: 'Iniciativa de Gremio',
+				icon: 'network',
+				color: '#22c55e',
+				default_status: 'backlog',
+				fields: [
 					{
-						"id": 1,
-						"key": "guild",
-						"name": "Gremio",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'guild',
+						name: 'Gremio',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "coordinator",
-						"name": "Coordinador",
-						"type": "user",
-						"obligatory": false
+						id: 2,
+						key: 'coordinator',
+						name: 'Coordinador',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 3,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 3,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "tribe-bet",
-				"name": "Apuesta de Tribu",
-				"icon": "hand-coins",
-				"color": "#a855f7",
-				"default_status": "bet_open",
-				"fields": [
+				id: 'tribe-bet',
+				name: 'Apuesta de Tribu',
+				icon: 'hand-coins',
+				color: '#a855f7',
+				default_status: 'bet_open',
+				fields: [
 					{
-						"id": 1,
-						"key": "tribe",
-						"name": "Tribu",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'tribe',
+						name: 'Tribu',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "quarter",
-						"name": "Trimestre",
-						"type": "text",
-						"obligatory": true
+						id: 2,
+						key: 'quarter',
+						name: 'Trimestre',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "bet_table",
-						"name": "Miembros de la mesa de apuestas",
-						"type": "text",
-						"obligatory": true
+						id: 3,
+						key: 'bet_table',
+						name: 'Miembros de la mesa de apuestas',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "problem",
-						"name": "Problem",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'problem',
+						name: 'Problem',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "outcome",
-						"name": "Outcome",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'outcome',
+						name: 'Outcome',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "killed_reason",
-						"name": "Why killed (if applicable)",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'killed_reason',
+						name: 'Why killed (if applicable)',
+						obligatory: false,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "disciplined-agile-delivery",
-		"name": "Entrega Ágil Disciplinada",
-		"description": "Disciplined Agile es el marco *más flexible* en este catálogo. El DAD original (2012) era un enfoque híbrido de Scrum + Kanban + Lean con un *Ciclo de Vida de Riesgo-Valor* (Incepción → Construcción → Transición → Continuo) y 21 *Objetivos de Proceso*. El Kit de Herramientas DA (PMI, 2018+) añade **DevOps Disciplinado** y **TI Ágil Disciplinada (DAIT)**, e introduce seis ciclos de vida explícitos: **Ágil (basado en Scrum)**, **Lean (basado en Kanban)**, **Entrega Continua: Ágil**, **Entrega Continua: Lean**, **Exploratorio (Lean Startup)**, **Programa (Equipo de Equipos)**. La filosofía DA es \"el contexto cuenta, la elección es buena, sé increíble\".",
-		"config": {
-			"product_goal": "Adapta tu forma de trabajar al contexto: elige un ciclo de vida DA, selecciona estrategias por objetivo de proceso y entrega soluciones consumibles.",
-			"definition_of_done": [
-				"El elemento de trabajo es potencialmente consumible (integrado, probado, desplegable).",
-				"Todos los objetivos de proceso aplicables tienen una estrategia registrada.",
-				"Se cumplen los criterios iniciales de preparación para el despliegue (fase de Transición)."
+		id: 'disciplined-agile-delivery',
+		name: 'Entrega Ágil Disciplinada',
+		description:
+			'Disciplined Agile es el marco *más flexible* en este catálogo. El DAD original (2012) era un enfoque híbrido de Scrum + Kanban + Lean con un *Ciclo de Vida de Riesgo-Valor* (Incepción → Construcción → Transición → Continuo) y 21 *Objetivos de Proceso*. El Kit de Herramientas DA (PMI, 2018+) añade **DevOps Disciplinado** y **TI Ágil Disciplinada (DAIT)**, e introduce seis ciclos de vida explícitos: **Ágil (basado en Scrum)**, **Lean (basado en Kanban)**, **Entrega Continua: Ágil**, **Entrega Continua: Lean**, **Exploratorio (Lean Startup)**, **Programa (Equipo de Equipos)**. La filosofía DA es "el contexto cuenta, la elección es buena, sé increíble".',
+		config: {
+			product_goal:
+				'Adapta tu forma de trabajar al contexto: elige un ciclo de vida DA, selecciona estrategias por objetivo de proceso y entrega soluciones consumibles.',
+			definition_of_done: [
+				'El elemento de trabajo es potencialmente consumible (integrado, probado, desplegable).',
+				'Todos los objetivos de proceso aplicables tienen una estrategia registrada.',
+				'Se cumplen los criterios iniciales de preparación para el despliegue (fase de Transición).'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "inception",
-					"name": "Incepción",
-					"color": "#a855f7",
-					"category": "doing"
+					id: 'inception',
+					name: 'Incepción',
+					color: '#a855f7',
+					category: 'doing'
 				},
 				{
-					"id": "construction",
-					"name": "Construcción",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'construction',
+					name: 'Construcción',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "transition",
-					"name": "Transición",
-					"color": "#f59e0b",
-					"category": "doing"
+					id: 'transition',
+					name: 'Transición',
+					color: '#f59e0b',
+					category: 'doing'
 				},
 				{
-					"id": "production",
-					"name": "En producción",
-					"color": "#10b981",
-					"category": "done"
+					id: 'production',
+					name: 'En producción',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "retired",
-					"name": "Retirado",
-					"color": "#a3a3a3",
-					"category": "cancelled"
+					id: 'retired',
+					name: 'Retirado',
+					color: '#a3a3a3',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "construction",
-			"labels": [
+			default_status: 'construction',
+			labels: [
 				{
-					"id": "pg-form-team",
-					"name": "PG: Form Team",
-					"color": "#3b82f6"
+					id: 'pg-form-team',
+					name: 'PG: Form Team',
+					color: '#3b82f6'
 				},
 				{
-					"id": "pg-explore-scope",
-					"name": "PG: Explore Scope",
-					"color": "#0ea5e9"
+					id: 'pg-explore-scope',
+					name: 'PG: Explore Scope',
+					color: '#0ea5e9'
 				},
 				{
-					"id": "pg-plan-release",
-					"name": "PG: Plan Release",
-					"color": "#a855f7"
+					id: 'pg-plan-release',
+					name: 'PG: Plan Release',
+					color: '#a855f7'
 				},
 				{
-					"id": "pg-accelerate-value",
-					"name": "PG: Accelerate Value",
-					"color": "#22c55e"
+					id: 'pg-accelerate-value',
+					name: 'PG: Accelerate Value',
+					color: '#22c55e'
 				},
 				{
-					"id": "pg-improve-quality",
-					"name": "PG: Improve Quality",
-					"color": "#facc15"
+					id: 'pg-improve-quality',
+					name: 'PG: Improve Quality',
+					color: '#facc15'
 				},
 				{
-					"id": "pg-deploy-solution",
-					"name": "PG: Deploy",
-					"color": "#0f766e"
+					id: 'pg-deploy-solution',
+					name: 'PG: Deploy',
+					color: '#0f766e'
 				},
 				{
-					"id": "lifecycle-agile",
-					"name": "Lifecycle: Agile (Scrum)",
-					"color": "#3b82f6"
+					id: 'lifecycle-agile',
+					name: 'Lifecycle: Agile (Scrum)',
+					color: '#3b82f6'
 				},
 				{
-					"id": "lifecycle-lean",
-					"name": "Lifecycle: Lean (Kanban)",
-					"color": "#0ea5e9"
+					id: 'lifecycle-lean',
+					name: 'Lifecycle: Lean (Kanban)',
+					color: '#0ea5e9'
 				},
 				{
-					"id": "lifecycle-cd-agile",
-					"name": "Lifecycle: CD Agile",
-					"color": "#a855f7"
+					id: 'lifecycle-cd-agile',
+					name: 'Lifecycle: CD Agile',
+					color: '#a855f7'
 				},
 				{
-					"id": "lifecycle-cd-lean",
-					"name": "Lifecycle: CD Lean",
-					"color": "#22c55e"
+					id: 'lifecycle-cd-lean',
+					name: 'Lifecycle: CD Lean',
+					color: '#22c55e'
 				},
 				{
-					"id": "lifecycle-exploratory",
-					"name": "Lifecycle: Exploratory (Lean Startup)",
-					"color": "#facc15"
+					id: 'lifecycle-exploratory',
+					name: 'Lifecycle: Exploratory (Lean Startup)',
+					color: '#facc15'
 				},
 				{
-					"id": "lifecycle-program",
-					"name": "Lifecycle: Program (team of teams)",
-					"color": "#ef4444"
+					id: 'lifecycle-program',
+					name: 'Lifecycle: Program (team of teams)',
+					color: '#ef4444'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"inception",
-					"construction",
-					"transition",
-					"production"
-				]
+			users: [],
+			kanban: {
+				columns: ['inception', 'construction', 'transition', 'production']
 			},
-			"gantt": {
-				"group_by": "issue_type",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'issue_type',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "inception-goal",
-				"name": "Inception Goal",
-				"icon": "compass",
-				"color": "#a855f7",
-				"default_status": "inception",
-				"fields": [
+				id: 'inception-goal',
+				name: 'Inception Goal',
+				icon: 'compass',
+				color: '#a855f7',
+				default_status: 'inception',
+				fields: [
 					{
-						"id": 1,
-						"key": "process_goal",
-						"name": "Process goal",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"pg-form-team",
-							"pg-explore-scope",
-							"pg-plan-release",
-							"pg-accelerate-value",
-							"pg-improve-quality",
-							"pg-deploy-solution"
+						id: 1,
+						key: 'process_goal',
+						name: 'Process goal',
+						type: 'select',
+						obligatory: true,
+						options: [
+							'pg-form-team',
+							'pg-explore-scope',
+							'pg-plan-release',
+							'pg-accelerate-value',
+							'pg-improve-quality',
+							'pg-deploy-solution'
 						]
 					},
 					{
-						"id": 2,
-						"key": "lifecycle",
-						"name": "Lifecycle",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"lifecycle-agile",
-							"lifecycle-lean",
-							"lifecycle-cd-agile",
-							"lifecycle-cd-lean",
-							"lifecycle-exploratory",
-							"lifecycle-program"
+						id: 2,
+						key: 'lifecycle',
+						name: 'Lifecycle',
+						type: 'select',
+						obligatory: true,
+						options: [
+							'lifecycle-agile',
+							'lifecycle-lean',
+							'lifecycle-cd-agile',
+							'lifecycle-cd-lean',
+							'lifecycle-exploratory',
+							'lifecycle-program'
 						]
 					},
 					{
-						"id": 3,
-						"key": "owner",
-						"name": "Propietario",
-						"type": "user",
-						"obligatory": true
+						id: 3,
+						key: 'owner',
+						name: 'Propietario',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "strategy",
-						"name": "Chosen strategy",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'strategy',
+						name: 'Chosen strategy',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "tradeoffs",
-						"name": "Tradeoffs",
-						"obligatory": true,
-						"default": ""
+						id: 3,
+						key: 'tradeoffs',
+						name: 'Tradeoffs',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "exploratory-experiment",
-				"name": "Exploratory Experiment",
-				"icon": "flask-conical",
-				"color": "#facc15",
-				"default_status": "construction",
-				"fields": [
+				id: 'exploratory-experiment',
+				name: 'Exploratory Experiment',
+				icon: 'flask-conical',
+				color: '#facc15',
+				default_status: 'construction',
+				fields: [
 					{
-						"id": 1,
-						"key": "hypothesis",
-						"name": "Hypothesis",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'hypothesis',
+						name: 'Hypothesis',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "metric",
-						"name": "Metric to move",
-						"type": "text",
-						"obligatory": true
+						id: 2,
+						key: 'metric',
+						name: 'Metric to move',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "owner",
-						"name": "Experiment owner",
-						"type": "user",
-						"obligatory": true
+						id: 3,
+						key: 'owner',
+						name: 'Experiment owner',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "experiment",
-						"name": "Experiment (Build-Measure-Learn)",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'experiment',
+						name: 'Experiment (Build-Measure-Learn)',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "result",
-						"name": "Result & validated learning",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'result',
+						name: 'Result & validated learning',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "devops-task",
-				"name": "DevOps Task",
-				"icon": "server",
-				"color": "#0f766e",
-				"default_status": "construction",
-				"fields": [
+				id: 'devops-task',
+				name: 'DevOps Task',
+				icon: 'server',
+				color: '#0f766e',
+				default_status: 'construction',
+				fields: [
 					{
-						"id": 1,
-						"key": "devops_goal",
-						"name": "DevOps goal",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"continuous-integration",
-							"continuous-delivery",
-							"continuous-deployment",
-							"observability",
-							"incident-response",
-							"infrastructure-as-code"
+						id: 1,
+						key: 'devops_goal',
+						name: 'DevOps goal',
+						type: 'select',
+						obligatory: true,
+						options: [
+							'continuous-integration',
+							'continuous-delivery',
+							'continuous-deployment',
+							'observability',
+							'incident-response',
+							'infrastructure-as-code'
 						]
 					},
 					{
-						"id": 2,
-						"key": "owner",
-						"name": "Propietario",
-						"type": "user",
-						"obligatory": true
+						id: 2,
+						key: 'owner',
+						name: 'Propietario',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 3,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "slo",
-						"name": "SLO / SRE target",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'slo',
+						name: 'SLO / SRE target',
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "team-topologies",
-		"name": "Team Topologies",
-		"description": "Topologías de Equipos es un modelo *práctico y adaptativo* para diseñar equipos de software para flujo rápido. Cuatro tipos fundamentales de equipos: **Alineado al flujo (Stream-aligned)** (dueño de un único flujo de trabajo valioso, 80–90% de la org), **Plataforma** (proporciona servicios internos), **Habilitador** (especialistas que ayudan a los equipos alineados al flujo), **Subsistema Complicado** (equipos superespecialistas). Tres modos de interacción: **Colaboración**, **X-como-Servicio**, **Facilitación**. El concepto fundamental: la **carga cognitiva** es la variable de diseño *más importante*.",
-		"config": {
-			"product_goal": "Design the team topology for fast flow, manage cognitive load, and evolve the design as the system matures.",
-			"definition_of_done": [
-				"Team has an explicit type (stream-aligned, platform, enabling, complicated-subsystem).",
-				"Interaction modes are recorded for every inter-team boundary.",
-				"Cognitive load is measured (domain / technical / operational).",
-				"Migration path is documented for any topology change."
+		id: 'team-topologies',
+		name: 'Team Topologies',
+		description:
+			'Topologías de Equipos es un modelo *práctico y adaptativo* para diseñar equipos de software para flujo rápido. Cuatro tipos fundamentales de equipos: **Alineado al flujo (Stream-aligned)** (dueño de un único flujo de trabajo valioso, 80–90% de la org), **Plataforma** (proporciona servicios internos), **Habilitador** (especialistas que ayudan a los equipos alineados al flujo), **Subsistema Complicado** (equipos superespecialistas). Tres modos de interacción: **Colaboración**, **X-como-Servicio**, **Facilitación**. El concepto fundamental: la **carga cognitiva** es la variable de diseño *más importante*.',
+		config: {
+			product_goal:
+				'Design the team topology for fast flow, manage cognitive load, and evolve the design as the system matures.',
+			definition_of_done: [
+				'Team has an explicit type (stream-aligned, platform, enabling, complicated-subsystem).',
+				'Interaction modes are recorded for every inter-team boundary.',
+				'Cognitive load is measured (domain / technical / operational).',
+				'Migration path is documented for any topology change.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "assess",
-					"name": "Assess (cognitive load)",
-					"color": "#a3a3a3",
-					"category": "doing"
+					id: 'assess',
+					name: 'Assess (cognitive load)',
+					color: '#a3a3a3',
+					category: 'doing'
 				},
 				{
-					"id": "design",
-					"name": "Design",
-					"color": "#0ea5e9",
-					"category": "doing"
+					id: 'design',
+					name: 'Design',
+					color: '#0ea5e9',
+					category: 'doing'
 				},
 				{
-					"id": "implement",
-					"name": "Implement (migration)",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'implement',
+					name: 'Implement (migration)',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "review",
-					"name": "Review (3-6 months)",
-					"color": "#f59e0b",
-					"category": "doing"
+					id: 'review',
+					name: 'Review (3-6 months)',
+					color: '#f59e0b',
+					category: 'doing'
 				},
 				{
-					"id": "stable",
-					"name": "Stable",
-					"color": "#10b981",
-					"category": "done"
+					id: 'stable',
+					name: 'Stable',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "retired",
-					"name": "Retirado",
-					"color": "#a3a3a3",
-					"category": "cancelled"
+					id: 'retired',
+					name: 'Retirado',
+					color: '#a3a3a3',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "assess",
-			"labels": [
+			default_status: 'assess',
+			labels: [
 				{
-					"id": "stream-aligned",
-					"name": "Stream-aligned (default)",
-					"color": "#3b82f6"
+					id: 'stream-aligned',
+					name: 'Stream-aligned (default)',
+					color: '#3b82f6'
 				},
 				{
-					"id": "platform",
-					"name": "Platform",
-					"color": "#0f766e"
+					id: 'platform',
+					name: 'Platform',
+					color: '#0f766e'
 				},
 				{
-					"id": "enabling",
-					"name": "Enabling",
-					"color": "#a855f7"
+					id: 'enabling',
+					name: 'Enabling',
+					color: '#a855f7'
 				},
 				{
-					"id": "complicated-subsystem",
-					"name": "Complicated-subsystem",
-					"color": "#facc15"
+					id: 'complicated-subsystem',
+					name: 'Complicated-subsystem',
+					color: '#facc15'
 				},
 				{
-					"id": "interaction-collab",
-					"name": "Interaction: Collaboration",
-					"color": "#22c55e"
+					id: 'interaction-collab',
+					name: 'Interaction: Collaboration',
+					color: '#22c55e'
 				},
 				{
-					"id": "interaction-xaas",
-					"name": "Interaction: X-as-a-Service",
-					"color": "#0ea5e9"
+					id: 'interaction-xaas',
+					name: 'Interaction: X-as-a-Service',
+					color: '#0ea5e9'
 				},
 				{
-					"id": "interaction-facil",
-					"name": "Interaction: Facilitating",
-					"color": "#f59e0b"
+					id: 'interaction-facil',
+					name: 'Interaction: Facilitating',
+					color: '#f59e0b'
 				},
 				{
-					"id": "cognitive-overload",
-					"name": "Cognitive overload",
-					"color": "#ef4444"
+					id: 'cognitive-overload',
+					name: 'Cognitive overload',
+					color: '#ef4444'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"assess",
-					"design",
-					"implement",
-					"review",
-					"stable"
-				]
+			users: [],
+			kanban: {
+				columns: ['assess', 'design', 'implement', 'review', 'stable']
 			},
-			"gantt": {
-				"group_by": "issue_type",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'issue_type',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "team-design",
-				"name": "Team Design",
-				"icon": "blueprint",
-				"color": "#3b82f6",
-				"default_status": "assess",
-				"fields": [
+				id: 'team-design',
+				name: 'Team Design',
+				icon: 'blueprint',
+				color: '#3b82f6',
+				default_status: 'assess',
+				fields: [
 					{
-						"id": 1,
-						"key": "team_type",
-						"name": "Team type",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"stream-aligned",
-							"platform",
-							"enabling",
-							"complicated-subsystem"
-						]
+						id: 1,
+						key: 'team_type',
+						name: 'Team type',
+						type: 'select',
+						obligatory: true,
+						options: ['stream-aligned', 'platform', 'enabling', 'complicated-subsystem']
 					},
 					{
-						"id": 2,
-						"key": "value_stream",
-						"name": "Flujo de valor",
-						"type": "text",
-						"obligatory": true
+						id: 2,
+						key: 'value_stream',
+						name: 'Flujo de valor',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "team_size",
-						"name": "Team size",
-						"type": "number",
-						"obligatory": true
+						id: 3,
+						key: 'team_size',
+						name: 'Team size',
+						type: 'number',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "purpose",
-						"name": "Team purpose",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'purpose',
+						name: 'Team purpose',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "responsibilities",
-						"name": "Responsibilities",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'responsibilities',
+						name: 'Responsibilities',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "interaction_modes",
-						"name": "Interaction modes (X-as-a-Service / Collaboration / Facilitating)",
-						"obligatory": true,
-						"default": ""
+						id: 3,
+						key: 'interaction_modes',
+						name: 'Interaction modes (X-as-a-Service / Collaboration / Facilitating)',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "team-interaction",
-				"name": "Team Interaction",
-				"icon": "link-2",
-				"color": "#0ea5e9",
-				"default_status": "design",
-				"fields": [
+				id: 'team-interaction',
+				name: 'Team Interaction',
+				icon: 'link-2',
+				color: '#0ea5e9',
+				default_status: 'design',
+				fields: [
 					{
-						"id": 1,
-						"key": "from_team",
-						"name": "From team",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'from_team',
+						name: 'From team',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "to_team",
-						"name": "To team",
-						"type": "text",
-						"obligatory": true
+						id: 2,
+						key: 'to_team',
+						name: 'To team',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "mode",
-						"name": "Interaction mode",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"interaction-collab",
-							"interaction-xaas",
-							"interaction-facil"
-						]
+						id: 3,
+						key: 'mode',
+						name: 'Interaction mode',
+						type: 'select',
+						obligatory: true,
+						options: ['interaction-collab', 'interaction-xaas', 'interaction-facil']
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "team_api",
-						"name": "Team API (what we expose / consume)",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'team_api',
+						name: 'Team API (what we expose / consume)',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "cognitive-load-assessment",
-				"name": "Cognitive Load Assessment",
-				"icon": "brain",
-				"color": "#a855f7",
-				"default_status": "assess",
-				"fields": [
+				id: 'cognitive-load-assessment',
+				name: 'Cognitive Load Assessment',
+				icon: 'brain',
+				color: '#a855f7',
+				default_status: 'assess',
+				fields: [
 					{
-						"id": 1,
-						"key": "team",
-						"name": "Team",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'team',
+						name: 'Team',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "intrinsic",
-						"name": "Intrinsic (1-5)",
-						"type": "number",
-						"obligatory": true
+						id: 2,
+						key: 'intrinsic',
+						name: 'Intrinsic (1-5)',
+						type: 'number',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "extraneous",
-						"name": "Extraneous (1-5)",
-						"type": "number",
-						"obligatory": true
+						id: 3,
+						key: 'extraneous',
+						name: 'Extraneous (1-5)',
+						type: 'number',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "germane",
-						"name": "Germane (1-5)",
-						"type": "number",
-						"obligatory": true
+						id: 4,
+						key: 'germane',
+						name: 'Germane (1-5)',
+						type: 'number',
+						obligatory: true
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "evidence",
-						"name": "Evidence (handoffs, rework, on-call hours)",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'evidence',
+						name: 'Evidence (handoffs, rework, on-call hours)',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "team-migration",
-				"name": "Team Migration",
-				"icon": "arrow-right-left",
-				"color": "#22c55e",
-				"default_status": "design",
-				"fields": [
+				id: 'team-migration',
+				name: 'Team Migration',
+				icon: 'arrow-right-left',
+				color: '#22c55e',
+				default_status: 'design',
+				fields: [
 					{
-						"id": 1,
-						"key": "from_state",
-						"name": "From (current)",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'from_state',
+						name: 'From (current)',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "to_state",
-						"name": "To (target)",
-						"type": "text",
-						"obligatory": true
+						id: 2,
+						key: 'to_state',
+						name: 'To (target)',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "driver",
-						"name": "Driver (cognitive overload / value stream change / etc.)",
-						"type": "text",
-						"obligatory": true
+						id: 3,
+						key: 'driver',
+						name: 'Driver (cognitive overload / value stream change / etc.)',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "plan",
-						"name": "Migration plan",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'plan',
+						name: 'Migration plan',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "risks",
-						"name": "Risks",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'risks',
+						name: 'Risks',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "platform-product",
-				"name": "Platform Product",
-				"icon": "server-cog",
-				"color": "#0f766e",
-				"default_status": "design",
-				"fields": [
+				id: 'platform-product',
+				name: 'Platform Product',
+				icon: 'server-cog',
+				color: '#0f766e',
+				default_status: 'design',
+				fields: [
 					{
-						"id": 1,
-						"key": "internal_users",
-						"name": "Internal users (which stream-aligned teams consume)",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'internal_users',
+						name: 'Internal users (which stream-aligned teams consume)',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "owner",
-						"name": "Platform owner",
-						"type": "user",
-						"obligatory": true
+						id: 2,
+						key: 'owner',
+						name: 'Platform owner',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 3,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "scope",
-						"name": "Thinnest viable platform (scope)",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'scope',
+						name: 'Thinnest viable platform (scope)',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "slo",
-						"name": "Platform SLO (reliability / latency / adoption)",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'slo',
+						name: 'Platform SLO (reliability / latency / adoption)',
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "devops-continuous-delivery",
-		"name": "DevOps / Continuous Delivery",
-		"description": "DevOps es la convergencia de la ingeniería ágil, lean y de sistemas aplicada a la *entrega*: llevar el código desde el commit hasta producción de forma segura, rápida y confiable. El programa de investigación DORA identificó cuatro métricas de *rendimiento* de entrega de software: **Tiempo de Entrega para Cambios**, **Frecuencia de Despliegue**, **Tasa de Fallos de Cambio**, **Tiempo Medio de Restauración (MTTR)**. *Accelerate* correlacionó estas métricas con el rendimiento organizacional a través de 24 capacidades predictivas.",
-		"config": {
-			"product_goal": "Build, ship, and run software safely and frequently, tracking the four DORA metrics (Lead Time, Deploy Frequency, CFR, MTTR).",
-			"definition_of_done": [
-				"Change has been deployed to production and is monitored.",
-				"Service level objectives are met or breached incidents are filed.",
-				"Post-incident reviews produce actionable improvements."
+		id: 'devops-continuous-delivery',
+		name: 'DevOps / Continuous Delivery',
+		description:
+			'DevOps es la convergencia de la ingeniería ágil, lean y de sistemas aplicada a la *entrega*: llevar el código desde el commit hasta producción de forma segura, rápida y confiable. El programa de investigación DORA identificó cuatro métricas de *rendimiento* de entrega de software: **Tiempo de Entrega para Cambios**, **Frecuencia de Despliegue**, **Tasa de Fallos de Cambio**, **Tiempo Medio de Restauración (MTTR)**. *Accelerate* correlacionó estas métricas con el rendimiento organizacional a través de 24 capacidades predictivas.',
+		config: {
+			product_goal:
+				'Build, ship, and run software safely and frequently, tracking the four DORA metrics (Lead Time, Deploy Frequency, CFR, MTTR).',
+			definition_of_done: [
+				'Change has been deployed to production and is monitored.',
+				'Service level objectives are met or breached incidents are filed.',
+				'Post-incident reviews produce actionable improvements.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "plan",
-					"name": "Plan",
-					"color": "#a3a3a3",
-					"category": "todo"
+					id: 'plan',
+					name: 'Plan',
+					color: '#a3a3a3',
+					category: 'todo'
 				},
 				{
-					"id": "develop",
-					"name": "Develop",
-					"color": "#0ea5e9",
-					"category": "doing"
+					id: 'develop',
+					name: 'Develop',
+					color: '#0ea5e9',
+					category: 'doing'
 				},
 				{
-					"id": "build",
-					"name": "Build (CI)",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'build',
+					name: 'Build (CI)',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "test",
-					"name": "Test",
-					"color": "#a855f7",
-					"category": "doing"
+					id: 'test',
+					name: 'Test',
+					color: '#a855f7',
+					category: 'doing'
 				},
 				{
-					"id": "staging",
-					"name": "Staging",
-					"color": "#f59e0b",
-					"category": "doing"
+					id: 'staging',
+					name: 'Staging',
+					color: '#f59e0b',
+					category: 'doing'
 				},
 				{
-					"id": "production",
-					"name": "Production",
-					"color": "#10b981",
-					"category": "done"
+					id: 'production',
+					name: 'Production',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "rolled_back",
-					"name": "Rolled back",
-					"color": "#ef4444",
-					"category": "cancelled"
+					id: 'rolled_back',
+					name: 'Rolled back',
+					color: '#ef4444',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "plan",
-			"labels": [
+			default_status: 'plan',
+			labels: [
 				{
-					"id": "dora-elite",
-					"name": "DORA: Elite",
-					"color": "#10b981"
+					id: 'dora-elite',
+					name: 'DORA: Elite',
+					color: '#10b981'
 				},
 				{
-					"id": "dora-high",
-					"name": "DORA: High",
-					"color": "#3b82f6"
+					id: 'dora-high',
+					name: 'DORA: High',
+					color: '#3b82f6'
 				},
 				{
-					"id": "dora-medium",
-					"name": "DORA: Medium",
-					"color": "#facc15"
+					id: 'dora-medium',
+					name: 'DORA: Medium',
+					color: '#facc15'
 				},
 				{
-					"id": "dora-low",
-					"name": "DORA: Low",
-					"color": "#ef4444"
+					id: 'dora-low',
+					name: 'DORA: Low',
+					color: '#ef4444'
 				},
 				{
-					"id": "incident",
-					"name": "Incident (P1/P2)",
-					"color": "#dc2626"
+					id: 'incident',
+					name: 'Incident (P1/P2)',
+					color: '#dc2626'
 				},
 				{
-					"id": "post-incident",
-					"name": "Post-incident review",
-					"color": "#a855f7"
+					id: 'post-incident',
+					name: 'Post-incident review',
+					color: '#a855f7'
 				},
 				{
-					"id": "service-api",
-					"name": "Service: API",
-					"color": "#0ea5e9"
+					id: 'service-api',
+					name: 'Service: API',
+					color: '#0ea5e9'
 				},
 				{
-					"id": "service-web",
-					"name": "Service: Web",
-					"color": "#22c55e"
+					id: 'service-web',
+					name: 'Service: Web',
+					color: '#22c55e'
 				},
 				{
-					"id": "service-data",
-					"name": "Service: Data",
-					"color": "#facc15"
+					id: 'service-data',
+					name: 'Service: Data',
+					color: '#facc15'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"plan",
-					"develop",
-					"build",
-					"test",
-					"staging",
-					"production"
-				]
+			users: [],
+			kanban: {
+				columns: ['plan', 'develop', 'build', 'test', 'staging', 'production']
 			},
-			"gantt": {
-				"group_by": "labels",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'labels',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "change-request",
-				"name": "Change Request",
-				"icon": "git-pull-request",
-				"color": "#3b82f6",
-				"default_status": "plan",
-				"fields": [
+				id: 'change-request',
+				name: 'Change Request',
+				icon: 'git-pull-request',
+				color: '#3b82f6',
+				default_status: 'plan',
+				fields: [
 					{
-						"id": 1,
-						"key": "service",
-						"name": "Service",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'service',
+						name: 'Service',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "change_kind",
-						"name": "Change kind",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"feature",
-							"experiment",
-							"hotfix",
-							"config",
-							"rollback"
-						]
+						id: 2,
+						key: 'change_kind',
+						name: 'Change kind',
+						type: 'select',
+						obligatory: true,
+						options: ['feature', 'experiment', 'hotfix', 'config', 'rollback']
 					},
 					{
-						"id": 3,
-						"key": "risk",
-						"name": "Risk",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"low",
-							"medium",
-							"high"
-						]
+						id: 3,
+						key: 'risk',
+						name: 'Risk',
+						type: 'select',
+						obligatory: true,
+						options: ['low', 'medium', 'high']
 					},
 					{
-						"id": 4,
-						"key": "deploy_window",
-						"name": "Deploy window",
-						"type": "text",
-						"obligatory": false
+						id: 4,
+						key: 'deploy_window',
+						name: 'Deploy window',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "rollback_plan",
-						"name": "Rollback plan",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'rollback_plan',
+						name: 'Rollback plan',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "monitoring",
-						"name": "Monitoring / SLO impact",
-						"obligatory": true,
-						"default": ""
+						id: 3,
+						key: 'monitoring',
+						name: 'Monitoring / SLO impact',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "change-failure",
-				"name": "Change Failure / Incident",
-				"icon": "siren",
-				"color": "#ef4444",
-				"default_status": "production",
-				"fields": [
+				id: 'change-failure',
+				name: 'Change Failure / Incident',
+				icon: 'siren',
+				color: '#ef4444',
+				default_status: 'production',
+				fields: [
 					{
-						"id": 1,
-						"key": "severity",
-						"name": "Severity (SEV1 / SEV2 / SEV3)",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"SEV1",
-							"SEV2",
-							"SEV3"
-						]
+						id: 1,
+						key: 'severity',
+						name: 'Severity (SEV1 / SEV2 / SEV3)',
+						type: 'select',
+						obligatory: true,
+						options: ['SEV1', 'SEV2', 'SEV3']
 					},
 					{
-						"id": 2,
-						"key": "detected_at",
-						"name": "Detected at",
-						"type": "date",
-						"obligatory": true
+						id: 2,
+						key: 'detected_at',
+						name: 'Detected at',
+						type: 'date',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "mitigated_at",
-						"name": "Mitigated at",
-						"type": "date",
-						"obligatory": false
+						id: 3,
+						key: 'mitigated_at',
+						name: 'Mitigated at',
+						type: 'date',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "mttr_min",
-						"name": "MTTR (min)",
-						"type": "number",
-						"obligatory": false
+						id: 4,
+						key: 'mttr_min',
+						name: 'MTTR (min)',
+						type: 'number',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "summary",
-						"name": "Summary",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'summary',
+						name: 'Summary',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "root_cause",
-						"name": "Root cause (5-Whys)",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'root_cause',
+						name: 'Root cause (5-Whys)',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "action_items",
-						"name": "Action items (post-incident review)",
-						"obligatory": true,
-						"default": ""
+						id: 3,
+						key: 'action_items',
+						name: 'Action items (post-incident review)',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "deploy",
-				"name": "Deploy",
-				"icon": "rocket",
-				"color": "#10b981",
-				"default_status": "production",
-				"fields": [
+				id: 'deploy',
+				name: 'Deploy',
+				icon: 'rocket',
+				color: '#10b981',
+				default_status: 'production',
+				fields: [
 					{
-						"id": 1,
-						"key": "service",
-						"name": "Service",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'service',
+						name: 'Service',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "environment",
-						"name": "Environment",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"dev",
-							"staging",
-							"prod",
-							"canary"
-						]
+						id: 2,
+						key: 'environment',
+						name: 'Environment',
+						type: 'select',
+						obligatory: true,
+						options: ['dev', 'staging', 'prod', 'canary']
 					},
 					{
-						"id": 3,
-						"key": "build_id",
-						"name": "Build / commit",
-						"type": "text",
-						"obligatory": true
+						id: 3,
+						key: 'build_id',
+						name: 'Build / commit',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "deployer",
-						"name": "Deployer",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'deployer',
+						name: 'Deployer',
+						type: 'user',
+						obligatory: false
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "deploy_log",
-						"name": "Deploy log",
-						"obligatory": false,
-						"default": ""
+						id: 1,
+						key: 'deploy_log',
+						name: 'Deploy log',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "service-level-objective",
-				"name": "SLO / Error Budget",
-				"icon": "gauge",
-				"color": "#a855f7",
-				"default_status": "plan",
-				"fields": [
+				id: 'service-level-objective',
+				name: 'SLO / Error Budget',
+				icon: 'gauge',
+				color: '#a855f7',
+				default_status: 'plan',
+				fields: [
 					{
-						"id": 1,
-						"key": "service",
-						"name": "Service",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'service',
+						name: 'Service',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "indicator",
-						"name": "SLI (e.g. availability / latency p99)",
-						"type": "text",
-						"obligatory": true
+						id: 2,
+						key: 'indicator',
+						name: 'SLI (e.g. availability / latency p99)',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "target",
-						"name": "SLO target",
-						"type": "text",
-						"obligatory": true
+						id: 3,
+						key: 'target',
+						name: 'SLO target',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "window",
-						"name": "Window (28d / 90d)",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"28d",
-							"90d"
-						]
+						id: 4,
+						key: 'window',
+						name: 'Window (28d / 90d)',
+						type: 'select',
+						obligatory: true,
+						options: ['28d', '90d']
 					},
 					{
-						"id": 5,
-						"key": "owner",
-						"name": "SRE owner",
-						"type": "user",
-						"obligatory": true
+						id: 5,
+						key: 'owner',
+						name: 'SRE owner',
+						type: 'user',
+						obligatory: true
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "burn_rate",
-						"name": "Error budget burn rate (per day)",
-						"obligatory": false,
-						"default": ""
+						id: 1,
+						key: 'burn_rate',
+						name: 'Error budget burn rate (per day)',
+						obligatory: false,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "runbook",
-						"name": "Runbook link",
-						"obligatory": false,
-						"default": ""
+						id: 2,
+						key: 'runbook',
+						name: 'Runbook link',
+						obligatory: false,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "okr-driven-agile",
-		"name": "OKR-driven agile",
-		"description": "Los OKRs (Objetivos y Resultados Clave) *no* son un marco de proceso, son una herramienta de alineación de objetivos inventada en Intel. Un *Objetivo* es una meta cualitativa, ambiciosa y con límite de tiempo. Los *Resultados Clave* son 3–5 medidas de progreso cuantitativas. Los OKR complementan un marco de entrega ágil. La contribución de Google fue adoptar los OKR como práctica cultural: cadencia trimestral, 0.7 como puntuación objetivo (1.0 es fracaso), transparencia y desacoplamiento de las evaluaciones de desempeño.",
-		"config": {
-			"product_goal": "Align the team around ambitious objectives with measurable, time-bound key results, scored 0.0–1.0 each quarter.",
-			"definition_of_done": [
-				"Objective is qualitative, ambitious, and time-bound (one quarter).",
-				"Key Result is quantitative, measurable, and scored at quarter-end.",
-				"Final OKR score is between 0.0 and 1.0 (target 0.7; 1.0 means the bar was too low)."
+		id: 'okr-driven-agile',
+		name: 'OKR-driven agile',
+		description:
+			'Los OKRs (Objetivos y Resultados Clave) *no* son un marco de proceso, son una herramienta de alineación de objetivos inventada en Intel. Un *Objetivo* es una meta cualitativa, ambiciosa y con límite de tiempo. Los *Resultados Clave* son 3–5 medidas de progreso cuantitativas. Los OKR complementan un marco de entrega ágil. La contribución de Google fue adoptar los OKR como práctica cultural: cadencia trimestral, 0.7 como puntuación objetivo (1.0 es fracaso), transparencia y desacoplamiento de las evaluaciones de desempeño.',
+		config: {
+			product_goal:
+				'Align the team around ambitious objectives with measurable, time-bound key results, scored 0.0–1.0 each quarter.',
+			definition_of_done: [
+				'Objective is qualitative, ambitious, and time-bound (one quarter).',
+				'Key Result is quantitative, measurable, and scored at quarter-end.',
+				'Final OKR score is between 0.0 and 1.0 (target 0.7; 1.0 means the bar was too low).'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "draft",
-					"name": "Draft",
-					"color": "#a3a3a3",
-					"category": "todo"
+					id: 'draft',
+					name: 'Draft',
+					color: '#a3a3a3',
+					category: 'todo'
 				},
 				{
-					"id": "approved",
-					"name": "Approved",
-					"color": "#0ea5e9",
-					"category": "todo"
+					id: 'approved',
+					name: 'Approved',
+					color: '#0ea5e9',
+					category: 'todo'
 				},
 				{
-					"id": "in_progress",
-					"name": "En progreso",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'in_progress',
+					name: 'En progreso',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "closed",
-					"name": "Closed (scored)",
-					"color": "#10b981",
-					"category": "done"
+					id: 'closed',
+					name: 'Closed (scored)',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "abandoned",
-					"name": "Abandonado",
-					"color": "#a3a3a3",
-					"category": "cancelled"
+					id: 'abandoned',
+					name: 'Abandonado',
+					color: '#a3a3a3',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "draft",
-			"labels": [
+			default_status: 'draft',
+			labels: [
 				{
-					"id": "company-okr",
-					"name": "Company OKR",
-					"color": "#7c3aed"
+					id: 'company-okr',
+					name: 'Company OKR',
+					color: '#7c3aed'
 				},
 				{
-					"id": "tribe-okr",
-					"name": "Tribe / Org OKR",
-					"color": "#a855f7"
+					id: 'tribe-okr',
+					name: 'Tribe / Org OKR',
+					color: '#a855f7'
 				},
 				{
-					"id": "team-okr",
-					"name": "Team OKR",
-					"color": "#3b82f6"
+					id: 'team-okr',
+					name: 'Team OKR',
+					color: '#3b82f6'
 				},
 				{
-					"id": "individual-okr",
-					"name": "Individual OKR",
-					"color": "#0ea5e9"
+					id: 'individual-okr',
+					name: 'Individual OKR',
+					color: '#0ea5e9'
 				},
 				{
-					"id": "aspirational",
-					"name": "Aspirational",
-					"color": "#facc15"
+					id: 'aspirational',
+					name: 'Aspirational',
+					color: '#facc15'
 				},
 				{
-					"id": "committed",
-					"name": "Committed",
-					"color": "#22c55e"
+					id: 'committed',
+					name: 'Committed',
+					color: '#22c55e'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"draft",
-					"approved",
-					"in_progress",
-					"closed"
-				]
+			users: [],
+			kanban: {
+				columns: ['draft', 'approved', 'in_progress', 'closed']
 			},
-			"gantt": {
-				"group_by": "labels",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'labels',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "objective",
-				"name": "Objective",
-				"icon": "telescope",
-				"color": "#a855f7",
-				"default_status": "draft",
-				"fields": [
+				id: 'objective',
+				name: 'Objective',
+				icon: 'telescope',
+				color: '#a855f7',
+				default_status: 'draft',
+				fields: [
 					{
-						"id": 1,
-						"key": "quarter",
-						"name": "Trimestre",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'quarter',
+						name: 'Trimestre',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "owner",
-						"name": "Propietario",
-						"type": "user",
-						"obligatory": true
+						id: 2,
+						key: 'owner',
+						name: 'Propietario',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "level",
-						"name": "Level",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"company-okr",
-							"tribe-okr",
-							"team-okr",
-							"individual-okr"
-						]
+						id: 3,
+						key: 'level',
+						name: 'Level',
+						type: 'select',
+						obligatory: true,
+						options: ['company-okr', 'tribe-okr', 'team-okr', 'individual-okr']
 					},
 					{
-						"id": 4,
-						"key": "aspirational",
-						"name": "Aspirational?",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"aspirational",
-							"committed"
-						]
+						id: 4,
+						key: 'aspirational',
+						name: 'Aspirational?',
+						type: 'select',
+						obligatory: true,
+						options: ['aspirational', 'committed']
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Objective statement (one sentence, qualitative, ambitious)",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Objective statement (one sentence, qualitative, ambitious)',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "why",
-						"name": "Why this objective matters",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'why',
+						name: 'Why this objective matters',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "key-result",
-				"name": "Key Result",
-				"icon": "target",
-				"color": "#3b82f6",
-				"default_status": "draft",
-				"fields": [
+				id: 'key-result',
+				name: 'Key Result',
+				icon: 'target',
+				color: '#3b82f6',
+				default_status: 'draft',
+				fields: [
 					{
-						"id": 1,
-						"key": "objective",
-						"name": "Parent objective",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'objective',
+						name: 'Parent objective',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "baseline",
-						"name": "Valor base",
-						"type": "text",
-						"obligatory": true
+						id: 2,
+						key: 'baseline',
+						name: 'Valor base',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "target",
-						"name": "Valor objetivo",
-						"type": "text",
-						"obligatory": true
+						id: 3,
+						key: 'target',
+						name: 'Valor objetivo',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "current",
-						"name": "Current value",
-						"type": "text",
-						"obligatory": false
+						id: 4,
+						key: 'current',
+						name: 'Current value',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "unit",
-						"name": "Unit (e.g. %, $, count, p99)",
-						"type": "text",
-						"obligatory": true
+						id: 5,
+						key: 'unit',
+						name: 'Unit (e.g. %, $, count, p99)',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 6,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 6,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "description",
-						"name": "Description",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'description',
+						name: 'Description',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "checkins",
-						"name": "Weekly check-ins",
-						"obligatory": false,
-						"default": ""
+						id: 2,
+						key: 'checkins',
+						name: 'Weekly check-ins',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "okr-checkin",
-				"name": "OKR Check-in",
-				"icon": "refresh-cw",
-				"color": "#0ea5e9",
-				"default_status": "in_progress",
-				"fields": [
+				id: 'okr-checkin',
+				name: 'OKR Check-in',
+				icon: 'refresh-cw',
+				color: '#0ea5e9',
+				default_status: 'in_progress',
+				fields: [
 					{
-						"id": 1,
-						"key": "key_result",
-						"name": "Key Result",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'key_result',
+						name: 'Key Result',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "date",
-						"name": "Date",
-						"type": "date",
-						"obligatory": true
+						id: 2,
+						key: 'date',
+						name: 'Date',
+						type: 'date',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "current_value",
-						"name": "Current value",
-						"type": "text",
-						"obligatory": true
+						id: 3,
+						key: 'current_value',
+						name: 'Current value',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "confidence",
-						"name": "Confidence (0-1)",
-						"type": "number",
-						"obligatory": true
+						id: 4,
+						key: 'confidence',
+						name: 'Confidence (0-1)',
+						type: 'number',
+						obligatory: true
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "what_changed",
-						"name": "What changed",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'what_changed',
+						name: 'What changed',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "next_step",
-						"name": "Next step",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'next_step',
+						name: 'Next step',
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "lean-startup",
-		"name": "Lean Startup",
-		"description": "Lean Startup es el \"ágil de los nuevos productos\": *aprendizaje validado* a través de ciclos **Construir-Medir-Aprender**. Las dos mecánicas principales: **Producto Mínimo Viable (MVP)** (lo más pequeño que puedes construir para iniciar el ciclo de aprendizaje) y **Aprendizaje Validado** (decisiones basadas en datos, no en opiniones). Conceptos relacionados: **Contabilidad de Innovación** y **Pivote** (cambiar de dirección, no de visión, cuando los datos lo indican). La cadencia es de *semanas*, no meses.",
-		"config": {
-			"product_goal": "Discover a product that customers actually want, by running fast Build-Measure-Learn loops and pivoting on evidence.",
-			"definition_of_done": [
-				"Hypothesis is falsifiable and recorded before building.",
-				"MVP is the smallest thing that could test the hypothesis.",
-				"Validated learning is recorded and a pivot / persevere decision is made."
+		id: 'lean-startup',
+		name: 'Lean Startup',
+		description:
+			'Lean Startup es el "ágil de los nuevos productos": *aprendizaje validado* a través de ciclos **Construir-Medir-Aprender**. Las dos mecánicas principales: **Producto Mínimo Viable (MVP)** (lo más pequeño que puedes construir para iniciar el ciclo de aprendizaje) y **Aprendizaje Validado** (decisiones basadas en datos, no en opiniones). Conceptos relacionados: **Contabilidad de Innovación** y **Pivote** (cambiar de dirección, no de visión, cuando los datos lo indican). La cadencia es de *semanas*, no meses.',
+		config: {
+			product_goal:
+				'Discover a product that customers actually want, by running fast Build-Measure-Learn loops and pivoting on evidence.',
+			definition_of_done: [
+				'Hypothesis is falsifiable and recorded before building.',
+				'MVP is the smallest thing that could test the hypothesis.',
+				'Validated learning is recorded and a pivot / persevere decision is made.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "hypothesis",
-					"name": "Hypothesis",
-					"color": "#a3a3a3",
-					"category": "todo"
+					id: 'hypothesis',
+					name: 'Hypothesis',
+					color: '#a3a3a3',
+					category: 'todo'
 				},
 				{
-					"id": "build",
-					"name": "Build",
-					"color": "#0ea5e9",
-					"category": "doing"
+					id: 'build',
+					name: 'Build',
+					color: '#0ea5e9',
+					category: 'doing'
 				},
 				{
-					"id": "measure",
-					"name": "Measure",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'measure',
+					name: 'Measure',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "learn",
-					"name": "Learn",
-					"color": "#a855f7",
-					"category": "doing"
+					id: 'learn',
+					name: 'Learn',
+					color: '#a855f7',
+					category: 'doing'
 				},
 				{
-					"id": "validated",
-					"name": "Validated",
-					"color": "#10b981",
-					"category": "done"
+					id: 'validated',
+					name: 'Validated',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "invalidated",
-					"name": "Invalidated (pivot)",
-					"color": "#ef4444",
-					"category": "cancelled"
+					id: 'invalidated',
+					name: 'Invalidated (pivot)',
+					color: '#ef4444',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "hypothesis",
-			"labels": [
+			default_status: 'hypothesis',
+			labels: [
 				{
-					"id": "mvp",
-					"name": "MVP",
-					"color": "#a855f7"
+					id: 'mvp',
+					name: 'MVP',
+					color: '#a855f7'
 				},
 				{
-					"id": "smoke-test",
-					"name": "Smoke test",
-					"color": "#0ea5e9"
+					id: 'smoke-test',
+					name: 'Smoke test',
+					color: '#0ea5e9'
 				},
 				{
-					"id": "concierge",
-					"name": "Concierge MVP",
-					"color": "#facc15"
+					id: 'concierge',
+					name: 'Concierge MVP',
+					color: '#facc15'
 				},
 				{
-					"id": "wizard-of-oz",
-					"name": "Wizard of Oz",
-					"color": "#22c55e"
+					id: 'wizard-of-oz',
+					name: 'Wizard of Oz',
+					color: '#22c55e'
 				},
 				{
-					"id": "pivot-zoom-in",
-					"name": "Pivot: zoom-in",
-					"color": "#dc2626"
+					id: 'pivot-zoom-in',
+					name: 'Pivot: zoom-in',
+					color: '#dc2626'
 				},
 				{
-					"id": "pivot-zoom-out",
-					"name": "Pivot: zoom-out",
-					"color": "#dc2626"
+					id: 'pivot-zoom-out',
+					name: 'Pivot: zoom-out',
+					color: '#dc2626'
 				},
 				{
-					"id": "pivot-segment",
-					"name": "Pivot: customer segment",
-					"color": "#dc2626"
+					id: 'pivot-segment',
+					name: 'Pivot: customer segment',
+					color: '#dc2626'
 				},
 				{
-					"id": "pivot-need",
-					"name": "Pivot: customer need",
-					"color": "#dc2626"
+					id: 'pivot-need',
+					name: 'Pivot: customer need',
+					color: '#dc2626'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"hypothesis",
-					"build",
-					"measure",
-					"learn",
-					"validated"
-				]
+			users: [],
+			kanban: {
+				columns: ['hypothesis', 'build', 'measure', 'learn', 'validated']
 			},
-			"gantt": {
-				"group_by": "issue_type",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'issue_type',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "hypothesis",
-				"name": "Hypothesis",
-				"icon": "lightbulb",
-				"color": "#a855f7",
-				"default_status": "hypothesis",
-				"fields": [
+				id: 'hypothesis',
+				name: 'Hypothesis',
+				icon: 'lightbulb',
+				color: '#a855f7',
+				default_status: 'hypothesis',
+				fields: [
 					{
-						"id": 1,
-						"key": "persona",
-						"name": "Persona",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'persona',
+						name: 'Persona',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "falsifiable_if",
-						"name": "Falsifiable if...",
-						"type": "text",
-						"obligatory": true
+						id: 2,
+						key: 'falsifiable_if',
+						name: 'Falsifiable if...',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "owner",
-						"name": "Propietario",
-						"type": "user",
-						"obligatory": true
+						id: 3,
+						key: 'owner',
+						name: 'Propietario',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 4,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "we_believe",
-						"name": "We believe that...",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'we_believe',
+						name: 'We believe that...',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "because",
-						"name": "Because...",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'because',
+						name: 'Because...',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "mvp-experiment",
-				"name": "MVP Experiment",
-				"icon": "flask-conical",
-				"color": "#0ea5e9",
-				"default_status": "build",
-				"fields": [
+				id: 'mvp-experiment',
+				name: 'MVP Experiment',
+				icon: 'flask-conical',
+				color: '#0ea5e9',
+				default_status: 'build',
+				fields: [
 					{
-						"id": 1,
-						"key": "hypothesis",
-						"name": "Hypothesis",
-						"type": "text",
-						"obligatory": true
+						id: 1,
+						key: 'hypothesis',
+						name: 'Hypothesis',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "mvp_kind",
-						"name": "MVP kind",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"mvp",
-							"smoke-test",
-							"concierge",
-							"wizard-of-oz"
-						]
+						id: 2,
+						key: 'mvp_kind',
+						name: 'MVP kind',
+						type: 'select',
+						obligatory: true,
+						options: ['mvp', 'smoke-test', 'concierge', 'wizard-of-oz']
 					},
 					{
-						"id": 3,
-						"key": "primary_metric",
-						"name": "Primary metric",
-						"type": "text",
-						"obligatory": true
+						id: 3,
+						key: 'primary_metric',
+						name: 'Primary metric',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "min_sample_size",
-						"name": "Min sample size",
-						"type": "number",
-						"obligatory": true
+						id: 4,
+						key: 'min_sample_size',
+						name: 'Min sample size',
+						type: 'number',
+						obligatory: true
 					},
 					{
-						"id": 5,
-						"key": "owner",
-						"name": "Propietario",
-						"type": "user",
-						"obligatory": true
+						id: 5,
+						key: 'owner',
+						name: 'Propietario',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 6,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 6,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "experiment",
-						"name": "Experiment design",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'experiment',
+						name: 'Experiment design',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "results",
-						"name": "Results & learning",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'results',
+						name: 'Results & learning',
+						obligatory: true,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "pivot-decision",
-				"name": "Pivot Decision",
-				"icon": "git-branch",
-				"color": "#ef4444",
-				"default_status": "learn",
-				"fields": [
+				id: 'pivot-decision',
+				name: 'Pivot Decision',
+				icon: 'git-branch',
+				color: '#ef4444',
+				default_status: 'learn',
+				fields: [
 					{
-						"id": 1,
-						"key": "decision",
-						"name": "Decision",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"pivot-zoom-in",
-							"pivot-zoom-out",
-							"pivot-segment",
-							"pivot-need",
-							"persevere"
-						]
+						id: 1,
+						key: 'decision',
+						name: 'Decision',
+						type: 'select',
+						obligatory: true,
+						options: ['pivot-zoom-in', 'pivot-zoom-out', 'pivot-segment', 'pivot-need', 'persevere']
 					},
 					{
-						"id": 2,
-						"key": "evidence",
-						"name": "Evidence (links to experiments)",
-						"type": "text",
-						"obligatory": true
+						id: 2,
+						key: 'evidence',
+						name: 'Evidence (links to experiments)',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "owner",
-						"name": "Decision owner",
-						"type": "user",
-						"obligatory": true
+						id: 3,
+						key: 'owner',
+						name: 'Decision owner',
+						type: 'user',
+						obligatory: true
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "narrative",
-						"name": "Decision narrative",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'narrative',
+						name: 'Decision narrative',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "next_hypothesis",
-						"name": "Next hypothesis",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'next_hypothesis',
+						name: 'Next hypothesis',
+						obligatory: true,
+						default: ''
 					}
 				]
 			}
 		]
 	},
 	{
-		"id": "water-scrum-fall",
-		"name": "Water-Scrum-Fall",
-		"description": "Water-Scrum-Fall es el *patrón observado* en TI empresarial regulada: fuertes requisitos iniciales (Water), un medio con Scrum o Kanban, y trabajo especializado final (Fall). Larman & Vodde lo documentaron como la situación típica anti-LeSS, y la realidad práctica de la mayoría de las empresas de TI. *No* es un marco en el sentido prescriptivo, sino un *patrón* que el equipo debe aceptar antes de poder reducir el Water o el Fall.",
-		"config": {
-			"product_goal": "Bridge upstream requirements (Water) and downstream deployment / compliance (Fall) with an agile middle (Scrum) — without pretending the Fall is Scrum.",
-			"definition_of_done": [
-				"Requirement is signed off by the upstream BA and the business sponsor.",
-				"User story is integrated and tested end-to-end by the Scrum team.",
-				"Integration task has cleared the Fall gate (compliance, security, deployment, etc.).",
-				"Release package is approved for production."
+		id: 'water-scrum-fall',
+		name: 'Water-Scrum-Fall',
+		description:
+			'Water-Scrum-Fall es el *patrón observado* en TI empresarial regulada: fuertes requisitos iniciales (Water), un medio con Scrum o Kanban, y trabajo especializado final (Fall). Larman & Vodde lo documentaron como la situación típica anti-LeSS, y la realidad práctica de la mayoría de las empresas de TI. *No* es un marco en el sentido prescriptivo, sino un *patrón* que el equipo debe aceptar antes de poder reducir el Water o el Fall.',
+		config: {
+			product_goal:
+				'Bridge upstream requirements (Water) and downstream deployment / compliance (Fall) with an agile middle (Scrum) — without pretending the Fall is Scrum.',
+			definition_of_done: [
+				'Requirement is signed off by the upstream BA and the business sponsor.',
+				'User story is integrated and tested end-to-end by the Scrum team.',
+				'Integration task has cleared the Fall gate (compliance, security, deployment, etc.).',
+				'Release package is approved for production.'
 			],
-			"statuses": [
+			statuses: [
 				{
-					"id": "water",
-					"name": "Water (requirements)",
-					"color": "#a3a3a3",
-					"category": "todo"
+					id: 'water',
+					name: 'Water (requirements)',
+					color: '#a3a3a3',
+					category: 'todo'
 				},
 				{
-					"id": "ready",
-					"name": "Ready (Sprint planning)",
-					"color": "#0ea5e9",
-					"category": "todo"
+					id: 'ready',
+					name: 'Ready (Sprint planning)',
+					color: '#0ea5e9',
+					category: 'todo'
 				},
 				{
-					"id": "in_progress",
-					"name": "In progress (Scrum)",
-					"color": "#3b82f6",
-					"category": "doing"
+					id: 'in_progress',
+					name: 'In progress (Scrum)',
+					color: '#3b82f6',
+					category: 'doing'
 				},
 				{
-					"id": "integration",
-					"name": "Integration (Fall)",
-					"color": "#a855f7",
-					"category": "doing"
+					id: 'integration',
+					name: 'Integration (Fall)',
+					color: '#a855f7',
+					category: 'doing'
 				},
 				{
-					"id": "release",
-					"name": "Release",
-					"color": "#f59e0b",
-					"category": "doing"
+					id: 'release',
+					name: 'Release',
+					color: '#f59e0b',
+					category: 'doing'
 				},
 				{
-					"id": "deployed",
-					"name": "Desplegado",
-					"color": "#10b981",
-					"category": "done"
+					id: 'deployed',
+					name: 'Desplegado',
+					color: '#10b981',
+					category: 'done'
 				},
 				{
-					"id": "rejected",
-					"name": "Rejected (upstream)",
-					"color": "#ef4444",
-					"category": "cancelled"
+					id: 'rejected',
+					name: 'Rejected (upstream)',
+					color: '#ef4444',
+					category: 'cancelled'
 				}
 			],
-			"default_status": "water",
-			"labels": [
+			default_status: 'water',
+			labels: [
 				{
-					"id": "ba",
-					"name": "BA-owned",
-					"color": "#a855f7"
+					id: 'ba',
+					name: 'BA-owned',
+					color: '#a855f7'
 				},
 				{
-					"id": "compliance",
-					"name": "Compliance",
-					"color": "#0f766e"
+					id: 'compliance',
+					name: 'Compliance',
+					color: '#0f766e'
 				},
 				{
-					"id": "security",
-					"name": "Security",
-					"color": "#dc2626"
+					id: 'security',
+					name: 'Security',
+					color: '#dc2626'
 				},
 				{
-					"id": "legal",
-					"name": "Legal",
-					"color": "#a3a3a3"
+					id: 'legal',
+					name: 'Legal',
+					color: '#a3a3a3'
 				},
 				{
-					"id": "hardware",
-					"name": "Hardware / Infra",
-					"color": "#facc15"
+					id: 'hardware',
+					name: 'Hardware / Infra',
+					color: '#facc15'
 				},
 				{
-					"id": "upstream-blocked",
-					"name": "Upstream blocked",
-					"color": "#ef4444"
+					id: 'upstream-blocked',
+					name: 'Upstream blocked',
+					color: '#ef4444'
 				}
 			],
-			"users": [],
-			"kanban": {
-				"columns": [
-					"water",
-					"ready",
-					"in_progress",
-					"integration",
-					"release",
-					"deployed"
-				]
+			users: [],
+			kanban: {
+				columns: ['water', 'ready', 'in_progress', 'integration', 'release', 'deployed']
 			},
-			"gantt": {
-				"group_by": "issue_type",
-				"default_view": "weeks"
+			gantt: {
+				group_by: 'issue_type',
+				default_view: 'weeks'
 			},
-			"remote": {
-				"cors_proxy": "https://cors.isomorphic-git.org"
+			remote: {
+				cors_proxy: 'https://cors.isomorphic-git.org'
 			}
 		},
-		"templates": [
+		templates: [
 			{
-				"id": "user-story",
-				"name": "Historia de Usuario",
-				"icon": "book-open",
-				"color": "#3b82f6",
-				"default_status": "open",
-				"fields": [
+				id: 'user-story',
+				name: 'Historia de Usuario',
+				icon: 'book-open',
+				color: '#3b82f6',
+				default_status: 'open',
+				fields: [
 					{
-						"id": 1,
-						"key": "story_points",
-						"name": "Puntos de historia",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"1",
-							"2",
-							"3",
-							"5",
-							"8",
-							"13",
-							"21"
-						]
+						id: 1,
+						key: 'story_points',
+						name: 'Puntos de historia',
+						type: 'select',
+						obligatory: true,
+						options: ['1', '2', '3', '5', '8', '13', '21']
 					},
 					{
-						"id": 2,
-						"key": "priority",
-						"name": "Prioridad",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"p0",
-							"p1",
-							"p2",
-							"p3"
-						]
+						id: 2,
+						key: 'priority',
+						name: 'Prioridad',
+						type: 'select',
+						obligatory: true,
+						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						"id": 3,
-						"key": "sprint",
-						"name": "Sprint",
-						"type": "text",
-						"obligatory": false
+						id: 3,
+						key: 'sprint',
+						name: 'Sprint',
+						type: 'text',
+						obligatory: false
 					},
 					{
-						"id": 4,
-						"key": "assignee",
-						"name": "Responsable",
-						"type": "user",
-						"obligatory": false
+						id: 4,
+						key: 'assignee',
+						name: 'Responsable',
+						type: 'user',
+						obligatory: false
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "user_story",
-						"name": "User story",
-						"obligatory": true,
-						"default": "**As a** ___\n**I want** ___\n**so that** ___."
+						id: 1,
+						key: 'user_story',
+						name: 'User story',
+						obligatory: true,
+						default: '**As a** ___\n**I want** ___\n**so that** ___.'
 					},
 					{
-						"id": 2,
-						"key": "acceptance",
-						"name": "Acceptance criteria",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'acceptance',
+						name: 'Acceptance criteria',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "notes",
-						"name": "Notes & assumptions",
-						"obligatory": false,
-						"default": ""
+						id: 3,
+						key: 'notes',
+						name: 'Notes & assumptions',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "requirement",
-				"name": "Upstream Requirement",
-				"icon": "file-text",
-				"color": "#a855f7",
-				"default_status": "water",
-				"fields": [
+				id: 'requirement',
+				name: 'Upstream Requirement',
+				icon: 'file-text',
+				color: '#a855f7',
+				default_status: 'water',
+				fields: [
 					{
-						"id": 1,
-						"key": "ba_owner",
-						"name": "BA owner",
-						"type": "user",
-						"obligatory": true
+						id: 1,
+						key: 'ba_owner',
+						name: 'BA owner',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "sponsor",
-						"name": "Business sponsor",
-						"type": "user",
-						"obligatory": true
+						id: 2,
+						key: 'sponsor',
+						name: 'Business sponsor',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "priority",
-						"name": "Priority (MoSCoW)",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"must",
-							"should",
-							"could",
-							"wont"
-						]
+						id: 3,
+						key: 'priority',
+						name: 'Priority (MoSCoW)',
+						type: 'select',
+						obligatory: true,
+						options: ['must', 'should', 'could', 'wont']
 					},
 					{
-						"id": 4,
-						"key": "upstream_gate",
-						"name": "Upstream gate",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"ba-review",
-							"legal-review",
-							"security-review"
-						]
+						id: 4,
+						key: 'upstream_gate',
+						name: 'Upstream gate',
+						type: 'select',
+						obligatory: true,
+						options: ['ba-review', 'legal-review', 'security-review']
 					},
 					{
-						"id": 5,
-						"key": "labels",
-						"name": "Etiquetas",
-						"type": "multi-select",
-						"obligatory": false,
-						"options_source": "config.labels"
+						id: 5,
+						key: 'labels',
+						name: 'Etiquetas',
+						type: 'multi-select',
+						obligatory: false,
+						options_source: 'config.labels'
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "business_need",
-						"name": "Business need",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'business_need',
+						name: 'Business need',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "brd_link",
-						"name": "BRD / FRD link",
-						"obligatory": true,
-						"default": ""
+						id: 2,
+						key: 'brd_link',
+						name: 'BRD / FRD link',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 3,
-						"key": "acceptance",
-						"name": "Acceptance criteria",
-						"obligatory": true,
-						"default": ""
+						id: 3,
+						key: 'acceptance',
+						name: 'Acceptance criteria',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 4,
-						"key": "sign_off",
-						"name": "Sign-off log",
-						"obligatory": false,
-						"default": ""
+						id: 4,
+						key: 'sign_off',
+						name: 'Sign-off log',
+						obligatory: false,
+						default: ''
 					}
 				]
 			},
 			{
-				"id": "release-package",
-				"name": "Release Package",
-				"icon": "package-open",
-				"color": "#10b981",
-				"default_status": "integration",
-				"fields": [
+				id: 'release-package',
+				name: 'Release Package',
+				icon: 'package-open',
+				color: '#10b981',
+				default_status: 'integration',
+				fields: [
 					{
-						"id": 1,
-						"key": "release_date",
-						"name": "Release date",
-						"type": "date",
-						"obligatory": true
+						id: 1,
+						key: 'release_date',
+						name: 'Release date',
+						type: 'date',
+						obligatory: true
 					},
 					{
-						"id": 2,
-						"key": "fall_owner",
-						"name": "Fall owner",
-						"type": "user",
-						"obligatory": true
+						id: 2,
+						key: 'fall_owner',
+						name: 'Fall owner',
+						type: 'user',
+						obligatory: true
 					},
 					{
-						"id": 3,
-						"key": "environments",
-						"name": "Environments (dev/staging/prod)",
-						"type": "text",
-						"obligatory": true
+						id: 3,
+						key: 'environments',
+						name: 'Environments (dev/staging/prod)',
+						type: 'text',
+						obligatory: true
 					},
 					{
-						"id": 4,
-						"key": "rollout_kind",
-						"name": "Rollout kind",
-						"type": "select",
-						"obligatory": true,
-						"options": [
-							"blue-green",
-							"canary",
-							"feature-flag",
-							"big-bang"
-						]
+						id: 4,
+						key: 'rollout_kind',
+						name: 'Rollout kind',
+						type: 'select',
+						obligatory: true,
+						options: ['blue-green', 'canary', 'feature-flag', 'big-bang']
 					},
 					{
-						"id": 5,
-						"key": "rollback_runbook",
-						"name": "Rollback runbook",
-						"type": "text",
-						"obligatory": true
+						id: 5,
+						key: 'rollback_runbook',
+						name: 'Rollback runbook',
+						type: 'text',
+						obligatory: true
 					}
 				],
-				"sections": [
+				sections: [
 					{
-						"id": 1,
-						"key": "contents",
-						"name": "Contents (linked user stories, requirements, integration tasks)",
-						"obligatory": true,
-						"default": ""
+						id: 1,
+						key: 'contents',
+						name: 'Contents (linked user stories, requirements, integration tasks)',
+						obligatory: true,
+						default: ''
 					},
 					{
-						"id": 2,
-						"key": "change_advisory",
-						"name": "Change advisory board notes",
-						"obligatory": false,
-						"default": ""
+						id: 2,
+						key: 'change_advisory',
+						name: 'Change advisory board notes',
+						obligatory: false,
+						default: ''
 					}
 				]
 			}

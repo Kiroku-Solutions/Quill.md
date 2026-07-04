@@ -67,6 +67,7 @@ export const en = {
 			kanban: 'Kanban',
 			gantt: 'Gantt',
 			graph: 'Graph',
+			tree: 'Tree',
 			backlog: 'Backlog',
 			sprint: 'Sprint Planner'
 		},
@@ -198,8 +199,7 @@ export const en = {
 	},
 
 	formFields: {
-		issueTypeDisabledNote:
-			'Item type cannot be changed after creation — create a new one instead.',
+		issueTypeDisabledNote: 'Item type cannot be changed after creation — create a new one instead.',
 		assigneePlaceholder: 'Unassigned',
 		selectPlaceholder: 'Select…',
 		noIssues: 'No items',
@@ -351,7 +351,8 @@ export const en = {
 		noFolder: 'No local folder is open. Use "Open local folder" on the home page.',
 		applyError: (params: Params) => `Failed to write the wizard setup: ${params.msg}`,
 		selectFrameworkAria: (params: Params) => `Select framework ${params.name}`,
-		frameworkIncludes: (params: Params) => `Includes ${params.templates} templates · ${params.statuses} statuses`
+		frameworkIncludes: (params: Params) =>
+			`Includes ${params.templates} templates · ${params.statuses} statuses`
 	},
 	sprint: {
 		progress: 'Sprint Progress',
@@ -419,13 +420,17 @@ export const en = {
 		typesHelpText:
 			'• Short Text: For names or brief titles.\n• Long Text: For extensive descriptions or details.\n• Date: Calendar picker.\n• Number: Quantities, estimates or metrics.\n• Single/Multi Select: Predefined labels and categories.\n• User: Assign to team members.\n• Relations: Blockers or dependencies with other items.',
 		basicHelp: 'What is basic info?',
-		basicHelpText: 'The Name is what you see in the UI (e.g. "Use Case"). The System ID is the unique identifier on disk; it is used internally and should not change once created.',
+		basicHelpText:
+			'The Name is what you see in the UI (e.g. "Use Case"). The System ID is the unique identifier on disk; it is used internally and should not change once created.',
 		appearanceHelp: 'What is appearance for?',
-		appearanceHelpText: 'The icon and color will visually identify items of this category across the Kanban boards, Gantt charts, and lists.',
+		appearanceHelpText:
+			'The icon and color will visually identify items of this category across the Kanban boards, Gantt charts, and lists.',
 		fieldsHelp: 'What are data fields?',
-		fieldsHelpText: 'Fields are specific properties (metadata) you want to track for this item (e.g. Priority, Story Points, or Due Date). They will appear on the right sidebar of the item.',
+		fieldsHelpText:
+			'Fields are specific properties (metadata) you want to track for this item (e.g. Priority, Story Points, or Due Date). They will appear on the right sidebar of the item.',
 		sectionsHelp: 'What are content blocks?',
-		sectionsHelpText: 'These are the main free-text Markdown areas. Useful for sections like "Acceptance Criteria", "Context" or "Steps to reproduce". They will appear in the main body of the item.',
+		sectionsHelpText:
+			'These are the main free-text Markdown areas. Useful for sections like "Acceptance Criteria", "Context" or "Steps to reproduce". They will appear in the main body of the item.',
 		loadExample: 'Load Sample Example',
 		example: {
 			name: 'Critical Incident',
@@ -441,7 +446,8 @@ export const en = {
 		allowedTargets: 'Allowed Categories',
 		allowedTargetsHint: 'If none are checked, linking with any item will be allowed.',
 		allowedRelationTypes: 'Allowed Relation Types',
-		allowedRelationTypesHint: 'If none are checked, all types (Parent, Child, Blocks, etc.) will be allowed.'
+		allowedRelationTypesHint:
+			'If none are checked, all types (Parent, Child, Blocks, etc.) will be allowed.'
 	}
 };
 

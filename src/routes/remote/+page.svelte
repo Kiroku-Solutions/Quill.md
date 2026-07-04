@@ -26,6 +26,7 @@
 	import SprintView from '$lib/components/SprintView.svelte';
 	import EditorPanel from '$lib/components/EditorPanel.svelte';
 	import GraphView from '$lib/components/GraphView.svelte';
+	import TreeView from '$lib/components/TreeView.svelte';
 	import FilterUrlSync from '$lib/components/FilterUrlSync.svelte';
 	import RemoteToolbar from '$lib/components/RemoteToolbar.svelte';
 
@@ -49,6 +50,8 @@
 			<KanbanView />
 		{:else if stores.view.view === 'graph'}
 			<GraphView />
+		{:else if stores.view.view === 'tree'}
+			<TreeView />
 		{:else if stores.view.view === 'gantt'}
 			<GanttView />
 		{:else if stores.view.view === 'backlog'}

@@ -73,7 +73,8 @@
 							const pre = node.parentElement;
 							if (pre && pre.tagName === 'PRE') {
 								const wrapper = document.createElement('div');
-								wrapper.className = 'mermaid-wrapper relative group rounded-md border border-border bg-surface my-4';
+								wrapper.className =
+									'mermaid-wrapper relative group rounded-md border border-border bg-surface my-4';
 
 								const div = document.createElement('div');
 								div.className = 'mermaid p-4 flex justify-center overflow-x-auto';
@@ -82,11 +83,13 @@
 								wrapper.appendChild(div);
 
 								const btnGroup = document.createElement('div');
-								btnGroup.className = 'absolute top-2 right-2 z-10 flex gap-1 p-1 rounded-md bg-surface border border-border shadow-sm opacity-0 group-hover:opacity-100 transition-opacity';
+								btnGroup.className =
+									'absolute top-2 right-2 z-10 flex gap-1 p-1 rounded-md bg-surface border border-border shadow-sm opacity-0 group-hover:opacity-100 transition-opacity';
 
 								const createBtn = (icon: string, title: string, onClick: () => void) => {
 									const b = document.createElement('button');
-									b.className = 'p-1.5 rounded hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer';
+									b.className =
+										'p-1.5 rounded hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer';
 									b.title = title;
 									b.innerHTML = icon;
 									b.onclick = onClick;
@@ -96,7 +99,7 @@
 								let currentScale = 1;
 								let originalWidth: number | null = null;
 								let originalHeight: number | null = null;
-								
+
 								const zoomInIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/><path d="M11 8v6"/></svg>`;
 								const zoomOutIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/></svg>`;
 								const resetIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`;
@@ -130,51 +133,73 @@
 									}
 								};
 
-								btnGroup.appendChild(createBtn(zoomInIcon, t('common.zoomIn') || 'Zoom In', () => { currentScale += 0.25; updateZoom(); }));
-								btnGroup.appendChild(createBtn(zoomOutIcon, t('common.zoomOut') || 'Zoom Out', () => { currentScale = Math.max(0.25, currentScale - 0.25); updateZoom(); }));
-								btnGroup.appendChild(createBtn(resetIcon, t('common.resetZoom') || 'Reset Zoom', () => { currentScale = 1; updateZoom(); }));
-								
-								btnGroup.appendChild(createBtn(downloadIcon, t('common.download') || 'Download PNG', () => {
-									const svg = div.querySelector('svg');
-									if (!svg) return;
-									const clone = svg.cloneNode(true) as SVGSVGElement;
-									const box = svg.getBoundingClientRect();
-									const unscaledWidth = box.width / currentScale;
-									const unscaledHeight = box.height / currentScale;
-									
-									clone.style.transform = 'none';
-									clone.setAttribute('width', String(unscaledWidth));
-									clone.setAttribute('height', String(unscaledHeight));
-									
-									const svgData = new XMLSerializer().serializeToString(clone);
-									const canvas = document.createElement('canvas');
-									canvas.width = unscaledWidth * 2;
-									canvas.height = unscaledHeight * 2;
-									const ctx = canvas.getContext('2d');
-									if (!ctx) return;
-									ctx.scale(2, 2);
-									ctx.fillStyle = '#ffffff';
-									ctx.fillRect(0, 0, canvas.width, canvas.height);
-									
-									const img = new Image();
-									img.onload = () => {
-										ctx.drawImage(img, 0, 0);
-										const a = document.createElement('a');
-										a.download = `diagram-${Date.now()}.png`;
-										a.href = canvas.toDataURL('image/png');
-										a.click();
-									};
-									img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
-								}));
+								btnGroup.appendChild(
+									createBtn(zoomInIcon, t('common.zoomIn') || 'Zoom In', () => {
+										currentScale += 0.25;
+										updateZoom();
+									})
+								);
+								btnGroup.appendChild(
+									createBtn(zoomOutIcon, t('common.zoomOut') || 'Zoom Out', () => {
+										currentScale = Math.max(0.25, currentScale - 0.25);
+										updateZoom();
+									})
+								);
+								btnGroup.appendChild(
+									createBtn(resetIcon, t('common.resetZoom') || 'Reset Zoom', () => {
+										currentScale = 1;
+										updateZoom();
+									})
+								);
 
-								const fsBtn = createBtn(maximizeIcon, t('common.fullscreen') || 'Fullscreen', () => {
-									if (document.fullscreenElement) {
-										document.exitFullscreen().catch(console.error);
-									} else {
-										wrapper.requestFullscreen().catch(console.error);
+								btnGroup.appendChild(
+									createBtn(downloadIcon, t('common.download') || 'Download PNG', () => {
+										const svg = div.querySelector('svg');
+										if (!svg) return;
+										const clone = svg.cloneNode(true) as SVGSVGElement;
+										const box = svg.getBoundingClientRect();
+										const unscaledWidth = box.width / currentScale;
+										const unscaledHeight = box.height / currentScale;
+
+										clone.style.transform = 'none';
+										clone.setAttribute('width', String(unscaledWidth));
+										clone.setAttribute('height', String(unscaledHeight));
+
+										const svgData = new XMLSerializer().serializeToString(clone);
+										const canvas = document.createElement('canvas');
+										canvas.width = unscaledWidth * 2;
+										canvas.height = unscaledHeight * 2;
+										const ctx = canvas.getContext('2d');
+										if (!ctx) return;
+										ctx.scale(2, 2);
+										ctx.fillStyle = '#ffffff';
+										ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+										const img = new Image();
+										img.onload = () => {
+											ctx.drawImage(img, 0, 0);
+											const a = document.createElement('a');
+											a.download = `diagram-${Date.now()}.png`;
+											a.href = canvas.toDataURL('image/png');
+											a.click();
+										};
+										img.src =
+											'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+									})
+								);
+
+								const fsBtn = createBtn(
+									maximizeIcon,
+									t('common.fullscreen') || 'Fullscreen',
+									() => {
+										if (document.fullscreenElement) {
+											document.exitFullscreen().catch(console.error);
+										} else {
+											wrapper.requestFullscreen().catch(console.error);
+										}
 									}
-								});
-								
+								);
+
 								wrapper.addEventListener('fullscreenchange', () => {
 									if (document.fullscreenElement === wrapper) {
 										fsBtn.innerHTML = minimizeIcon;

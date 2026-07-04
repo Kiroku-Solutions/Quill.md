@@ -91,10 +91,7 @@
 >
 	{#if mode === 'local' || mode === 'remote'}
 		<div class="md:hidden flex-shrink-0 -ml-2 mr-1">
-			<IconButton
-				label={t('topbar.toggleMobileNav')}
-				onclick={() => stores.ui.toggleMobileNav()}
-			>
+			<IconButton label={t('topbar.toggleMobileNav')} onclick={() => stores.ui.toggleMobileNav()}>
 				<MenuIcon class="h-6 w-6" aria-hidden="true" />
 			</IconButton>
 		</div>

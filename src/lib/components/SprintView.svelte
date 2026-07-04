@@ -84,10 +84,7 @@
 			return linksToSprint || sprintLinksToStory;
 		});
 		const count = related.length;
-		const points = related.reduce(
-			(acc, story) => acc + (Number(story.estimate) || 0),
-			0
-		);
+		const points = related.reduce((acc, story) => acc + (Number(story.estimate) || 0), 0);
 		const completed = related.filter((s) => s.status === 'done' || s.status === 'closed').length;
 		const progress = count > 0 ? Math.round((completed / count) * 100) : 0;
 		return { count, points, progress };

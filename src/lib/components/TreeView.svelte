@@ -5,7 +5,6 @@
 
 	let container: HTMLDivElement | undefined = $state();
 	let graph: any;
-	let is3D = $state(true);
 
 	function buildGraphData() {
 		let nodes: any[] = [];
@@ -112,7 +111,6 @@
 		for (const node of nodes) {
 			const deg = degrees.get(node.id) || 0;
 			// Base volume is 3. Each connection adds 1.5 to volume.
-			// The library calculates radius = cbrt(val), so volume grows linearly with connections.
 			node.val = 3 + deg * 1.5;
 		}
 
@@ -139,7 +137,6 @@
 	$effect(() => {
 		if (!container) return;
 
-		const currentIs3D = is3D;
 		let currentGraph: any = null;
 		let mounted = true;
 
@@ -160,44 +157,25 @@
 			const linkColorStr =
 				theme.theme === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.7)';
 
-			if (currentIs3D) {
-				const module = await import('3d-force-graph');
-				const ForceGraph3D = module.default;
-				if (!mounted) return;
+			const module = await import('force-graph');
+			const ForceGraph2D = module.default;
+			if (!mounted) return;
 
-				currentGraph = (ForceGraph3D as any)()(container)
-					.nodeLabel('name')
-					.nodeColor((n: any) => n.color || undefined)
-					.nodeAutoColorBy('groupId')
-					.nodeVal('val')
-					.linkColor(() => linkColorStr)
-					.linkDirectionalArrowLength(3.5)
-					.linkDirectionalArrowRelPos(1)
-					.backgroundColor('#00000000')
-					.onNodeClick((node: any) => {
-						if (!node.id.startsWith('debug-')) {
-							editor.open(Number(node.id));
-						}
-					});
-			} else {
-				const module = await import('force-graph');
-				const ForceGraph2D = module.default;
-				if (!mounted) return;
-
-				currentGraph = (ForceGraph2D as any)()(container)
-					.nodeLabel('name')
-					.nodeColor((n: any) => n.color || undefined)
-					.nodeAutoColorBy('groupId')
-					.nodeVal('val')
-					.linkColor(() => linkColorStr)
-					.linkDirectionalArrowLength(3.5)
-					.linkDirectionalArrowRelPos(1)
-					.onNodeClick((node: any) => {
-						if (!node.id.startsWith('debug-')) {
-							editor.open(Number(node.id));
-						}
-					});
-			}
+			currentGraph = (ForceGraph2D as any)()(container)
+				.dagMode('td') // Top-Down DAG mode
+				.dagLevelDistance(60)
+				.nodeLabel('name')
+				.nodeColor((n: any) => n.color || undefined)
+				.nodeAutoColorBy('groupId')
+				.nodeVal('val')
+				.linkColor(() => linkColorStr)
+				.linkDirectionalArrowLength(3.5)
+				.linkDirectionalArrowRelPos(1)
+				.onNodeClick((node: any) => {
+					if (!node.id.startsWith('debug-')) {
+						editor.open(Number(node.id));
+					}
+				});
 
 			currentGraph.graphData(data);
 
@@ -245,44 +223,4 @@
 
 <div class="relative w-full h-full bg-surface overflow-hidden">
 	<div bind:this={container} class="absolute inset-0"></div>
-
-	<!-- 2D/3D Toggle -->
-	<div
-		class="absolute bottom-6 right-6 flex items-center gap-2 bg-background/80 backdrop-blur border border-border p-2 rounded-lg shadow-sm z-10"
-	>
-		<span
-			class="text-[11px] font-bold uppercase tracking-widest {is3D
-				? 'text-muted-foreground'
-				: 'text-primary'}">2D</span
-		>
-		<button
-			type="button"
-			class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-			onclick={() => (is3D = !is3D)}
-			aria-pressed={is3D}
-		>
-			<span class="sr-only">Toggle 3D mode</span>
-			<span
-				aria-hidden="true"
-				class="pointer-events-none absolute h-full w-full rounded-md bg-transparent"
-			></span>
-			<span
-				aria-hidden="true"
-				class="pointer-events-none mx-auto h-4 w-9 rounded-full {is3D
-					? 'bg-primary'
-					: 'bg-muted-foreground'} transition-colors duration-200 ease-in-out"
-			></span>
-			<span
-				aria-hidden="true"
-				class="pointer-events-none absolute left-0 inline-block h-5 w-5 transform rounded-full border border-border bg-background shadow ring-0 transition-transform duration-200 ease-in-out {is3D
-					? 'translate-x-4'
-					: 'translate-x-0'}"
-			></span>
-		</button>
-		<span
-			class="text-[11px] font-bold uppercase tracking-widest {is3D
-				? 'text-primary'
-				: 'text-muted-foreground'}">3D</span
-		>
-	</div>
 </div>

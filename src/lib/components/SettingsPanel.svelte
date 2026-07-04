@@ -233,12 +233,19 @@
 
 			<section class="mt-6 flex flex-col gap-2" data-testid="settings-templates">
 				<div class="flex items-center justify-between">
-					<h3 class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center justify-between">
+					<h3
+						class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center justify-between"
+					>
 						<span>{t('settings.templatesHeading')}</span>
 					</h3>
 					<div class="flex items-center gap-2">
-
-						<Button variant="secondary" size="sm" class="h-6 text-xs px-2" onclick={() => (editorOpen = true)} disabled={!localAdapter}>
+						<Button
+							variant="secondary"
+							size="sm"
+							class="h-6 text-xs px-2"
+							onclick={() => (editorOpen = true)}
+							disabled={!localAdapter}
+						>
 							{t('settings.newTemplate')}
 						</Button>
 					</div>
@@ -325,7 +332,7 @@
 {#if editorOpen}
 	<div class="fixed inset-0 z-[100] bg-background flex flex-col">
 		<TopBar mode="editor" onCancel={() => (editorOpen = false)} />
-		
+
 		<!-- Editor Body -->
 		<div class="flex-1 p-4 sm:p-8 overflow-y-auto">
 			<TemplateEditor onsave={onSaveTemplate} oncancel={() => (editorOpen = false)} />

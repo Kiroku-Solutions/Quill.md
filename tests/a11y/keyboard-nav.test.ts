@@ -232,7 +232,11 @@ function buildStub(opts: {
 		view: { view: 'list', setView: () => {} },
 		theme: { preference: 'light', theme: 'light', setTheme: () => {}, toggle: () => {} },
 		ui: {
-			settingsOpen: false, mobileNavOpen: false, openMobileNav: () => {}, closeMobileNav: () => {}, toggleMobileNav: () => {},
+			settingsOpen: false,
+			mobileNavOpen: false,
+			openMobileNav: () => {},
+			closeMobileNav: () => {},
+			toggleMobileNav: () => {},
 			openSettings: () => {},
 			closeSettings: () => {},
 			toggleSettings: () => {},

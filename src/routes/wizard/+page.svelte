@@ -67,13 +67,17 @@
 			applyError = t('wizard.noFolder');
 			return;
 		}
-		const preset = activePresets.find(p => p.id === selectedPresetId);
+		const preset = activePresets.find((p) => p.id === selectedPresetId);
 		if (!preset) return;
 
 		isApplying = true;
 		applyError = null;
 		try {
-			await writeWizardSetup(adapter, preset.templates, { overwriteConfig: true, overwriteTemplates: true, config: preset.config });
+			await writeWizardSetup(adapter, preset.templates, {
+				overwriteConfig: true,
+				overwriteTemplates: true,
+				config: preset.config
+			});
 			// Re-load the affected stores so the UI reflects the new files.
 			await Promise.all([stores.config.load(), stores.templates.load()]);
 			await stores.issues.load();
@@ -94,7 +98,11 @@
 		isApplying = true;
 		applyError = null;
 		try {
-			await writeWizardSetup(adapter, [tmpl], { overwriteConfig: true, overwriteTemplates: true, config: defaultConfig() });
+			await writeWizardSetup(adapter, [tmpl], {
+				overwriteConfig: true,
+				overwriteTemplates: true,
+				config: defaultConfig()
+			});
 			await Promise.all([stores.config.load(), stores.templates.load()]);
 			await stores.issues.load();
 			await goto(resolve('/local'));
@@ -177,11 +185,17 @@
 											<div class="font-medium">
 												{preset.name}
 											</div>
-											<div class="mt-1 text-xs opacity-70 leading-relaxed line-clamp-3" title={preset.description}>
+											<div
+												class="mt-1 text-xs opacity-70 leading-relaxed line-clamp-3"
+												title={preset.description}
+											>
 												{preset.description}
 											</div>
 											<div class="mt-3 text-xs font-semibold opacity-60">
-												{t('wizard.frameworkIncludes', { templates: preset.templates.length, statuses: preset.config.statuses.length })}
+												{t('wizard.frameworkIncludes', {
+													templates: preset.templates.length,
+													statuses: preset.config.statuses.length
+												})}
 											</div>
 										</div>
 									</label>
@@ -194,10 +208,7 @@
 
 			{#if path === 'custom'}
 				<div class="mt-4 border-t border-border/50 pt-8">
-					<TemplateEditor 
-						onsave={applyCustomTemplate} 
-						oncancel={() => (path = 'builtin')} 
-					/>
+					<TemplateEditor onsave={applyCustomTemplate} oncancel={() => (path = 'builtin')} />
 				</div>
 			{/if}
 
@@ -214,18 +225,18 @@
 							text={canApply ? t('wizard.applyTooltip') : t('wizard.applyTooltipDisabled')}
 							position="top"
 						>
-						<Button
-							variant="primary"
-							disabled={!canApply}
-							loading={isApplying}
-							onclick={apply}
-							data-testid="wizard-apply"
-						>
-							{isApplying ? t('wizard.applying') : t('wizard.applyButton')}
-						</Button>
-					</Tooltip>
-					<Button variant="ghost" onclick={cancel}>{t('wizard.cancel')}</Button>
-				</div>
+							<Button
+								variant="primary"
+								disabled={!canApply}
+								loading={isApplying}
+								onclick={apply}
+								data-testid="wizard-apply"
+							>
+								{isApplying ? t('wizard.applying') : t('wizard.applyButton')}
+							</Button>
+						</Tooltip>
+						<Button variant="ghost" onclick={cancel}>{t('wizard.cancel')}</Button>
+					</div>
 				</div>
 			{/if}
 		</div>

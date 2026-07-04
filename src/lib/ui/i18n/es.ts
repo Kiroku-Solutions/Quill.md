@@ -68,6 +68,7 @@ export const es: Translations = {
 			kanban: 'Kanban',
 			gantt: 'Gantt',
 			graph: 'Grafo',
+			tree: 'Árbol',
 			backlog: 'Backlog',
 			sprint: 'Planificador Sprint'
 		},
@@ -352,7 +353,8 @@ export const es: Translations = {
 		noFolder: 'No hay carpeta local abierta. Usa "Abrir carpeta local" en el inicio.',
 		applyError: (params: Params) => `Error al escribir la configuración: ${params.msg}`,
 		selectFrameworkAria: (params: Params) => `Seleccionar framework ${params.name}`,
-		frameworkIncludes: (params: Params) => `Incluye ${params.templates} plantillas · ${params.statuses} estados`
+		frameworkIncludes: (params: Params) =>
+			`Incluye ${params.templates} plantillas · ${params.statuses} estados`
 	},
 	sprint: {
 		progress: 'Progreso del Sprint',
@@ -420,13 +422,17 @@ export const es: Translations = {
 		typesHelpText:
 			'• Texto Corto: Para nombres o títulos cortos.\n• Texto Largo: Para descripciones o detalles extensos.\n• Fecha: Selector de calendario.\n• Número: Cantidades, estimaciones o métricas.\n• Selección Única/Múltiple: Etiquetas y categorías predefinidas.\n• Usuario: Asignar a miembros del equipo.\n• Relaciones: Bloqueos o dependencias con otros elementos.',
 		basicHelp: '¿Qué es la información básica?',
-		basicHelpText: 'El Nombre es cómo verás tu categoría en los menús (ej. "Caso de Uso"). El ID del Sistema es el identificador único en disco; se usa internamente y no debe cambiar una vez creado.',
+		basicHelpText:
+			'El Nombre es cómo verás tu categoría en los menús (ej. "Caso de Uso"). El ID del Sistema es el identificador único en disco; se usa internamente y no debe cambiar una vez creado.',
 		appearanceHelp: '¿Para qué sirve la apariencia?',
-		appearanceHelpText: 'El ícono y el color permitirán identificar visualmente los elementos de esta categoría en los tableros Kanban, diagramas Gantt y listas.',
+		appearanceHelpText:
+			'El ícono y el color permitirán identificar visualmente los elementos de esta categoría en los tableros Kanban, diagramas Gantt y listas.',
 		fieldsHelp: '¿Qué son los campos de datos?',
-		fieldsHelpText: 'Los campos son propiedades específicas (metadatos) que quieres registrar para este elemento (ej. Prioridad, Puntos de Esfuerzo, o Fecha Límite). Aparecerán en el panel derecho del elemento.',
+		fieldsHelpText:
+			'Los campos son propiedades específicas (metadatos) que quieres registrar para este elemento (ej. Prioridad, Puntos de Esfuerzo, o Fecha Límite). Aparecerán en el panel derecho del elemento.',
 		sectionsHelp: '¿Qué son los bloques de contenido?',
-		sectionsHelpText: 'Son las áreas principales de texto libre donde puedes escribir Markdown. Útiles para secciones como "Criterios de Aceptación", "Contexto" o "Pasos para reproducir". Aparecerán en el cuerpo central del elemento.',
+		sectionsHelpText:
+			'Son las áreas principales de texto libre donde puedes escribir Markdown. Útiles para secciones como "Criterios de Aceptación", "Contexto" o "Pasos para reproducir". Aparecerán en el cuerpo central del elemento.',
 		loadExample: 'Cargar Ejemplo Muestra',
 		example: {
 			name: 'Incidente Crítico',
@@ -442,6 +448,7 @@ export const es: Translations = {
 		allowedTargets: 'Categorías Permitidas',
 		allowedTargetsHint: 'Si no marcas ninguna, se permitirá vincular con cualquier elemento.',
 		allowedRelationTypes: 'Tipos de Relación Permitidos',
-		allowedRelationTypesHint: 'Si no marcas ninguno, se permitirán todos los tipos (Padre, Hijo, Bloquea, etc.).'
+		allowedRelationTypesHint:
+			'Si no marcas ninguno, se permitirán todos los tipos (Padre, Hijo, Bloquea, etc.).'
 	}
 };

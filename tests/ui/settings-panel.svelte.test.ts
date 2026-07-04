@@ -79,7 +79,8 @@ function buildStub(opts: {
 	corsProxy?: string;
 	recentHandles?: HandleRecord[];
 	hasLocalAdapter?: boolean;
-	settingsOpen?: boolean; mobileNavOpen?: boolean;
+	settingsOpen?: boolean;
+	mobileNavOpen?: boolean;
 }): StoreGraph {
 	const config: Config = {
 		product_goal: '',
@@ -189,7 +190,11 @@ function buildStub(opts: {
 			toggle: () => {}
 		},
 		ui: {
-			mobileNavOpen: false, openMobileNav: () => {}, closeMobileNav: () => {}, toggleMobileNav: () => {}, get settingsOpen() {
+			mobileNavOpen: false,
+			openMobileNav: () => {},
+			closeMobileNav: () => {},
+			toggleMobileNav: () => {},
+			get settingsOpen() {
 				return opts.settingsOpen ?? true;
 			},
 			openSettings: () => {},

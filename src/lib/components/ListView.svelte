@@ -67,7 +67,9 @@
 
 	const groups = $derived.by(() => {
 		if (groupBy === 'sprint') {
-			const sprintIssues = Array.from(issues.byId.values()).filter((li) => li.issue.issueType === 'sprint');
+			const sprintIssues = Array.from(issues.byId.values()).filter(
+				(li) => li.issue.issueType === 'sprint'
+			);
 			const definedGroups = sprintIssues.map((s) => ({
 				id: `sprint-${s.issue.id}`,
 				title: `Sprint ${s.issue.customFields?.sprint_number ?? s.issue.id} · ${s.issue.title}`,
@@ -78,7 +80,9 @@
 			return [...definedGroups, { id: 'unassigned', title: 'Sin Asignar', match: () => true }];
 		}
 		if (groupBy === 'epic') {
-			const epicIssues = Array.from(issues.byId.values()).filter((li) => li.issue.issueType === 'epic');
+			const epicIssues = Array.from(issues.byId.values()).filter(
+				(li) => li.issue.issueType === 'epic'
+			);
 			const definedGroups = epicIssues.map((e) => ({
 				id: `epic-${e.issue.id}`,
 				title: e.issue.title,
@@ -96,12 +100,14 @@
 		for (const g of groups) {
 			result[g.id] = [];
 		}
-		
+
 		for (const li of sortedRows) {
-			const group = groupBy !== 'none'
-				? groups.find((g) => g.id !== 'unassigned' && g.match(li.issue)) || groups[groups.length - 1]
-				: groups[0];
-			
+			const group =
+				groupBy !== 'none'
+					? groups.find((g) => g.id !== 'unassigned' && g.match(li.issue)) ||
+						groups[groups.length - 1]
+					: groups[0];
+
 			if (group) {
 				result[group.id].push(li);
 			}
@@ -244,7 +250,9 @@
 						<tr>
 							<td colspan="7" class="px-4 py-2 font-bold text-sm text-foreground">
 								{group.title}
-								<span class="ml-2 text-xs text-muted-foreground font-normal opacity-70">({groupRows.length})</span>
+								<span class="ml-2 text-xs text-muted-foreground font-normal opacity-70"
+									>({groupRows.length})</span
+								>
 							</td>
 						</tr>
 					</tbody>
@@ -258,7 +266,11 @@
 							data-row-id={li.issue.id}
 							aria-label={t('list.rowAria', { id: li.issue.id, title: li.issue.title })}
 							onclick={() => open(li.issue.id)}
-							onkeydown={(e) => onRowKeydown(e, rows.findIndex(r => r.issue.id === li.issue.id))}
+							onkeydown={(e) =>
+								onRowKeydown(
+									e,
+									rows.findIndex((r) => r.issue.id === li.issue.id)
+								)}
 						>
 							<td class="font-mono text-xs text-muted-foreground px-4 py-3"
 								>{li.issue.id.toString().padStart(4, '0')}</td

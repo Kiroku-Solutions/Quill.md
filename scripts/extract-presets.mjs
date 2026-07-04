@@ -27,7 +27,10 @@ for (let i = 0; i < lines.length; i++) {
 			templates: []
 		};
 		// generate an ID from the name
-		currentFramework.id = currentFramework.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+		currentFramework.id = currentFramework.name
+			.toLowerCase()
+			.replace(/[^a-z0-9]+/g, '-')
+			.replace(/(^-|-$)/g, '');
 		frameworks.push(currentFramework);
 		parsingMode = null;
 		continue;
@@ -63,7 +66,7 @@ for (let i = 0; i < lines.length; i++) {
 			currentJson.push(lines[j]);
 			j++;
 		}
-		
+
 		const jsonString = currentJson.join('\n');
 		try {
 			const parsed = JSON.parse(jsonString);
@@ -73,31 +76,34 @@ for (let i = 0; i < lines.length; i++) {
 				currentFramework.templates.push(parsed);
 			}
 		} catch (e) {
-			console.error(`Failed to parse JSON for ${currentFramework.name} in mode ${parsingMode}:`, e.message);
+			console.error(
+				`Failed to parse JSON for ${currentFramework.name} in mode ${parsingMode}:`,
+				e.message
+			);
 		}
-		
+
 		i = j; // skip to end of json block
 		parsingMode = null;
 	}
 }
 
 // Filter valid frameworks (those that have a config and templates)
-const validFrameworks = frameworks.filter(f => f.config !== null && f.templates.length > 0);
+const validFrameworks = frameworks.filter((f) => f.config !== null && f.templates.length > 0);
 
 // Resolve template inheritance (scaling frameworks use Scrum templates)
-const scrum = validFrameworks.find(f => f.id === 'scrum');
+const scrum = validFrameworks.find((f) => f.id === 'scrum');
 if (scrum) {
-	const epicT = scrum.templates.find(t => t.id === 'epic');
-	const storyT = scrum.templates.find(t => t.id === 'user-story');
-	const taskT = scrum.templates.find(t => t.id === 'task');
-	const bugT = scrum.templates.find(t => t.id === 'bug');
+	const epicT = scrum.templates.find((t) => t.id === 'epic');
+	const storyT = scrum.templates.find((t) => t.id === 'user-story');
+	const taskT = scrum.templates.find((t) => t.id === 'task');
+	const bugT = scrum.templates.find((t) => t.id === 'bug');
 	const baseScrumT = [epicT, storyT, taskT, bugT].filter(Boolean);
 
 	const injectTo = (id, tmpls) => {
-		const fw = validFrameworks.find(f => f.id === id);
+		const fw = validFrameworks.find((f) => f.id === id);
 		if (fw) {
-			const existingIds = fw.templates.map(t => t.id);
-			const toAdd = tmpls.filter(t => !existingIds.includes(t.id));
+			const existingIds = fw.templates.map((t) => t.id);
+			const toAdd = tmpls.filter((t) => !existingIds.includes(t.id));
 			// Insert base templates at the beginning
 			fw.templates.unshift(...toAdd);
 		}
