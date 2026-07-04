@@ -66,7 +66,7 @@ export async function createTemplate(templateJsonStr) {
         // Ensure standard system fields are present
         template.fields = template.fields || [];
         const systemFields = [
-            { id: -4, key: 'status', name: 'Status', type: 'select', obligatory: true },
+            { id: -4, key: 'status', name: 'Status', type: 'select', obligatory: true, options_source: 'config.statuses' },
             { id: -3, key: 'assignee', name: 'Assignee', type: 'user', obligatory: false },
             { id: -2, key: 'labels', name: 'Labels', type: 'multi-select', obligatory: false, options_source: 'config.labels' },
             { id: -1, key: 'relations', name: 'Relations', type: 'relations', obligatory: false }
