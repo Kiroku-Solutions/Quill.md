@@ -161,28 +161,80 @@
 			const ForceGraph2D = module.default;
 			if (!mounted) return;
 
+			let hoverNode: any = null;
+
 			currentGraph = (ForceGraph2D as any)()(container)
 				.dagMode('td') // Top-Down DAG mode
-				.dagLevelDistance(90)
-				.nodeLabel('name')
-				.nodeColor((n: any) => n.color || undefined)
-				.nodeAutoColorBy('groupId')
-				.nodeVal('val')
+				.dagLevelDistance(50) // Reduced vertical dispersion
 				.linkColor(() => linkColorStr)
+				.linkCurvature(0.15) // Organic curves
 				.linkDirectionalArrowLength(3.5)
 				.linkDirectionalArrowRelPos(1)
+				.onNodeHover((node: any) => {
+					hoverNode = node;
+					if (container) container.style.cursor = node ? 'pointer' : 'default';
+				})
 				.onNodeClick((node: any) => {
 					if (!node.id.startsWith('debug-')) {
 						editor.open(Number(node.id));
 					}
+				})
+				.nodeCanvasObject((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
+					const label = node.name.length > 22 ? node.name.slice(0, 20) + '...' : node.name;
+					const fontSize = 12 / globalScale;
+					ctx.font = `${fontSize}px Inter, sans-serif`;
+					const textWidth = ctx.measureText(label).width;
+					
+					const h = 26 / globalScale;
+					const w = textWidth + (20 / globalScale);
+					const x = node.x - w/2;
+					const y = node.y - h/2;
+					const radius = 6 / globalScale;
+
+					ctx.beginPath();
+					if (ctx.roundRect) {
+						ctx.roundRect(x, y, w, h, radius);
+					} else {
+						ctx.rect(x, y, w, h); // Fallback
+					}
+					
+					// Background
+					ctx.fillStyle = theme.theme === 'dark' ? '#18181b' : '#ffffff';
+					ctx.fill();
+
+					// Border
+					ctx.strokeStyle = node.color || '#888888';
+					ctx.lineWidth = (node === hoverNode ? 2.5 : 1.5) / globalScale;
+					if (node === hoverNode) {
+						ctx.shadowColor = node.color || '#888888';
+						ctx.shadowBlur = 8 / globalScale;
+					}
+					ctx.stroke();
+					ctx.shadowBlur = 0; // Reset
+
+					// Text
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'middle';
+					ctx.fillStyle = theme.theme === 'dark' ? '#f4f4f5' : '#18181b';
+					ctx.fillText(label, node.x, node.y);
+				})
+				.nodePointerAreaPaint((node: any, color: string, ctx: CanvasRenderingContext2D, globalScale: number) => {
+					const label = node.name.length > 22 ? node.name.slice(0, 20) + '...' : node.name;
+					const fontSize = 12 / globalScale;
+					ctx.font = `${fontSize}px Inter, sans-serif`;
+					const textWidth = ctx.measureText(label).width;
+					const h = 26 / globalScale;
+					const w = textWidth + (20 / globalScale);
+					ctx.fillStyle = color;
+					ctx.fillRect(node.x - w/2, node.y - h/2, w, h);
 				});
 
-			// Spread out nodes to prevent the tight vertical string
+			// Spread out horizontally to prevent overlap of the wide cards
 			if (currentGraph.d3Force('charge')) {
-				currentGraph.d3Force('charge').strength(-400).distanceMax(400);
+				currentGraph.d3Force('charge').strength(-800).distanceMax(800);
 			}
 			if (currentGraph.d3Force('link')) {
-				currentGraph.d3Force('link').distance(60);
+				currentGraph.d3Force('link').distance(40);
 			}
 
 			currentGraph.graphData(data);
