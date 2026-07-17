@@ -64,22 +64,22 @@
 
 <div
 	role={variant === 'error' || variant === 'warning' ? 'alert' : 'status'}
-	class="flex items-start gap-3 p-4 rounded-xl border border-l-4 shadow-sm {config.bg} {config.border} {extraClass} transition-all duration-[var(--motion-base)]"
+	class="flex items-start gap-3 rounded-xl border border-l-4 p-4 shadow-sm {config.bg} {config.border} {extraClass} transition-all duration-[var(--motion-base)]"
 >
 	<div class="mt-0.5 shrink-0 {config.iconColor}">
 		<Icon class="h-5 w-5" aria-hidden="true" />
 	</div>
-	<div class="flex-1 font-sans text-sm text-foreground/90 font-medium leading-relaxed">
+	<div class="flex-1 font-sans text-sm leading-relaxed font-medium text-foreground/90">
 		{#if children}{@render children()}{/if}
 	</div>
 	{#if onclose}
 		<button
 			type="button"
 			aria-label="Close"
-			class="shrink-0 p-1.5 -m-1.5 rounded-full text-muted-foreground hover:bg-foreground/5 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+			class="-m-1.5 shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
 			onclick={onclose}
 		>
-			<X class="w-4 h-4" aria-hidden="true" />
+			<X class="h-4 w-4" aria-hidden="true" />
 		</button>
 	{/if}
 </div>

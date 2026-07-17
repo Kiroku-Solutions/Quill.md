@@ -47,7 +47,7 @@
 		{id}
 		type="checkbox"
 		aria-label={ariaLabel ?? undefined}
-		class="appearance-none w-5 h-5 border border-border rounded-sm flex-shrink-0 bg-background transition-all duration-[var(--motion-fast)] ease-[var(--ease-out)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed checked:bg-primary checked:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 bg-no-repeat bg-center bg-[length:12px_12px] checked:bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M10.5%203L4.5%209L1.5%206%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')]"
+		class="h-5 w-5 flex-shrink-0 cursor-pointer appearance-none rounded-sm border border-border bg-background bg-[length:12px_12px] bg-center bg-no-repeat transition-all duration-[var(--motion-fast)] ease-[var(--ease-out)] checked:border-primary checked:bg-primary checked:bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M10.5%203L4.5%209L1.5%206%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
 		bind:checked
 		{disabled}
 		{...rest}
@@ -55,7 +55,7 @@
 	{#if label}
 		<label
 			for={id}
-			class="font-sans text-sm text-foreground cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed"
+			class="cursor-pointer font-sans text-sm text-foreground select-none disabled:cursor-not-allowed disabled:opacity-50"
 			>{label}</label
 		>
 	{/if}

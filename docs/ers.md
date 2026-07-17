@@ -84,10 +84,11 @@ The goal of the project is to remove the dependency on third-party issue tracker
 
 ### 1.5 Revision History
 
-| Version | Date       | Author | Notes                                                                                                                                                                                                                                                                    |
-| ------- | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1.0.0   | 2026-06-20 | Jose   | Initial draft.                                                                                                                                                                                                                                                           |
-| 2.0.0   | 2026-07-12 | Jose   | Provider Strategy migration: isomorphic-git + LightningFS replaced with GitHub / GitLab REST Strategy. Remote Mode is editable; commits land on a dedicated `quill-md` branch. PAT may live in `sessionStorage`. Full change log: `docs/provider-strategy-migration.md`. |
+| Version | Date       | Author | Notes                                                                                                                                                                                                                                                                                                                |
+| ------- | ---------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0.0   | 2026-06-20 | Jose   | Initial draft.                                                                                                                                                                                                                                                                                                       |
+| 2.0.0   | 2026-07-12 | Jose   | Provider Strategy migration: isomorphic-git + LightningFS replaced with GitHub / GitLab REST Strategy. Remote Mode is editable; commits land on a dedicated `quill-md` branch. PAT may live in `sessionStorage`. Full change log: `docs/provider-strategy-migration.md`.                                             |
+| 3.0.0   | 2026-07-17 | Jose   | GitHub provider transport migrated from hand-rolled `globalThis.fetch` to the official `@octokit/rest` SDK with `@octokit/plugin-throttling` and `@octokit/plugin-retry`. GitLab provider unchanged. Closes the rate-limit / 5xx / secondary-rate-limit handling gaps. Full change log: `docs/octokit-migration.md`. |
 
 ---
 
@@ -491,28 +492,57 @@ Adding a new provider is a Strategy-pattern registration: implement `RepoProvide
 
 ### 5.3 Technology Stack
 
-| Concern                | Library / API                           | Notes                                                                                              |
-| ---------------------- | --------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Framework              | SvelteKit + `adapter-static`            | SPA build, no SSR.                                                                                 |
-| Component model        | Svelte 5 (runes)                        | `$state`, `$derived`, `$effect`.                                                                   |
-| Styling                | **Tailwind CSS v4**                     | With `@tailwindcss/typography` for prose.                                                          |
-| Icons                  | **lucide-svelte**                       | Template icons, status icons, UI chrome.                                                           |
-| Local filesystem       | File System Access API                  | Native browser API.                                                                                |
-| Remote Git (read)      | Provider REST API (Strategy pattern)    | GitHub: `api.github.com`. GitLab: `gitlab.com/api/v4`. Permissive CORS, no proxy.                  |
-| Remote Git (write)     | Provider REST API (Strategy pattern)    | `PUT /contents`, Git Data API on GitHub; `PUT /repository/files`, `/repository/commits` on GitLab. |
-| Remote cache           | `idb` (IndexedDB-backed snapshot)       | FR-10 snapshot of `.quill.md/` files keyed by `(providerId, owner/repo, editBranch, sha)`.         |
-| PAT persistence        | `sessionStorage`                        | Namespaced under `quill-md.remote-pat` (cleared on tab close / sign-out).                          |
-| YAML parsing           | `js-yaml`                               | Frontmatter.                                                                                       |
-| Frontmatter + sections | `gray-matter` (extended)                | `gray-matter` handles the `---` block; a custom adapter handles the section markers.               |
-| Markdown rendering     | `marked` + `DOMPurify`                  | Sanitized output.                                                                                  |
-| Code highlighting      | `shiki` (preferred) or `highlight.js`   | For code blocks in sections.                                                                       |
-| Integrity hash         | Web Crypto API (`crypto.subtle.digest`) | Native SHA-256 for FR-15. No third-party hashing library.                                          |
-| Drag-and-drop          | `svelte-dnd-action`                     | Kanban.                                                                                            |
-| Gantt                  | Custom SVG component                    | Built on plain SVG; no third-party Gantt library.                                                  |
-| State                  | Svelte stores + runes                   | Reactive.                                                                                          |
-| Testing                | Vitest + Playwright                     | Unit and end-to-end.                                                                               |
-| Bundler                | Vite (via SvelteKit)                    | Default.                                                                                           |
-| Hosting                | Static (any)                            | GitHub Pages, Netlify, etc.                                                                        |
+| Concern                | Library / API                           | Notes                                                                                                                                                                                                            |
+| ---------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework              | SvelteKit + `adapter-static`            | SPA build, no SSR.                                                                                                                                                                                               |
+| Component model        | Svelte 5 (runes)                        | `$state`, `$derived`, `$effect`.                                                                                                                                                                                 |
+| Styling                | **Tailwind CSS v4**                     | With `@tailwindcss/typography` for prose.                                                                                                                                                                        |
+| Icons                  | **lucide-svelte**                       | Template icons, status icons, UI chrome.                                                                                                                                                                         |
+| Local filesystem       | File System Access API                  | Native browser API.                                                                                                                                                                                              |
+| Remote Git (read)      | Provider REST API (Strategy pattern)    | GitHub: `api.github.com` via `@octokit/rest`. GitLab: `gitlab.com/api/v4` (hand-rolled, see §5.3.1). Permissive CORS, no proxy.                                                                                  |
+| Remote Git (write)     | Provider REST API (Strategy pattern)    | GitHub: `@octokit/rest` (`createOrUpdateFileContents`, `deleteFile`, `git.createTree` + `git.createCommit` + `git.updateRef` for batched). GitLab: `PUT /repository/files`, `/repository/commits` (hand-rolled). |
+| Remote cache           | `idb` (IndexedDB-backed snapshot)       | FR-10 snapshot of `.quill.md/` files keyed by `(providerId, owner/repo, editBranch, sha)`.                                                                                                                       |
+| PAT persistence        | `sessionStorage`                        | Namespaced under `quill-md.remote-pat` (cleared on tab close / sign-out).                                                                                                                                        |
+| YAML parsing           | `js-yaml`                               | Frontmatter.                                                                                                                                                                                                     |
+| Frontmatter + sections | `gray-matter` (extended)                | `gray-matter` handles the `---` block; a custom adapter handles the section markers.                                                                                                                             |
+| Markdown rendering     | `marked` + `DOMPurify`                  | Sanitized output.                                                                                                                                                                                                |
+| Code highlighting      | `shiki` (preferred) or `highlight.js`   | For code blocks in sections.                                                                                                                                                                                     |
+| Integrity hash         | Web Crypto API (`crypto.subtle.digest`) | Native SHA-256 for FR-15. No third-party hashing library.                                                                                                                                                        |
+| Drag-and-drop          | `svelte-dnd-action`                     | Kanban.                                                                                                                                                                                                          |
+| Gantt                  | Custom SVG component                    | Built on plain SVG; no third-party Gantt library.                                                                                                                                                                |
+| State                  | Svelte stores + runes                   | Reactive.                                                                                                                                                                                                        |
+| Testing                | Vitest + Playwright                     | Unit and end-to-end.                                                                                                                                                                                             |
+| Bundler                | Vite (via SvelteKit)                    | Default.                                                                                                                                                                                                         |
+| Hosting                | Static (any)                            | GitHub Pages, Netlify, etc.                                                                                                                                                                                      |
+
+#### 5.3.1 GitHub transport library
+
+The GitHub provider (`src/lib/adapters/providers/github.ts`) issues
+every request through the official `@octokit/rest` SDK
+(`octokit.rest.*`), with `@octokit/plugin-throttling` and
+`@octokit/plugin-retry` configured in `src/lib/adapters/providers/_octokit.ts`.
+This replaces the hand-rolled `globalThis.fetch` wrapper that
+preceded v3.0.0; the GitLab provider remains on the hand-rolled
+client and will be migrated to `@gitbeaker/*` (or equivalent) in a
+separate change. The plugin configuration closes three gaps the
+previous client left open:
+
+1. **Primary rate limit.** A 403 carrying `x-ratelimit-remaining: 0`
+   and a future `x-ratelimit-reset` is retried up to twice, then
+   surfaced as `RemoteAuthError`.
+2. **Secondary rate limit.** A 403 with the GitHub secondary
+   rate-limit body marker is retried once before surfacing.
+3. **5xx and network errors.** Up to 3 retries with exponential
+   backoff via `@octokit/plugin-retry`.
+
+`409` and `412` are added to the retry plugin's `doNotRetry` list
+because they are optimistic-concurrency signals that must surface
+as `RemoteCommitRejectedError` immediately (NFR-7). NFR-2 (PAT
+hygiene) is preserved: the PAT only ever lives in the
+`Authorization` header, never in a URL path or query parameter,
+so the URL redaction that mangled SHAs (40 hex chars) into
+`[REDACTED:PAT]` is no longer applied to URLs — only to response
+bodies. Full change log: `docs/octokit-migration.md`.
 
 ### 5.4 Build and Deploy
 
@@ -659,6 +689,7 @@ After submitting valid credentials, the user is redirected to a
 2. Enter valid credentials.
 3. Click "Sign in".
 4. Observe the URL.
+
 <!-- [SECTION_END: Steps to reproduce] -->
 ```
 
@@ -1234,6 +1265,7 @@ After submitting valid credentials, the user is redirected to a
 2. Enter valid credentials.
 3. Click "Sign in".
 4. Observe the URL.
+
 <!-- [SECTION_END: Steps to reproduce] -->
 
 <!-- [SECTION_START: Expected vs. actual] -->

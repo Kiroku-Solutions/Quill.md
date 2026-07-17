@@ -450,7 +450,7 @@
 </div>
 
 <div
-	class="flex flex-col gap-8 min-h-[calc(100vh-var(--topbar-height)-4rem)] p-6 overflow-y-auto bg-background"
+	class="flex min-h-[calc(100vh-var(--topbar-height)-4rem)] flex-col gap-8 overflow-y-auto bg-background p-6"
 	data-testid="kanban-view"
 >
 	{#each groups as group (group.id)}
@@ -459,12 +459,12 @@
 				{@render columnSet(group)}
 			</div>
 		{:else}
-			<details class="group/sprint bg-surface rounded-xl border border-border overflow-hidden" open>
+			<details class="group/sprint overflow-hidden rounded-xl border border-border bg-surface" open>
 				<summary
-					class="flex items-center gap-2 px-6 py-4 cursor-pointer hover:bg-surface-dark transition-colors font-bold text-foreground border-b border-border outline-none focus-visible:bg-surface-dark select-none list-none [&::-webkit-details-marker]:hidden"
+					class="hover:bg-surface-dark focus-visible:bg-surface-dark flex cursor-pointer list-none items-center gap-2 border-b border-border px-6 py-4 font-bold text-foreground transition-colors outline-none select-none [&::-webkit-details-marker]:hidden"
 				>
 					<svg
-						class="w-5 h-5 transition-transform group-open/sprint:rotate-90 text-muted-foreground"
+						class="h-5 w-5 text-muted-foreground transition-transform group-open/sprint:rotate-90"
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
@@ -473,7 +473,7 @@
 					>
 					{group.title}
 				</summary>
-				<div class="flex gap-6 overflow-x-auto p-6 bg-background">
+				<div class="flex gap-6 overflow-x-auto bg-background p-6">
 					{@render columnSet(group)}
 				</div>
 			</details>
@@ -488,7 +488,7 @@
 		<div
 			role="group"
 			aria-label={col.id}
-			class="bg-surface border flex w-80 shrink-0 flex-col rounded-2xl p-4 shadow-sm transition-colors duration-150
+			class="flex w-80 shrink-0 flex-col rounded-2xl border bg-surface p-4 shadow-sm transition-colors duration-150
 				{isDropTarget ? 'border-primary bg-primary/5 ring-2 ring-primary ring-inset' : 'border-border'}"
 			data-testid="kanban-column"
 			data-column-id={col.id}
@@ -500,13 +500,13 @@
 				<Tooltip text={t('kanban.readOnlyTooltip')} position="bottom">
 					<div class="mb-3 flex items-center justify-between">
 						<h3
-							class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+							class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 							data-testid="kanban-column-header"
 						>
 							{col.id}
 						</h3>
 						<span
-							class="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-widest"
+							class="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-widest"
 							style="background-color: {col.color ?? 'var(--color-cb-muted)'}; color: #fff"
 						>
 							{colCards.length}
@@ -516,13 +516,13 @@
 			{:else}
 				<div class="mb-3 flex items-center justify-between">
 					<h3
-						class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+						class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 						data-testid="kanban-column-header"
 					>
 						{col.id}
 					</h3>
 					<span
-						class="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-widest"
+						class="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-widest"
 						style="background-color: {col.color ?? 'var(--color-cb-muted)'}; color: #fff"
 					>
 						{colCards.length}
@@ -538,16 +538,16 @@
 						<button
 							type="button"
 							draggable={!isReadOnly}
-							class="flex flex-col w-full p-4 rounded-xl text-left transition-shadow duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset {isReadOnly
+							class="flex w-full flex-col rounded-xl p-4 text-left transition-shadow duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset {isReadOnly
 								? ''
-								: 'cursor-grab active:cursor-grabbing active:animate-shake'}
+								: 'cursor-grab active:animate-shake active:cursor-grabbing'}
 								{isDragging
 								? 'opacity-0'
 								: isJustDropped
-									? 'bg-background border border-primary shadow-md animate-pop'
+									? 'animate-pop border border-primary bg-background shadow-md'
 									: isLifted
-										? 'bg-background border border-primary ring-primary scale-[1.02] shadow-md ring-2 ring-offset-2'
-										: 'bg-background border border-border shadow-sm hover:shadow-[var(--shadow-soft)]'}"
+										? 'scale-[1.02] border border-primary bg-background shadow-md ring-2 ring-primary ring-offset-2'
+										: 'border border-border bg-background shadow-sm hover:shadow-[var(--shadow-soft)]'}"
 							data-testid="kanban-card"
 							data-card-id={li.issue.id}
 							data-lifted={isLifted ? 'true' : 'false'}
@@ -565,32 +565,32 @@
 							ondragend={onDragEnd}
 						>
 							<div class="mb-2 flex items-start gap-2">
-								<span class="font-mono text-[11px] text-muted-foreground shrink-0 mt-0.5">
+								<span class="mt-0.5 shrink-0 font-mono text-[11px] text-muted-foreground">
 									{li.issue.id.toString().padStart(4, '0')}
 								</span>
-								<div class="flex flex-wrap items-center gap-1.5 ml-auto justify-end">
+								<div class="ml-auto flex flex-wrap items-center justify-end gap-1.5">
 									{#if epicFor(li)}
 										<span
-											class="px-2 py-0.5 bg-primary/10 text-primary rounded text-[10px] font-bold uppercase tracking-widest truncate max-w-[120px]"
+											class="max-w-[120px] truncate rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold tracking-widest text-primary uppercase"
 											title={epicFor(li)}
 										>
 											{epicFor(li)}
 										</span>
 									{/if}
 									<span
-										class="px-2 py-0.5 bg-foreground/5 rounded text-[10px] font-bold uppercase tracking-widest text-muted-foreground shrink-0"
+										class="shrink-0 rounded bg-foreground/5 px-2 py-0.5 text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
 										>{li.issue.issueType}</span
 									>
 								</div>
 							</div>
-							<div class="text-sm font-medium leading-snug text-foreground mb-3">
+							<div class="mb-3 text-sm leading-snug font-medium text-foreground">
 								{li.issue.title}
 							</div>
 							{#if li.issue.assignee}
 								<div
-									class="mt-auto text-xs text-muted-foreground flex items-center gap-1.5 font-medium"
+									class="mt-auto flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
 								>
-									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+									<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
 											stroke-linecap="round"
 											stroke-linejoin="round"
@@ -621,34 +621,34 @@
 	{@const li = findLoaded(draggedId)}
 	{#if li}
 		<div
-			class="fixed pointer-events-none z-50 animate-shake"
+			class="pointer-events-none fixed z-50 animate-shake"
 			style="left: {dragPos.x}px; top: {dragPos.y}px; margin-left: -160px; margin-top: -60px;"
 		>
 			<div
-				class="flex flex-col w-80 p-4 rounded-xl text-left bg-background border-2 border-primary shadow-2xl"
+				class="flex w-80 flex-col rounded-xl border-2 border-primary bg-background p-4 text-left shadow-2xl"
 			>
 				<div class="mb-2 flex items-start gap-2">
-					<span class="font-mono text-[11px] text-muted-foreground shrink-0 mt-0.5">
+					<span class="mt-0.5 shrink-0 font-mono text-[11px] text-muted-foreground">
 						{li.issue.id.toString().padStart(4, '0')}
 					</span>
-					<div class="flex flex-wrap items-center gap-1.5 ml-auto justify-end">
+					<div class="ml-auto flex flex-wrap items-center justify-end gap-1.5">
 						{#if epicFor(li)}
 							<span
-								class="px-2 py-0.5 bg-primary/10 text-primary rounded text-[10px] font-bold uppercase tracking-widest truncate max-w-[120px]"
+								class="max-w-[120px] truncate rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold tracking-widest text-primary uppercase"
 							>
 								{epicFor(li)}
 							</span>
 						{/if}
 						<span
-							class="px-2 py-0.5 bg-foreground/5 rounded text-[10px] font-bold uppercase tracking-widest text-muted-foreground shrink-0"
+							class="shrink-0 rounded bg-foreground/5 px-2 py-0.5 text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
 							>{li.issue.issueType}</span
 						>
 					</div>
 				</div>
-				<div class="text-sm font-medium leading-snug text-foreground mb-3">{li.issue.title}</div>
+				<div class="mb-3 text-sm leading-snug font-medium text-foreground">{li.issue.title}</div>
 				{#if li.issue.assignee}
-					<div class="mt-auto text-xs text-muted-foreground flex items-center gap-1.5 font-medium">
-						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+					<div class="mt-auto flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+						<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
 								stroke-linecap="round"
 								stroke-linejoin="round"
@@ -674,29 +674,29 @@
 		aria-labelledby="dod-title"
 	>
 		<div
-			class="bg-surface border border-border shadow-xl rounded-xl w-[400px] max-w-full overflow-hidden flex flex-col"
+			class="flex w-[400px] max-w-full flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-xl"
 		>
-			<div class="px-6 py-4 border-b border-border">
+			<div class="border-b border-border px-6 py-4">
 				<h3 id="dod-title" class="text-lg font-bold text-foreground">
 					{t('kanban.dodTitle', { default: 'Definition of Done' })}
 				</h3>
-				<p class="text-xs text-muted-foreground mt-1">
+				<p class="mt-1 text-xs text-muted-foreground">
 					{t('kanban.dodSubtitle', {
 						default: 'Please verify the following requirements before completing this task:'
 					})}
 				</p>
 			</div>
-			<div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+			<div class="max-h-[60vh] space-y-4 overflow-y-auto p-6">
 				{#each dodList as dodItem, i}
-					<label class="flex items-start gap-3 cursor-pointer group">
-						<div class="relative flex items-center justify-center shrink-0 w-5 h-5 mt-0.5">
+					<label class="group flex cursor-pointer items-start gap-3">
+						<div class="relative mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center">
 							<input
 								type="checkbox"
 								bind:checked={dodChecks[i]}
-								class="peer appearance-none w-5 h-5 border-2 border-muted-foreground rounded bg-background checked:bg-primary checked:border-primary transition-colors cursor-pointer"
+								class="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-muted-foreground bg-background transition-colors checked:border-primary checked:bg-primary"
 							/>
 							<svg
-								class="absolute w-3.5 h-3.5 text-primary-foreground pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity"
+								class="pointer-events-none absolute h-3.5 w-3.5 text-primary-foreground opacity-0 transition-opacity peer-checked:opacity-100"
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
@@ -706,23 +706,23 @@
 							</svg>
 						</div>
 						<span
-							class="text-sm text-foreground/90 group-hover:text-foreground transition-colors leading-snug"
+							class="text-sm leading-snug text-foreground/90 transition-colors group-hover:text-foreground"
 							>{dodItem}</span
 						>
 					</label>
 				{/each}
 			</div>
-			<div class="px-6 py-4 border-t border-border bg-muted/20 flex justify-end gap-3">
+			<div class="flex justify-end gap-3 border-t border-border bg-muted/20 px-6 py-4">
 				<button
-					class="px-4 py-2 rounded font-bold text-sm bg-transparent text-foreground hover:bg-foreground/5 transition-colors"
+					class="rounded bg-transparent px-4 py-2 text-sm font-bold text-foreground transition-colors hover:bg-foreground/5"
 					onclick={cancelDoD}
 				>
 					{t('common.cancel', { default: 'Cancel' })}
 				</button>
 				<button
-					class="px-4 py-2 rounded font-bold text-sm transition-colors {dodAllChecked
+					class="rounded px-4 py-2 text-sm font-bold transition-colors {dodAllChecked
 						? 'bg-primary text-primary-foreground hover:bg-primary/90'
-						: 'bg-muted text-muted-foreground cursor-not-allowed'}"
+						: 'cursor-not-allowed bg-muted text-muted-foreground'}"
 					disabled={!dodAllChecked}
 					onclick={confirmDoD}
 				>

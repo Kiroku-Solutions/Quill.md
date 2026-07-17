@@ -72,7 +72,7 @@
 	<div class="flex items-center gap-4 border-b border-border">
 		<button
 			type="button"
-			class="px-4 py-2 font-sans text-sm font-semibold border-b-2 -mb-[1px] transition-colors cursor-pointer {activeTab ===
+			class="-mb-[1px] cursor-pointer border-b-2 px-4 py-2 font-sans text-sm font-semibold transition-colors {activeTab ===
 			'epic'
 				? 'border-primary text-primary'
 				: 'border-transparent text-muted-foreground hover:text-foreground'}"
@@ -82,7 +82,7 @@
 		</button>
 		<button
 			type="button"
-			class="px-4 py-2 font-sans text-sm font-semibold border-b-2 -mb-[1px] transition-colors cursor-pointer {activeTab ===
+			class="-mb-[1px] cursor-pointer border-b-2 px-4 py-2 font-sans text-sm font-semibold transition-colors {activeTab ===
 			'use-case'
 				? 'border-primary text-primary'
 				: 'border-transparent text-muted-foreground hover:text-foreground'}"
@@ -97,17 +97,17 @@
 		{#if activeTab === 'epic'}
 			{#each epics as epic (epic.id)}
 				{@const related = getEpicStories(epic.id)}
-				<Card class="hover:border-primary/30 transition-all duration-[var(--motion-base)]">
+				<Card class="transition-all duration-[var(--motion-base)] hover:border-primary/30">
 					<div class="flex flex-col gap-4">
 						<!-- Epic Header -->
 						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<!-- svelte-ignore a11y_no_static_element_interactions -->
 						<div
 							onclick={() => openIssue(epic.id)}
-							class="flex items-center justify-between cursor-pointer border-b border-border/40 pb-3 hover:opacity-85"
+							class="flex cursor-pointer items-center justify-between border-b border-border/40 pb-3 hover:opacity-85"
 						>
 							<div class="flex items-center gap-2">
-								<span class="p-1.5 bg-primary/10 text-primary rounded">
+								<span class="rounded bg-primary/10 p-1.5 text-primary">
 									<FolderOpen class="h-4 w-4" />
 								</span>
 								<h3 class="font-display font-semibold text-foreground">
@@ -120,7 +120,7 @@
 						<!-- Stories List -->
 						<div class="flex flex-col gap-2">
 							{#if related.length === 0}
-								<p class="text-xs text-muted-foreground italic px-2">
+								<p class="px-2 text-xs text-muted-foreground italic">
 									{t('backlogView.noStories')}
 								</p>
 							{:else}
@@ -129,19 +129,19 @@
 									<!-- svelte-ignore a11y_no_static_element_interactions -->
 									<div
 										onclick={() => openIssue(story.id)}
-										class="flex items-center justify-between py-2 px-3 rounded-lg bg-surface-dark/20 border border-border/40 hover:border-primary/20 hover:bg-surface-dark/40 cursor-pointer transition-all duration-[var(--motion-fast)]"
+										class="bg-surface-dark/20 hover:bg-surface-dark/40 flex cursor-pointer items-center justify-between rounded-lg border border-border/40 px-3 py-2 transition-all duration-[var(--motion-fast)] hover:border-primary/20"
 									>
 										<div class="flex items-center gap-2 truncate">
-											<BookOpen class="h-3.5 w-3.5 text-primary/70 shrink-0" />
-											<span class="text-xs font-semibold shrink-0 text-muted-foreground"
+											<BookOpen class="h-3.5 w-3.5 shrink-0 text-primary/70" />
+											<span class="shrink-0 text-xs font-semibold text-muted-foreground"
 												>#{story.id}</span
 											>
-											<span class="text-sm text-foreground truncate">{story.title}</span>
+											<span class="truncate text-sm text-foreground">{story.title}</span>
 										</div>
 										<div class="flex items-center gap-3">
 											{#if story.customFields.story_points}
 												<span
-													class="text-[10px] font-bold px-2 py-0.5 rounded bg-muted text-foreground"
+													class="rounded bg-muted px-2 py-0.5 text-[10px] font-bold text-foreground"
 												>
 													{story.customFields.story_points}
 													{t('sprint.pointsUnit')}
@@ -149,7 +149,7 @@
 											{/if}
 											{#if story.customFields.priority}
 												<span
-													class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded {story
+													class="rounded px-1.5 py-0.5 text-[10px] font-bold uppercase {story
 														.customFields.priority === 'alta' ||
 													story.customFields.priority === 'high'
 														? 'bg-error/15 text-error'
@@ -162,7 +162,7 @@
 												</span>
 											{/if}
 											<span
-												class="text-xs font-semibold px-2 py-0.5 rounded bg-success/15 text-success"
+												class="rounded bg-success/15 px-2 py-0.5 text-xs font-semibold text-success"
 											>
 												{story.status}
 											</span>
@@ -178,17 +178,17 @@
 		{:else}
 			{#each useCases as uc (uc.id)}
 				{@const related = getUseCaseStories(uc.id)}
-				<Card class="hover:border-primary/30 transition-all duration-[var(--motion-base)]">
+				<Card class="transition-all duration-[var(--motion-base)] hover:border-primary/30">
 					<div class="flex flex-col gap-4">
 						<!-- Use Case Header -->
 						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<!-- svelte-ignore a11y_no_static_element_interactions -->
 						<div
 							onclick={() => openIssue(uc.id)}
-							class="flex items-center justify-between cursor-pointer border-b border-border/40 pb-3 hover:opacity-85"
+							class="flex cursor-pointer items-center justify-between border-b border-border/40 pb-3 hover:opacity-85"
 						>
 							<div class="flex items-center gap-2">
-								<span class="p-1.5 bg-primary/10 text-primary rounded">
+								<span class="rounded bg-primary/10 p-1.5 text-primary">
 									<FileText class="h-4 w-4" />
 								</span>
 								<h3 class="font-display font-semibold text-foreground">
@@ -201,7 +201,7 @@
 						<!-- Stories List -->
 						<div class="flex flex-col gap-2">
 							{#if related.length === 0}
-								<p class="text-xs text-muted-foreground italic px-2">
+								<p class="px-2 text-xs text-muted-foreground italic">
 									{t('backlogView.noStories')}
 								</p>
 							{:else}
@@ -210,19 +210,19 @@
 									<!-- svelte-ignore a11y_no_static_element_interactions -->
 									<div
 										onclick={() => openIssue(story.id)}
-										class="flex items-center justify-between py-2 px-3 rounded-lg bg-surface-dark/20 border border-border/40 hover:border-primary/20 hover:bg-surface-dark/40 cursor-pointer transition-all duration-[var(--motion-fast)]"
+										class="bg-surface-dark/20 hover:bg-surface-dark/40 flex cursor-pointer items-center justify-between rounded-lg border border-border/40 px-3 py-2 transition-all duration-[var(--motion-fast)] hover:border-primary/20"
 									>
 										<div class="flex items-center gap-2 truncate">
-											<BookOpen class="h-3.5 w-3.5 text-primary/70 shrink-0" />
-											<span class="text-xs font-semibold shrink-0 text-muted-foreground"
+											<BookOpen class="h-3.5 w-3.5 shrink-0 text-primary/70" />
+											<span class="shrink-0 text-xs font-semibold text-muted-foreground"
 												>#{story.id}</span
 											>
-											<span class="text-sm text-foreground truncate">{story.title}</span>
+											<span class="truncate text-sm text-foreground">{story.title}</span>
 										</div>
 										<div class="flex items-center gap-3">
 											{#if story.customFields.story_points}
 												<span
-													class="text-[10px] font-bold px-2 py-0.5 rounded bg-muted text-foreground"
+													class="rounded bg-muted px-2 py-0.5 text-[10px] font-bold text-foreground"
 												>
 													{story.customFields.story_points}
 													{t('sprint.pointsUnit')}
@@ -230,7 +230,7 @@
 											{/if}
 											{#if story.customFields.priority}
 												<span
-													class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded {story
+													class="rounded px-1.5 py-0.5 text-[10px] font-bold uppercase {story
 														.customFields.priority === 'alta' ||
 													story.customFields.priority === 'high'
 														? 'bg-error/15 text-error'
@@ -243,7 +243,7 @@
 												</span>
 											{/if}
 											<span
-												class="text-xs font-semibold px-2 py-0.5 rounded bg-success/15 text-success"
+												class="rounded bg-success/15 px-2 py-0.5 text-xs font-semibold text-success"
 											>
 												{story.status}
 											</span>
@@ -261,11 +261,11 @@
 		<!-- Unclassified Stories Section -->
 		{#if unparentedStories.length > 0}
 			<Card
-				class="border-dashed border-border hover:border-primary/30 transition-all duration-[var(--motion-base)]"
+				class="border-dashed border-border transition-all duration-[var(--motion-base)] hover:border-primary/30"
 			>
 				<div class="flex flex-col gap-4">
 					<div class="flex items-center gap-2 border-b border-border/40 pb-3">
-						<span class="p-1.5 bg-muted text-muted-foreground rounded">
+						<span class="rounded bg-muted p-1.5 text-muted-foreground">
 							<AlertTriangle class="h-4 w-4" />
 						</span>
 						<h3 class="font-display font-semibold text-muted-foreground">
@@ -279,19 +279,19 @@
 							<!-- svelte-ignore a11y_no_static_element_interactions -->
 							<div
 								onclick={() => openIssue(story.id)}
-								class="flex items-center justify-between py-2 px-3 rounded-lg bg-surface-dark/20 border border-border/40 hover:border-primary/20 hover:bg-surface-dark/40 cursor-pointer transition-all duration-[var(--motion-fast)]"
+								class="bg-surface-dark/20 hover:bg-surface-dark/40 flex cursor-pointer items-center justify-between rounded-lg border border-border/40 px-3 py-2 transition-all duration-[var(--motion-fast)] hover:border-primary/20"
 							>
 								<div class="flex items-center gap-2 truncate">
-									<BookOpen class="h-3.5 w-3.5 text-primary/70 shrink-0" />
-									<span class="text-xs font-semibold shrink-0 text-muted-foreground"
+									<BookOpen class="h-3.5 w-3.5 shrink-0 text-primary/70" />
+									<span class="shrink-0 text-xs font-semibold text-muted-foreground"
 										>#{story.id}</span
 									>
-									<span class="text-sm text-foreground truncate">{story.title}</span>
+									<span class="truncate text-sm text-foreground">{story.title}</span>
 								</div>
 								<div class="flex items-center gap-3">
 									{#if story.customFields.story_points}
 										<span
-											class="text-[10px] font-bold px-2 py-0.5 rounded bg-muted text-foreground"
+											class="rounded bg-muted px-2 py-0.5 text-[10px] font-bold text-foreground"
 										>
 											{story.customFields.story_points}
 											{t('sprint.pointsUnit')}
@@ -299,7 +299,7 @@
 									{/if}
 									{#if story.customFields.priority}
 										<span
-											class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded {story
+											class="rounded px-1.5 py-0.5 text-[10px] font-bold uppercase {story
 												.customFields.priority === 'alta' || story.customFields.priority === 'high'
 												? 'bg-error/15 text-error'
 												: story.customFields.priority === 'media' ||
@@ -311,7 +311,7 @@
 										</span>
 									{/if}
 									<span
-										class="text-xs font-semibold px-2 py-0.5 rounded bg-success/15 text-success"
+										class="rounded bg-success/15 px-2 py-0.5 text-xs font-semibold text-success"
 									>
 										{story.status}
 									</span>

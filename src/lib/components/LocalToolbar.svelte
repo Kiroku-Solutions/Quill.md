@@ -140,7 +140,7 @@
 </script>
 
 <nav
-	class="sticky top-[var(--topbar-height)] z-10 flex flex-wrap items-center gap-3 border-b border-border bg-surface/80 backdrop-blur-xl px-6 py-3 transition-colors duration-[var(--motion-slow)]"
+	class="sticky top-[var(--topbar-height)] z-10 flex flex-wrap items-center gap-3 border-b border-border bg-surface/80 px-6 py-3 backdrop-blur-xl transition-colors duration-[var(--motion-slow)]"
 	data-testid="local-toolbar"
 >
 	{#if !isReadOnly}
@@ -177,7 +177,7 @@
 	{/if}
 
 	<span
-		class="px-2 py-1 bg-foreground/5 rounded-md text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+		class="rounded-md bg-foreground/5 px-2 py-1 text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 		data-testid="toolbar-view-label"
 	>
 		{viewLabel}
@@ -185,13 +185,13 @@
 
 	<button
 		type="button"
-		class="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-foreground/5 hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+		class="ml-auto flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
 		disabled={isReadOnly}
 		onclick={openEmptyTrash}
 		data-testid="toolbar-trash"
 		aria-label={t('localToolbar.trashAria', { n: trashCount })}
 	>
-		<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+		<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 			><path
 				stroke-linecap="round"
 				stroke-linejoin="round"
@@ -205,7 +205,7 @@
 	</button>
 
 	<span
-		class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+		class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 		data-testid="toolbar-status"
 	>
 		{t('common.issueCount', { n: issueCount })} ·
@@ -213,7 +213,7 @@
 	</span>
 
 	{#if refreshError}
-		<span class="text-error text-xs font-medium" role="alert">{refreshError}</span>
+		<span class="text-xs font-medium text-error" role="alert">{refreshError}</span>
 	{/if}
 </nav>
 

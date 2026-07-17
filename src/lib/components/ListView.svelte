@@ -177,7 +177,7 @@
 
 <div class="px-6 py-4" data-testid="list-view">
 	<div
-		class="mb-4 flex items-center justify-between text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+		class="mb-4 flex items-center justify-between text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 	>
 		<span data-testid="list-view-count">
 			{t('list.countPill', { filtered: filteredCount, total: total })}
@@ -185,16 +185,16 @@
 		<span>{t('list.sortLabel', { key: sortKey, dir: sortDir })}</span>
 	</div>
 
-	<div class="overflow-x-auto border border-border rounded-xl bg-background shadow-sm">
+	<div class="overflow-x-auto rounded-xl border border-border bg-background shadow-sm">
 		<table class="w-full text-left text-sm whitespace-nowrap">
 			<thead
-				class="bg-surface border-b border-border text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+				class="border-b border-border bg-surface text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 			>
 				<tr>
 					<th aria-sort={ariaSortFor('id')} class="px-4 py-3 font-semibold">
 						<button
 							type="button"
-							class="flex items-center gap-1 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+							class="flex items-center gap-1 transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
 							onclick={() => toggleSort('id')}
 						>
 							{t('list.headers.id')}
@@ -205,7 +205,7 @@
 					<th aria-sort={ariaSortFor('title')}>
 						<button
 							type="button"
-							class="flex items-center gap-1 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+							class="flex items-center gap-1 transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
 							onclick={() => toggleSort('title')}
 						>
 							{t('list.headers.title')}
@@ -218,7 +218,7 @@
 					<th aria-sort={ariaSortFor('status')}>
 						<button
 							type="button"
-							class="flex items-center gap-1 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+							class="flex items-center gap-1 transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
 							onclick={() => toggleSort('status')}
 						>
 							{t('list.headers.status')}
@@ -232,7 +232,7 @@
 					<th aria-sort={ariaSortFor('updated_date')}>
 						<button
 							type="button"
-							class="flex items-center gap-1 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+							class="flex items-center gap-1 transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
 							onclick={() => toggleSort('updated_date')}
 						>
 							{t('list.headers.updated')}
@@ -248,19 +248,19 @@
 				{#if groupBy !== 'none' && (groupRows.length > 0 || group.id !== 'unassigned')}
 					<tbody class="bg-surface-dark border-b border-border">
 						<tr>
-							<td colspan="7" class="px-4 py-2 font-bold text-sm text-foreground">
+							<td colspan="7" class="px-4 py-2 text-sm font-bold text-foreground">
 								{group.title}
-								<span class="ml-2 text-xs text-muted-foreground font-normal opacity-70"
+								<span class="ml-2 text-xs font-normal text-muted-foreground opacity-70"
 									>({groupRows.length})</span
 								>
 							</td>
 						</tr>
 					</tbody>
 				{/if}
-				<tbody class="divide-y divide-hairline">
+				<tbody class="divide-hairline divide-y">
 					{#each groupRows as li (li.issue.id)}
 						<tr
-							class="hover:bg-surface transition-colors cursor-pointer text-foreground focus-visible:outline-none focus-visible:bg-surface focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+							class="cursor-pointer text-foreground transition-colors hover:bg-surface focus-visible:bg-surface focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset"
 							tabindex="0"
 							role="button"
 							data-row-id={li.issue.id}
@@ -272,19 +272,19 @@
 									rows.findIndex((r) => r.issue.id === li.issue.id)
 								)}
 						>
-							<td class="font-mono text-xs text-muted-foreground px-4 py-3"
+							<td class="px-4 py-3 font-mono text-xs text-muted-foreground"
 								>{li.issue.id.toString().padStart(4, '0')}</td
 							>
-							<td class="font-medium px-4 py-3 min-w-[20rem] truncate">{li.issue.title}</td>
+							<td class="min-w-[20rem] truncate px-4 py-3 font-medium">{li.issue.title}</td>
 							<td class="px-4 py-3"
 								><span
-									class="px-2 py-0.5 bg-foreground/5 rounded text-[10px] font-bold uppercase tracking-widest text-muted-foreground"
+									class="rounded bg-foreground/5 px-2 py-0.5 text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
 									>{li.issue.issueType}</span
 								></td
 							>
 							<td class="px-4 py-3">
 								<span
-									class="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-widest"
+									class="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-widest"
 									style="background-color: var(--status-color, var(--color-cb-muted)); color: #fff"
 								>
 									{li.issue.status}
@@ -294,17 +294,17 @@
 							<td class="px-4 py-3">
 								{#each li.issue.labels as l (l)}
 									<span
-										class="px-1.5 py-0.5 border border-border rounded text-[10px] font-bold uppercase tracking-widest text-muted-foreground mr-1"
+										class="mr-1 rounded border border-border px-1.5 py-0.5 text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
 										>{l}</span
 									>
 								{/each}
 							</td>
-							<td class="text-xs text-muted-foreground px-4 py-3">{li.issue.updatedDate}</td>
+							<td class="px-4 py-3 text-xs text-muted-foreground">{li.issue.updatedDate}</td>
 						</tr>
 					{/each}
 					{#if groupRows.length === 0 && (groupBy === 'none' || group.id !== 'unassigned')}
 						<tr>
-							<td colspan="7" class="py-12 text-center text-muted-foreground font-medium italic"
+							<td colspan="7" class="py-12 text-center font-medium text-muted-foreground italic"
 								>{t('list.empty')}</td
 							>
 						</tr>

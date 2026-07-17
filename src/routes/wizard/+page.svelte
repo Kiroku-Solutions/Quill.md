@@ -172,7 +172,7 @@
 						{#each activePresets as preset (preset.id)}
 							<div data-testid="wizard-preset-{preset.id}">
 								<Card compact class="h-full">
-									<label class="flex cursor-pointer items-start gap-3 h-full">
+									<label class="flex h-full cursor-pointer items-start gap-3">
 										<Radio
 											name="preset"
 											value={preset.id}
@@ -186,7 +186,7 @@
 												{preset.name}
 											</div>
 											<div
-												class="mt-1 text-xs opacity-70 leading-relaxed line-clamp-3"
+												class="mt-1 line-clamp-3 text-xs leading-relaxed opacity-70"
 												title={preset.description}
 											>
 												{preset.description}

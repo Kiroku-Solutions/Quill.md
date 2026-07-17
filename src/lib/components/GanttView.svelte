@@ -402,12 +402,12 @@
 		</div>
 	{/if}
 
-	<details class="rounded-xl border border-border bg-surface p-5 text-sm mt-8">
+	<details class="mt-8 rounded-xl border border-border bg-surface p-5 text-sm">
 		<summary class="cursor-pointer font-bold text-foreground">{t('gantt.fallbackSummary')}</summary>
-		<div class="mt-4 overflow-x-auto border border-border rounded-lg bg-background shadow-sm">
+		<div class="mt-4 overflow-x-auto rounded-lg border border-border bg-background shadow-sm">
 			<table class="w-full text-left text-sm whitespace-nowrap">
 				<thead
-					class="bg-surface border-b border-border text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+					class="border-b border-border bg-surface text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 				>
 					<tr>
 						<th class="px-4 py-3">{t('gantt.fallbackHeaders.id')}</th>
@@ -419,13 +419,13 @@
 						<th class="px-4 py-3">{t('gantt.fallbackHeaders.endOrDuration')}</th>
 					</tr>
 				</thead>
-				<tbody class="divide-y divide-hairline">
+				<tbody class="divide-hairline divide-y">
 					{#each bars as bar (bar.id)}
 						<tr
-							class="hover:bg-surface transition-colors cursor-pointer text-foreground"
+							class="cursor-pointer text-foreground transition-colors hover:bg-surface"
 							onclick={() => open(bar.id)}
 						>
-							<td class="font-mono text-xs text-muted-foreground px-4 py-3"
+							<td class="px-4 py-3 font-mono text-xs text-muted-foreground"
 								>{bar.id.toString().padStart(4, '0')}</td
 							>
 							<td class="px-4 py-3">{bar.title}</td>
@@ -441,20 +441,20 @@
 					{/each}
 					{#each undated as li (li.issue.id)}
 						<tr
-							class="hover:bg-surface transition-colors cursor-pointer text-muted-foreground"
+							class="cursor-pointer text-muted-foreground transition-colors hover:bg-surface"
 							onclick={() => open(brandIssueId(li.issue.id))}
 						>
-							<td class="font-mono text-xs px-4 py-3">{li.issue.id.toString().padStart(4, '0')}</td>
+							<td class="px-4 py-3 font-mono text-xs">{li.issue.id.toString().padStart(4, '0')}</td>
 							<td class="px-4 py-3">{li.issue.title}</td>
 							<td class="px-4 py-3">{li.issue.issueType}</td>
 							<td class="px-4 py-3">{li.issue.status}</td>
-							<td colspan="2" class="italic px-4 py-3">{t('gantt.fallbackNotScheduled')}</td>
+							<td colspan="2" class="px-4 py-3 italic">{t('gantt.fallbackNotScheduled')}</td>
 							<td class="px-4 py-3">—</td>
 						</tr>
 					{/each}
 					{#if bars.length === 0 && undated.length === 0}
 						<tr>
-							<td colspan="7" class="py-12 text-center text-muted-foreground font-medium italic"
+							<td colspan="7" class="py-12 text-center font-medium text-muted-foreground italic"
 								>{t('gantt.fallbackEmpty')}</td
 							>
 						</tr>

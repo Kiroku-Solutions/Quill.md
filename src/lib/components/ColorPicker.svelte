@@ -31,14 +31,14 @@
 
 <div class="flex flex-col gap-2">
 	<span class="text-sm font-medium">{t('templateEditor.color')}</span>
-	<div class="flex flex-wrap gap-2 rounded-lg border border-border p-3 bg-surface/50">
+	<div class="flex flex-wrap gap-2 rounded-lg border border-border bg-surface/50 p-3">
 		{#each PRESET_COLORS as color}
 			{@const isSelected = value === color}
 			<button
 				type="button"
 				class="relative h-8 w-8 rounded-full shadow-sm transition-all duration-200
 					{isSelected
-					? 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-110'
+					? 'scale-110 ring-2 ring-primary ring-offset-2 ring-offset-background'
 					: 'hover:scale-110'}"
 				style="background-color: {color}"
 				onclick={() => selectColor(color)}
@@ -62,11 +62,11 @@
 				{/if}
 			</button>
 		{/each}
-		<div class="flex items-center ml-2 border-l border-border pl-4">
+		<div class="ml-2 flex items-center border-l border-border pl-4">
 			<input
 				type="color"
 				bind:value
-				class="h-8 w-8 cursor-pointer rounded overflow-hidden border-0 p-0"
+				class="h-8 w-8 cursor-pointer overflow-hidden rounded border-0 p-0"
 				title={t('templateEditor.customColor')}
 			/>
 		</div>

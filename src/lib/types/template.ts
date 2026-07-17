@@ -2,14 +2,7 @@ import type { FrontmatterValue } from './frontmatter.ts';
 
 /** ERS §6.2.1: the closed set of field types a template can declare. */
 export type FieldType =
-	| 'text'
-	| 'longtext'
-	| 'date'
-	| 'number'
-	| 'select'
-	| 'multi-select'
-	| 'user'
-	| 'relations';
+	'text' | 'longtext' | 'date' | 'number' | 'select' | 'multi-select' | 'user' | 'relations';
 
 export const FIELD_TYPES: readonly FieldType[] = [
 	'text',

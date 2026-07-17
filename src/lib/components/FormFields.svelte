@@ -244,42 +244,42 @@
 			<div
 				class="overflow-hidden rounded-xl border border-border bg-surface p-5 shadow-soft transition-all duration-[var(--motion-base)]"
 			>
-				<div class="flex items-center justify-between border-b border-border/60 pb-3 mb-4">
-					<h3 class="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+				<div class="mb-4 flex items-center justify-between border-b border-border/60 pb-3">
+					<h3 class="text-xs font-bold tracking-wider text-muted-foreground uppercase">
 						{t('sprint.progress')}
 					</h3>
-					<span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-warning/10 text-warning">
+					<span class="rounded-full bg-warning/10 px-2 py-0.5 text-[11px] font-bold text-warning">
 						{issue.title}
 					</span>
 				</div>
 
-				<div class="grid grid-cols-3 gap-4 mb-4">
+				<div class="mb-4 grid grid-cols-3 gap-4">
 					<div class="flex flex-col">
-						<span class="text-[10px] uppercase font-bold tracking-wider text-muted-foreground"
+						<span class="text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
 							>{t('sprint.stories')}</span
 						>
-						<span class="text-2xl font-display font-bold text-foreground mt-1">{storyCount}</span>
+						<span class="mt-1 font-display text-2xl font-bold text-foreground">{storyCount}</span>
 					</div>
 					<div class="flex flex-col">
-						<span class="text-[10px] uppercase font-bold tracking-wider text-muted-foreground"
+						<span class="text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
 							>{t('sprint.points')}</span
 						>
-						<span class="text-2xl font-display font-bold text-foreground mt-1"
+						<span class="mt-1 font-display text-2xl font-bold text-foreground"
 							>{storyPoints} {t('sprint.pointsUnit')}</span
 						>
 					</div>
 					<div class="flex flex-col">
-						<span class="text-[10px] uppercase font-bold tracking-wider text-muted-foreground"
+						<span class="text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
 							>{t('sprint.progressLabel')}</span
 						>
-						<span class="text-2xl font-display font-bold text-success mt-1">{avance}%</span>
+						<span class="mt-1 font-display text-2xl font-bold text-success">{avance}%</span>
 					</div>
 				</div>
 
 				<!-- Progress Bar -->
-				<div class="w-full bg-muted rounded-full h-2 overflow-hidden">
+				<div class="h-2 w-full overflow-hidden rounded-full bg-muted">
 					<div
-						class="bg-success h-full transition-all duration-[var(--motion-base)] ease-out"
+						class="h-full bg-success transition-all duration-[var(--motion-base)] ease-out"
 						style="width: {avance}%"
 					></div>
 				</div>
@@ -291,7 +291,7 @@
 			{@const value = currentValue(field)}
 			<div class="flex flex-col gap-1" data-field-key={field.key} data-field-type={field.type}>
 				<label for={fid} class="flex items-center pb-1">
-					<span class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+					<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
 						{field.name}
 						{#if field.obligatory}<span class="text-error" aria-hidden="true">&nbsp;*</span>
 							<span class="sr-only">{t('common.required')}</span>{/if}
@@ -302,7 +302,7 @@
 					<input
 						id={fid}
 						type={field.type}
-						class="w-full bg-background text-foreground rounded-md border {err
+						class="w-full rounded-md border bg-background text-foreground {err
 							? 'border-error ring-1 ring-error'
 							: 'border-border focus:border-transparent'} px-3 py-2 text-sm focus:outline-none {ringClass} transition-shadow"
 						value={(value as string | undefined) ?? ''}
@@ -317,7 +317,7 @@
 					<input
 						id={fid}
 						type="number"
-						class="w-full bg-background text-foreground rounded-md border {err
+						class="w-full rounded-md border bg-background text-foreground {err
 							? 'border-error ring-1 ring-error'
 							: 'border-border focus:border-transparent'} px-3 py-2 text-sm focus:outline-none {ringClass} transition-shadow"
 						value={value === null || value === undefined ? '' : String(value)}
@@ -341,9 +341,9 @@
 					<div class="relative w-full">
 						<select
 							id={fid}
-							class="w-full appearance-none bg-background text-foreground rounded-md border {err
+							class="w-full appearance-none rounded-md border bg-background text-foreground {err
 								? 'border-error ring-1 ring-error'
-								: 'border-border focus:border-transparent'} pl-3 pr-10 py-2 text-sm focus:outline-none {ringClass} transition-shadow"
+								: 'border-border focus:border-transparent'} py-2 pr-10 pl-3 text-sm focus:outline-none {ringClass} transition-shadow"
 							value={(value as string | undefined) ?? ''}
 							aria-invalid={err ? 'true' : undefined}
 							onchange={(e) => {
@@ -395,15 +395,15 @@
 						id={fid}
 						role="group"
 						aria-label={field.name}
-						class="flex flex-wrap gap-1 {err ? 'rounded ring-1 ring-error p-1' : ''}"
+						class="flex flex-wrap gap-1 {err ? 'rounded p-1 ring-1 ring-error' : ''}"
 					>
 						{#each opts as opt (opt.id)}
 							{@const on = selected.includes(opt.id)}
 							<button
 								type="button"
-								class="px-2 py-1 rounded-full text-[11px] font-bold tracking-widest border transition-colors {ringClass} {on
-									? 'bg-foreground text-background border-foreground'
-									: 'bg-transparent text-muted-foreground border-border hover:border-muted'}"
+								class="rounded-full border px-2 py-1 text-[11px] font-bold tracking-widest transition-colors {ringClass} {on
+									? 'border-foreground bg-foreground text-background'
+									: 'border-border bg-transparent text-muted-foreground hover:border-muted'}"
 								aria-pressed={on}
 								onclick={() => toggleMulti(field, opt.id)}
 							>
@@ -418,7 +418,7 @@
 					})()}
 					<div
 						id={fid}
-						class="flex flex-col gap-3 border rounded-md border-border p-3 {err
+						class="flex flex-col gap-3 rounded-md border border-border p-3 {err
 							? 'border-error ring-1 ring-error'
 							: ''}"
 					>
@@ -432,9 +432,9 @@
 									? field.allowed_targets[relTargetIssueType]
 									: RELATION_TYPES}
 							<div class="flex items-center gap-2">
-								<div class="flex-1 min-w-0">
+								<div class="min-w-0 flex-1">
 									<select
-										class="w-full appearance-none bg-surface text-foreground rounded border border-border pl-2 pr-6 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+										class="w-full appearance-none rounded border border-border bg-surface py-1.5 pr-6 pl-2 text-xs text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 										value={rel.type}
 										onchange={(e) => changeRelationType(rel.id, e.currentTarget.value)}
 									>
@@ -444,18 +444,18 @@
 									</select>
 								</div>
 								<span
-									class="text-sm font-medium text-foreground truncate flex-1"
+									class="flex-1 truncate text-sm font-medium text-foreground"
 									title={relationTitle(rel.id)}
 								>
 									{relationTitle(rel.id)}
 								</span>
 								<button
 									type="button"
-									class="text-muted-foreground hover:text-error transition-colors p-1"
+									class="p-1 text-muted-foreground transition-colors hover:text-error"
 									aria-label={t('formFields.removeRelationAria')}
 									onclick={() => removeRelation(rel.id)}
 								>
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+									<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
 											stroke-linecap="round"
 											stroke-linejoin="round"
@@ -468,11 +468,11 @@
 						{/each}
 
 						<div
-							class="flex flex-col sm:flex-row gap-2 items-start sm:items-center mt-1 border-t border-border pt-3"
+							class="mt-1 flex flex-col items-start gap-2 border-t border-border pt-3 sm:flex-row sm:items-center"
 						>
-							<div class="flex-1 min-w-0 relative w-full sm:w-auto">
+							<div class="relative w-full min-w-0 flex-1 sm:w-auto">
 								<select
-									class="w-full appearance-none bg-background text-foreground rounded border border-border pl-2 pr-8 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+									class="w-full appearance-none rounded border border-border bg-background py-1.5 pr-8 pl-2 text-xs text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 									bind:value={newRelationId}
 								>
 									<option value="">{t('formFields.selectPlaceholder')}</option>
@@ -503,9 +503,9 @@
 									field.allowed_targets[targetIssueType].length > 0
 										? field.allowed_targets[targetIssueType]
 										: RELATION_TYPES}
-								<div class="flex-1 min-w-0 relative w-full sm:w-auto">
+								<div class="relative w-full min-w-0 flex-1 sm:w-auto">
 									<select
-										class="w-full appearance-none bg-background text-foreground rounded border border-border pl-2 pr-8 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+										class="w-full appearance-none rounded border border-border bg-background py-1.5 pr-8 pl-2 text-xs text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 										bind:value={newRelationType}
 									>
 										{#each allowedRelTypesForNew as rType}
@@ -529,7 +529,7 @@
 
 							<button
 								type="button"
-								class="px-3 py-1.5 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors text-xs font-bold shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+								class="shrink-0 rounded bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
 								title={t('formFields.addRelation')}
 								disabled={!newRelationId}
 								onclick={addRelation}
@@ -541,7 +541,7 @@
 				{/if}
 
 				{#if err}
-					<p class="text-error text-xs font-medium" role="alert">{err}</p>
+					<p class="text-xs font-medium text-error" role="alert">{err}</p>
 				{/if}
 			</div>
 		{/each}
@@ -553,7 +553,7 @@
 				{t('formFields.changeTypeTitle')}
 			</h3>
 			<p
-				class="px-4 py-3 bg-[var(--color-cb-yellow)]/10 text-foreground border border-[var(--color-cb-yellow)] rounded-md text-sm my-4 font-medium"
+				class="my-4 rounded-md border border-[var(--color-cb-yellow)] bg-[var(--color-cb-yellow)]/10 px-4 py-3 text-sm font-medium text-foreground"
 			>
 				{t('formFields.changeTypeBody', { old: currentTypeName, new: pendingTypeName })}
 			</p>

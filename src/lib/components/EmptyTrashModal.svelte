@@ -64,11 +64,11 @@
 		<h2 class="text-lg font-semibold">{t('emptyTrashModal.title')}</h2>
 		<button
 			type="button"
-			class="p-1 rounded-full text-muted-foreground hover:bg-foreground/5 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+			class="rounded-full p-1 text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
 			onclick={close}
 			aria-label={t('emptyTrashModal.closeAria')}
 		>
-			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+			<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 				><path
 					stroke-linecap="round"
 					stroke-linejoin="round"
@@ -88,13 +88,13 @@
 	</p>
 
 	{#if error}
-		<p class="text-error mt-3 text-xs font-medium" role="alert">{error}</p>
+		<p class="mt-3 text-xs font-medium text-error" role="alert">{error}</p>
 	{/if}
 
 	<footer class="mt-4 flex items-center justify-end gap-2">
 		<button
 			type="button"
-			class="px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-foreground/5 hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+			class="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset disabled:cursor-not-allowed disabled:opacity-50"
 			onclick={close}
 			disabled={busy}
 		>
@@ -102,7 +102,7 @@
 		</button>
 		<button
 			type="button"
-			class="px-3 py-1.5 bg-error text-white rounded-md text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-error focus-visible:ring-offset-2 flex items-center gap-2"
+			class="flex items-center gap-2 rounded-md bg-error px-3 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-error focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
 			disabled={count === 0 || busy || !adapter}
 			aria-busy={busy || undefined}
 			onclick={() => void confirm()}
@@ -110,7 +110,7 @@
 		>
 			{#if busy}
 				<svg
-					class="animate-spin h-3.5 w-3.5 text-current"
+					class="h-3.5 w-3.5 animate-spin text-current"
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
 					viewBox="0 0 24 24"

@@ -149,7 +149,7 @@
 								type="button"
 								role="tab"
 								aria-selected={isOn}
-								class="rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset transition-colors {isOn
+								class="rounded-md px-3 py-1.5 text-xs font-semibold tracking-wider uppercase transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset {isOn
 									? 'bg-foreground text-background'
 									: 'text-muted-foreground hover:bg-foreground/5 hover:text-foreground'}"
 								onclick={() => setActiveSection(sec.id)}
@@ -187,7 +187,7 @@
 		</div>
 
 		<footer
-			class="flex items-center gap-3 border-t border-border px-6 py-4 bg-surface"
+			class="flex items-center gap-3 border-t border-border bg-surface px-6 py-4"
 			data-testid="editor-panel-footer"
 		>
 			{#if isReadOnly}
@@ -241,7 +241,7 @@
 					position="top"
 					class="ml-auto"
 				>
-					<span class="text-xs text-error cursor-help" data-testid="editor-panel-error-count">
+					<span class="cursor-help text-xs text-error" data-testid="editor-panel-error-count">
 						{t('common.validationErrors', { n: editor.errors.length })}
 					</span>
 				</Tooltip>

@@ -51,25 +51,25 @@
 	<div
 		role="alert"
 		data-testid="integrity-warning-banner"
-		class="flex items-start gap-4 px-6 py-4 bg-error/10 text-foreground border-b border-error"
+		class="flex items-start gap-4 border-b border-error bg-error/10 px-6 py-4 text-foreground"
 	>
 		<AlertTriangle class="h-5 w-5 shrink-0 text-error" aria-hidden="true" />
-		<span class="flex-1 text-sm font-sans mt-0.5">{t('integrity.bannerBody', { n: count })}</span>
+		<span class="mt-0.5 flex-1 font-sans text-sm">{t('integrity.bannerBody', { n: count })}</span>
 		<div class="flex items-center gap-2">
 			<button
 				type="button"
-				class="text-xs font-semibold uppercase tracking-wider text-error hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+				class="text-xs font-semibold tracking-wider text-error uppercase transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
 				onclick={review}
 			>
 				{t('common.review')}
 			</button>
 			<button
 				type="button"
-				class="shrink-0 p-1 rounded-full text-muted-foreground hover:bg-foreground/5 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ml-4"
+				class="ml-4 shrink-0 rounded-full p-1 text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
 				aria-label={t('integrity.dismissAria')}
 				onclick={dismiss}
 			>
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 					><path
 						stroke-linecap="round"
 						stroke-linejoin="round"

@@ -27,15 +27,15 @@
 >
 	<h2
 		id="how-it-works-title"
-		class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-center"
+		class="text-center text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 	>
 		{t('home.howItWorks.title')}
 	</h2>
 	<ol class="grid grid-cols-1 gap-6 md:grid-cols-3" role="list">
 		<li
-			class="flex flex-col gap-3 rounded-xl border border-border bg-background p-6 shadow-sm hover:shadow-[var(--shadow-soft)] transition-shadow duration-[var(--motion-base)]"
+			class="flex flex-col gap-3 rounded-xl border border-border bg-background p-6 shadow-sm transition-shadow duration-[var(--motion-base)] hover:shadow-[var(--shadow-soft)]"
 		>
-			<div class="p-2 bg-primary/10 text-primary w-fit rounded-lg">
+			<div class="w-fit rounded-lg bg-primary/10 p-2 text-primary">
 				<FolderPlus class="h-5 w-5" aria-hidden="true" />
 			</div>
 			<h3 class="text-base font-semibold text-foreground">
@@ -46,9 +46,9 @@
 			</p>
 		</li>
 		<li
-			class="flex flex-col gap-3 rounded-xl border border-border bg-background p-6 shadow-sm hover:shadow-[var(--shadow-soft)] transition-shadow duration-[var(--motion-base)]"
+			class="flex flex-col gap-3 rounded-xl border border-border bg-background p-6 shadow-sm transition-shadow duration-[var(--motion-base)] hover:shadow-[var(--shadow-soft)]"
 		>
-			<div class="p-2 bg-primary/10 text-primary w-fit rounded-lg">
+			<div class="w-fit rounded-lg bg-primary/10 p-2 text-primary">
 				<LayoutList class="h-5 w-5" aria-hidden="true" />
 			</div>
 			<h3 class="text-base font-semibold text-foreground">{t('home.howItWorks.browse.title')}</h3>
@@ -57,9 +57,9 @@
 			</p>
 		</li>
 		<li
-			class="flex flex-col gap-3 rounded-xl border border-border bg-background p-6 shadow-sm hover:shadow-[var(--shadow-soft)] transition-shadow duration-[var(--motion-base)]"
+			class="flex flex-col gap-3 rounded-xl border border-border bg-background p-6 shadow-sm transition-shadow duration-[var(--motion-base)] hover:shadow-[var(--shadow-soft)]"
 		>
-			<div class="p-2 bg-primary/10 text-primary w-fit rounded-lg">
+			<div class="w-fit rounded-lg bg-primary/10 p-2 text-primary">
 				<PencilLine class="h-5 w-5" aria-hidden="true" />
 			</div>
 			<h3 class="text-base font-semibold text-foreground">{t('home.howItWorks.edit.title')}</h3>

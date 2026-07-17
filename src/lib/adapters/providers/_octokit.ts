@@ -44,6 +44,25 @@ import { RequestError } from '@octokit/request-error';
 import { RemoteAuthError, RemoteCommitRejectedError, RemoteFetchError } from '../errors.ts';
 import { brandPat, redactPatInText, type Pat } from './_pat.ts';
 
+/**
+ * Structural shape of `@octokit/graphql`'s `GraphqlResponseError`.
+ *
+ * We do not import the class directly because `@octokit/graphql` is a
+ * transitive dependency under pnpm and is not symlinked into the top-level
+ * `node_modules/`. Duck-typing on `name === 'GraphqlResponseError'` is the
+ * stable public contract documented by the package; the per-error fields
+ * (`message`, `errors[].message`, `errors[].extensions.code`) are part of
+ * the GraphQL spec itself.
+ */
+export interface GraphqlResponseErrorLike {
+	readonly name: 'GraphqlResponseError';
+	readonly message: string;
+	readonly errors?: ReadonlyArray<{
+		readonly message: string;
+		readonly extensions?: { readonly code?: string };
+	}>;
+}
+
 const USER_AGENT = 'quill-md/0.0.1';
 const DEFAULT_BASE_URL = 'https://api.github.com';
 
@@ -134,6 +153,60 @@ export function mapRequestError(err: unknown): Error {
 	}
 	return new RemoteFetchError(`HTTP ${status} from ${url}: ${messageBody}`, {
 		status,
+		cause: err
+	});
+}
+
+/**
+ * Type guard for Octokit's GraphQL `GraphqlResponseError`. GraphQL transport
+ * failures (5xx, network drops) still flow through the `request` hook and
+ * {@link mapRequestError}; this guard is for the 200-OK-with-`errors[]`
+ * case that `@octokit/graphql` throws after the response is received.
+ */
+export function isGraphqlResponseError(err: unknown): err is GraphqlResponseErrorLike {
+	return err instanceof Error && err.name === 'GraphqlResponseError';
+}
+
+/**
+ * Map a GraphQL `GraphqlResponseError` to an {@link AdapterError} subclass.
+ *
+ * GitHub returns HTTP 200 even for auth, scope, and not-found failures on
+ * the `/graphql` endpoint — the failure is carried in the response body's
+ * `errors[]` array. Mapping mirrors {@link mapRequestError}:
+ *   - `UNAUTHENTICATED` / "Bad credentials" / "Authentication failed" → `RemoteAuthError`
+ *   - `FORBIDDEN`        / "Forbidden"            / "insufficient_scope" → `RemoteAuthError`
+ *   - `NOT_FOUND`        / "Could not resolve"   / "Not Found"          → `RemoteFetchError(404)`
+ *   - anything else                                                       → `RemoteFetchError(0)`
+ *
+ * Non-`GraphqlResponseError` inputs are rethrown unchanged: transport-level
+ * failures were already mapped by the `request` hook, and letting programmer
+ * errors (`TypeError`, etc.) surface unmodified keeps the existing handlers
+ * in charge.
+ */
+export function mapGraphQLError(err: unknown, endpointUrl: string): Error {
+	if (!isGraphqlResponseError(err)) {
+		return err instanceof Error ? err : new Error(String(err));
+	}
+	const firstMessage = (err.errors?.[0]?.message ?? err.message).slice(0, 200);
+	const code = err.errors?.[0]?.extensions?.code as string | undefined;
+
+	if (code === 'FORBIDDEN' || /forbidden|insufficient_scope/i.test(firstMessage)) {
+		return new RemoteAuthError(
+			`Forbidden — check that your token has the required scopes for ${endpointUrl}`,
+			err
+		);
+	}
+	if (code === 'UNAUTHENTICATED' || /bad credentials|authentication failed/i.test(firstMessage)) {
+		return new RemoteAuthError(`Authentication failed for ${endpointUrl}`, err);
+	}
+	if (
+		code === 'NOT_FOUND' ||
+		/not found|could not resolve to a (Repository|Tree|Blob|Commit)/i.test(firstMessage)
+	) {
+		return new RemoteFetchError(`Not found: ${endpointUrl}`, { status: 404, cause: err });
+	}
+	return new RemoteFetchError(`GraphQL error from ${endpointUrl}: ${firstMessage}`, {
+		status: 0,
 		cause: err
 	});
 }

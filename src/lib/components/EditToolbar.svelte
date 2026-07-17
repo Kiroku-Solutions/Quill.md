@@ -171,7 +171,7 @@
 </script>
 
 <nav
-	class="sticky top-[var(--topbar-height)] z-10 flex flex-wrap items-center gap-3 border-b border-border bg-surface/80 backdrop-blur-xl px-6 py-3 transition-colors duration-[var(--motion-slow)]"
+	class="sticky top-[var(--topbar-height)] z-10 flex flex-wrap items-center gap-3 border-b border-border bg-surface/80 px-6 py-3 backdrop-blur-xl transition-colors duration-[var(--motion-slow)]"
 	data-testid="edit-toolbar"
 >
 	<Button variant="primary" size="sm" onclick={openNewIssue} data-testid="toolbar-new-issue">
@@ -212,7 +212,7 @@
 	{/if}
 
 	<span
-		class="px-2 py-1 bg-foreground/5 rounded-md text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+		class="rounded-md bg-foreground/5 px-2 py-1 text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 		data-testid="toolbar-view-label"
 	>
 		{viewLabel}
@@ -220,14 +220,14 @@
 
 	{#if isRemote}
 		<span
-			class="px-2 py-1 bg-primary/10 text-primary rounded-md text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-1"
+			class="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-1 text-[11px] font-bold tracking-widest text-primary uppercase"
 			data-testid="toolbar-provider-pill"
 		>
 			<Globe class="h-3 w-3" aria-hidden="true" />
 			{providerLabel}
 		</span>
 		<span
-			class="px-2 py-1 bg-foreground/5 rounded-md text-[11px] font-bold uppercase tracking-widest text-muted-foreground inline-flex items-center gap-1"
+			class="inline-flex items-center gap-1 rounded-md bg-foreground/5 px-2 py-1 text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 			data-testid="toolbar-branch-pill"
 		>
 			<GitBranch class="h-3 w-3" aria-hidden="true" />
@@ -240,7 +240,7 @@
 			<Tooltip text={t('localToolbar.trashAria', { n: trashCount })} position="bottom">
 				<button
 					type="button"
-					class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-foreground/5 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+					class="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
 					onclick={openEmptyTrash}
 					data-testid="toolbar-trash"
 				>
@@ -253,7 +253,7 @@
 		{/if}
 
 		<span
-			class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+			class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 			data-testid="toolbar-status"
 		>
 			{t('common.issueCount', { n: issueCount })} ·
@@ -269,10 +269,10 @@
 	</div>
 
 	{#if refreshError}
-		<span class="text-error text-xs font-medium" role="alert">{refreshError}</span>
+		<span class="text-xs font-medium text-error" role="alert">{refreshError}</span>
 	{/if}
 	{#if queueError && isAnyRemoteError(queueError)}
-		<div class="w-full mt-2">
+		<div class="mt-2 w-full">
 			<Alert variant="error">
 				{queueError.message}
 				{#if queueError.name === 'RemoteConflictError'}
@@ -304,7 +304,7 @@
 		aria-modal="true"
 	>
 		<div
-			class="bg-surface border border-border shadow-xl rounded-xl w-[28rem] max-w-full p-6 flex flex-col gap-4"
+			class="flex w-[28rem] max-w-full flex-col gap-4 rounded-xl border border-border bg-surface p-6 shadow-xl"
 		>
 			<h2 class="text-lg font-bold text-foreground">{t('refreshPatPrompt.title')}</h2>
 			<p class="text-sm text-muted-foreground">{t('refreshPatPrompt.body')}</p>
@@ -315,7 +315,7 @@
 				bind:value={promptPat}
 				disabled={refreshing}
 				placeholder={t('home.remotePatPlaceholder')}
-				class="w-full bg-background text-foreground rounded-md border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+				class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 				data-testid="edit-toolbar-pat-input"
 			/>
 			<div class="flex justify-end gap-3">

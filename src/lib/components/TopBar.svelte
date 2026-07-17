@@ -105,10 +105,10 @@
 <header
 	data-testid="topbar"
 	aria-label={t('topbar.ariaLabel')}
-	class="sticky top-0 z-30 flex h-[var(--topbar-height)] w-full items-center gap-3 border-b border-border bg-background/80 backdrop-blur-md px-4 md:px-6 transition-colors duration-[var(--motion-slow)]"
+	class="sticky top-0 z-30 flex h-[var(--topbar-height)] w-full items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur-md transition-colors duration-[var(--motion-slow)] md:px-6"
 >
 	{#if mode === 'local' || mode === 'remote'}
-		<div class="md:hidden flex-shrink-0 -ml-2 mr-1">
+		<div class="mr-1 -ml-2 flex-shrink-0 md:hidden">
 			<IconButton label={t('topbar.toggleMobileNav')} onclick={() => stores.ui.toggleMobileNav()}>
 				<MenuIcon class="h-6 w-6" aria-hidden="true" />
 			</IconButton>
@@ -117,22 +117,22 @@
 
 	<a
 		href={resolve('/')}
-		class="flex items-center gap-3 font-display font-bold tracking-tight hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
+		class="flex items-center gap-3 rounded font-display font-bold tracking-tight hover:opacity-80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
 		aria-label={t('app.homeAria')}
 	>
 		<img src={Bird} alt={t('app.logoAlt')} class="h-7 w-7" />
 		<div class="flex items-baseline gap-2">
 			<span class="text-xl text-foreground">{t('app.name')}</span>
-			<span class="text-xs text-muted-foreground font-sans font-medium">{t('app.version')}</span>
+			<span class="font-sans text-xs font-medium text-muted-foreground">{t('app.version')}</span>
 		</div>
 	</a>
 
 	<Badge variant={badge.variant} size="sm">{badge.label}</Badge>
 
 	{#if indicatorText && indicatorText !== 'null'}
-		<div class="hidden md:flex flex-1 items-center justify-center mx-4 min-w-0">
+		<div class="mx-4 hidden min-w-0 flex-1 items-center justify-center md:flex">
 			<span
-				class="text-base text-foreground font-semibold truncate"
+				class="truncate text-base font-semibold text-foreground"
 				title={indicatorText}
 				data-testid="topbar-project-name"
 			>

@@ -5,9 +5,4 @@
  * type (anything outside the system keys defined in ERS §6.1.3).
  */
 export type FrontmatterValue =
-	| string
-	| number
-	| boolean
-	| null
-	| FrontmatterValue[]
-	| { [key: string]: FrontmatterValue };
+	string | number | boolean | null | FrontmatterValue[] | { [key: string]: FrontmatterValue };

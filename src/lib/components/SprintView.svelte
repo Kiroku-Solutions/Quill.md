@@ -128,17 +128,17 @@
 	}
 </script>
 
-<div class="flex h-full min-h-0 flex-col md:flex-row gap-6 p-6">
+<div class="flex h-full min-h-0 flex-col gap-6 p-6 md:flex-row">
 	{#if sprints.length === 0}
-		<div class="flex-1 flex flex-col items-center justify-center text-center p-12">
-			<Milestone class="h-12 w-12 text-muted-foreground/40 mb-4" />
-			<h3 class="text-lg font-semibold text-foreground mb-2">
+		<div class="flex flex-1 flex-col items-center justify-center p-12 text-center">
+			<Milestone class="mb-4 h-12 w-12 text-muted-foreground/40" />
+			<h3 class="mb-2 text-lg font-semibold text-foreground">
 				{t('sprintPlanner.noSprints')}
 			</h3>
 		</div>
 	{:else}
 		<!-- Left Column: Sprints List -->
-		<div class="w-full md:w-80 shrink-0 flex flex-col gap-4 overflow-y-auto pr-2">
+		<div class="flex w-full shrink-0 flex-col gap-4 overflow-y-auto pr-2 md:w-80">
 			{#each sprints as sprint (sprint.id)}
 				{@const metrics = getSprintMetrics(sprint)}
 				<!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -156,7 +156,7 @@
 							<div class="flex items-center justify-between">
 								<div class="flex items-center gap-2">
 									<Milestone class="h-4 w-4 text-warning" />
-									<h4 class="font-display font-semibold text-foreground text-sm">
+									<h4 class="font-display text-sm font-semibold text-foreground">
 										{sprint.title}
 									</h4>
 								</div>
@@ -168,23 +168,23 @@
 								<span>{sprint.startDate ?? '—'} · {sprint.endDate ?? '—'}</span>
 							</div>
 
-							<div class="grid grid-cols-2 gap-2 text-xs border-t border-border/40 pt-2 mt-1">
+							<div class="mt-1 grid grid-cols-2 gap-2 border-t border-border/40 pt-2 text-xs">
 								<div>
 									<span class="text-muted-foreground">{t('sprint.stories')}:</span>
-									<span class="font-bold text-foreground ml-1">{metrics.count}</span>
+									<span class="ml-1 font-bold text-foreground">{metrics.count}</span>
 								</div>
 								<div>
 									<span class="text-muted-foreground">{t('sprint.points')}:</span>
-									<span class="font-bold text-foreground ml-1"
+									<span class="ml-1 font-bold text-foreground"
 										>{metrics.points} {t('sprint.pointsUnit')}</span
 									>
 								</div>
 							</div>
 
 							<!-- Mini Progress Bar -->
-							<div class="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+							<div class="h-1.5 w-full overflow-hidden rounded-full bg-muted">
 								<div
-									class="bg-success h-full transition-all duration-[var(--motion-base)]"
+									class="h-full bg-success transition-all duration-[var(--motion-base)]"
 									style="width: {metrics.progress}%"
 								></div>
 							</div>
@@ -195,18 +195,18 @@
 		</div>
 
 		<!-- Right Column: Planner Workspace -->
-		<div class="flex-1 flex flex-col gap-6 overflow-y-auto">
+		<div class="flex flex-1 flex-col gap-6 overflow-y-auto">
 			{#if selectedSprint}
 				{@const selectedMetrics = getSprintMetrics(selectedSprint)}
 				<div class="flex flex-col gap-6">
 					<!-- Header / Dashboard -->
-					<div class="flex flex-col gap-4 bg-surface p-5 rounded-xl border border-border">
+					<div class="flex flex-col gap-4 rounded-xl border border-border bg-surface p-5">
 						<div class="flex items-center justify-between border-b border-border pb-3">
 							<div class="flex items-center gap-2">
 								<button
 									type="button"
 									onclick={() => openIssue(selectedSprint.id)}
-									class="text-left font-display font-bold text-foreground hover:opacity-85 text-lg cursor-pointer focus-visible:outline-none focus-visible:underline"
+									class="cursor-pointer text-left font-display text-lg font-bold text-foreground hover:opacity-85 focus-visible:underline focus-visible:outline-none"
 								>
 									{selectedSprint.title}
 								</button>
@@ -216,35 +216,35 @@
 
 						<div class="grid grid-cols-3 gap-4 text-center">
 							<div>
-								<div class="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+								<div class="text-xs font-bold tracking-wider text-muted-foreground uppercase">
 									{t('sprint.stories')}
 								</div>
-								<div class="text-2xl font-display font-bold text-foreground mt-1">
+								<div class="mt-1 font-display text-2xl font-bold text-foreground">
 									{selectedMetrics.count}
 								</div>
 							</div>
 							<div>
-								<div class="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+								<div class="text-xs font-bold tracking-wider text-muted-foreground uppercase">
 									{t('sprint.points')}
 								</div>
-								<div class="text-2xl font-display font-bold text-foreground mt-1">
+								<div class="mt-1 font-display text-2xl font-bold text-foreground">
 									{selectedMetrics.points}
 									{t('sprint.pointsUnit')}
 								</div>
 							</div>
 							<div>
-								<div class="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+								<div class="text-xs font-bold tracking-wider text-muted-foreground uppercase">
 									{t('sprint.progressLabel')}
 								</div>
-								<div class="text-2xl font-display font-bold text-success mt-1">
+								<div class="mt-1 font-display text-2xl font-bold text-success">
 									{selectedMetrics.progress}%
 								</div>
 							</div>
 						</div>
 
-						<div class="w-full bg-muted rounded-full h-2 overflow-hidden">
+						<div class="h-2 w-full overflow-hidden rounded-full bg-muted">
 							<div
-								class="bg-success h-full transition-all duration-[var(--motion-base)]"
+								class="h-full bg-success transition-all duration-[var(--motion-base)]"
 								style="width: {selectedMetrics.progress}%"
 							></div>
 						</div>
@@ -252,7 +252,7 @@
 
 					<!-- Stories in Sprint -->
 					<div class="flex flex-col gap-3">
-						<h4 class="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+						<h4 class="text-sm font-bold tracking-wider text-muted-foreground uppercase">
 							{t('sprintPlanner.storiesInSprint')}
 						</h4>
 
@@ -267,18 +267,18 @@
 									<!-- svelte-ignore a11y_no_static_element_interactions -->
 									<div
 										onclick={() => openIssue(story.id)}
-										class="flex items-center justify-between p-3 rounded-lg bg-surface border border-border hover:border-primary/20 hover:bg-surface-dark/10 cursor-pointer transition-all"
+										class="hover:bg-surface-dark/10 flex cursor-pointer items-center justify-between rounded-lg border border-border bg-surface p-3 transition-all hover:border-primary/20"
 									>
 										<div class="flex items-center gap-2 truncate">
-											<BookOpen class="h-4 w-4 text-primary shrink-0" />
+											<BookOpen class="h-4 w-4 shrink-0 text-primary" />
 											<span class="text-xs font-semibold text-muted-foreground">#{story.id}</span>
-											<span class="text-sm font-medium text-foreground truncate">{story.title}</span
+											<span class="truncate text-sm font-medium text-foreground">{story.title}</span
 											>
 										</div>
 										<div class="flex items-center gap-3">
 											{#if story.estimate}
 												<span
-													class="text-xs font-bold px-2.5 py-0.5 rounded bg-muted text-foreground"
+													class="rounded bg-muted px-2.5 py-0.5 text-xs font-bold text-foreground"
 												>
 													{story.estimate}
 													{t('sprint.pointsUnit')}
@@ -293,7 +293,7 @@
 														e.stopPropagation();
 														unlinkStory(story.id);
 													}}
-													class="p-1.5 text-muted-foreground hover:text-error hover:bg-error/10 rounded transition-colors cursor-pointer"
+													class="cursor-pointer rounded p-1.5 text-muted-foreground transition-colors hover:bg-error/10 hover:text-error"
 													title={t('sprintPlanner.unlink')}
 												>
 													<Minus class="h-4 w-4" />
@@ -308,21 +308,21 @@
 
 					<!-- Link Stories Block -->
 					{#if isWritable}
-						<div class="flex flex-col gap-3 border-t border-border pt-6 mt-2">
-							<h4 class="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+						<div class="mt-2 flex flex-col gap-3 border-t border-border pt-6">
+							<h4 class="text-sm font-bold tracking-wider text-muted-foreground uppercase">
 								{t('sprintPlanner.unassignedHeader')}
 							</h4>
 
-							<div class="flex flex-col gap-4 max-h-80 overflow-y-auto pr-2">
+							<div class="flex max-h-80 flex-col gap-4 overflow-y-auto pr-2">
 								<!-- Ready to Plan -->
 								<div class="flex flex-col gap-2">
 									<h5
-										class="text-xs font-bold uppercase tracking-wider text-muted-foreground/80 px-1"
+										class="px-1 text-xs font-bold tracking-wider text-muted-foreground/80 uppercase"
 									>
 										{t('sprintPlanner.readyToPlan')}
 									</h5>
 									{#if unassignedStories.length === 0}
-										<p class="text-xs text-muted-foreground italic p-2">
+										<p class="p-2 text-xs text-muted-foreground italic">
 											{t('sprintPlanner.noUnassigned')}
 										</p>
 									{:else}
@@ -331,19 +331,19 @@
 											<!-- svelte-ignore a11y_no_static_element_interactions -->
 											<div
 												onclick={() => openIssue(story.id)}
-												class="flex items-center justify-between p-3 rounded-lg bg-surface/50 border border-border/60 hover:border-primary/20 hover:bg-surface-dark/10 cursor-pointer transition-all"
+												class="hover:bg-surface-dark/10 flex cursor-pointer items-center justify-between rounded-lg border border-border/60 bg-surface/50 p-3 transition-all hover:border-primary/20"
 											>
 												<div class="flex items-center gap-2 truncate">
-													<BookOpen class="h-4 w-4 text-muted-foreground shrink-0" />
+													<BookOpen class="h-4 w-4 shrink-0 text-muted-foreground" />
 													<span class="text-xs font-semibold text-muted-foreground"
 														>#{story.id}</span
 													>
-													<span class="text-sm text-foreground truncate">{story.title}</span>
+													<span class="truncate text-sm text-foreground">{story.title}</span>
 												</div>
 												<div class="flex items-center gap-3">
 													{#if story.estimate}
 														<span
-															class="text-xs font-bold px-2.5 py-0.5 rounded bg-muted text-foreground"
+															class="rounded bg-muted px-2.5 py-0.5 text-xs font-bold text-foreground"
 														>
 															{story.estimate}
 															{t('sprint.pointsUnit')}
@@ -355,7 +355,7 @@
 															e.stopPropagation();
 															linkStory(story.id);
 														}}
-														class="p-1.5 text-primary hover:bg-primary/10 rounded transition-colors cursor-pointer"
+														class="cursor-pointer rounded p-1.5 text-primary transition-colors hover:bg-primary/10"
 														title={t('sprintPlanner.linkStory')}
 													>
 														<Plus class="h-4 w-4" />
@@ -370,7 +370,7 @@
 								{#if refinementStories.length > 0}
 									<div class="flex flex-col gap-2 border-t border-border/40 pt-3">
 										<h5
-											class="text-xs font-bold uppercase tracking-wider text-muted-foreground/80 px-1"
+											class="px-1 text-xs font-bold tracking-wider text-muted-foreground/80 uppercase"
 										>
 											{t('sprintPlanner.needsRefinement')}
 										</h5>
@@ -379,19 +379,19 @@
 											<!-- svelte-ignore a11y_no_static_element_interactions -->
 											<div
 												onclick={() => openIssue(story.id)}
-												class="flex items-center justify-between p-3 rounded-lg bg-surface/20 border border-border/40 opacity-70 hover:opacity-100 cursor-pointer transition-all"
+												class="flex cursor-pointer items-center justify-between rounded-lg border border-border/40 bg-surface/20 p-3 opacity-70 transition-all hover:opacity-100"
 											>
 												<div class="flex items-center gap-2 truncate">
-													<BookOpen class="h-4 w-4 text-muted-foreground shrink-0" />
+													<BookOpen class="h-4 w-4 shrink-0 text-muted-foreground" />
 													<span class="text-xs font-semibold text-muted-foreground"
 														>#{story.id}</span
 													>
-													<span class="text-sm text-foreground truncate">{story.title}</span>
+													<span class="truncate text-sm text-foreground">{story.title}</span>
 												</div>
 												<div class="flex items-center gap-3">
 													{#if story.estimate}
 														<span
-															class="text-xs font-bold px-2.5 py-0.5 rounded bg-muted text-foreground"
+															class="rounded bg-muted px-2.5 py-0.5 text-xs font-bold text-foreground"
 														>
 															{story.estimate}
 															{t('sprint.pointsUnit')}
@@ -400,7 +400,7 @@
 													<button
 														type="button"
 														disabled
-														class="p-1.5 text-muted-foreground opacity-40 cursor-not-allowed"
+														class="cursor-not-allowed p-1.5 text-muted-foreground opacity-40"
 														title={t('sprintPlanner.linkDisabledTooltip')}
 													>
 														<Plus class="h-4 w-4" />

@@ -86,7 +86,7 @@
 
 {#if visible.length > 0}
 	<section data-testid="recent-folders" class="flex flex-col gap-2">
-		<h2 class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+		<h2 class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
 			{t('home.recentFolders.title')}
 		</h2>
 		<ul class="flex flex-col gap-1" role="list">
@@ -95,13 +95,13 @@
 				<li
 					data-testid="recent-folder-row"
 					data-record-id={record.id}
-					class="flex items-center gap-3 rounded-md border border-transparent px-2 py-2 hover:bg-surface transition-colors focus-within:border-primary"
+					class="flex items-center gap-3 rounded-md border border-transparent px-2 py-2 transition-colors focus-within:border-primary hover:bg-surface"
 				>
 					<Folder class="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
 					<button
 						type="button"
 						data-testid="recent-folder-open"
-						class="flex-1 truncate text-left text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
+						class="flex-1 truncate rounded text-left text-sm font-medium focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
 						title={record.name}
 						onclick={() => void reBind(record)}
 					>

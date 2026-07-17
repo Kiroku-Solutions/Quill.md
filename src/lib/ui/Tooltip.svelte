@@ -40,7 +40,7 @@
 <span class="group relative inline-block {extraClass}">
 	{#if children}{@render children()}{/if}
 	<span
-		class="pointer-events-none absolute z-50 whitespace-nowrap rounded-md bg-surface-dark text-on-dark px-2 py-1 text-xs opacity-0 transition-opacity duration-[var(--motion-fast)] group-hover:opacity-100 {positionClass}"
+		class="bg-surface-dark text-on-dark pointer-events-none absolute z-50 rounded-md px-2 py-1 text-xs whitespace-nowrap opacity-0 transition-opacity duration-[var(--motion-fast)] group-hover:opacity-100 {positionClass}"
 	>
 		{text}
 	</span>

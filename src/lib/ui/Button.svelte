@@ -81,14 +81,14 @@
 
 <button
 	{type}
-	class="inline-flex items-center justify-center font-sans font-semibold rounded-pill transition-all duration-[var(--motion-fast)] ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-95 {variantClass} {sizeClass} {disabledClass} {extraClass}"
+	class="inline-flex items-center justify-center rounded-pill font-sans font-semibold transition-all duration-[var(--motion-fast)] ease-in-out focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none active:scale-95 {variantClass} {sizeClass} {disabledClass} {extraClass}"
 	disabled={isInactive}
 	aria-busy={loading || undefined}
 	{...rest}
 >
 	{#if loading}
 		<svg
-			class="animate-spin -ml-1 mr-2 h-4 w-4 text-current"
+			class="mr-2 -ml-1 h-4 w-4 animate-spin text-current"
 			xmlns="http://www.w3.org/2000/svg"
 			fill="none"
 			viewBox="0 0 24 24"

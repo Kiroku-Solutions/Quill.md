@@ -125,7 +125,7 @@
 {#if open}
 	<button
 		type="button"
-		class="fixed inset-0 z-40 cursor-default backdrop-blur-sm bg-black/40 transition-opacity duration-[var(--motion-base)]"
+		class="fixed inset-0 z-40 cursor-default bg-black/40 backdrop-blur-sm transition-opacity duration-[var(--motion-base)]"
 		aria-label={t('settings.backdropAria')}
 		onclick={() => stores.ui.closeSettings()}
 		data-testid="settings-backdrop"
@@ -142,7 +142,7 @@
 			class="flex items-center justify-between gap-3 border-b border-border px-6 py-4"
 			data-testid="settings-header"
 		>
-			<h2 class="text-xl font-display font-semibold text-foreground">{t('settings.title')}</h2>
+			<h2 class="font-display text-xl font-semibold text-foreground">{t('settings.title')}</h2>
 			<IconButton
 				label={t('settings.closeAria')}
 				onclick={() => stores.ui.closeSettings()}
@@ -154,7 +154,7 @@
 
 		<div class="flex-1 overflow-y-auto px-4 py-4">
 			<section class="flex flex-col gap-2" data-testid="settings-theme">
-				<h3 class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+				<h3 class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
 					{t('settings.themeHeading')}
 				</h3>
 				<div class="flex gap-2">
@@ -185,9 +185,9 @@
 
 			<section class="mt-6 flex flex-col gap-2" data-testid="settings-language">
 				<h3
-					class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1"
+					class="flex items-center gap-1 text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 				>
-					<Globe class="h-3 w-3 inline-block" />
+					<Globe class="inline-block h-3 w-3" />
 					{t('settings.languageHeading')}
 				</h3>
 				<div class="flex gap-2">
@@ -208,7 +208,7 @@
 			</section>
 
 			<section class="mt-6 flex flex-col gap-2" data-testid="settings-cors">
-				<h3 class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+				<h3 class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
 					{t('settings.corsHeading')}
 				</h3>
 				<Input
@@ -223,7 +223,7 @@
 			</section>
 
 			<section class="mt-6 flex flex-col gap-2" data-testid="settings-recent">
-				<h3 class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+				<h3 class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
 					{t('settings.recentHeading')}
 				</h3>
 				<Card compact>
@@ -234,7 +234,7 @@
 			<section class="mt-6 flex flex-col gap-2" data-testid="settings-templates">
 				<div class="flex items-center justify-between">
 					<h3
-						class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center justify-between"
+						class="flex items-center justify-between text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 					>
 						<span>{t('settings.templatesHeading')}</span>
 					</h3>
@@ -242,7 +242,7 @@
 						<Button
 							variant="secondary"
 							size="sm"
-							class="h-6 text-xs px-2"
+							class="h-6 px-2 text-xs"
 							onclick={() => (editorOpen = true)}
 							disabled={!localAdapter}
 						>
@@ -250,10 +250,10 @@
 						</Button>
 					</div>
 				</div>
-				<div class="flex flex-col gap-2 mt-2">
+				<div class="mt-2 flex flex-col gap-2">
 					{#each stores.templates.templates as tmpl}
 						<Card compact class="flex items-center gap-3 px-3 py-2">
-							<span class="w-3 h-3 rounded-full" style="background-color: {tmpl.color}"></span>
+							<span class="h-3 w-3 rounded-full" style="background-color: {tmpl.color}"></span>
 							<span class="text-sm font-medium">{tmpl.name}</span>
 						</Card>
 					{/each}
@@ -261,7 +261,7 @@
 			</section>
 
 			<section class="mt-6 flex flex-col gap-3" data-testid="settings-commands">
-				<h3 class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+				<h3 class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
 					{t('settings.commandsHeading')}
 				</h3>
 				<div class="flex flex-wrap gap-2">
@@ -330,11 +330,11 @@
 {/if}
 
 {#if editorOpen}
-	<div class="fixed inset-0 z-[100] bg-background flex flex-col">
+	<div class="fixed inset-0 z-[100] flex flex-col bg-background">
 		<TopBar mode="editor" onCancel={() => (editorOpen = false)} />
 
 		<!-- Editor Body -->
-		<div class="flex-1 p-4 sm:p-8 overflow-y-auto">
+		<div class="flex-1 overflow-y-auto p-4 sm:p-8">
 			<TemplateEditor onsave={onSaveTemplate} oncancel={() => (editorOpen = false)} />
 		</div>
 	</div>

@@ -87,29 +87,29 @@
 <div class="mx-auto flex w-full max-w-5xl flex-col gap-12 px-6 py-20">
 	<section
 		aria-labelledby="home-hero-title"
-		class="flex flex-col gap-4 text-center items-center justify-center mb-6"
+		class="mb-6 flex flex-col items-center justify-center gap-4 text-center"
 	>
-		<img src={Bird} alt={t('app.logoAlt')} class="h-16 w-16 mb-2" />
-		<h1 id="home-hero-title" class="text-5xl font-display font-bold tracking-tight text-foreground">
+		<img src={Bird} alt={t('app.logoAlt')} class="mb-2 h-16 w-16" />
+		<h1 id="home-hero-title" class="font-display text-5xl font-bold tracking-tight text-foreground">
 			{t('home.heroTitle')}
 		</h1>
-		<p class="text-lg text-muted-foreground max-w-2xl">{t('home.heroSubtitle')}</p>
+		<p class="max-w-2xl text-lg text-muted-foreground">{t('home.heroSubtitle')}</p>
 	</section>
 
 	<section aria-label={t('home.chooseModeAria')} class="grid grid-cols-1 gap-6 md:grid-cols-2">
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div onclick={openLocalFolder} class="cursor-pointer group">
+		<div onclick={openLocalFolder} class="group cursor-pointer">
 			<Card
-				class="h-full hover:shadow-md hover:border-primary/50 hover:-translate-y-1 transition-all duration-[var(--motion-base)] ease-in-out"
+				class="h-full transition-all duration-[var(--motion-base)] ease-in-out hover:-translate-y-1 hover:border-primary/50 hover:shadow-md"
 			>
 				<div class="flex h-full flex-col gap-3">
 					<div
-						class="p-3 bg-primary/10 text-primary w-fit rounded-lg mb-2 group-hover:scale-110 transition-transform duration-[var(--motion-fast)] ease-out"
+						class="mb-2 w-fit rounded-lg bg-primary/10 p-3 text-primary transition-transform duration-[var(--motion-fast)] ease-out group-hover:scale-110"
 					>
 						<FolderOpen class="h-6 w-6" aria-hidden="true" />
 					</div>
-					<h2 class="text-xl font-display font-semibold text-foreground">
+					<h2 class="font-display text-xl font-semibold text-foreground">
 						{t('home.openLocalTitle')}
 					</h2>
 					<p class="text-sm text-muted-foreground">{t('home.openLocalBody')}</p>
@@ -137,21 +137,21 @@
 		</div>
 
 		<Card
-			class="hover:shadow-md hover:border-primary/50 transition-all duration-[var(--motion-base)] ease-in-out focus-within:-translate-y-1 focus-within:shadow-md focus-within:border-primary/50"
+			class="transition-all duration-[var(--motion-base)] ease-in-out focus-within:-translate-y-1 focus-within:border-primary/50 focus-within:shadow-md hover:border-primary/50 hover:shadow-md"
 		>
 			<form
-				class="flex h-full flex-col gap-3 group"
+				class="group flex h-full flex-col gap-3"
 				onsubmit={(e) => {
 					e.preventDefault();
 					openRemoteRepo();
 				}}
 			>
 				<div
-					class="p-3 bg-primary/10 text-primary w-fit rounded-lg mb-2 group-focus-within:scale-110 transition-transform duration-[var(--motion-fast)] ease-out"
+					class="mb-2 w-fit rounded-lg bg-primary/10 p-3 text-primary transition-transform duration-[var(--motion-fast)] ease-out group-focus-within:scale-110"
 				>
 					<Globe class="h-6 w-6" aria-hidden="true" />
 				</div>
-				<h2 class="text-xl font-display font-semibold text-foreground">
+				<h2 class="font-display text-xl font-semibold text-foreground">
 					{t('home.openRemoteTitle')}
 				</h2>
 				<p class="text-sm text-muted-foreground">{t('home.openRemoteBody')}</p>

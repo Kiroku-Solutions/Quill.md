@@ -1,6 +1,6 @@
 # AGENTS.md
 
-quill\.md is a SvelteKit \+ Svelte 5 client-side web app for managing repository-stored issues. Full spec: `docs/ers.md` (skim it before making scope changes — it defines Local Edit Mode, Remote Read-Only Mode via `isomorphic-git`, three views, and the `.quill.md/` config tree).
+quill\.md is a SvelteKit \+ Svelte 5 client-side web app for managing repository-stored issues. Full spec: `docs/ers.md` (skim it before making scope changes — it defines Local Edit Mode, Remote Edit Mode via provider REST Strategies, three views, and the `.quill.md/` config tree). Migration history: `docs/provider-strategy-migration.md` (isomorphic-git → Strategy pattern) and `docs/octokit-migration.md` (hand-rolled GitHub REST → `@octokit/rest`).
 
 ## Stack
 
@@ -9,6 +9,7 @@ quill\.md is a SvelteKit \+ Svelte 5 client-side web app for managing repository
 - Tailwind CSS 4 — **CSS-first config** (no `tailwind.config.*`); stylesheet is `src/routes/layout.css`
 - Vite 8, Vitest 4, ESLint 10 (flat config), Prettier 3
 - Package manager: **pnpm** (`pnpm-lock.yaml`). `.npmrc` has `engine-strict=true` — Node must satisfy the engines range or install will fail.
+- Remote Git transport: `@octokit/rest` + `@octokit/plugin-throttling` + `@octokit/plugin-retry` (GitHub provider only; GitLab provider is still hand-rolled — see `docs/octokit-migration.md` §7 follow-ups).
 
 ## Commands
 

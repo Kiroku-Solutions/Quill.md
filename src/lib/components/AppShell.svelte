@@ -43,7 +43,7 @@
 </script>
 
 <div
-	class="flex min-h-screen flex-col bg-background text-foreground font-sans selection:bg-primary/20 selection:text-foreground"
+	class="flex min-h-screen flex-col bg-background font-sans text-foreground selection:bg-primary/20 selection:text-foreground"
 >
 	<TopBar {mode} />
 

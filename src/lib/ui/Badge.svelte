@@ -11,14 +11,7 @@
 	import type { Snippet } from 'svelte';
 
 	type Variant =
-		| 'neutral'
-		| 'primary'
-		| 'secondary'
-		| 'success'
-		| 'warning'
-		| 'error'
-		| 'ghost'
-		| 'outline';
+		'neutral' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'ghost' | 'outline';
 	type Size = 'sm' | 'md' | 'lg';
 
 	type Props = {
@@ -57,7 +50,7 @@
 </script>
 
 <span
-	class="inline-flex items-center justify-center font-sans uppercase font-semibold tracking-wider rounded-pill {variantClass} {sizeClass} {extraClass}"
+	class="inline-flex items-center justify-center rounded-pill font-sans font-semibold tracking-wider uppercase {variantClass} {sizeClass} {extraClass}"
 >
 	{#if children}{@render children()}{/if}
 </span>

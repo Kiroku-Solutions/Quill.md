@@ -286,6 +286,6 @@
 	});
 </script>
 
-<div class="relative w-full h-full bg-surface overflow-hidden">
+<div class="relative h-full w-full overflow-hidden bg-surface">
 	<div bind:this={container} class="absolute inset-0"></div>
 </div>

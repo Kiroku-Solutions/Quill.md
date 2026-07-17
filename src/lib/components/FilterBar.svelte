@@ -32,12 +32,12 @@
 
 <div class="flex flex-col gap-4">
 	<label class="flex flex-col gap-1.5">
-		<span class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+		<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 			>{t('filter.searchLabel')}</span
 		>
 		<input
 			type="search"
-			class="w-full bg-background text-foreground rounded-md border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow placeholder-muted-foreground"
+			class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 			placeholder={t('filter.searchPlaceholder')}
 			value={q}
 			oninput={(e) => update({ q: e.currentTarget.value || undefined })}
@@ -45,12 +45,12 @@
 	</label>
 
 	<label class="flex flex-col gap-1.5">
-		<span class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+		<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 			>{t('filter.statusLabel')}</span
 		>
 		<div class="relative w-full">
 			<select
-				class="w-full appearance-none bg-background text-foreground rounded-md border border-border pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+				class="w-full appearance-none rounded-md border border-border bg-background py-2 pr-10 pl-3 text-sm text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 				value={status}
 				onchange={(e) => update({ status: e.currentTarget.value || undefined })}
 			>
@@ -71,12 +71,12 @@
 	</label>
 
 	<label class="flex flex-col gap-1.5">
-		<span class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+		<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 			>{t('filter.typeLabel')}</span
 		>
 		<input
 			type="text"
-			class="w-full bg-background text-foreground rounded-md border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow placeholder-muted-foreground"
+			class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 			placeholder={t('filter.typePlaceholder')}
 			value={type}
 			oninput={(e) => update({ type: e.currentTarget.value || undefined })}
@@ -84,12 +84,12 @@
 	</label>
 
 	<label class="flex flex-col gap-1.5">
-		<span class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+		<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 			>{t('kanban.sprintLabel', { default: 'Sprint ID' })}</span
 		>
 		<input
 			type="text"
-			class="w-full bg-background text-foreground rounded-md border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow placeholder-muted-foreground"
+			class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 			placeholder="e.g. Sprint-1"
 			value={sprintId}
 			oninput={(e) => update({ sprintId: e.currentTarget.value || undefined })}
@@ -97,12 +97,12 @@
 	</label>
 
 	<label class="flex flex-col gap-1.5">
-		<span class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+		<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 			>View Level (Group By)</span
 		>
 		<div class="relative w-full">
 			<select
-				class="w-full appearance-none bg-background text-foreground rounded-md border border-border pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+				class="w-full appearance-none rounded-md border border-border bg-background py-2 pr-10 pl-3 text-sm text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 				value={groupBy}
 				onchange={(e) =>
 					update({
@@ -129,7 +129,7 @@
 
 	<button
 		type="button"
-		class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors mt-1 w-fit"
+		class="mt-1 w-fit text-[11px] font-bold tracking-widest text-muted-foreground uppercase transition-colors hover:text-foreground"
 		onclick={clear}
 	>
 		{t('filter.clearButton')}

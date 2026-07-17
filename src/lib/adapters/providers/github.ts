@@ -6,18 +6,20 @@
  * The transport is the official Octokit client (`@octokit/rest`),
  * instantiated per PAT via {@link createOctokit}. No HTTP calls are
  * issued from this file directly — every method delegates to a typed
- * `octokit.rest.*` call. The plugins `@octokit/plugin-retry` and
- * `@octokit/plugin-throttling` are wired in at construction time and
- * are responsible for retry on 5xx, honouring GitHub's
- * `x-ratelimit-*` headers on 403, and backing off on the secondary
- * rate limit.
+ * `octokit.rest.*` or `octokit.graphql()` call. The plugins
+ * `@octokit/plugin-retry` and `@octokit/plugin-throttling` are wired
+ * in at construction time and are responsible for retry on 5xx,
+ * honouring GitHub's `x-ratelimit-*` headers on 403, and backing off
+ * on the secondary rate limit. The auth + `'request'` hook chain they
+ * share also fires for the GraphQL endpoint, so a single
+ * `createOctokit` instance powers both transports.
  *
  * Octokit methods used:
  *   users.getAuthenticated                       — verifyAuth
  *   repos.get, repos.getBranch                   — resolveBranch / getBranch
  *   git.createRef, git.getCommit                 — createBranch
  *   git.createCommit, git.createRef              — createOrphanBranch
- *   git.getTree, repos.getContent                — fetchAll
+ *   graphql (POST /graphql)                      — fetchAll  ←  single round-trip
  *   repos.listCommits, repos.getContent (raw)    — fetchSince
  *   repos.createOrUpdateFileContents             — putFile
  *   repos.deleteFile                             — deleteFile
@@ -30,8 +32,12 @@
  */
 
 import type { Octokit } from '@octokit/rest';
-import { createOctokit, decodeBase64Content, utf8ToBase64 } from './_octokit.ts';
-import { RemoteBranchMissingError, RemoteCommitRejectedError } from '../errors.ts';
+import { createOctokit, decodeBase64Content, mapGraphQLError, utf8ToBase64 } from './_octokit.ts';
+import {
+	RemoteBranchMissingError,
+	RemoteCommitRejectedError,
+	RemoteFetchError
+} from '../errors.ts';
 import type {
 	AuthorIdentity,
 	AuthenticatedUser,
@@ -50,11 +56,107 @@ import type {
 
 const EMPTY_TREE_SHA = '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
 const SUBTREE = '.quill.md';
+const TEMPLATES_DIR = `${SUBTREE}/templates`;
+const ISSUES_DIR = `${SUBTREE}/issues`;
+const CONFIG_PATH = `${SUBTREE}/config.json`;
 
-interface TreeEntryLike {
+/**
+ * Single round-trip GraphQL query that replaces the previous
+ * `git.getTree({ recursive: 'true' })` + N × `repos.getContent`
+ * fan-out. Three sub-trees are pinned to the branch commit SHA via
+ * `object(expression: "<sha>:.quill.md/...")`. Truncated blobs
+ * (`Blob.isTruncated === true`, > 500 KB) are recovered in the
+ * provider via the existing `repos.getContent({ mediaType: raw })`
+ * fallback — see {@link GitHubProvider.fetchAll}.
+ *
+ * Note: GitHub's `Tree.entries` is typed `[TreeEntry!]`, not a
+ * Relay-style connection, so it does not accept `first`/`after`
+ * pagination arguments. The response is bounded only by GraphQL's
+ * overall size limit (~10 MB). For very large `.quill.md/issues/`
+ * directories a future change should switch to per-issue
+ * `object(expression: "{sha}:.quill.md/issues/<file>")` lookups
+ * (tracked in `docs/octokit-migration.md` §7).
+ */
+const FETCH_ALL_QUERY = /* GraphQL */ `
+	query QuillMdFetchAll(
+		$owner: String!
+		$name: String!
+		$configExpr: String!
+		$templatesExpr: String!
+		$issuesExpr: String!
+	) {
+		repository(owner: $owner, name: $name) {
+			config: object(expression: $configExpr) {
+				... on Blob {
+					oid
+					isTruncated
+					text
+				}
+			}
+			templates: object(expression: $templatesExpr) {
+				... on Tree {
+					oid
+					entries {
+						name
+						type
+						path
+						object {
+							... on Blob {
+								oid
+								isTruncated
+								text
+							}
+						}
+					}
+				}
+			}
+			issues: object(expression: $issuesExpr) {
+				... on Tree {
+					oid
+					entries {
+						name
+						type
+						path
+						object {
+							... on Blob {
+								oid
+								isTruncated
+								text
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+`;
+
+interface QuillMdBlobNode {
+	readonly oid: string;
+	readonly isTruncated: boolean;
+	readonly text: string | null;
+}
+
+interface QuillMdSubtreeEntry {
+	readonly name: string;
+	readonly type: 'blob' | 'tree' | 'commit';
 	readonly path: string;
-	readonly type: string;
-	readonly sha: string;
+	readonly object: QuillMdBlobNode | null;
+}
+
+interface QuillMdSubtree {
+	readonly oid: string;
+	// GitHub's `Tree.entries` is typed `[TreeEntry!]`, not a connection —
+	// the field carries no `first`/`after` arguments and no `pageInfo`.
+	readonly entries: ReadonlyArray<QuillMdSubtreeEntry>;
+}
+
+interface QuillMdFetchAllResponse {
+	readonly repository: {
+		readonly config: QuillMdBlobNode | null;
+		readonly templates: QuillMdSubtree | null;
+		readonly issues: QuillMdSubtree | null;
+	} | null;
 }
 
 export class GitHubProvider implements RepoProvider {
@@ -187,19 +289,54 @@ export class GitHubProvider implements RepoProvider {
 		pat: string
 	): Promise<readonly RemoteFile[]> {
 		const octokit = this.#client(parsed, pat);
-		const { data: tree } = await octokit.rest.git.getTree({
-			owner: parsed.owner,
-			repo: parsed.repo,
-			tree_sha: branch.treeSha,
-			recursive: 'true'
-		});
+		const expr = (sub: string): string => `${branch.sha}:${SUBTREE}/${sub}`;
+		const endpointUrl = `${parsed.baseUrl}/graphql`;
+		let data: QuillMdFetchAllResponse;
+		try {
+			data = await octokit.graphql<QuillMdFetchAllResponse>(FETCH_ALL_QUERY, {
+				owner: parsed.owner,
+				name: parsed.repo,
+				configExpr: expr('config.json'),
+				templatesExpr: expr('templates'),
+				issuesExpr: expr('issues')
+			});
+		} catch (err) {
+			throw mapGraphQLError(err, endpointUrl);
+		}
+		const repo = data.repository;
+		if (!repo) {
+			throw new RemoteFetchError(`Repository not found: ${parsed.owner}/${parsed.repo}`, {
+				status: 404
+			});
+		}
 		const out: RemoteFile[] = [];
-		for (const raw of tree.tree) {
-			const entry = raw as TreeEntryLike;
-			if (entry.type !== 'blob') continue;
-			if (entry.path !== SUBTREE && !entry.path.startsWith(`${SUBTREE}/`)) continue;
-			const content = await this.fetchBlob(parsed, branch.sha, entry.path, pat);
-			out.push({ path: entry.path, content, sha: entry.sha });
+
+		if (repo.config) {
+			const blob = repo.config;
+			const content = blob.isTruncated
+				? await this.fetchBlob(parsed, branch.sha, CONFIG_PATH, pat, 'raw')
+				: (blob.text ?? '');
+			out.push({ path: CONFIG_PATH, content, sha: blob.oid });
+		}
+		if (repo.templates) {
+			for (const entry of repo.templates.entries) {
+				if (entry.type !== 'blob' || !entry.object) continue;
+				const path = `${TEMPLATES_DIR}/${entry.name}`;
+				const content = entry.object.isTruncated
+					? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
+					: (entry.object.text ?? '');
+				out.push({ path, content, sha: entry.object.oid });
+			}
+		}
+		if (repo.issues) {
+			for (const entry of repo.issues.entries) {
+				if (entry.type !== 'blob' || !entry.object) continue;
+				const path = `${ISSUES_DIR}/${entry.name}`;
+				const content = entry.object.isTruncated
+					? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
+					: (entry.object.text ?? '');
+				out.push({ path, content, sha: entry.object.oid });
+			}
 		}
 		return out;
 	}
@@ -208,9 +345,21 @@ export class GitHubProvider implements RepoProvider {
 		parsed: ParsedRepo,
 		refSha: string,
 		path: string,
-		pat: string
+		pat: string,
+		format: 'base64' | 'raw' = 'base64'
 	): Promise<string> {
-		const { data } = await this.#client(parsed, pat).rest.repos.getContent({
+		const octokit = this.#client(parsed, pat);
+		if (format === 'raw') {
+			const { data } = await octokit.rest.repos.getContent({
+				owner: parsed.owner,
+				repo: parsed.repo,
+				path,
+				ref: refSha,
+				mediaType: { format: 'raw' }
+			});
+			return typeof data === 'string' ? data : '';
+		}
+		const { data } = await octokit.rest.repos.getContent({
 			owner: parsed.owner,
 			repo: parsed.repo,
 			path,

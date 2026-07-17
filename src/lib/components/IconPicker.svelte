@@ -52,7 +52,7 @@
 
 <div class="flex flex-col gap-2">
 	<span class="text-sm font-medium">{t('templateEditor.icon')}</span>
-	<div class="flex flex-wrap justify-start gap-2 rounded-lg border border-border p-3 bg-surface/50">
+	<div class="flex flex-wrap justify-start gap-2 rounded-lg border border-border bg-surface/50 p-3">
 		{#each PRESET_ICONS as iconName}
 			{@const IconComponent = getLucideComponent(iconName)}
 			{@const isSelected = value === iconName}
@@ -60,8 +60,8 @@
 				type="button"
 				class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md transition-all duration-200
 					{isSelected
-					? 'bg-primary text-primary-foreground shadow-md scale-110'
-					: 'text-muted-foreground hover:bg-muted hover:text-foreground hover:scale-105'}"
+					? 'scale-110 bg-primary text-primary-foreground shadow-md'
+					: 'text-muted-foreground hover:scale-105 hover:bg-muted hover:text-foreground'}"
 				onclick={() => selectIcon(iconName)}
 				aria-label={iconName}
 				title={iconName}

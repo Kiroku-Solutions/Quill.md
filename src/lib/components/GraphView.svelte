@@ -243,21 +243,21 @@
 	});
 </script>
 
-<div class="relative w-full h-full bg-surface overflow-hidden">
+<div class="relative h-full w-full overflow-hidden bg-surface">
 	<div bind:this={container} class="absolute inset-0"></div>
 
 	<!-- 2D/3D Toggle -->
 	<div
-		class="absolute bottom-6 right-6 flex items-center gap-2 bg-background/80 backdrop-blur border border-border p-2 rounded-lg shadow-sm z-10"
+		class="absolute right-6 bottom-6 z-10 flex items-center gap-2 rounded-lg border border-border bg-background/80 p-2 shadow-sm backdrop-blur"
 	>
 		<span
-			class="text-[11px] font-bold uppercase tracking-widest {is3D
+			class="text-[11px] font-bold tracking-widest uppercase {is3D
 				? 'text-muted-foreground'
 				: 'text-primary'}">2D</span
 		>
 		<button
 			type="button"
-			class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+			class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none"
 			onclick={() => (is3D = !is3D)}
 			aria-pressed={is3D}
 		>
@@ -280,7 +280,7 @@
 			></span>
 		</button>
 		<span
-			class="text-[11px] font-bold uppercase tracking-widest {is3D
+			class="text-[11px] font-bold tracking-widest uppercase {is3D
 				? 'text-primary'
 				: 'text-muted-foreground'}">3D</span
 		>

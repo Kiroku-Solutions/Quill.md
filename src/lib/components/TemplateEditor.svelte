@@ -232,29 +232,29 @@
 </script>
 
 <div
-	class="flex flex-col gap-8 w-full max-w-5xl mx-auto pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500"
+	class="animate-in fade-in slide-in-from-bottom-4 mx-auto flex w-full max-w-5xl flex-col gap-8 pb-20 duration-500"
 >
 	<!-- Header / Preview Card -->
 	<div style="border-color: {color}40;" class="rounded-xl">
 		<Card
-			class="overflow-hidden border-2 transition-colors duration-300 shadow-lg border-transparent"
+			class="overflow-hidden border-2 border-transparent shadow-lg transition-colors duration-300"
 		>
-			<div class="bg-surface/30 p-6 sm:p-8 flex items-center gap-6 relative overflow-hidden">
+			<div class="relative flex items-center gap-6 overflow-hidden bg-surface/30 p-6 sm:p-8">
 				<!-- Decorative background blob -->
 				<div
-					class="absolute -right-10 -top-10 w-40 h-40 rounded-full blur-3xl opacity-20 transition-colors duration-500"
+					class="absolute -top-10 -right-10 h-40 w-40 rounded-full opacity-20 blur-3xl transition-colors duration-500"
 					style="background-color: {color};"
 				></div>
 
 				<div
-					class="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl shadow-xl transition-all duration-300 scale-100"
+					class="flex h-20 w-20 shrink-0 scale-100 items-center justify-center rounded-2xl shadow-xl transition-all duration-300"
 					style="background: linear-gradient(135deg, {color}, {color}99);"
 				>
 					<PreviewIcon size={40} class="text-white" />
 				</div>
-				<div class="flex flex-col z-10 flex-1">
-					<div class="flex justify-between items-center w-full">
-						<h2 class="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+				<div class="z-10 flex flex-1 flex-col">
+					<div class="flex w-full items-center justify-between">
+						<h2 class="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
 							{t('templateEditor.preview')}
 						</h2>
 						<Button
@@ -267,17 +267,17 @@
 							{t('templateEditor.loadExample')}
 						</Button>
 					</div>
-					<h1 class="text-3xl sm:text-4xl font-bold tracking-tight mt-1 text-foreground">
+					<h1 class="mt-1 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
 						{name || t('templateEditor.unnamed')}
 					</h1>
-					<div class="flex gap-2 mt-3 flex-wrap">
+					<div class="mt-3 flex flex-wrap gap-2">
 						<span
-							class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold text-foreground bg-background/50 shadow-sm"
+							class="inline-flex items-center rounded-full border bg-background/50 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-sm"
 						>
 							ID: {id || '...'}
 						</span>
 						<span
-							class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold text-foreground bg-background/50 shadow-sm"
+							class="inline-flex items-center rounded-full border bg-background/50 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-sm"
 						>
 							{fields.length}
 							{t('templateEditor.fieldsBadge')}
@@ -289,15 +289,15 @@
 	</div>
 
 	<!-- Main Form -->
-	<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+	<div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
 		<!-- Left Column: Basic Info & Appearance -->
-		<div class="lg:col-span-4 flex flex-col gap-6">
+		<div class="flex flex-col gap-6 lg:col-span-4">
 			<section class="flex flex-col gap-4">
 				<div class="flex items-center gap-2">
 					<h3 class="text-lg font-bold tracking-tight">{t('templateEditor.basicInfo')}</h3>
 					<button
 						type="button"
-						class="text-muted-foreground hover:text-primary transition-colors"
+						class="text-muted-foreground transition-colors hover:text-primary"
 						onclick={() => (showBasicHelp = !showBasicHelp)}
 						title={t('templateEditor.basicHelp')}
 						aria-label={t('templateEditor.basicHelp')}
@@ -307,7 +307,7 @@
 				</div>
 				{#if showBasicHelp}
 					<div
-						class="p-3 text-sm bg-primary/5 border border-primary/20 rounded-md text-foreground leading-relaxed"
+						class="rounded-md border border-primary/20 bg-primary/5 p-3 text-sm leading-relaxed text-foreground"
 						transition:slide|local
 					>
 						{t('templateEditor.basicHelpText')}
@@ -321,7 +321,7 @@
 						type="text"
 						value={name}
 						oninput={handleNameInput}
-						class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+						class="border-input focus-visible:ring-ring flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
 						placeholder="Ej. Requerimiento Técnico"
 					/>
 				</div>
@@ -333,19 +333,19 @@
 						type="text"
 						value={id}
 						oninput={handleIdInput}
-						class="flex h-10 w-full rounded-md border border-input bg-muted/50 px-3 py-2 text-sm ring-offset-background font-mono text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+						class="border-input focus-visible:ring-ring flex h-10 w-full rounded-md border bg-muted/50 px-3 py-2 font-mono text-sm text-muted-foreground ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
 						placeholder="ej. requerimiento-tecnico"
 					/>
 					<span class="text-xs text-muted-foreground">{t('templateEditor.idHint')}</span>
 				</div>
 			</section>
 
-			<section class="flex flex-col gap-4 pt-4 border-t border-border/50">
+			<section class="flex flex-col gap-4 border-t border-border/50 pt-4">
 				<div class="flex items-center gap-2">
 					<h3 class="text-lg font-bold tracking-tight">{t('templateEditor.appearance')}</h3>
 					<button
 						type="button"
-						class="text-muted-foreground hover:text-primary transition-colors"
+						class="text-muted-foreground transition-colors hover:text-primary"
 						onclick={() => (showAppearanceHelp = !showAppearanceHelp)}
 						title={t('templateEditor.appearanceHelp')}
 						aria-label={t('templateEditor.appearanceHelp')}
@@ -355,7 +355,7 @@
 				</div>
 				{#if showAppearanceHelp}
 					<div
-						class="p-3 text-sm bg-primary/5 border border-primary/20 rounded-md text-foreground leading-relaxed"
+						class="rounded-md border border-primary/20 bg-primary/5 p-3 text-sm leading-relaxed text-foreground"
 						transition:slide|local
 					>
 						{t('templateEditor.appearanceHelpText')}
@@ -367,7 +367,7 @@
 		</div>
 
 		<!-- Right Column: Fields and Sections -->
-		<div class="lg:col-span-8 flex flex-col gap-10">
+		<div class="flex flex-col gap-10 lg:col-span-8">
 			<!-- Fields Builder -->
 			<section class="flex flex-col gap-4">
 				<div class="flex items-center justify-between">
@@ -376,7 +376,7 @@
 							<h3 class="text-lg font-bold tracking-tight">{t('templateEditor.fieldsTitle')}</h3>
 							<button
 								type="button"
-								class="text-muted-foreground hover:text-primary transition-colors"
+								class="text-muted-foreground transition-colors hover:text-primary"
 								onclick={() => (showFieldsHelp = !showFieldsHelp)}
 								title={t('templateEditor.fieldsHelp')}
 								aria-label={t('templateEditor.fieldsHelp')}
@@ -384,7 +384,7 @@
 								<Icons.Info size={16} />
 							</button>
 						</div>
-						<p class="text-sm text-muted-foreground mt-1">{t('templateEditor.fieldsSubtitle')}</p>
+						<p class="mt-1 text-sm text-muted-foreground">{t('templateEditor.fieldsSubtitle')}</p>
 					</div>
 					<Button variant="secondary" size="sm" onclick={addField}>
 						<Icons.Plus size={16} class="mr-2" />
@@ -394,7 +394,7 @@
 
 				{#if showFieldsHelp}
 					<div
-						class="p-4 text-sm bg-primary/5 border border-primary/20 rounded-md text-foreground leading-relaxed"
+						class="rounded-md border border-primary/20 bg-primary/5 p-4 text-sm leading-relaxed text-foreground"
 						transition:slide|local
 					>
 						{t('templateEditor.fieldsHelpText')}
@@ -408,7 +408,7 @@
 							transition:slide|local
 						>
 							<button
-								class="absolute right-3 top-3 text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
+								class="hover:text-destructive absolute top-3 right-3 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
 								onclick={() => removeField(index)}
 								aria-label="Remove field"
 								title={t('common.delete')}
@@ -416,29 +416,29 @@
 								<Icons.Trash2 size={18} />
 							</button>
 
-							<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pr-6">
+							<div class="grid grid-cols-1 gap-4 pr-6 sm:grid-cols-2">
 								<div class="flex flex-col gap-1.5">
 									<span
-										class="block text-xs font-medium uppercase tracking-wider text-muted-foreground"
+										class="block text-xs font-medium tracking-wider text-muted-foreground uppercase"
 										>{t('templateEditor.fieldName')}</span
 									>
 									<input
 										type="text"
 										bind:value={field.name}
-										class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+										class="border-input focus-visible:ring-ring flex h-9 w-full rounded-md border bg-background px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
 										placeholder="Ej. Prioridad"
 									/>
 								</div>
 								<div class="flex flex-col gap-1.5">
 									<div class="flex items-center gap-2">
 										<span
-											class="block text-xs font-medium uppercase tracking-wider text-muted-foreground"
+											class="block text-xs font-medium tracking-wider text-muted-foreground uppercase"
 											>{t('templateEditor.fieldType')}</span
 										>
 										{#if index === 0}
 											<button
 												type="button"
-												class="text-muted-foreground hover:text-primary transition-colors"
+												class="text-muted-foreground transition-colors hover:text-primary"
 												onclick={() => (showTypeHelp = !showTypeHelp)}
 												title={t('templateEditor.typesHelp')}
 												aria-label={t('templateEditor.typesHelp')}
@@ -449,7 +449,7 @@
 									</div>
 									<select
 										bind:value={field.type}
-										class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+										class="border-input focus-visible:ring-ring flex h-9 w-full rounded-md border bg-background px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
 									>
 										{#each FIELD_TYPES as ft}
 											<option value={ft}>{t(`templateEditor.types.${ft}`)}</option>
@@ -460,31 +460,31 @@
 
 							{#if index === 0 && showTypeHelp}
 								<div
-									class="mt-1 p-3 text-xs bg-primary/5 border border-primary/20 rounded-md text-foreground whitespace-pre-line leading-relaxed"
+									class="mt-1 rounded-md border border-primary/20 bg-primary/5 p-3 text-xs leading-relaxed whitespace-pre-line text-foreground"
 									transition:slide|local
 								>
 									{t('templateEditor.typesHelpText')}
 								</div>
 							{/if}
 
-							<div class="flex items-center gap-4 mt-2">
-								<label class="flex items-center gap-2 text-sm cursor-pointer">
+							<div class="mt-2 flex items-center gap-4">
+								<label class="flex cursor-pointer items-center gap-2 text-sm">
 									<input
 										type="checkbox"
 										bind:checked={field.obligatory}
-										class="rounded border-input text-primary focus:ring-primary h-4 w-4"
+										class="border-input h-4 w-4 rounded text-primary focus:ring-primary"
 									/>
 									{t('templateEditor.required')}
 								</label>
 								<div class="flex items-center gap-2">
 									<span
-										class="block text-xs font-medium uppercase tracking-wider text-muted-foreground"
+										class="block text-xs font-medium tracking-wider text-muted-foreground uppercase"
 										>{t('templateEditor.key')}</span
 									>
 									<input
 										type="text"
 										bind:value={field.key}
-										class="flex h-7 w-32 rounded border border-transparent bg-muted/50 px-2 py-1 text-xs font-mono text-muted-foreground hover:border-input focus:border-input focus:bg-background focus:outline-none"
+										class="hover:border-input focus:border-input flex h-7 w-32 rounded border border-transparent bg-muted/50 px-2 py-1 font-mono text-xs text-muted-foreground focus:bg-background focus:outline-none"
 										placeholder={field.name
 											? field.name.toLowerCase().replace(/[^a-z0-9]+/g, '_')
 											: 'auto'}
@@ -494,18 +494,18 @@
 
 							{#if field.type === 'select' || field.type === 'multi-select'}
 								<div
-									class="flex flex-col gap-1.5 mt-2 p-3 bg-muted/30 rounded-md border border-border/50"
+									class="mt-2 flex flex-col gap-1.5 rounded-md border border-border/50 bg-muted/30 p-3"
 									transition:slide|local
 								>
 									<span
-										class="block text-xs font-medium uppercase tracking-wider text-muted-foreground"
+										class="block text-xs font-medium tracking-wider text-muted-foreground uppercase"
 										>{t('templateEditor.options')}</span
 									>
 									<input
 										type="text"
 										value={(field.options || []).join(', ')}
 										oninput={(e) => handleFieldOptionsChange(e, index)}
-										class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+										class="border-input focus-visible:ring-ring flex h-9 w-full rounded-md border bg-background px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
 										placeholder="Alta, Media, Baja"
 									/>
 									<span class="text-[10px] text-muted-foreground"
@@ -513,7 +513,7 @@
 									>
 
 									{#if field.options && field.options.length > 0}
-										<div class="flex flex-wrap gap-1 mt-2">
+										<div class="mt-2 flex flex-wrap gap-1">
 											{#each field.options as opt}
 												<span
 													class="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
@@ -528,27 +528,27 @@
 
 							{#if field.type === 'relations'}
 								<div
-									class="flex flex-col gap-3 mt-2 p-3 bg-muted/30 rounded-md border border-border/50"
+									class="mt-2 flex flex-col gap-3 rounded-md border border-border/50 bg-muted/30 p-3"
 									transition:slide|local
 								>
 									<div class="flex flex-col gap-1.5">
 										<span
-											class="block text-xs font-medium uppercase tracking-wider text-muted-foreground"
+											class="block text-xs font-medium tracking-wider text-muted-foreground uppercase"
 											>{t('templateEditor.allowedTargets')}</span
 										>
 										<span class="text-[10px] text-muted-foreground"
 											>{t('templateEditor.allowedTargetsHint')}</span
 										>
-										<div class="flex flex-col gap-2 mt-1">
+										<div class="mt-1 flex flex-col gap-2">
 											{#each availableTemplates as tmpl (tmpl.id)}
 												{@const isTargetAllowed =
 													field.allowed_targets && tmpl.id in field.allowed_targets}
 												<div
-													class="flex flex-col gap-2 p-2 border {isTargetAllowed
+													class="flex flex-col gap-2 border p-2 {isTargetAllowed
 														? 'border-primary/30 bg-primary/5'
 														: 'border-border bg-surface'} rounded"
 												>
-													<label class="flex items-center gap-2 text-xs font-medium cursor-pointer">
+													<label class="flex cursor-pointer items-center gap-2 text-xs font-medium">
 														<input
 															type="checkbox"
 															class="sr-only"
@@ -556,8 +556,8 @@
 															onchange={() => toggleAllowedTarget(field, tmpl.id)}
 														/>
 														<div
-															class="w-4 h-4 rounded border flex items-center justify-center {isTargetAllowed
-																? 'bg-primary border-primary'
+															class="flex h-4 w-4 items-center justify-center rounded border {isTargetAllowed
+																? 'border-primary bg-primary'
 																: 'border-border bg-background'}"
 														>
 															{#if isTargetAllowed}<Icons.Check
@@ -566,26 +566,26 @@
 																/>{/if}
 														</div>
 														<span
-															class="w-3 h-3 rounded-full"
+															class="h-3 w-3 rounded-full"
 															style="background-color: {tmpl.color}"
 														></span>
 														{tmpl.name}
 													</label>
 
 													{#if isTargetAllowed}
-														<div class="ml-6 flex flex-col gap-1 mt-1" transition:slide|local>
+														<div class="mt-1 ml-6 flex flex-col gap-1" transition:slide|local>
 															<span
-																class="text-[10px] text-muted-foreground uppercase tracking-wider"
+																class="text-[10px] tracking-wider text-muted-foreground uppercase"
 																>{t('templateEditor.allowedRelationTypes')}</span
 															>
-															<div class="flex flex-wrap gap-2 mt-1">
+															<div class="mt-1 flex flex-wrap gap-2">
 																{#each RELATION_TYPES as rType}
 																	{@const checked =
 																		field.allowed_targets?.[tmpl.id]?.includes(rType) ?? false}
 																	<label
-																		class="flex items-center gap-1.5 text-[11px] cursor-pointer bg-background border {checked
+																		class="flex cursor-pointer items-center gap-1.5 border bg-background text-[11px] {checked
 																			? 'border-primary ring-1 ring-primary'
-																			: 'border-border'} px-2 py-1 rounded"
+																			: 'border-border'} rounded px-2 py-1"
 																	>
 																		<input
 																			type="checkbox"
@@ -611,7 +611,7 @@
 
 					{#if fields.length === 0}
 						<div
-							class="flex flex-col items-center justify-center p-8 rounded-lg border-2 border-dashed border-border/50 text-muted-foreground"
+							class="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-border/50 p-8 text-muted-foreground"
 						>
 							<Icons.LayoutList size={32} class="mb-2 opacity-20" />
 							<p class="text-sm">{t('templateEditor.noFields')}</p>
@@ -628,7 +628,7 @@
 							<h3 class="text-lg font-bold tracking-tight">{t('templateEditor.sectionsTitle')}</h3>
 							<button
 								type="button"
-								class="text-muted-foreground hover:text-primary transition-colors"
+								class="text-muted-foreground transition-colors hover:text-primary"
 								onclick={() => (showSectionsHelp = !showSectionsHelp)}
 								title={t('templateEditor.sectionsHelp')}
 								aria-label={t('templateEditor.sectionsHelp')}
@@ -636,7 +636,7 @@
 								<Icons.Info size={16} />
 							</button>
 						</div>
-						<p class="text-sm text-muted-foreground mt-1">{t('templateEditor.sectionsSubtitle')}</p>
+						<p class="mt-1 text-sm text-muted-foreground">{t('templateEditor.sectionsSubtitle')}</p>
 					</div>
 					<Button variant="secondary" size="sm" onclick={addSection}>
 						<Icons.Plus size={16} class="mr-2" />
@@ -646,7 +646,7 @@
 
 				{#if showSectionsHelp}
 					<div
-						class="p-4 text-sm bg-primary/5 border border-primary/20 rounded-md text-foreground leading-relaxed"
+						class="rounded-md border border-primary/20 bg-primary/5 p-4 text-sm leading-relaxed text-foreground"
 						transition:slide|local
 					>
 						{t('templateEditor.sectionsHelpText')}
@@ -663,22 +663,22 @@
 								<input
 									type="text"
 									bind:value={section.name}
-									class="flex h-9 w-full rounded-md border-0 bg-transparent px-2 py-1 text-sm font-semibold hover:bg-muted/50 focus:bg-background focus:ring-1 focus:ring-ring"
+									class="focus:ring-ring flex h-9 w-full rounded-md border-0 bg-transparent px-2 py-1 text-sm font-semibold hover:bg-muted/50 focus:bg-background focus:ring-1"
 									placeholder="Nombre de la sección"
 								/>
 							</div>
 
 							<div class="flex items-center gap-4">
-								<label class="flex items-center gap-2 text-sm cursor-pointer">
+								<label class="flex cursor-pointer items-center gap-2 text-sm">
 									<input
 										type="checkbox"
 										bind:checked={section.obligatory}
-										class="rounded border-input text-primary focus:ring-primary h-4 w-4"
+										class="border-input h-4 w-4 rounded text-primary focus:ring-primary"
 									/>
 									{t('templateEditor.required')}
 								</label>
 								<button
-									class="text-muted-foreground transition-colors hover:text-destructive p-2 rounded-md hover:bg-destructive/10"
+									class="hover:text-destructive hover:bg-destructive/10 rounded-md p-2 text-muted-foreground transition-colors"
 									onclick={() => removeSection(index)}
 									aria-label="Remove section"
 									title={t('common.delete')}
@@ -694,7 +694,7 @@
 	</div>
 
 	<!-- Bottom Action Bar -->
-	<div class="mt-12 pt-6 border-t border-border/50 flex justify-end gap-4 pb-4">
+	<div class="mt-12 flex justify-end gap-4 border-t border-border/50 pt-6 pb-4">
 		<Button variant="ghost" onclick={oncancel}>{t('common.cancel')}</Button>
 		<Button
 			variant="primary"
