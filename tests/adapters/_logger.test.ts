@@ -89,13 +89,11 @@ describe('_logger — recursive redaction (audit finding)', () => {
 		expect(line).not.toContain(GITLAB);
 	});
 
-	it('passes non-PAT strings through unchanged', () => {
-		const fine = { ok: 'hello world', count: 42, flag: true };
+	it('does not redact strings that merely contain PAT-shaped substrings inside wider tokens', () => {
+		const fine = { ref: 'abcdef0123456789abcdef0123456789abcdef01-not-a-pat' };
 		logRaw('info', 'fine', fine);
 		const line = (console.info as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
-		expect(line).toContain('hello world');
-		expect(line).toContain('42');
-		expect(line).toContain('true');
+		expect(line).toContain('abcdef0123456789abcdef0123456789abcdef01-not-a-pat');
 		expect(line).not.toContain('[REDACTED:PAT]');
 	});
 

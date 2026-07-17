@@ -35,14 +35,13 @@
 import { handleStore } from '../adapters/index.ts';
 import {
 	clearCache,
-	clearCacheForUrl,
 	fetchSubtree,
-	isCacheKey,
+	makeCacheKey,
 	type CacheKey,
 	type RepoUrl,
 	type Branch
-} from '../adapters/remote-git.ts';
-import { RemoteFetchError } from '../adapters/errors.ts';
+} from '../adapters/remote.ts';
+import { clearPat, readPat, readSessionMeta, writePat, writeSessionMeta } from './pat-storage.ts';
 import type { HandleRecord } from '../adapters/handle-store.ts';
 import type {
 	ReadOnlyDirectoryAdapter,
@@ -59,11 +58,25 @@ export type Mode = 'home' | 'local' | 'remote';
  * Parameters for opening a remote repository.
  *
  * `pat` is consumed by `openRemote(creds, pat)` and is never stored on the
- * store object.
+ * store object. The optional overrides mirror `RemoteConfig` (see
+ * `src/lib/types/config.ts`) so a caller that already has the loaded config
+ * can forward per-project settings without going through a separate code
+ * path. Unspecified fields fall back to `DEFAULT_EDIT_BRANCH` and the
+ * provider's authenticated user identity.
  */
 export interface RemoteCredentials {
 	readonly url: RepoUrl;
 	readonly branch: Branch;
+	/** Edit branch (overrides `RemoteConfig.edit_branch` and the `quill-md` default). */
+	readonly editBranch?: string;
+	/** Self-hosted provider base URL (overrides `RemoteConfig.custom_base_url`). */
+	readonly customBaseUrl?: string;
+	/** Force provider selection when a URL would otherwise be ambiguous. */
+	readonly preferredProviderId?: 'github' | 'gitlab';
+	/** Commit author name override (overrides `RemoteConfig.commit_author_name`). */
+	readonly authorName?: string;
+	/** Commit author email override (overrides `RemoteConfig.commit_author_email`). */
+	readonly authorEmail?: string;
 }
 
 /**
@@ -102,6 +115,10 @@ export interface ModeStore {
 	readonly localAdapter: WritableDirectoryAdapter | null;
 	/** Read-only adapter bound when a remote repository is open. */
 	readonly remoteAdapter: ReadOnlyDirectoryAdapter | null;
+	/** Edit branch the remote mode is committing to (`quill-md` by default). */
+	readonly editBranch: string | null;
+	/** Provider id the remote session is using (`github` / `gitlab`). */
+	readonly providerId: string | null;
 
 	readonly bootstrap: () => Promise<void>;
 	readonly openLocalFolder: (handle: FileSystemDirectoryHandle) => Promise<void>;
@@ -215,6 +232,13 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 	let recentHandles = $state.raw<HandleRecord[]>([]);
 	let localAdapter = $state<WritableDirectoryAdapter | null>(null);
 	let remoteAdapter = $state<ReadOnlyDirectoryAdapter | null>(null);
+	// Edit branch the remote mode commits to. Default `quill-md`; settable
+	// via `openRemote({editBranch})`. Surfaced in the TopBar / EditToolbar.
+	let editBranch = $state<string | null>(null);
+	// Provider id the remote session is using (`github` / `gitlab`). Surfaced
+	// in the EditToolbar pill so the user knows which API their PAT is
+	// hitting.
+	let providerId = $state<string | null>(null);
 	// CORS proxy warning text. Populated by openRemote from
 	// fetchSubtree's `proxyWarning` field; cleared on signOut. Safe
 	// to expose on the public surface — see the `proxyWarning` getter.
@@ -269,6 +293,25 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 	// ─── Public actions ────────────────────────────────────────────────
 
 	async function bootstrap(): Promise<void> {
+		// Remote-session restoration (FR-5 silent restore). If the previous
+		// session left a PAT + session metadata in sessionStorage, attempt a
+		// low-cost refresh. A successful refresh restores the adapter without
+		// re-prompting the user; a stale PAT drops the session silently.
+		const persistedPat = readPat();
+		const persistedMeta = readSessionMeta();
+		if (persistedPat && persistedMeta) {
+			try {
+				await openRemote(
+					{ url: persistedMeta.url, branch: persistedMeta.editBranch },
+					persistedPat
+				);
+				return;
+			} catch {
+				clearPat();
+				// Fall through to the local-folder bootstrap path below.
+			}
+		}
+
 		const record = await handles.getActive();
 		if (!record) {
 			mode = 'home';
@@ -346,30 +389,59 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 	): Promise<{
 		adapter: ReadOnlyDirectoryAdapter;
 		scope: { url: RepoUrl; branch: Branch };
-		proxyWarning: string;
+		fetchResult: Awaited<ReturnType<typeof fetchSubtree>>;
 	}> {
+		const author =
+			creds.authorName || creds.authorEmail
+				? {
+						name: creds.authorName ?? 'quill.md',
+						email: creds.authorEmail ?? 'noreply@quill.md'
+					}
+				: undefined;
 		const fetchResult = await fetchSubtree({
 			url: creds.url,
 			branch: creds.branch,
 			pat,
-			depth: 1
+			editBranch: creds.editBranch,
+			customBaseUrl: creds.customBaseUrl,
+			preferredProviderId: creds.preferredProviderId,
+			commitAuthor: author
 		});
 		return {
 			adapter: fetchResult.adapter,
 			scope: { url: creds.url, branch: creds.branch },
-			proxyWarning: fetchResult.proxyWarning
+			fetchResult
 		};
 	}
 
 	async function openRemote(creds: RemoteCredentials, pat: string): Promise<void> {
-		const { adapter, scope, proxyWarning: warning } = await consumePatAndFetch(creds, pat);
+		const { adapter, scope, fetchResult } = await consumePatAndFetch(creds, pat);
 		_patScope = scope;
 		remoteAdapter = adapter;
-		// Capture the CORS proxy warning text for the UI (FR-12). Safe
-		// to expose — see the `proxyWarning` getter docstring.
-		proxyWarning = warning;
+		editBranch = fetchResult.editBranch;
+		providerId = fetchResult.providerId;
+		// No CORS proxy warning in the new architecture — provider REST
+		// APIs ship permissive CORS. The `proxyWarning` slot is kept
+		// (always null) for backwards compatibility with consumers that
+		// read it (e.g. TopBar's `ProxyWarningBanner` mount guard).
+		proxyWarning = null;
 		// Stamp the fetch timestamp so the toolbar can show "Last fetched".
 		lastFetchedAt = Date.now();
+		// Persist the PAT to sessionStorage (ERS C-6 amendment) so a refresh
+		// does not re-prompt the user. Cleared on `signOut` and on tab close.
+		writePat(pat);
+		// Persist the non-secret session metadata alongside the PAT so a
+		// refresh can silently restore the remote session without the user
+		// re-submitting the URL / branch / provider. The PAT itself never
+		// touches this struct — it lives in a separate sessionStorage key.
+		writeSessionMeta({
+			providerId: fetchResult.providerId,
+			url: creds.url,
+			editBranch: fetchResult.editBranch as Branch,
+			customBaseUrl: creds.customBaseUrl,
+			displayName: fetchResult.author.name,
+			authorLogin: fetchResult.author.name
+		});
 		// Remote Mode is read-only; clear any local session markers.
 		activeHandle = null;
 		localAdapter = null;
@@ -405,25 +477,25 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 		// their cached subtree.
 		const previousAdapter = remoteAdapter;
 		let nextAdapter: ReadOnlyDirectoryAdapter;
-		let nextWarning: string;
 		try {
 			const result = await consumePatAndFetch(scope, pat);
 			nextAdapter = result.adapter;
-			nextWarning = result.proxyWarning;
+			editBranch = result.fetchResult.editBranch;
+			providerId = result.fetchResult.providerId;
 		} catch (cause) {
 			// Re-throw with the existing adapter left in place. Do NOT
 			// clear `lastFetchedAt` — it still describes the cache the
 			// user is reading through.
 			throw cause instanceof Error ? cause : new StateError('internal', String(cause), { cause });
 		}
-		// Commit: swap adapter, bump timestamp, refresh proxy warning.
+		// Commit: swap adapter, bump timestamp.
 		remoteAdapter = nextAdapter;
-		proxyWarning = nextWarning;
+		proxyWarning = null;
 		lastFetchedAt = Date.now();
 		await onRefreshSuccess();
 		// `previousAdapter` is captured to make the rollback contract
 		// explicit; it is not used after the swap because the old
-		// adapter's LightningFS handle is GC-eligible (no live references).
+		// adapter's IndexedDB snapshot is read-only and GC-eligible.
 		void previousAdapter;
 	}
 
@@ -434,6 +506,9 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 		localAdapter = null;
 		proxyWarning = null;
 		lastFetchedAt = null;
+		editBranch = null;
+		providerId = null;
+		clearPat();
 		await handles.clearActive();
 		await readRecent();
 		mode = 'home';
@@ -469,18 +544,10 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 				);
 			}
 			// The session's (url, branch) pair is enough to identify the
-			// cached clone — the SHA is irrelevant for the LFS DB name
-			// (`makeLfsDbName(url, branch)`). Use the dedicated helper
-			// to avoid the cache-key round-trip + the SHA validation
-			// that `clearCache` would otherwise force.
-			await clearCacheForUrl(_patScope.url, _patScope.branch);
+			// cached snapshot. Drop every snapshot when no key is
+			// supplied — the user can re-open to repopulate.
+			await clearCache(makeCacheKey(_patScope.url, _patScope.branch, 'pending'));
 			return;
-		}
-		// Explicit key path — re-validate at the boundary even though
-		// the brand already encodes the type. A caller that cast
-		// through `as unknown as CacheKey` should be caught here.
-		if (!isCacheKey(key)) {
-			throw new RemoteFetchError('Cannot clear cache: invalid key');
 		}
 		await clearCache(key);
 	}
@@ -512,6 +579,12 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 		},
 		get remoteAdapter() {
 			return remoteAdapter;
+		},
+		get editBranch() {
+			return editBranch;
+		},
+		get providerId() {
+			return providerId;
 		},
 		bootstrap,
 		openLocalFolder,

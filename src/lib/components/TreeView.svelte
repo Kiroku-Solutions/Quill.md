@@ -184,11 +184,11 @@
 					const fontSize = 12 / globalScale;
 					ctx.font = `${fontSize}px Inter, sans-serif`;
 					const textWidth = ctx.measureText(label).width;
-					
+
 					const h = 26 / globalScale;
-					const w = textWidth + (20 / globalScale);
-					const x = node.x - w/2;
-					const y = node.y - h/2;
+					const w = textWidth + 20 / globalScale;
+					const x = node.x - w / 2;
+					const y = node.y - h / 2;
 					const radius = 6 / globalScale;
 
 					ctx.beginPath();
@@ -197,7 +197,7 @@
 					} else {
 						ctx.rect(x, y, w, h); // Fallback
 					}
-					
+
 					// Background
 					ctx.fillStyle = theme.theme === 'dark' ? '#18181b' : '#ffffff';
 					ctx.fill();
@@ -218,16 +218,18 @@
 					ctx.fillStyle = theme.theme === 'dark' ? '#f4f4f5' : '#18181b';
 					ctx.fillText(label, node.x, node.y);
 				})
-				.nodePointerAreaPaint((node: any, color: string, ctx: CanvasRenderingContext2D, globalScale: number) => {
-					const label = node.name.length > 22 ? node.name.slice(0, 20) + '...' : node.name;
-					const fontSize = 12 / globalScale;
-					ctx.font = `${fontSize}px Inter, sans-serif`;
-					const textWidth = ctx.measureText(label).width;
-					const h = 26 / globalScale;
-					const w = textWidth + (20 / globalScale);
-					ctx.fillStyle = color;
-					ctx.fillRect(node.x - w/2, node.y - h/2, w, h);
-				});
+				.nodePointerAreaPaint(
+					(node: any, color: string, ctx: CanvasRenderingContext2D, globalScale: number) => {
+						const label = node.name.length > 22 ? node.name.slice(0, 20) + '...' : node.name;
+						const fontSize = 12 / globalScale;
+						ctx.font = `${fontSize}px Inter, sans-serif`;
+						const textWidth = ctx.measureText(label).width;
+						const h = 26 / globalScale;
+						const w = textWidth + 20 / globalScale;
+						ctx.fillStyle = color;
+						ctx.fillRect(node.x - w / 2, node.y - h / 2, w, h);
+					}
+				);
 
 			// Spread out horizontally to prevent overlap of the wide cards
 			if (currentGraph.d3Force('charge')) {
@@ -237,9 +239,9 @@
 				currentGraph.d3Force('link').distance(20);
 			}
 
-			// Apply an explicit collision force using a custom d3 force if needed, 
+			// Apply an explicit collision force using a custom d3 force if needed,
 			// but a massive charge is usually enough to keep them apart in DAG mode.
-			
+
 			currentGraph.graphData(data);
 
 			if (container) {

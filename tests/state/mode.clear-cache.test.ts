@@ -14,11 +14,11 @@
  * call shape.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import * as remoteGit from '$lib/adapters/remote-git';
+import * as remote from '$lib/adapters/remote';
 import { createModeStore, RemotePatRequiredError } from '$lib/state';
 import { createStateContext } from '$lib/state';
 import { handleStore as realHandleStore } from '$lib/adapters/handle-store';
-import type { Branch, CacheKey, RepoUrl } from '$lib/adapters/remote-git';
+import type { Branch, CacheKey, RepoUrl } from '$lib/adapters/remote';
 import { MemoryFsAdapter } from '$lib/adapters/memory-fs';
 
 function makeRepoUrl(url = 'https://github.com/acme/widgets'): RepoUrl {
@@ -49,14 +49,14 @@ describe('clearRemoteCache — no session', () => {
 	});
 
 	it('passes a valid key straight through to clearCache', async () => {
-		const clearCacheSpy = vi.spyOn(remoteGit, 'clearCache').mockResolvedValue(undefined as void);
+		const clearCacheSpy = vi.spyOn(remote, 'clearCache').mockResolvedValue(undefined as void);
 		const ctx = createStateContext(new MemoryFsAdapter());
 		const mode = createModeStore(ctx);
 		// Build a synthetic 40-hex SHA so makeCacheKey's brander accepts
 		// it (production never calls makeCacheKey with 'pending' — the
-		// clear path uses clearCacheForUrl directly).
-		const fakeSha = 'a'.repeat(40) as unknown as remoteGit.Sha;
-		const key = remoteGit.makeCacheKey(makeRepoUrl(), makeBranch(), fakeSha);
+		// clear path uses clearCache directly).
+		const fakeSha = 'a'.repeat(40) as unknown as remote.Sha;
+		const key = remote.makeCacheKey(makeRepoUrl(), makeBranch(), fakeSha);
 		await mode.clearRemoteCache(key as unknown as CacheKey);
 		expect(clearCacheSpy).toHaveBeenCalledWith(key);
 	});
@@ -64,9 +64,7 @@ describe('clearRemoteCache — no session', () => {
 
 describe('clearRemoteCache — active session', () => {
 	it('derives the (url, branch) from the active session when no key is supplied', async () => {
-		const clearCacheForUrlSpy = vi
-			.spyOn(remoteGit, 'clearCacheForUrl')
-			.mockResolvedValue(undefined as void);
+		const clearCacheSpy = vi.spyOn(remote, 'clearCache').mockResolvedValue(undefined as void);
 		const ctx = createStateContext(new MemoryFsAdapter());
 		const mode = createModeStore(ctx);
 		// Stub fetchSubtree to avoid network.
@@ -74,20 +72,22 @@ describe('clearRemoteCache — active session', () => {
 			listDirectory: () => Promise.resolve([]),
 			readTextFile: () => Promise.reject(new Error('not used'))
 		};
-		vi.spyOn(remoteGit, 'fetchSubtree').mockResolvedValue({
+		vi.spyOn(remote, 'fetchSubtree').mockResolvedValue({
 			url: makeRepoUrl(),
 			branch: makeBranch(),
-			sha: 'pending' as unknown as remoteGit.Sha,
-			adapter: fakeAdapter as unknown as remoteGit.ReadonlyRemoteAdapter,
-			cacheKey: 'pending-key' as unknown as CacheKey,
-			proxyWarning: 'warning'
+			sha: 'pending' as unknown as remote.Sha,
+			providerId: 'github',
+			editBranch: 'quill-md',
+			author: { name: 'Test User', email: 'test@example.com' },
+			adapter: fakeAdapter as unknown as remote.ReadonlyRemoteAdapter,
+			cacheKey: 'pending-key' as unknown as CacheKey
 		});
 		await mode.openRemote({ url: makeRepoUrl(), branch: makeBranch() }, 'test-pat');
-		clearCacheForUrlSpy.mockClear();
+		clearCacheSpy.mockClear();
 		await mode.clearRemoteCache();
-		expect(clearCacheForUrlSpy).toHaveBeenCalledTimes(1);
-		const [calledUrl, calledBranch] = clearCacheForUrlSpy.mock.calls[0]!;
-		expect(calledUrl).toBe('https://github.com/acme/widgets');
-		expect(calledBranch).toBe('main');
+		expect(clearCacheSpy).toHaveBeenCalledTimes(1);
+		const [calledKey] = clearCacheSpy.mock.calls[0]!;
+		expect(String(calledKey)).toContain('https://github.com/acme/widgets');
+		expect(String(calledKey)).toContain('main');
 	});
 });

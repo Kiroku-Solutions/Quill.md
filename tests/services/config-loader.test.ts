@@ -139,14 +139,15 @@ describe('loadConfig — error paths', () => {
 		await expect(loadConfig(fs)).rejects.toThrow(/gantt\.group_by/);
 	});
 
-	it('throws when remote.cors_proxy is missing', async () => {
+	it('accepts a config with no remote.cors_proxy (v1: cors_proxy is optional)', async () => {
 		const fs = new MemoryFsAdapter();
 		const bad = JSON.parse(VALID_CONFIG) as Record<string, unknown>;
 		const remote = { ...(bad['remote'] as Record<string, unknown>) };
 		delete remote['cors_proxy'];
 		bad['remote'] = remote;
 		await fs.writeTextFile('.quill.md/config.json', JSON.stringify(bad));
-		await expect(loadConfig(fs)).rejects.toThrow(/remote\.cors_proxy/);
+		const cfg = await loadConfig(fs);
+		expect(cfg.remote.cors_proxy).toBeUndefined();
 	});
 
 	it('throws when default_status is the empty string', async () => {

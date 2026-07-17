@@ -156,10 +156,10 @@ function assertConfig(value: unknown): Config {
 		throw new Error('config.json: "gantt.default_view" must be a string');
 	}
 
-	const remote = v['remote'] as Record<string, unknown>;
-	if (!isString(remote['cors_proxy'])) {
-		throw new Error('config.json: "remote.cors_proxy" must be a string');
-	}
+	// `remote` is now optional + all-optional. Legacy `cors_proxy` is
+	// accepted but ignored. Provider-strategy fields default when absent.
+	// No required check on `remote.cors_proxy` anymore — see FR-5 migration.
+	void v['remote'];
 
 	return value as Config;
 }

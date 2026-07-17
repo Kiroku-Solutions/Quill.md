@@ -72,7 +72,7 @@
 			const branch = repoBranch.trim() as unknown as Parameters<
 				typeof stores.mode.openRemote
 			>[0]['branch'];
-			await stores.mode.openRemote({ url, branch }, pat.trim());
+			await stores.mode.openRemote({ url, branch, editBranch: branch }, pat.trim());
 			await Promise.all([stores.config.load(), stores.templates.load()]);
 			await stores.issues.load();
 			await goto(resolve('/remote'));

@@ -21,9 +21,29 @@
  * the production build.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import * as remoteGit from '$lib/adapters/remote-git';
+import * as remote from '$lib/adapters/remote';
 import type { HandleStore } from '$lib/adapters/handle-store';
 import { createModeStore } from '$lib/state';
+import { readSessionMeta } from '$lib/state/pat-storage';
+
+const sessionStore = new Map<string, string>();
+(
+	globalThis as {
+		sessionStorage?: {
+			getItem: (k: string) => string | null;
+			setItem: (k: string, v: string) => void;
+			removeItem: (k: string) => void;
+		};
+	}
+).sessionStorage = {
+	getItem: (k) => sessionStore.get(k) ?? null,
+	setItem: (k, v) => {
+		sessionStore.set(k, v);
+	},
+	removeItem: (k) => {
+		sessionStore.delete(k);
+	}
+};
 
 const KNOWN_PAT = 'ghp_' + 'A'.repeat(36);
 
@@ -57,21 +77,24 @@ describe('createModeStore — openRemote PAT hygiene (NFR-2, end-to-end)', () =>
 	let consoleDebugSpy: ReturnType<typeof vi.spyOn>;
 
 	beforeEach(async () => {
-		fetchSubtreeSpy = vi.spyOn(remoteGit, 'fetchSubtree').mockResolvedValue({
-			url: 'https://github.com/example/repo' as remoteGit.RepoUrl,
-			branch: 'main' as remoteGit.Branch,
-			sha: 'pending' as remoteGit.Sha,
+		fetchSubtreeSpy = vi.spyOn(remote, 'fetchSubtree').mockResolvedValue({
+			url: 'https://github.com/example/repo' as remote.RepoUrl,
+			branch: 'main' as remote.Branch,
+			sha: 'pending' as remote.Sha,
+			providerId: 'github',
+			editBranch: 'quill-md',
+			author: { name: 'Test User', email: 'test@example.com' },
 			adapter: {
 				readTextFile: vi.fn(async () => '[]'),
 				listDirectory: vi.fn(async () => []),
-				headSha: vi.fn(async () => 'pending' as remoteGit.Sha),
+				headSha: vi.fn(async () => 'pending' as remote.Sha),
 				exists: vi.fn(async () => false)
 			},
-			cacheKey: 'https://github.com/example/repo|main|pending' as remoteGit.CacheKey,
-			proxyWarning: 'proxy warning'
+			cacheKey: 'https://github.com/example/repo|main|pending' as remote.CacheKey
 		});
 		consoleInfoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined);
 		consoleDebugSpy = vi.spyOn(console, 'debug').mockImplementation(() => undefined);
+		sessionStore.clear();
 
 		store = createModeStore({ adapter: undefined as never }, { handles: makeFakeHandleStore() });
 	});
@@ -83,8 +106,8 @@ describe('createModeStore — openRemote PAT hygiene (NFR-2, end-to-end)', () =>
 	it('forwards the PAT into fetchSubtree so it reaches the onAuth callback', async () => {
 		await store.openRemote(
 			{
-				url: 'https://github.com/example/repo' as remoteGit.RepoUrl,
-				branch: 'main' as remoteGit.Branch
+				url: 'https://github.com/example/repo' as remote.RepoUrl,
+				branch: 'main' as remote.Branch
 			},
 			KNOWN_PAT
 		);
@@ -96,8 +119,8 @@ describe('createModeStore — openRemote PAT hygiene (NFR-2, end-to-end)', () =>
 	it('does not expose the PAT on the public store surface', async () => {
 		await store.openRemote(
 			{
-				url: 'https://github.com/example/repo' as remoteGit.RepoUrl,
-				branch: 'main' as remoteGit.Branch
+				url: 'https://github.com/example/repo' as remote.RepoUrl,
+				branch: 'main' as remote.Branch
 			},
 			KNOWN_PAT
 		);
@@ -109,8 +132,8 @@ describe('createModeStore — openRemote PAT hygiene (NFR-2, end-to-end)', () =>
 	it('sets hasRemoteCredentials=true and binds a read-only adapter after openRemote', async () => {
 		await store.openRemote(
 			{
-				url: 'https://github.com/example/repo' as remoteGit.RepoUrl,
-				branch: 'main' as remoteGit.Branch
+				url: 'https://github.com/example/repo' as remote.RepoUrl,
+				branch: 'main' as remote.Branch
 			},
 			KNOWN_PAT
 		);
@@ -128,8 +151,8 @@ describe('createModeStore — openRemote PAT hygiene (NFR-2, end-to-end)', () =>
 	it('signOut clears hasRemoteCredentials and unbinds the adapter', async () => {
 		await store.openRemote(
 			{
-				url: 'https://github.com/example/repo' as remoteGit.RepoUrl,
-				branch: 'main' as remoteGit.Branch
+				url: 'https://github.com/example/repo' as remote.RepoUrl,
+				branch: 'main' as remote.Branch
 			},
 			KNOWN_PAT
 		);
@@ -143,8 +166,8 @@ describe('createModeStore — openRemote PAT hygiene (NFR-2, end-to-end)', () =>
 	it('does not log the PAT in any captured console call', async () => {
 		await store.openRemote(
 			{
-				url: 'https://github.com/example/repo' as remoteGit.RepoUrl,
-				branch: 'main' as remoteGit.Branch
+				url: 'https://github.com/example/repo' as remote.RepoUrl,
+				branch: 'main' as remote.Branch
 			},
 			KNOWN_PAT
 		);
@@ -158,8 +181,8 @@ describe('createModeStore — openRemote PAT hygiene (NFR-2, end-to-end)', () =>
 	it('the PAT argument is consumed inside openRemote — a follow-up openLocalFolder still has no PAT', async () => {
 		await store.openRemote(
 			{
-				url: 'https://github.com/example/repo' as remoteGit.RepoUrl,
-				branch: 'main' as remoteGit.Branch
+				url: 'https://github.com/example/repo' as remote.RepoUrl,
+				branch: 'main' as remote.Branch
 			},
 			KNOWN_PAT
 		);
@@ -172,5 +195,44 @@ describe('createModeStore — openRemote PAT hygiene (NFR-2, end-to-end)', () =>
 		} as unknown as FileSystemDirectoryHandle);
 		expect(store.mode).toBe('local');
 		expect(JSON.stringify(store)).not.toContain(KNOWN_PAT);
+	});
+
+	it('persists session metadata alongside the PAT so silent-restore can fire', async () => {
+		await store.openRemote(
+			{
+				url: 'https://github.com/example/repo' as remote.RepoUrl,
+				branch: 'main' as remote.Branch
+			},
+			KNOWN_PAT
+		);
+		const meta = readSessionMeta();
+		expect(meta).not.toBeNull();
+		expect(meta?.providerId).toBe('github');
+		expect(meta?.url).toBe('https://github.com/example/repo');
+		expect(meta?.editBranch).toBe('quill-md');
+	});
+
+	it('forwards customBaseUrl / editBranch / preferredProviderId / commitAuthor to fetchSubtree', async () => {
+		await store.openRemote(
+			{
+				url: 'https://gitlab.example.com/acme/widgets' as remote.RepoUrl,
+				branch: 'main' as remote.Branch,
+				editBranch: 'custom-branch',
+				customBaseUrl: 'https://gitlab.example.com/api/v4',
+				preferredProviderId: 'gitlab',
+				authorName: 'Custom Author',
+				authorEmail: 'custom@example.com'
+			},
+			KNOWN_PAT
+		);
+		expect(fetchSubtreeSpy).toHaveBeenCalledTimes(1);
+		const opts = fetchSubtreeSpy.mock.calls[0][0];
+		expect(opts.editBranch).toBe('custom-branch');
+		expect(opts.customBaseUrl).toBe('https://gitlab.example.com/api/v4');
+		expect(opts.preferredProviderId).toBe('gitlab');
+		expect(opts.commitAuthor).toEqual({
+			name: 'Custom Author',
+			email: 'custom@example.com'
+		});
 	});
 });

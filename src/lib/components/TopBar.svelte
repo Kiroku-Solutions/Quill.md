@@ -49,7 +49,7 @@
 	const stores = getStores();
 
 	const folderName = $derived(mode === 'local' ? (stores.mode.activeHandle?.name ?? null) : null);
-	
+
 	function parseRepoName(url: string | null): string | null {
 		if (!url) return null;
 		try {
@@ -63,7 +63,11 @@
 		}
 	}
 
-	const repoLabel = $derived(mode === 'remote' ? (parseRepoName(stores.mode.remoteUrl) ?? t('topbar.remoteRepository')) : null);
+	const repoLabel = $derived(
+		mode === 'remote'
+			? (parseRepoName(stores.mode.remoteUrl) ?? t('topbar.remoteRepository'))
+			: null
+	);
 
 	const badge = $derived.by(() => {
 		switch (mode) {

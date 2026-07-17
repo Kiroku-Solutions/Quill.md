@@ -4,7 +4,6 @@
 	// evaluate. See `src/lib/polyfills/buffer.ts` for the rationale and
 	// `docs/audits/2026-06-23/architecture-audit.md:353` for the audit
 	// finding this closes.
-	import '$lib/polyfills/buffer';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { onMount } from 'svelte';
@@ -77,9 +76,9 @@
 	// ReadOnlyDirectoryAdapter | null` so the read-only remote adapter is
 	// not dishonestly cast to the writable shape. Local Mode returns the
 	// FSA-backed writable adapter; Remote Mode returns the
-	// isomorphic-git-backed read-only adapter; on the home screen (no
-	// folder / no remote open) the provider returns `null` and the data
-	// stores stay in their 'idle' status.
+	// provider-driven read-only adapter; on the home screen (no folder
+	// / no remote open) the provider returns `null` and the data stores
+	// stay in their 'idle' status.
 	const adapterProvider = (): WritableDirectoryAdapter | ReadOnlyDirectoryAdapter | null => {
 		return mode.localAdapter ?? mode.remoteAdapter ?? null;
 	};

@@ -20,7 +20,11 @@ export {
 	FsaPermissionError,
 	FsaUnavailableError,
 	RemoteAuthError,
+	RemoteBranchMissingError,
+	RemoteCommitRejectedError,
+	RemoteConflictError,
 	RemoteFetchError,
+	RemoteUnsupportedHostError,
 	RenderError,
 	type AdapterErrorType
 } from './errors.ts';
@@ -28,10 +32,12 @@ export {
 export {
 	getBrowserCapabilities,
 	isAdapterError,
+	isAnyRemoteError,
 	isFsaAvailable,
 	isFsaPermissionError,
 	isIndexedDBAvailable,
 	isNotFoundError,
+	isRemoteConflictError,
 	isRemoteError,
 	isWebCryptoAvailable
 } from './feature-detect.ts';
@@ -63,8 +69,6 @@ export {
 	clearAllCaches,
 	clearCache,
 	fetchSubtree,
-	isPat,
-	makeCacheKey,
 	type Branch,
 	type CacheKey,
 	type FetchOptions,
@@ -72,4 +76,46 @@ export {
 	type ReadonlyRemoteAdapter,
 	type RepoUrl,
 	type Sha
-} from './remote-git.ts';
+} from './remote.ts';
+
+// New (Strategy-pattern) provider exports — the canonical replacement for
+// the isomorphic-git-backed adapter above.
+export {
+	GitHubProvider,
+	GitLabProvider,
+	detectProvider,
+	resolveProvider,
+	getProvider,
+	listProviders as listRemoteProviders,
+	type AuthenticatedUser,
+	type BranchTip,
+	type ParsedRepo,
+	type RemoteFile,
+	type RemoteFileChange,
+	type RepoProvider,
+	type PutFileInput,
+	type PutFileResult,
+	type DeleteFileInput,
+	type DeleteFileResult,
+	type CommitBatchInput,
+	type CommitBatchResult,
+	type AuthorIdentity
+} from './providers/index.ts';
+
+export {
+	getSnapshot,
+	putSnapshot,
+	deleteSnapshot,
+	clearAllSnapshots,
+	type CachedSnapshot
+} from './read-cache.ts';
+
+// Re-export brand + cacheKey helpers from the new remote.ts for callers
+// that previously imported them from the legacy `remote-git.ts`.
+export {
+	brandRepoUrl,
+	brandBranch,
+	brandSha,
+	makeCacheKey,
+	DEFAULT_EDIT_BRANCH
+} from './remote.ts';

@@ -204,6 +204,8 @@ function buildStub(opts: {
 			hasRemoteCredentials: opts.mode === 'remote',
 			remoteUrl: null,
 			proxyWarning: null,
+			editBranch: null,
+			providerId: null,
 			lastFetchedAt: opts.mode === 'remote' ? Date.now() - 5 * 60 * 1000 : null,
 			localAdapter:
 				opts.mode === 'local'

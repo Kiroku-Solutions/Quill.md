@@ -40,7 +40,7 @@ The goal of the project is to remove the dependency on third-party issue tracker
 
 - A single-page web application built with SvelteKit (`adapter-static`) that runs entirely in the user's browser. There is no server-side component, no API endpoint, and no telemetry.
 - A **Local Edit Mode** that reads and writes issue files inside a user-selected local folder through the File System Access API (FSA).
-- A **Remote Read-Only Mode** that uses `isomorphic-git` to perform a partial clone of the user's Git repository (only the `.quill.md/` subtree), reads issue files, and renders them without ever writing to the remote.
+- A **Remote Edit Mode** that talks to provider REST APIs (GitHub and GitLab) through a Strategy pattern (`src/lib/adapters/providers/`). The app auto-detects the provider from the URL host and supports a manual dropdown override. Reads fetch the `.quill.md/` subtree; writes land as commits on a dedicated, long-lived `quill-md` branch (orphan-style — independent history from `main`).
 - A configuration and template system that lives inside the same repository under `.quill.md/`, allowing each project to define its own issue types, fields, sections, statuses, labels, and workflow columns.
 - Three views over the issue set: a tabular **List view**, a **Kanban** board, and a **Gantt** timeline.
 - A filter bar that combines multiple criteria (type, status, assignee, label, free text, date range).
@@ -49,24 +49,31 @@ The goal of the project is to remove the dependency on third-party issue tracker
 
 ### 1.3 Definitions and Acronyms
 
-| Term           | Definition                                                                                                                      |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| ERS            | Engineering Requirements Specification (this document).                                                                         |
-| FSA            | File System Access API. A browser API that grants JavaScript read/write access to a user-selected local directory.              |
-| PAT            | Personal Access Token. A credential used to authenticate against a Git provider.                                                |
-| SPA            | Single-Page Application.                                                                                                        |
-| Frontmatter    | The YAML metadata block at the top of a Markdown file, delimited by `---`.                                                      |
-| Section marker | An HTML comment pair of the form `<!-- [SECTION_START: name] -->` and `<!-- [SECTION_END: name] -->`.                           |
-| Template       | A JSON file under `.quill.md/templates/` describing the fields and sections of one issue type.                                  |
-| Issue          | A single Markdown file under `.quill.md/issues/`, with a frontmatter header and a body of section-delimited Markdown.           |
-| Partial clone  | A clone of a Git repository that fetches only a specified subtree of the working tree, rather than the full repository history. |
-| LightningFS    | An IndexedDB-backed virtual filesystem used by `isomorphic-git` in the browser.                                                 |
+| Term                   | Definition                                                                                                                                                                         |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ERS                    | Engineering Requirements Specification (this document).                                                                                                                            |
+| FSA                    | File System Access API. A browser API that grants JavaScript read/write access to a user-selected local directory.                                                                 |
+| PAT                    | Personal Access Token. A credential used to authenticate against a Git provider.                                                                                                   |
+| SPA                    | Single-Page Application.                                                                                                                                                           |
+| Frontmatter            | The YAML metadata block at the top of a Markdown file, delimited by `---`.                                                                                                         |
+| Section marker         | An HTML comment pair of the form `<!-- [SECTION_START: name] -->` and `<!-- [SECTION_END: name] -->`.                                                                              |
+| Template               | A JSON file under `.quill.md/templates/` describing the fields and sections of one issue type.                                                                                     |
+| Issue                  | A single Markdown file under `.quill.md/issues/`, with a frontmatter header and a body of section-delimited Markdown.                                                              |
+| Partial clone          | A clone of a Git repository that fetches only a specified subtree of the working tree, rather than the full repository history.                                                    |
+| LightningFS            | _Removed in v2.0._ Previously an IndexedDB-backed virtual filesystem used by `isomorphic-git` in the browser.                                                                      |
+| Provider               | A Git hosting provider that implements the `RepoProvider` Strategy interface (`src/lib/adapters/providers/types.ts`).                                                              |
+| PAT                    | Personal Access Token. A credential used to authenticate against a Git provider's REST API.                                                                                        |
+| Edit branch            | The branch the app commits to in Remote Edit Mode. Default `quill-md`. Long-lived; the app never deletes it or merges it elsewhere.                                                |
+| Orphan branch          | A branch with no shared history with `main`. Created from an empty tree on first open. The `quill-md` branch is always orphan-style so accidental merges to `main` cannot collide. |
+| Optimistic concurrency | Provider APIs require the caller to send the file's last SHA on every write; mismatch returns 409. The app uses this for per-file conflict detection.                              |
+| Session PAT            | The PAT may live in `sessionStorage` (cleared on tab close) instead of memory only. v2.0 relaxes NFR-2 to "session-scoped only" to enable silent restore on page refresh.          |
 
 ### 1.4 References
 
 - SvelteKit documentation: <https://kit.svelte.dev>
 - File System Access API: <https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API>
-- `isomorphic-git`: <https://isomorphic-git.org>
+- GitHub REST API: <https://docs.github.com/en/rest>
+- GitLab REST API: <https://docs.gitlab.com/api/rest/>
 - `gray-matter`: <https://github.com/jonschlinkert/gray-matter>
 - `js-yaml`: <https://github.com/nodeca/js-yaml>
 - `marked`: <https://marked.js.org>
@@ -77,9 +84,10 @@ The goal of the project is to remove the dependency on third-party issue tracker
 
 ### 1.5 Revision History
 
-| Version | Date       | Author | Notes          |
-| ------- | ---------- | ------ | -------------- |
-| 1.0.0   | 2026-06-20 | Jose   | Initial draft. |
+| Version | Date       | Author | Notes                                                                                                                                                                                                                                                                    |
+| ------- | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1.0.0   | 2026-06-20 | Jose   | Initial draft.                                                                                                                                                                                                                                                           |
+| 2.0.0   | 2026-07-12 | Jose   | Provider Strategy migration: isomorphic-git + LightningFS replaced with GitHub / GitLab REST Strategy. Remote Mode is editable; commits land on a dedicated `quill-md` branch. PAT may live in `sessionStorage`. Full change log: `docs/provider-strategy-migration.md`. |
 
 ---
 
@@ -92,9 +100,9 @@ quill\.md is a **purely client-side web application**. It is delivered as a stat
 The application interacts with two external resources only:
 
 1. **The local file system** (in Local Edit Mode) — the user's folder on disk, accessed through FSA.
-2. **A remote Git repository** (in Remote Read-Only Mode) — accessed through `isomorphic-git`'s HTTP transport, optionally fronted by a CORS proxy.
+2. **A remote Git repository** (in Remote Edit Mode) — accessed through the registered provider's REST API (GitHub REST for `github.com`; GitLab REST for `gitlab.com`). Provider REST endpoints ship permissive CORS — no CORS proxy is needed.
 
-There is no first-party server. There is no analytics. The Personal Access Token is held in memory only and is never persisted.
+There is no first-party server. There is no analytics. The Personal Access Token is held in `sessionStorage` (session-scoped — cleared on tab close / sign-out) and is never written to IndexedDB, `localStorage`, URLs, or any non-namespaced key.
 
 ### 2.2 Operating Modes
 
@@ -109,38 +117,43 @@ The application exposes two operating modes. The user picks one at the home scre
 - All writes are performed through the FSA `FileSystemFileHandle` obtained at folder selection. The user is responsible for committing and pushing the changes through their own Git workflow.
 - The folder handle is **persisted** across sessions through the FSA permission model (`requestPermission({ mode: 'readwrite' })`). On startup, the application attempts to re-acquire the handle silently; if permission is denied or revoked, the user is prompted again. A "Switch folder" affordance in the UI allows the user to open a different folder at any time without losing the original handle (which is kept in memory but inactive until selected again).
 
-#### 2.2.2 Remote Read-Only Mode
+#### 2.2.2 Remote Edit Mode
 
-- The user enters a repository URL (HTTPS), a branch (default: the repository's default branch), and a PAT (required for private repositories; optional for public ones, depending on the provider's rate limit policy).
-- The application uses `isomorphic-git` to perform a **partial clone** of the repository, fetching **only the `.quill.md/` subtree** (FR-12). It does not download the rest of the repository.
-- The fetched tree is materialized into a LightningFS instance backed by IndexedDB. The cache is keyed by repository URL + branch.
-- The application then behaves identically to Local Edit Mode, **except that all write operations are disabled**. Kanban drag-and-drop is rendered but inert; the editor is read-only; the "New issue" button is hidden.
-- The PAT is held in memory only and is dropped when the user navigates away from the Remote Mode screen or closes the tab.
+- The user enters a repository URL (HTTPS), an edit branch (default: `quill-md`), and a PAT with write scope (`Contents: write` on GitHub, `api` on GitLab).
+- The application detects the provider from the URL host (`github.com`, `gitlab.com`) and selects the corresponding `RepoProvider`. A manual dropdown override is available for self-hosted instances.
+- The application fetches the `.quill.md/` subtree at the edit branch tip via the provider's REST API. GitHub: `GET /repos/{owner}/{repo}/git/trees/{sha}?recursive=1` filtered to `.quill.md/**`. GitLab: `GET /projects/{id}/repository/tree?path=.quill.md&recursive=true`.
+- The fetched files are stored in an IndexedDB snapshot keyed by `(providerId, owner, repo, editBranch, sha)` for fast reopen.
+- The application validates the PAT scope on connect (`GET /user` for GitHub, `GET /api/v4/user` for GitLab). Insufficient scope surfaces as a typed `RemoteAuthError`.
+- If the edit branch is absent, the app creates it as an **orphan branch** (no shared history with `main`). GitHub: empty-tree commit + ref creation. GitLab: branch-from-default + single no-op commit. The user is advised via FR-17 to use a dedicated repository for `.quill.md/` so accidental branch deletion does not affect code.
+- Writes go through the same `WritableDirectoryAdapter` interface as Local Mode. The adapter's `writeTextFile` / `removeFile` map to provider REST endpoints (`PUT /contents` on GitHub, `PUT /repository/files` on GitLab) with optimistic concurrency via the file's last SHA. Mismatch returns 409 → typed `RemoteConflictError`; the user's local draft is preserved.
+- A `CommitQueueStore` debounces Kanban drags into one `commitBatch` call (2-second idle window). A "Push now" button flushes immediately. Failed flushes preserve the queue and surface the error so the user can retry.
+- The PAT is held in `sessionStorage` (key `quill-md.remote-pat`) for the duration of the tab and cleared on sign-out. A silent restore on page refresh is attempted via `GET /user`; a stale PAT drops the session silently and shows the home screen.
 
 ### 2.3 User Characteristics
 
 The target user is a **software developer** who:
 
 - Is comfortable with the command line, Git, and Markdown.
-- Owns or contributes to a Git repository in which they wish to track issues.
-- Has a Personal Access Token for the relevant Git provider (GitHub, GitLab, Bitbucket, Gitea, or any provider that exposes the Git Smart HTTP protocol with permissive CORS).
-- Uses a Chromium-based browser (Chrome, Edge, Brave, Arc, Opera, Vivaldi) for the Local Edit Mode. The Remote Read-Only Mode is usable from any modern browser, including Firefox and Safari.
+- Owns or contributes to a Git repository (preferably a **dedicated issues repository**) in which they wish to track issues.
+- Has a Personal Access Token with write scope for the relevant Git provider (GitHub, GitLab).
+- Uses a Chromium-based browser (Chrome, Edge, Brave, Arc, Opera, Vivaldi) for the Local Edit Mode. The Remote Edit Mode is usable from any modern browser, including Firefox and Safari.
 
 ### 2.4 Constraints
 
 - **C-1 (No backend):** The application MUST NOT depend on any server-side component for its core functionality. Hosting is purely static.
-- **C-2 (No remote writes):** The application MUST NOT push to, create branches on, open pull requests on, or otherwise modify any remote Git repository. The user is fully responsible for version control.
-- **C-3 (Local-mode browser support):** Local Edit Mode is only available on browsers that implement FSA. This is, at the time of writing, Chromium-based browsers. Firefox and Safari are unsupported for Local Edit Mode but remain supported for Remote Read-Only Mode.
+- **C-2' (Edit-branch discipline):** The application MUST push to the configured edit branch only (default `quill-md`). The application MUST NOT force-push, MUST NOT delete the edit branch from inside the app, MUST NOT merge the edit branch elsewhere, and MUST NOT push to any branch the user has not explicitly configured. The user remains responsible for opening pull requests.
+- **C-3 (Local-mode browser support):** Local Edit Mode is only available on browsers that implement FSA. This is, at the time of writing, Chromium-based browsers. Firefox and Safari are unsupported for Local Edit Mode but remain supported for Remote Edit Mode.
 - **C-4 (Permission re-grant):** FSA permission may be revoked by the user or by the browser between sessions. The application MUST handle the resulting `NotAllowedError` gracefully and re-prompt.
-- **C-5 (CORS):** The Git Smart HTTP protocol is not, in general, CORS-friendly on public providers. The application MUST work through a CORS proxy. The default proxy is the public `https://cors.isomorphic-git.org`. Users may configure a custom proxy in `.quill.md/config.json` (FR-12, [Section 6.3](#63-config-file)).
-- **C-6 (Token hygiene):** The PAT MUST NOT be persisted, logged, transmitted to any non-provider endpoint, or exposed in URLs. The CORS proxy sees the token via the `Authorization` header, which is acceptable as long as the proxy URL is one the user trusts (the default proxy is documented as a public, free service).
+- **C-5 (revised, removed):** _Removed in v2.0._ Provider REST APIs ship permissive CORS. No CORS proxy is required.
+- **C-6 (Token hygiene):** The PAT MUST NOT appear in any log line, error message, URL, or analytics payload. The PAT MAY live in `sessionStorage` (cleared on tab close / sign-out) for the purpose of silent session restoration — this is a relaxation of the v0 "memory only" rule. The PAT MUST NOT be written to IndexedDB, `localStorage`, or any non-namespaced key.
+- **C-7 (Provider Strategy):** Adding a new provider MUST be confined to a new `RepoProvider` implementation registered in `src/lib/adapters/providers/registry.ts`. No other layer may branch on provider identity.
 
 ### 2.5 Assumptions and Dependencies
 
 - **A-1:** The repository the user selects already has a `.quill.md/` directory. If not, the wizard (FR-11) creates the scaffolding. The application does not assume any other structure.
-- **A-2:** The user's PAT has `read` scope (and, for write-protected remote browsing, `repo` scope on GitHub or `read_repository` on GitLab).
-- **A-3:** `isomorphic-git`, `LightningFS`, and the CORS proxy remain available. The application MUST degrade gracefully if the proxy is offline (show a clear error, not a silent failure).
-- **A-4:** The user is online for Remote Read-Only Mode. Local Edit Mode is fully offline-capable.
+- **A-2:** The user's PAT has **write** scope: `Contents: write` (or classic `repo`) on GitHub; `api` or `write_repository` on GitLab.
+- **A-3:** The provider's REST API is reachable from the user's browser and ships permissive CORS. GitHub.com and GitLab.com both satisfy this. Self-hosted providers may require a CSP relaxation at the app-host level.
+- **A-4:** The user is online for Remote Edit Mode. Local Edit Mode is fully offline-capable.
 - **D-1:** Browser support assumes ever-green versions of Chrome, Edge, Firefox, and Safari released within the last 18 months.
 
 ---
@@ -174,25 +187,28 @@ In Local Edit Mode, the application MUST support:
 
 The folder handle MUST be persisted across sessions (C-4). A "Switch folder" action MUST be available at all times from the main toolbar. The previously active handle MUST be retained (inactive) and selectable from a "Recent folders" list.
 
-#### FR-5: Remote Read-Only Mode
+#### FR-5: Remote Edit Mode
 
-In Remote Read-Only Mode, the application MUST:
+In Remote Edit Mode, the application MUST:
 
-- Accept a repository URL, a branch, and a PAT.
-- Perform a partial clone limited to the `.quill.md/` subtree (see FR-12).
-- Cache the clone in IndexedDB (key: `<url>|<branch>`).
-- Render the issues through all three views, **read-only**.
-- Hide or disable any UI affordance that would lead to a write (`New issue`, `Save`, `Delete`, Kanban drag).
-- Expose a "Refresh" command that re-fetches the subtree and updates the cache.
-
-The PAT MUST be requested through the `onAuth` callback of `isomorphic-git`'s HTTP transport and MUST NOT be persisted.
+- Accept a repository URL, an edit branch (default `quill-md`), and a PAT with write scope.
+- Auto-detect the provider from the URL host (`github.com`, `gitlab.com`). A manual dropdown override is available for self-hosted instances.
+- Validate the PAT scope on connect (`GET /user` on GitHub, `GET /api/v4/user` on GitLab). Insufficient scope surfaces as a typed `RemoteAuthError` with the required scope name.
+- Read the `.quill.md/` subtree at the edit branch tip via the provider's REST API. Cache the snapshot in IndexedDB keyed by `(providerId, owner/repo, editBranch, sha)`.
+- Resolve the edit branch tip. If the branch is absent, create it as an **orphan branch** (no shared history with `main`) with a `chore: initialize quill-md branch` commit on an empty tree.
+- Surface the edit branch name in the TopBar at all times (FR-17 advisory banner).
+- Persist the PAT in `sessionStorage` under `quill-md.remote-pat`. Clear on `signOut` and on tab close.
+- On `openRemote`, attempt silent restore from sessionStorage: validate the cached PAT against the provider; on success, restore the session without re-prompting; on failure, drop the session silently.
+- On every user save (issue editor, template editor, config editor, Kanban drag), write through the adapter and produce a commit on the edit branch (FR-16).
+- On 409 / 412 from the provider, throw `RemoteConflictError`; the editor surfaces an inline Alert; the user's local draft is preserved; the cached remote SHA is refreshed on the next Pull-to-refresh.
+- Never force-push; never push to a branch other than the configured edit branch; never delete the edit branch from the app.
 
 #### FR-6: Views
 
 The application MUST provide three views over the issue set. All views share the filter bar (FR-7).
 
 1. **List view** — a virtualized table of issues with columns: `id`, `title`, `type`, `status`, `assignee`, `labels`, `updated_date`. Clicking a row opens the issue in the editor. Sorting by column MUST be supported.
-2. **Kanban view** — a board whose columns are derived from `config.statuses` (each column header colored by `config.statuses[].color`). In Local Edit Mode, dragging a card between columns updates the issue's `status` field and persists the change. In Remote Read-Only Mode, the drag is visual only.
+2. **Kanban view** — a board whose columns are derived from `config.statuses` (each column header colored by `config.statuses[].color`). Dragging a card between columns enqueues a status change in the `CommitQueueStore`. The queue flushes after a 2-second idle window as a single `commitBatch` call (FR-16). An explicit "Push now" button flushes immediately.
 3. **Gantt view** — a horizontal timeline in which each issue with a `start_date` and either an `end_date` or a `duration` is rendered as a bar. Bars are grouped by `config.gantt.group_by` (default: `issue_type`). Dependency arrows are drawn for each `relation` of type `blocks` or `depends_on`.
 
 #### FR-7: Filters
@@ -244,9 +260,27 @@ Relation types:
 
 The application MUST detect and refuse to create a relation cycle. Cycles in `parent`/`child` and `blocks`/`depends_on` are forbidden; cycles in `relates_to` are allowed.
 
-#### FR-10: IndexedDB cache for remote mode
+#### FR-10: IndexedDB snapshot of remote read state
 
-Remote Read-Only Mode MUST cache the partial clone in IndexedDB through LightningFS. The cache key is `<repository-url>|<branch>|<sha>`. On subsequent loads of the same URL+branch, the application MUST use the cache and only fetch deltas. The user MUST be able to clear the cache from a settings panel.
+Remote Edit Mode MUST snapshot the most recently fetched `.quill.md/` subtree in IndexedDB via `idb`. The cache key is `(providerId, owner, repo, editBranch, commitSha)`. On reopen, the snapshot is loaded instantly and the app refreshes against the latest commit SHA. Delta-fetch (commits-since + tree-recursive) is used when the cached SHA differs from the latest. The user MUST be able to clear the snapshot from a settings panel (Settings → "Clear local snapshot").
+
+#### FR-16: Remote commit lifecycle
+
+- **Per-save commits.** A user save in the issue editor, template editor, or config editor produces **one commit** on the edit branch. Commit message format: `chore(quill.md): <action> <subject>` (e.g. `chore(quill.md): update issue 0042 status to in_review`).
+- **Debounced batched commits.** Kanban drag, which may move many cards in quick succession, queues writes and flushes them as **one commit** after a 2-second idle window (`KANBAN_DEBOUNCE_MS`), or on explicit "Push now" from the EditToolbar. Commit message format: `chore(quill.md): update N issue statuses`.
+- **Optimistic concurrency.** Every write includes the file's last SHA as the provider requires. The provider rejects with 409 / 412 on mismatch; the app surfaces a `RemoteConflictError` banner; the local draft is preserved; the user pulls to refresh and retries.
+- **Author identity.** Commit author is `{ name, email }` derived from the provider's authenticated user endpoint at connect time. Falls back to `quill.md <noreply@quill.md>` if the user endpoint does not return email.
+- **Pending-write indicator.** The EditToolbar shows the queue depth and a "Push now" button. A failed flush keeps the queue intact and surfaces the error; the user can retry.
+
+#### FR-17: Edit-branch advisory
+
+- The home screen, on first entry to Remote Edit Mode, presents a **Remote Setup Wizard** that walks the user through:
+  1. **Repo selection.** Strong recommendation: use a dedicated repository for `.quill.md/` so an accidental branch deletion does not affect code. Checkbox acknowledgement required to proceed.
+  2. **Branch setup.** Default `quill-md`; editable. Explainer: this branch is treated as long-lived; the app will never merge it elsewhere; the app will never force-push.
+  3. **PAT scope.** GitHub: `Contents: write` (fine-grained) or `repo` (classic). GitLab: `api` or `write_repository`. Document scopes inline.
+  4. **Branch initialization.** If the branch is absent, the app creates it as an orphan (empty-tree commit + ref). Document that this is an **orphan branch** — it has no shared history with `main`.
+- The EditToolbar shows a persistent advisory banner: "Using branch `quill-md`. Treat this branch as long-lived — never merge it elsewhere, never delete it. For safety, use a dedicated repository. [Show setup guide]". Dismissable per-session but re-shown on `openRemote`.
+- The Settings panel exposes `edit_branch`, `commit_author_name`, `commit_author_email` (the latter two default to provider-derived values).
 
 #### FR-11: First-run template setup wizard
 
@@ -261,14 +295,14 @@ In Remote Read-Only Mode, the wizard is offered as a "download these templates t
 
 The wizard MUST refuse to proceed until at least one template is in place.
 
-#### FR-12: CORS proxy and partial clone configuration
+#### FR-12: Provider detection and override
 
 The application MUST:
 
-- Read `config.remote.cors_proxy` (default: `https://cors.isomorphic-git.org`) before performing any remote operation.
-- Expose a settings field where the user can override the URL at runtime; the override is persisted back to `config.json` on save.
-- Use `isomorphic-git`'s partial-clone capabilities to fetch **only the `.quill.md/` subtree** of the repository. Concretely: a shallow fetch with `singleBranch: true`, `depth: 1`, and `refspec: 'refs/heads/<branch>:refs/remotes/origin/<branch>'`, followed by a tree walk that descends only into `.quill.md/`. Objects outside this path MUST NOT be downloaded.
-- Display a banner during the fetch that names the configured proxy and a one-line warning that the proxy operator can see the request, including the `Authorization` header.
+- Auto-detect the provider from the repository URL host (`github.com`, `gitlab.com`). Hosts that do not match any registered provider surface `RemoteUnsupportedHostError`.
+- Allow the user to override the auto-detection via a dropdown on the home screen's "Browse remote repository" card. The dropdown offers: Auto / GitHub.com / GitHub Enterprise (custom base URL) / GitLab.com / Self-hosted GitLab (custom base URL).
+- When the user selects "GitHub Enterprise" or "Self-hosted GitLab", an additional `<Input>` is shown for `customBaseUrl`. The value is forwarded to the provider's `parseUrl()` and used as the API base.
+- Legacy `config.remote.cors_proxy` is accepted but ignored (no proxy is needed; provider REST APIs ship permissive CORS).
 
 #### FR-13: Markdown rendering
 
@@ -303,7 +337,7 @@ The application MUST compute and persist a content hash of every issue file in o
 
 **Scope.**
 
-- Integrity tracking applies to Local Edit Mode. In Remote Read-Only Mode, the hash is computed and stored by the web app, but since the remote is read-only, only the **detection** half of the flow is active (the warning fires if the remote file was modified externally). The application MUST NOT write the recomputed hash back to the remote.
+- Integrity tracking applies to both Local Edit Mode and Remote Edit Mode. On every save through the web app, the hash is recomputed and stored. On Remote Mode saves, the new hash is written as part of the commit. The detection half of the flow is active in both modes: if the file was modified externally (e.g. via the provider's web UI between the app's read and write), the warning banner fires; the user's local draft is preserved; the user must Pull-to-refresh to reconcile.
 - The hash is per-file. There is no global, cross-file integrity check.
 
 ### 3.2 Non-Functional Requirements
@@ -313,20 +347,21 @@ The application MUST compute and persist a content hash of every issue file in o
 - The List view MUST render 1,000 issues with the filter bar and sort controls interactive in under 500 ms on a 2020-era laptop.
 - The Kanban view MUST handle 500 issues across 5 columns without frame drops during drag.
 - The Gantt view MUST render 200 bars and their dependency arrows in under 200 ms.
-- Remote Read-Only Mode's initial fetch (cold cache) MUST complete in under 10 s for repositories where `.quill.md/` is under 5 MB on disk.
+- Remote Edit Mode's initial cold-cache fetch MUST complete in under 5 s for repositories where `.quill.md/` is under 5 MB on disk. Reopen from the FR-10 IndexedDB snapshot MUST complete in under 500 ms.
 
 #### NFR-2: Security
 
-- The PAT MUST be held in memory only (no `localStorage`, no `sessionStorage`, no IndexedDB).
+- The PAT MUST NOT be written to IndexedDB, `localStorage`, URLs, or any non-namespaced key.
+- The PAT MAY be written to `sessionStorage` under the namespaced key `quill-md.remote-pat` so a page refresh does not re-prompt the user. The PAT is cleared on `signOut` and on tab close.
 - The PAT MUST NOT appear in any log line, error message, URL, or analytics payload.
-- The PAT MUST be passed to `isomorphic-git` exclusively through the `onAuth` callback.
-- The CORS proxy URL MUST be the only external endpoint the application contacts in Remote Read-Only Mode, other than the Git provider itself.
+- The PAT MUST be passed to the provider exclusively through the provider method's `pat` argument (which brands it before any I/O).
+- The provider REST endpoints (`api.github.com`, `gitlab.com/api/v4`) MUST be the only external endpoints the application contacts in Remote Edit Mode.
 - All Markdown rendering MUST be sanitized to prevent XSS.
 
 #### NFR-3: Privacy
 
 - The application MUST NOT include any analytics, telemetry, error reporting, or third-party script that transmits user data off-device.
-- The application's source code MUST NOT make any network request at runtime other than (a) the Git provider endpoint, (b) the configured CORS proxy endpoint, and (c) the static asset host (if any).
+- The application's source code MUST NOT make any network request at runtime other than (a) the registered provider REST endpoints (`api.github.com`, `gitlab.com/api/v4`, or the user-configured `custom_base_url`) and (b) the static asset host (if any).
 
 #### NFR-4: Accessibility
 
@@ -395,14 +430,16 @@ See [Section 6](#6-data-model) for the complete grammar and examples.
 
 ### 4.3 Git Provider Interface
 
-The application speaks the Git Smart HTTP protocol through `isomorphic-git`'s `http/web` transport. The transport is configured with:
+The application speaks the registered provider's REST API through the `RepoProvider` Strategy interface (`src/lib/adapters/providers/types.ts`). Each provider implementation encapsulates:
 
-- `url` — the repository's clone URL (HTTPS).
-- `ref` — the branch to fetch.
-- `onAuth` — a callback returning `{ username: '<token>' }` (the PAT is used as the username, per the Git Smart HTTP convention for token-based auth).
-- `corsProxy` — the configured CORS proxy URL (default `https://cors.isomorphic-git.org`).
+- **Authentication header:** GitHub uses `Authorization: Bearer <PAT>` (or `token <PAT>` for classic). GitLab uses `PRIVATE-TOKEN: <PAT>`. The PAT is supplied as the `pat` argument to every provider method; the brander ensures it never appears in logs.
+- **Read endpoints:** GitHub: `GET /repos/{owner}/{repo}/git/trees/{sha}?recursive=1` for cold-open, `GET /repos/{owner}/{repo}/commits?path=.quill.md/&since=…` for delta. GitLab: `GET /projects/{id}/repository/tree?path=.quill.md&recursive=true` for cold-open, `GET /repository/commits` + `/compare` for delta.
+- **Write endpoints:** GitHub: `PUT/DELETE /repos/{owner}/{repo}/contents/{path}` for single-file, Git Data API (`POST /git/commits` + `POST /git/trees` + `PATCH /git/refs/heads/{branch}`) for batched. GitLab: `PUT/DELETE /projects/{id}/repository/files/{path}` for single-file, `POST /repository/commits` with `actions[]` for batched.
+- **Optimistic concurrency:** GitHub uses the file's blob SHA; GitLab uses the file's last commit SHA. The app tracks both per file.
+- **Orphan branch creation:** Both providers can create the `quill-md` branch with no shared history with `main`. GitHub: empty-tree SHA `4b825dc6…` + commit + ref. GitLab: branch-from-default + single no-op commit.
+- **Force-push guard:** Neither provider uses `force: true`; the app cannot bypass branch protection.
 
-The application supports any provider that exposes the Git Smart HTTP protocol with permissive CORS headers. This includes Gitea, Forgejo, Gogs, and self-hosted GitLab instances. GitHub and GitLab.com do not advertise CORS headers for the Git Smart HTTP protocol, so the CORS proxy is **mandatory** for those providers.
+Adding a new provider is a Strategy-pattern registration: implement `RepoProvider`, register in `providers/registry.ts`, and (if auto-detection is desired) extend the `matches()` check.
 
 ---
 
@@ -437,40 +474,45 @@ The application supports any provider that exposes the Git Smart HTTP protocol w
 +------------------------------------------------------------+
 |  Adapter Layer                                             |
 |  - LocalFsAdapter  (FSA)                                   |
-|  - RemoteGitAdapter (isomorphic-git + LightningFS)         |
+|  - RemoteAdapter (Provider Strategy: GitHub, GitLab)       |
+|    - Read: provider.fetchAll / fetchSince                  |
+|    - Write: provider.putFile / deleteFile / commitBatch    |
+|  - ReadCache (idb-backed snapshot, FR-10)                   |
 |  - RendererAdapter (marked + DOMPurify)                    |
 +------------------------------------------------------------+
 ```
 
 ### 5.2 Module Boundaries
 
-- The **Adapter Layer** is the only layer that talks to the outside world. Swapping FSA for a different storage (e.g. a sync engine) or `isomorphic-git` for a different Git library MUST be confined to this layer.
+- The **Adapter Layer** is the only layer that talks to the outside world. Swapping FSA for a different storage (e.g. a sync engine) or replacing the provider Strategy with a different Git library MUST be confined to this layer.
 - The **Service Layer** is pure: it takes and returns domain objects, and never touches the DOM, the network, or the filesystem directly. It is fully unit-testable in a Node test runner.
 - The **State Layer** is the single source of truth for the UI. It is reactive (Svelte 5 runes) and is updated exclusively by the Service Layer.
 - The **UI Layer** is a pure function of the State Layer. It does not perform I/O.
 
 ### 5.3 Technology Stack
 
-| Concern                | Library / API                                        | Notes                                                                                |
-| ---------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Framework              | SvelteKit + `adapter-static`                         | SPA build, no SSR.                                                                   |
-| Component model        | Svelte 5 (runes)                                     | `$state`, `$derived`, `$effect`.                                                     |
-| Styling                | **Tailwind CSS v4**                                  | With `@tailwindcss/typography` for prose.                                            |
-| Icons                  | **lucide-svelte**                                    | Template icons, status icons, UI chrome.                                             |
-| Local filesystem       | File System Access API                               | Native browser API.                                                                  |
-| Remote Git             | `isomorphic-git` + `@isomorphic-git/lightning-fs`    | Partial clone.                                                                       |
-| CORS proxy             | Configurable URL (default `cors.isomorphic-git.org`) | Configurable per project.                                                            |
-| YAML parsing           | `js-yaml`                                            | Frontmatter.                                                                         |
-| Frontmatter + sections | `gray-matter` (extended)                             | `gray-matter` handles the `---` block; a custom adapter handles the section markers. |
-| Markdown rendering     | `marked` + `DOMPurify`                               | Sanitized output.                                                                    |
-| Code highlighting      | `shiki` (preferred) or `highlight.js`                | For code blocks in sections.                                                         |
-| Integrity hash         | Web Crypto API (`crypto.subtle.digest`)              | Native SHA-256 for FR-15. No third-party hashing library.                            |
-| Drag-and-drop          | `svelte-dnd-action`                                  | Kanban.                                                                              |
-| Gantt                  | Custom SVG component                                 | Built on plain SVG; no third-party Gantt library.                                    |
-| State                  | Svelte stores + runes                                | Reactive.                                                                            |
-| Testing                | Vitest + Playwright                                  | Unit and end-to-end.                                                                 |
-| Bundler                | Vite (via SvelteKit)                                 | Default.                                                                             |
-| Hosting                | Static (any)                                         | GitHub Pages, Netlify, etc.                                                          |
+| Concern                | Library / API                           | Notes                                                                                              |
+| ---------------------- | --------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Framework              | SvelteKit + `adapter-static`            | SPA build, no SSR.                                                                                 |
+| Component model        | Svelte 5 (runes)                        | `$state`, `$derived`, `$effect`.                                                                   |
+| Styling                | **Tailwind CSS v4**                     | With `@tailwindcss/typography` for prose.                                                          |
+| Icons                  | **lucide-svelte**                       | Template icons, status icons, UI chrome.                                                           |
+| Local filesystem       | File System Access API                  | Native browser API.                                                                                |
+| Remote Git (read)      | Provider REST API (Strategy pattern)    | GitHub: `api.github.com`. GitLab: `gitlab.com/api/v4`. Permissive CORS, no proxy.                  |
+| Remote Git (write)     | Provider REST API (Strategy pattern)    | `PUT /contents`, Git Data API on GitHub; `PUT /repository/files`, `/repository/commits` on GitLab. |
+| Remote cache           | `idb` (IndexedDB-backed snapshot)       | FR-10 snapshot of `.quill.md/` files keyed by `(providerId, owner/repo, editBranch, sha)`.         |
+| PAT persistence        | `sessionStorage`                        | Namespaced under `quill-md.remote-pat` (cleared on tab close / sign-out).                          |
+| YAML parsing           | `js-yaml`                               | Frontmatter.                                                                                       |
+| Frontmatter + sections | `gray-matter` (extended)                | `gray-matter` handles the `---` block; a custom adapter handles the section markers.               |
+| Markdown rendering     | `marked` + `DOMPurify`                  | Sanitized output.                                                                                  |
+| Code highlighting      | `shiki` (preferred) or `highlight.js`   | For code blocks in sections.                                                                       |
+| Integrity hash         | Web Crypto API (`crypto.subtle.digest`) | Native SHA-256 for FR-15. No third-party hashing library.                                          |
+| Drag-and-drop          | `svelte-dnd-action`                     | Kanban.                                                                                            |
+| Gantt                  | Custom SVG component                    | Built on plain SVG; no third-party Gantt library.                                                  |
+| State                  | Svelte stores + runes                   | Reactive.                                                                                          |
+| Testing                | Vitest + Playwright                     | Unit and end-to-end.                                                                               |
+| Bundler                | Vite (via SvelteKit)                    | Default.                                                                                           |
+| Hosting                | Static (any)                            | GitHub Pages, Netlify, etc.                                                                        |
 
 ### 5.4 Build and Deploy
 
@@ -826,11 +868,11 @@ The application ships with four built-in templates (see [Appendix C](#appendix-c
 ### UC-2: Browse a remote repository read-only
 
 1. The user clicks "Browse remote repository" on the home screen.
-2. The user enters the URL `https://github.com/acme/widgets`, the branch `main`, and a PAT.
-3. The application uses `isomorphic-git` with the configured CORS proxy to fetch the `.quill.md/` subtree only.
-4. The fetched tree is cached in IndexedDB and rendered in the List view.
-5. The user can switch to the Kanban view (drag is inert) and the Gantt view (read-only).
-6. The user can also click "Refresh" to re-fetch.
+2. The user enters the URL `https://github.com/acme/widgets`, accepts the auto-detected GitHub provider, and pastes a PAT with `Contents: write` scope.
+3. The application auto-detects the GitHub provider from the URL host, validates the PAT via `GET /user`, and ensures the `quill-md` edit branch exists (creating it as an orphan if absent).
+4. The application fetches the `.quill.md/` subtree via `GET /git/trees/{sha}?recursive=1`, snapshots it into IndexedDB (FR-10), and renders the issues in the List view.
+5. The user can switch to the Kanban view (drag enqueues a write; the queue debounces and flushes as one commitBatch per 2 s idle window) and the Gantt view (read-only).
+6. The user can also click "Refresh" to re-fetch (PAT re-prompted or read from sessionStorage).
 
 ### UC-3: Change an issue's status via Kanban drag
 
@@ -868,30 +910,30 @@ The application ships with four built-in templates (see [Appendix C](#appendix-c
 
 Each requirement is matched with one or more testable conditions. Conditions are phrased as pass/fail.
 
-| Req   | Acceptance Criteria                                                                                                                                                                                                                                            |
-| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| FR-1  | Given a valid issue file, the parser produces an in-memory object with all frontmatter keys, all sections, and the Markdown body of each section. Re-serializing the object produces a file that, when parsed again, yields an equivalent object (round-trip). |
-| FR-2  | Given a template, the editor renders one input per field, in ascending `id` order. `longtext` fields and `sections` are rendered as Markdown editors.                                                                                                          |
-| FR-3  | Given a missing or malformed `config.json`, the application shows an actionable error and refuses to start.                                                                                                                                                    |
-| FR-4  | Create, read, update, delete operations succeed against a real local folder in a Chromium browser. The folder handle is restored across page reloads. "Switch folder" works.                                                                                   |
-| FR-5  | A partial clone of a public GitHub repository with `.quill.md/` completes in under 10 s on a 2020-era laptop with a cold cache. The PAT does not appear in any log or URL.                                                                                     |
-| FR-6  | List view renders 1,000 issues in under 500 ms. Kanban supports drag-and-drop in Local Mode and is read-only in Remote Mode. Gantt renders 200 bars + dependency arrows in under 200 ms.                                                                       |
-| FR-7  | All filter predicates are combinable with AND. The active filter set survives a page reload.                                                                                                                                                                   |
-| FR-8  | Saving an issue with an empty obligatory field or empty obligatory section is blocked with a per-field error message.                                                                                                                                          |
-| FR-9  | Cycles in `parent`/`child` and `blocks`/`depends_on` are detected and refused. Cycles in `relates_to` are allowed.                                                                                                                                             |
-| FR-10 | Reloading Remote Read-Only Mode for a previously-cloned URL+branch reuses the cache and does not re-fetch objects that are already in IndexedDB.                                                                                                               |
-| FR-11 | On a folder without `.quill.md/`, the wizard appears. Both paths ("Use built-in templates" and "Create your own") are functional. At least one template is required to exit the wizard.                                                                        |
-| FR-12 | A custom CORS proxy URL is read from `config.json` and used for the next fetch. The default is `https://cors.isomorphic-git.org` and is used when no override is present. The fetched objects are limited to the `.quill.md/` subtree.                         |
-| FR-13 | Markdown sections render correctly. Code blocks are syntax-highlighted. A `<script>` tag in a section is stripped by the sanitizer.                                                                                                                            |
-| FR-14 | Light and dark themes render correctly. The theme preference persists across reloads.                                                                                                                                                                          |
-| FR-15 | Saving an issue writes a `sha256:` hash into the `integrity_hash` field. Re-loading a manually edited file produces a warning banner. The user can still edit and save the file; the warning is cleared on the next save performed through the web app.        |
-| NFR-1 | Performance budgets are met on the test machine described in NFR-1.                                                                                                                                                                                            |
-| NFR-2 | The PAT is held in memory only. It does not appear in any log, error message, URL, or IndexedDB store.                                                                                                                                                         |
-| NFR-3 | The application's network tab shows requests only to (a) the Git provider, (b) the configured CORS proxy, and (c) the static asset host. No other requests are made.                                                                                           |
-| NFR-4 | The application is fully operable by keyboard. Statuses and labels are conveyed by text, not color alone. The Gantt view has a textual fallback.                                                                                                               |
-| NFR-5 | The browser support matrix in [Section 3.2 NFR-5](#nfr-5-browser-support) holds.                                                                                                                                                                               |
-| NFR-6 | All user-facing strings are sourced from a single map.                                                                                                                                                                                                         |
-| NFR-7 | A failed remote fetch does not corrupt the cache. A failed local write is rolled back. A revoked FSA handle re-prompts without losing in-memory editor state.                                                                                                  |
+| Req   | Acceptance Criteria                                                                                                                                                                                                                                                                                                                                                                      |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FR-1  | Given a valid issue file, the parser produces an in-memory object with all frontmatter keys, all sections, and the Markdown body of each section. Re-serializing the object produces a file that, when parsed again, yields an equivalent object (round-trip).                                                                                                                           |
+| FR-2  | Given a template, the editor renders one input per field, in ascending `id` order. `longtext` fields and `sections` are rendered as Markdown editors.                                                                                                                                                                                                                                    |
+| FR-3  | Given a missing or malformed `config.json`, the application shows an actionable error and refuses to start.                                                                                                                                                                                                                                                                              |
+| FR-4  | Create, read, update, delete operations succeed against a real local folder in a Chromium browser. The folder handle is restored across page reloads. "Switch folder" works.                                                                                                                                                                                                             |
+| FR-5  | Opening a public GitHub repository with `.quill.md/` (via the provider REST API) completes the cold fetch in under 5 s on a 2020-era laptop. The PAT does not appear in any log or URL. Provider detection from the URL host works for `github.com` and `gitlab.com`. An unknown host surfaces `RemoteUnsupportedHostError` and the home-screen dropdown lets the user pick an override. |
+| FR-6  | List view renders 1,000 issues in under 500 ms. Kanban supports drag-and-drop in both Local and Remote modes (Remote enqueues via the CommitQueueStore, debounced to one commit per 2 s idle). Gantt renders 200 bars + dependency arrows in under 200 ms.                                                                                                                               |
+| FR-7  | All filter predicates are combinable with AND. The active filter set survives a page reload.                                                                                                                                                                                                                                                                                             |
+| FR-8  | Saving an issue with an empty obligatory field or empty obligatory section is blocked with a per-field error message.                                                                                                                                                                                                                                                                    |
+| FR-9  | Cycles in `parent`/`child` and `blocks`/`depends_on` are detected and refused. Cycles in `relates_to` are allowed.                                                                                                                                                                                                                                                                       |
+| FR-10 | Reopening Remote Edit Mode for a previously-fetched `(providerId, owner/repo, editBranch, sha)` loads the IndexedDB snapshot instantly; a `commitSha` mismatch triggers a `commits?since=…` delta-fetch. Clearing the snapshot from Settings drops it.                                                                                                                                   |
+| FR-11 | On a folder without `.quill.md/`, the wizard appears. Both paths ("Use built-in templates" and "Create your own") are functional. At least one template is required to exit the wizard.                                                                                                                                                                                                  |
+| FR-12 | The home-screen dropdown offers `auto` (default), `GitHub.com`, `GitHub Enterprise`, `GitLab.com`, and `Self-hosted GitLab`. Selecting an Enterprise / Self-hosted option surfaces an additional `customBaseUrl` input. Legacy `config.remote.cors_proxy` is accepted but ignored.                                                                                                       |
+| FR-13 | Markdown sections render correctly. Code blocks are syntax-highlighted. A `<script>` tag in a section is stripped by the sanitizer.                                                                                                                                                                                                                                                      |
+| FR-14 | Light and dark themes render correctly. The theme preference persists across reloads.                                                                                                                                                                                                                                                                                                    |
+| FR-15 | Saving an issue writes a `sha256:` hash into the `integrity_hash` field. Re-loading a manually edited file produces a warning banner. The user can still edit and save the file; the warning is cleared on the next save performed through the web app.                                                                                                                                  |
+| FR-16 | An issue save produces one commit on the edit branch with message `chore(quill.md): <action> <subject>`. Multiple Kanban drags within 2 s coalesce into one commitBatch with message `chore(quill.md): update N issue statuses`. A 409 from the provider surfaces a `RemoteConflictError` banner; the user's local draft is preserved; the queue is preserved.                           |
+| FR-17 | The Remote Setup Wizard presents (1) dedicated-repo recommendation with checkbox acknowledgement, (2) edit-branch default `quill-md`, (3) PAT scope guidance. The orphan-branch creation on first open succeeds. The EditToolbar shows a persistent advisory banner naming the branch and recommending a dedicated repo.                                                                 |
+| NFR-3 | The application's network tab shows requests only to (a) the Git provider, (b) the configured CORS proxy, and (c) the static asset host. No other requests are made.                                                                                                                                                                                                                     |
+| NFR-4 | The application is fully operable by keyboard. Statuses and labels are conveyed by text, not color alone. The Gantt view has a textual fallback.                                                                                                                                                                                                                                         |
+| NFR-5 | The browser support matrix in [Section 3.2 NFR-5](#nfr-5-browser-support) holds.                                                                                                                                                                                                                                                                                                         |
+| NFR-6 | All user-facing strings are sourced from a single map.                                                                                                                                                                                                                                                                                                                                   |
+| NFR-7 | A failed remote fetch does not corrupt the cache. A failed local write is rolled back. A revoked FSA handle re-prompts without losing in-memory editor state.                                                                                                                                                                                                                            |
 
 ---
 
@@ -899,17 +941,21 @@ Each requirement is matched with one or more testable conditions. Conditions are
 
 The following are explicitly **not** part of v1:
 
-- **Pushing to the remote.** The application never writes to the Git provider. The user is responsible for committing and pushing.
-- **Branch creation, pull request creation, merge, rebase.** All version-control operations are the user's responsibility.
+- **Pull request creation, merge, rebase.** The app commits to the edit branch only; the user is responsible for opening PRs and merging to `main`.
+- **Force-push.** The app never uses `force: true` on either provider.
+- **Branch protection enforcement.** The app cannot enforce that the user's repo has the `quill-md` branch protected. The wizard + advisory banner are guidance only.
+- **OAuth flow.** PAT only. GitHub OAuth App / GitLab OAuth flows are out of scope.
 - **Comments and discussion threads.** Issues are silent; there is no commenting system.
 - **Attachments and file uploads.** Issues contain only text and Markdown.
-- **Real-time multi-user collaboration.** The application is single-user. Concurrent edits from multiple machines are out of scope.
+- **Real-time multi-user collaboration.** The application is single-user. Concurrent edits from multiple sessions on the same edit branch may race; optimistic concurrency surfaces the collision.
 - **Notifications.** The application does not watch the repository for changes; it polls on user action.
 - **Mobile and touch support.** The application targets desktop browsers only.
 - **Localization.** English only in v1.
-- **Custom CORS-proxy management.** The application points at one proxy URL; the user is responsible for running their own if they need to.
 - **Import from / export to other issue trackers** (GitHub Issues, Jira, Linear). Migration tooling is out of scope.
 - **Webhooks, automation, custom workflows.** No server-side automation is possible; all behavior is local.
+- **Custom CORS-proxy management.** Removed in v2.0 — provider REST APIs ship permissive CORS.
+- **Pending-write queue persistence.** Closing the tab drops queued Kanban writes. A future commit could persist the queue in IndexedDB.
+- **GraphQL delta-fetch.** REST + commits-since + tree-recursive is the v2.0 implementation. A future commit could swap to GraphQL `repository.object.history(path, since)` for one-shot delta queries; the `RepoProvider` interface already accommodates it.
 
 ---
 
@@ -917,35 +963,37 @@ The following are explicitly **not** part of v1:
 
 ### Glossary
 
-| Term          | Definition                                                                                       |
-| ------------- | ------------------------------------------------------------------------------------------------ |
-| CORS          | Cross-Origin Resource Sharing. A browser-enforced restriction on cross-domain requests.          |
-| Frontmatter   | YAML metadata block at the top of a Markdown file, delimited by `---`.                           |
-| IndexedDB     | Browser-native key-value store. Used by LightningFS to back the remote cache.                    |
-| LightningFS   | A virtual filesystem backed by IndexedDB, used by `isomorphic-git` in the browser.               |
-| PAT           | Personal Access Token. A credential for Git provider APIs.                                       |
-| Partial clone | A Git clone that fetches only a specified subtree.                                               |
-| Section       | A named Markdown block in an issue file, delimited by `SECTION_START` and `SECTION_END` markers. |
-| Slug          | A URL- and filename-safe version of a string, lowercased with non-alphanumerics replaced by `-`. |
-| Template      | A JSON file describing the schema of an issue type.                                              |
-| Type          | Synonym for "issue type". A category of issue (e.g. Bug, Epic, User Story, Task).                |
+| Term                   | Definition                                                                                              |
+| ---------------------- | ------------------------------------------------------------------------------------------------------- |
+| CORS                   | Cross-Origin Resource Sharing. Provider REST APIs ship permissive CORS headers — no proxy.              |
+| Edit branch            | The branch the app commits to in Remote Edit Mode. Default `quill-md`. Long-lived, orphan-style.        |
+| Frontmatter            | YAML metadata block at the top of a Markdown file, delimited by `---`.                                  |
+| IndexedDB              | Browser-native key-value store. Used by the FR-10 snapshot and by `handleStore` for FSA handles.        |
+| Optimistic concurrency | Provider APIs require the file's last SHA on every write; mismatch returns 409 → `RemoteConflictError`. |
+| Orphan branch          | A branch with no shared history with `main`. The `quill-md` branch is always created as orphan.         |
+| PAT                    | Personal Access Token. A credential for Git provider APIs. Session-scoped (lives in `sessionStorage`).  |
+| Provider               | A registered `RepoProvider` Strategy implementation (GitHub, GitLab, …).                                |
+| Section                | A named Markdown block in an issue file, delimited by `SECTION_START` and `SECTION_END` markers.        |
+| Slug                   | A URL- and filename-safe version of a string, lowercased with non-alphanumerics replaced by `-`.        |
+| Template               | A JSON file describing the schema of an issue type.                                                     |
+| Type                   | Synonym for "issue type". A category of issue (e.g. Bug, Epic, User Story, Task).                       |
 
 ### Appendix A: Technology Stack with Rationale
 
-| Choice                       | Rationale                                                                                                                                                                                                      |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| SvelteKit + `adapter-static` | The simplest path to a pure static SPA with file-system-based routing, layouts, and a mature build pipeline. Svelte 5 runes give fine-grained reactivity without the boilerplate of older reactive primitives. |
-| Tailwind CSS v4              | Utility-first styling with strong defaults for prose via `@tailwindcss/typography`. Version 4 brings a smaller bundle and faster builds.                                                                       |
-| `lucide-svelte`              | A large, consistent, well-maintained icon set with first-class Svelte bindings.                                                                                                                                |
-| File System Access API       | The only browser API that gives JavaScript read/write access to a local folder. Limited to Chromium for now, which is acceptable given the target audience.                                                    |
-| `isomorphic-git`             | The only mature pure-JS Git implementation that runs in the browser. Supports partial clone through `singleBranch` + tree walking.                                                                             |
-| `LightningFS`                | The filesystem implementation recommended by `isomorphic-git` for the browser. Backed by IndexedDB.                                                                                                            |
-| `gray-matter`                | Battle-tested frontmatter parser. We extend it with a small post-processing step to handle section markers.                                                                                                    |
-| `js-yaml`                    | The standard YAML parser for JavaScript. Used by `gray-matter` internally and re-used directly for non-frontmatter YAML (e.g. template validation).                                                            |
-| `marked` + `DOMPurify`       | `marked` is small, fast, and extensible. `DOMPurify` is the de-facto XSS sanitizer.                                                                                                                            |
-| `svelte-dnd-action`          | A keyboard-accessible drag-and-drop library for Svelte, used in the Kanban view.                                                                                                                               |
-| Custom SVG Gantt             | Off-the-shelf Gantt libraries are heavy and not customizable enough for our use case. A 200-bar custom SVG component is well within scope.                                                                     |
-| Web Crypto API               | Native browser API. Used for SHA-256 integrity hashing (FR-15). Avoids adding a hashing dependency for a single digest.                                                                                        |
+| Choice                                   | Rationale                                                                                                                                                                                                                         |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SvelteKit + `adapter-static`             | The simplest path to a pure static SPA with file-system-based routing, layouts, and a mature build pipeline. Svelte 5 runes give fine-grained reactivity without the boilerplate of older reactive primitives.                    |
+| Tailwind CSS v4                          | Utility-first styling with strong defaults for prose via `@tailwindcss/typography`. Version 4 brings a smaller bundle and faster builds.                                                                                          |
+| `lucide-svelte`                          | A large, consistent, well-maintained icon set with first-class Svelte bindings.                                                                                                                                                   |
+| File System Access API                   | The only browser API that gives JavaScript read/write access to a local folder. Limited to Chromium for now, which is acceptable given the target audience.                                                                       |
+| Provider Strategy (GitHub / GitLab REST) | Replaces v0's isomorphic-git + LightningFS stack. Provider APIs ship permissive CORS — no proxy required. Each provider is a `RepoProvider` implementation; new providers can be added without touching the rest of the codebase. |
+| `idb`                                    | IndexedDB wrapper used by the FR-10 snapshot. Lightweight (no schema-management overhead) and works in Node test environments.                                                                                                    |
+| `sessionStorage`                         | Namespaced under `quill-md.*`. Holds the PAT and session metadata for the duration of the tab; cleared on close / sign-out.                                                                                                       |
+| `gray-matter`                            | Battle-tested frontmatter parser. We extend it with a small post-processing step to handle section markers.                                                                                                                       |
+| `js-yaml`                                | The standard YAML parser for JavaScript. Used by `gray-matter` internally and re-used directly for non-frontmatter YAML (e.g. template validation).                                                                               |
+| `marked` + `DOMPurify`                   | `marked` is small, fast, and extensible. `DOMPurify` is the de-facto XSS sanitizer.                                                                                                                                               |
+| Custom SVG Gantt                         | Off-the-shelf Gantt libraries are heavy and not customizable enough for our use case. A 200-bar custom SVG component is well within scope.                                                                                        |
+| Web Crypto API                           | Native browser API. Used for SHA-256 integrity hashing (FR-15). Avoids adding a hashing dependency for a single digest.                                                                                                           |
 
 ### Appendix B: Complete Example Files
 
@@ -1210,33 +1258,42 @@ The application ships with the following four templates in a bundle, accessible 
 
 Full schemas are in [Appendix B](#appendix-b-complete-example-files) (sections B.2, B.3, B.4, B.5).
 
-### Appendix D: Partial-Clone Implementation Sketch
+### Appendix D: Provider implementation sketch
 
-The following pseudocode documents the intended call sequence for the partial clone in Remote Read-Only Mode (FR-5, FR-12). It is not normative; it is provided to clarify the intent of the requirement.
+The following pseudocode documents the intended call sequence for opening a remote repository in Remote Edit Mode (FR-5, FR-16). It is not normative; it is provided to clarify the intent of the requirement.
 
-```text
-git.init({ fs, dir: '/repo' })
-git.addRemote({ fs, dir: '/repo', remote: 'origin', url, force: true })
+```ts
+// 1. Detect provider from URL host (or honour preferredId override).
+const provider = detectProvider(url) ?? resolveProvider(url, preferredId);
 
-git.fetch({
-  fs, http, dir: '/repo',
-  ref: branch,
-  refspec: `refs/heads/${branch}:refs/remotes/origin/${branch}`,
-  singleBranch: true,
-  depth: 1,
-  onAuth: () => ({ username: pat }),
-  corsProxy: config.remote.cors_proxy,
-})
+// 2. Verify PAT scope (one-time call).
+const user = await provider.verifyAuth(parsed, pat);
+//   throws RemoteAuthError on 401/403.
 
-git.checkout({
-  fs, dir: '/repo', ref: branch,
-  filepaths: ['.quill.md'],
-})
+// 3. Ensure the edit branch exists (orphan on first open).
+const tip = await provider.getBranch(parsed, editBranch, pat);
+if (!tip) {
+	tip = await provider.createOrphanBranch(parsed, editBranch, pat, author);
+	//   POST /git/commits on empty tree + POST /git/refs  (GitHub)
+	//   POST /repository/branches + POST /repository/commits with one action (GitLab)
+}
 
-// The local FS is now populated with .quill.md/** and nothing else.
+// 4. Read the .quill.md/ subtree.
+const files = await provider.fetchAll(parsed, tip, pat);
+//   GET /git/trees/{sha}?recursive=1  (GitHub)
+//   GET /repository/tree?path=.quill.md&recursive=true  (GitLab)
+
+// 5. Persist to IndexedDB snapshot for fast reopen (FR-10).
+await putSnapshot({ cacheKey, files });
+
+// 6. Build the read+write adapter rooted at the .quill.md/ subtree.
+const adapter = buildReadOnlyAdapter(files, tip);
+
+// 7. User saves → provider.putFile / deleteFile / commitBatch.
+//   409 → RemoteConflictError, local draft preserved.
 ```
 
-The `filepaths` option (or the equivalent tree-walk filter) is the mechanism by which the application fetches only the `.quill.md/` subtree. If the underlying `isomorphic-git` version does not yet support `filepaths`, the application falls back to a manual tree walk: it lists the tree at the root, descends only into `.quill.md/`, and copies the matching objects to the local FS.
+The `fetchSince` path replaces `fetchAll` on reopen when the cache's commit SHA differs from the latest: it issues `GET /repos/.../commits?path=.quill.md/&since=…` and re-fetches only the touched files.
 
 ---
 

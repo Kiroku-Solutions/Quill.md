@@ -46,6 +46,8 @@ Prettier (`pnpm format`): **tabs**, **single quotes**, **no trailing comma**, **
 
 ESLint flat config disables `no-undef` (TypeScript handles it) and runs `eslint-config-prettier` last so Prettier owns formatting. Do not add style rules to ESLint.
 
+All code, including comments, should be written in English. No literal user-facing strings are written in the code, but rather referenced using t(key) as specified in `/src/lib/ui/strings.ts`.
+
 ## Architecture notes that aren't obvious
 
 - **No `svelte.config.js`** — SvelteKit uses defaults. `adapter-static` is wired in `vite.config.ts`, but the ERS calls for `@sveltejs/adapter-static` for v1 (static-only deploy). Switching the adapter is a tracked scope item, not a refactor.

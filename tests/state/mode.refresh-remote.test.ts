@@ -19,9 +19,9 @@
  * deliberately avoids.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import * as remoteGit from '$lib/adapters/remote-git';
+import * as remoteGit from '$lib/adapters/remote';
 import type { HandleStore } from '$lib/adapters/handle-store';
-import { fetchSubtree } from '$lib/adapters/remote-git';
+import { fetchSubtree } from '$lib/adapters/remote';
 import { createModeStore, RemotePatRequiredError } from '$lib/state';
 
 const KNOWN_URL = 'https://github.com/example/repo' as remoteGit.RepoUrl;
@@ -99,7 +99,9 @@ describe('createModeStore — refreshRemote (sub-phase 6F)', () => {
 			sha: 'pending' as remoteGit.Sha,
 			adapter: initialAdapter,
 			cacheKey: `${KNOWN_URL}|${KNOWN_BRANCH}|pending` as remoteGit.CacheKey,
-			proxyWarning: 'initial proxy warning'
+			providerId: 'github',
+			editBranch: 'quill-md',
+			author: { name: 'Test User', email: 'test@example.com' }
 		});
 		await store.openRemote({ url: KNOWN_URL, branch: KNOWN_BRANCH }, KNOWN_PAT);
 
@@ -109,7 +111,9 @@ describe('createModeStore — refreshRemote (sub-phase 6F)', () => {
 			sha: 'pending' as remoteGit.Sha,
 			adapter: refreshedAdapter,
 			cacheKey: `${KNOWN_URL}|${KNOWN_BRANCH}|pending` as remoteGit.CacheKey,
-			proxyWarning: 'refreshed proxy warning'
+			providerId: 'github',
+			editBranch: 'quill-md',
+			author: { name: 'Test User', email: 'test@example.com' }
 		});
 
 		await store.refreshRemote(REFRESH_PAT);
@@ -126,7 +130,7 @@ describe('createModeStore — refreshRemote (sub-phase 6F)', () => {
 		// Adapter was swapped to the refreshed one.
 		expect(store.remoteAdapter).toBe(refreshedAdapter);
 		// Proxy warning was updated.
-		expect(store.proxyWarning).toBe('refreshed proxy warning');
+		expect(store.proxyWarning).toBe(null);
 		// onRefreshSuccess fires after both openRemote (1×) and refreshRemote
 		// (1×) — the dependency is wired into every successful remote fetch.
 		expect(onRefreshSuccessCalls).toBe(2);
@@ -147,7 +151,9 @@ describe('createModeStore — refreshRemote (sub-phase 6F)', () => {
 			sha: 'pending' as remoteGit.Sha,
 			adapter,
 			cacheKey: `${KNOWN_URL}|${KNOWN_BRANCH}|pending` as remoteGit.CacheKey,
-			proxyWarning: 'proxy warning'
+			providerId: 'github',
+			editBranch: 'quill-md',
+			author: { name: 'Test User', email: 'test@example.com' }
 		});
 		await store.openRemote({ url: KNOWN_URL, branch: KNOWN_BRANCH }, KNOWN_PAT);
 		const adapterBefore = store.remoteAdapter;
@@ -176,7 +182,9 @@ describe('createModeStore — refreshRemote (sub-phase 6F)', () => {
 			sha: 'pending' as remoteGit.Sha,
 			adapter: makeFakeAdapter('initial'),
 			cacheKey: `${KNOWN_URL}|${KNOWN_BRANCH}|pending` as remoteGit.CacheKey,
-			proxyWarning: 'proxy warning'
+			providerId: 'github',
+			editBranch: 'quill-md',
+			author: { name: 'Test User', email: 'test@example.com' }
 		});
 		await store.openRemote({ url: KNOWN_URL, branch: KNOWN_BRANCH }, KNOWN_PAT);
 		await store.signOut();
@@ -194,7 +202,9 @@ describe('createModeStore — refreshRemote (sub-phase 6F)', () => {
 			sha: 'pending' as remoteGit.Sha,
 			adapter: initialAdapter,
 			cacheKey: `${KNOWN_URL}|${KNOWN_BRANCH}|pending` as remoteGit.CacheKey,
-			proxyWarning: 'proxy warning'
+			providerId: 'github',
+			editBranch: 'quill-md',
+			author: { name: 'Test User', email: 'test@example.com' }
 		});
 		await store.openRemote({ url: KNOWN_URL, branch: KNOWN_BRANCH }, KNOWN_PAT);
 
@@ -224,7 +234,9 @@ describe('createModeStore — refreshRemote (sub-phase 6F)', () => {
 			sha: 'pending' as remoteGit.Sha,
 			adapter: makeFakeAdapter('initial'),
 			cacheKey: `${KNOWN_URL}|${KNOWN_BRANCH}|pending` as remoteGit.CacheKey,
-			proxyWarning: 'proxy warning'
+			providerId: 'github',
+			editBranch: 'quill-md',
+			author: { name: 'Test User', email: 'test@example.com' }
 		});
 		await store.openRemote({ url: KNOWN_URL, branch: KNOWN_BRANCH }, KNOWN_PAT);
 
@@ -234,7 +246,9 @@ describe('createModeStore — refreshRemote (sub-phase 6F)', () => {
 			sha: 'pending' as remoteGit.Sha,
 			adapter: makeFakeAdapter('refreshed'),
 			cacheKey: `${KNOWN_URL}|${KNOWN_BRANCH}|pending` as remoteGit.CacheKey,
-			proxyWarning: 'proxy warning'
+			providerId: 'github',
+			editBranch: 'quill-md',
+			author: { name: 'Test User', email: 'test@example.com' }
 		});
 		await store.refreshRemote(REFRESH_PAT);
 
@@ -252,7 +266,9 @@ describe('createModeStore — refreshRemote (sub-phase 6F)', () => {
 			sha: 'pending' as remoteGit.Sha,
 			adapter: makeFakeAdapter('initial'),
 			cacheKey: `${KNOWN_URL}|${KNOWN_BRANCH}|pending` as remoteGit.CacheKey,
-			proxyWarning: 'proxy warning'
+			providerId: 'github',
+			editBranch: 'quill-md',
+			author: { name: 'Test User', email: 'test@example.com' }
 		});
 		await store.openRemote({ url: KNOWN_URL, branch: KNOWN_BRANCH }, KNOWN_PAT);
 		expect(typeof store.lastFetchedAt).toBe('number');

@@ -101,6 +101,8 @@ function buildStub(opts: {
 			hasRemoteCredentials: false,
 			remoteUrl: null,
 			proxyWarning: null,
+			editBranch: null,
+			providerId: null,
 			lastFetchedAt: null,
 			localAdapter: opts.hasLocalAdapter
 				? ({

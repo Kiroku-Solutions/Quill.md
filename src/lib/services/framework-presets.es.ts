@@ -110,7 +110,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -452,7 +453,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -664,7 +666,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -1031,7 +1034,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -1318,7 +1322,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -1581,7 +1586,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -1790,7 +1796,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -2072,7 +2079,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -2366,7 +2374,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -2611,7 +2620,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -2964,7 +2974,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -3344,7 +3355,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -3727,7 +3739,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -4177,7 +4190,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -4509,7 +4523,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -4805,7 +4820,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -5204,7 +5220,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -5544,7 +5561,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -5845,7 +5863,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [
@@ -6121,7 +6140,8 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_view: 'weeks'
 			},
 			remote: {
-				cors_proxy: 'https://cors.isomorphic-git.org'
+				provider: 'github',
+				edit_branch: 'quill-md'
 			}
 		},
 		templates: [

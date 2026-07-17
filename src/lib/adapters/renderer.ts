@@ -86,6 +86,11 @@ export function __resetPurifierForTests(): void {
 	cachedPurifier = undefined;
 }
 
+/** Test helper: return the cached purifier (initialising it if needed). Exported for tests only. */
+export function __getPurifierForTests(): DOMPurifyType {
+	return getPurifier();
+}
+
 // ─── Configuration ──────────────────────────────────────────────────────────
 
 /**
