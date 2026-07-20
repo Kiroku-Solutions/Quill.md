@@ -91,20 +91,22 @@ const TEMPLATES: Template[] = [
 function makeIssue(id: number, status: string, title: string): Issue {
 	return {
 		id,
-		title,
-		author: 'tester',
-		creationDate: '2026-01-01',
-		updatedDate: '2026-01-15',
-		issueType: 'task',
-		status,
-		assignee: null,
-		labels: [],
-		relations: [],
-		startDate: null,
-		endDate: null,
-		duration: null,
-		sprintId: null,
-		estimate: null,
+		fields: {
+			title,
+			author: 'tester',
+			creationDate: '2026-01-01',
+			updatedDate: '2026-01-15',
+			issueType: 'task',
+			status,
+			assignee: null,
+			labels: [],
+			relations: [],
+			startDate: null,
+			endDate: null,
+			duration: null,
+			sprintId: null,
+			estimate: null
+		},
 		integrityHash: null,
 		customFields: {},
 		sections: [],
@@ -140,6 +142,7 @@ function buildStub(opts: {
 			proxyWarning: null,
 			editBranch: null,
 			providerId: null,
+			parentSha: null,
 			lastFetchedAt: null,
 			localAdapter:
 				opts.mode === 'local'
@@ -152,6 +155,20 @@ function buildStub(opts: {
 						} as never)
 					: null,
 			remoteAdapter: null,
+			commitQueue: {
+				depth: 0,
+				lastFlushAt: null,
+				lastError: null,
+				flushing: false,
+				active: false,
+				start: () => undefined,
+				setSession: () => undefined,
+				stop: () => undefined,
+				enqueue: () => undefined,
+				flushNow: () => Promise.resolve(),
+				clear: () => undefined,
+				pendingSnapshot: () => []
+			},
 			bootstrap: () => Promise.resolve(),
 			openLocalFolder: () => Promise.resolve(),
 			switchFolder: () => Promise.resolve(null),
@@ -193,7 +210,7 @@ function buildStub(opts: {
 			create: () => Promise.resolve(1 as never),
 			importIssue: () => Promise.resolve(1 as never),
 			// Mutate the loaded array in place so the test can observe
-			// the status update via `byId.get(1).issue.status`.
+			// the status update via `byId.get(1).issue.fields.status`.
 			update: (id: number, patch: object) => {
 				updateLog.push({ id, patch });
 				const li = loaded.find((l) => l.issue.id === id);
@@ -387,8 +404,9 @@ describe('Step 6 — keyboard-only walkthrough (NFR-4)', () => {
 		await expect
 			.poll(
 				() => {
-					const li = activeStub?.issues.byId.get(1) as { issue: { status: string } } | undefined;
-					return li?.issue.status;
+					const li = activeStub?.issues.byId.get(1) as
+						{ issue: { fields: { status: string } } } | undefined;
+					return li?.issue.fields.status;
 				},
 				{ timeout: 2000 }
 			)

@@ -20,7 +20,7 @@
 	const { editor, issues, templates, config } = getStores();
 
 	const template = $derived(
-		editor.draft ? (templates.byType.get(editor.draft.issue.issueType) ?? null) : null
+		editor.draft ? (templates.byType.get(editor.draft.issue.fields.issueType) ?? null) : null
 	);
 
 	const issue = $derived(editor.draft ? (editor.draft.issue as Issue) : null);
@@ -44,29 +44,29 @@
 		if (!issue) return undefined;
 		switch (field.key) {
 			case 'title':
-				return issue.title;
+				return issue.fields.title;
 			case 'author':
-				return issue.author;
+				return issue.fields.author;
 			case 'issueType':
-				return issue.issueType;
+				return issue.fields.issueType;
 			case 'status':
-				return issue.status;
+				return issue.fields.status;
 			case 'assignee':
-				return issue.assignee ?? '';
+				return issue.fields.assignee ?? '';
 			case 'labels':
-				return issue.labels;
+				return issue.fields.labels;
 			case 'relations':
-				return issue.relations.map((r: Relation) => r.id);
+				return issue.fields.relations.map((r: Relation) => r.id);
 			case 'start_date':
-				return issue.startDate ?? '';
+				return issue.fields.startDate ?? '';
 			case 'end_date':
-				return issue.endDate ?? '';
+				return issue.fields.endDate ?? '';
 			case 'duration':
-				return issue.duration ?? '';
+				return issue.fields.duration ?? '';
 			case 'sprint_id':
-				return issue.sprintId ?? '';
+				return issue.fields.sprintId ?? '';
 			case 'estimate':
-				return issue.estimate ?? '';
+				return issue.fields.estimate ?? '';
 			default:
 				return issue.customFields[field.key];
 		}
@@ -89,7 +89,7 @@
 
 	function relationTitle(id: number): string {
 		const li = issues.byId.get(id);
-		return li ? li.issue.title : `#${id}`;
+		return li ? li.issue.fields.title : `#${id}`;
 	}
 
 	function relationOptions(field: TemplateField): Option[] {
@@ -100,9 +100,13 @@
 				if (
 					!field.allowed_targets ||
 					Object.keys(field.allowed_targets).length === 0 ||
-					li.issue.issueType in field.allowed_targets
+					li.issue.fields.issueType in field.allowed_targets
 				) {
-					out.push({ id: String(li.issue.id), name: li.issue.title, type: li.issue.issueType });
+					out.push({
+						id: String(li.issue.id),
+						name: li.issue.fields.title,
+						type: li.issue.fields.issueType
+					});
 				}
 			}
 		}
@@ -129,13 +133,15 @@
 
 	function changeRelationType(id: number, newType: string): void {
 		if (!issue) return;
-		const next = issue.relations.map((r) => (r.id === id ? { ...r, type: newType as any } : r));
+		const next = issue.fields.relations.map((r) =>
+			r.id === id ? { ...r, type: newType as any } : r
+		);
 		editor.patchField('relations', next);
 	}
 
 	function removeRelation(id: number): void {
 		if (!issue) return;
-		const next = issue.relations.filter((r) => r.id !== id);
+		const next = issue.fields.relations.filter((r) => r.id !== id);
 		editor.patchField('relations', next);
 	}
 
@@ -145,8 +151,8 @@
 	function addRelation(): void {
 		if (!issue || !newRelationId) return;
 		const id = Number(newRelationId);
-		if (issue.relations.some((r) => r.id === id)) return;
-		const next = [...issue.relations, { type: newRelationType as any, id }];
+		if (issue.fields.relations.some((r) => r.id === id)) return;
+		const next = [...issue.fields.relations, { type: newRelationType as any, id }];
 		editor.patchField('relations', next);
 		newRelationId = '';
 		newRelationType = 'relates_to';
@@ -159,10 +165,10 @@
 		if (field.options_source === 'issues.sprints') {
 			return issues.issues
 				.map((li) => li.issue)
-				.filter((i) => i.issueType === 'sprint')
+				.filter((i) => i.fields.issueType === 'sprint')
 				.map((s) => ({
 					id: String(s.id),
-					name: s.title
+					name: s.fields.title
 				}));
 		}
 		return (field.options ?? []).map((o) => ({ id: o, name: o }));
@@ -182,13 +188,13 @@
 	});
 	const currentTypeName = $derived.by(() => {
 		if (!editor.draft) return '';
-		const id = editor.draft.issue.issueType;
+		const id = editor.draft.issue.fields.issueType;
 		return templates.templates.find((t) => t.id === id)?.name ?? id;
 	});
 
 	function onTypeChangeAttempt(next: string): void {
 		if (!editor.draft) return;
-		if (next === editor.draft.issue.issueType) {
+		if (next === editor.draft.issue.fields.issueType) {
 			pendingType = null;
 			return;
 		}
@@ -214,24 +220,24 @@
 
 	const sprintStories = $derived.by(() => {
 		void editor.errors; // React to patches
-		if (!issue || issue.issueType !== 'sprint') return [];
+		if (!issue || issue.fields.issueType !== 'sprint') return [];
 		const all = issues.issues.map((li) => li.issue);
 		return all.filter((other) => {
-			if (other.issueType !== 'user-story') return false;
+			if (other.fields.issueType !== 'user-story') return false;
 			// check if Sprint links to this story
-			const linksToOther = issue.relations.some((r) => r.id === other.id);
+			const linksToOther = issue.fields.relations.some((r) => r.id === other.id);
 			// check if story links to this Sprint
-			const otherLinksToSprint = other.relations.some((r) => r.id === issue.id);
+			const otherLinksToSprint = other.fields.relations.some((r) => r.id === issue.id);
 			return linksToOther || otherLinksToSprint;
 		});
 	});
 
 	const storyCount = $derived(sprintStories.length);
 	const storyPoints = $derived(
-		sprintStories.reduce((acc, story) => acc + (story.estimate || 0), 0)
+		sprintStories.reduce((acc, story) => acc + (story.fields.estimate || 0), 0)
 	);
 	const completedCount = $derived(
-		sprintStories.filter((s) => s.status === 'done' || s.status === 'closed').length
+		sprintStories.filter((s) => s.fields.status === 'done' || s.fields.status === 'closed').length
 	);
 	const avance = $derived(storyCount > 0 ? Math.round((completedCount / storyCount) * 100) : 0);
 
@@ -240,7 +246,7 @@
 
 {#if template && issue}
 	<div class="flex flex-col gap-6" data-testid="form-fields">
-		{#if issue.issueType === 'sprint'}
+		{#if issue.fields.issueType === 'sprint'}
 			<div
 				class="overflow-hidden rounded-xl border border-border bg-surface p-5 shadow-soft transition-all duration-[var(--motion-base)]"
 			>
@@ -249,7 +255,7 @@
 						{t('sprint.progress')}
 					</h3>
 					<span class="rounded-full bg-warning/10 px-2 py-0.5 text-[11px] font-bold text-warning">
-						{issue.title}
+						{issue.fields.title}
 					</span>
 				</div>
 
@@ -351,7 +357,7 @@
 								if (systemKeyFor(field.key) === 'issueType') {
 									onTypeChangeAttempt(v);
 									if (e.currentTarget instanceof HTMLSelectElement && issue) {
-										e.currentTarget.value = issue.issueType;
+										e.currentTarget.value = issue.fields.issueType;
 									}
 									return;
 								}
@@ -414,7 +420,7 @@
 				{:else if field.type === 'relations'}
 					{@const currentRelations = (() => {
 						void editor.errors;
-						return issue?.relations ?? [];
+						return issue?.fields.relations ?? [];
 					})()}
 					<div
 						id={fid}
@@ -423,7 +429,7 @@
 							: ''}"
 					>
 						{#each currentRelations as rel (rel.id)}
-							{@const relTargetIssueType = issues.byId.get(rel.id)?.issue.issueType}
+							{@const relTargetIssueType = issues.byId.get(rel.id)?.issue.fields.issueType}
 							{@const allowedRelTypes =
 								relTargetIssueType &&
 								field.allowed_targets &&
@@ -495,7 +501,8 @@
 							</div>
 
 							{#if newRelationId}
-								{@const targetIssueType = issues.byId.get(Number(newRelationId))?.issue.issueType}
+								{@const targetIssueType = issues.byId.get(Number(newRelationId))?.issue.fields
+									.issueType}
 								{@const allowedRelTypesForNew =
 									targetIssueType &&
 									field.allowed_targets &&

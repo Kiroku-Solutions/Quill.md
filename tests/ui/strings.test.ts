@@ -65,7 +65,7 @@ describe('t helper + STRINGS map', () => {
 			expect(t('leftrail.view.kanban')).toBe('Kanban');
 			expect(t('leftrail.view.gantt')).toBe('Gantt');
 			expect(t('modeBadge.local')).toBe('Local');
-			expect(t('modeBadge.remote')).toBe('Remote (read-only)');
+			expect(t('modeBadge.remote')).toBe('Remote');
 			expect(t('modeBadge.setup')).toBe('Setup');
 			expect(t('modeBadge.home')).toBe('Home');
 		});

@@ -71,14 +71,27 @@ export interface FetchResult {
 	readonly sha: Sha;
 	readonly providerId: string;
 	readonly editBranch: string;
-	readonly author: { readonly name: string; readonly email: string };
+	readonly author: { readonly name: string; email: string };
 	readonly adapter: ReadonlyRemoteAdapter;
 	readonly cacheKey: CacheKey;
+	/**
+	 * The provider's parsed view of the URL — `owner`, `repo`, `baseUrl`,
+	 * `canonicalUrl`, and `providerId`. Consumed by the commit queue
+	 * (`QueueState.parsed`) so `commitBatch` calls can reuse the same
+	 * parsed shape instead of re-parsing the URL on every flush.
+	 */
+	readonly parsed: ParsedRepo;
 }
 
 export interface ReadonlyRemoteAdapter extends ReadOnlyDirectoryAdapter {
 	headSha(): Promise<Sha>;
 	exists(rel: string): Promise<boolean>;
+	/**
+	 * Per-file blob SHA for `rel`, or `null` if the file is unknown to
+	 * the snapshot. Used by the writable adapter to populate optimistic-
+	 * concurrency SHAs on queued writes.
+	 */
+	blobShaFor(rel: string): Promise<string | null>;
 }
 
 // ─── Branded-type helpers ───────────────────────────────────────────────────
@@ -177,7 +190,8 @@ export async function fetchSubtree(options: FetchOptions): Promise<FetchResult> 
 		editBranch,
 		author,
 		adapter,
-		cacheKey
+		cacheKey,
+		parsed
 	};
 }
 
@@ -238,7 +252,8 @@ function buildReadOnlyAdapter(files: readonly RemoteFile[], tip: BranchTip): Rea
 		readTextFile,
 		listDirectory,
 		headSha: async () => tip.sha as Sha,
-		exists: async (rel: string) => byPath.has(normalizePath(rel))
+		exists: async (rel: string) => byPath.has(normalizePath(rel)),
+		blobShaFor: async (rel: string) => byPath.get(normalizePath(rel))?.sha ?? null
 	};
 }
 

@@ -1,13 +1,12 @@
 <!--
-	Remote view (sub-phase 6F). Same three-region chrome as the local
-	view (AppShell → TopBar + LeftRail + main canvas), read-only.
-	The RemoteToolbar (6F) sits at the top of the canvas and provides:
-	  - "Refresh" (calls modeStore.refreshRemote via the RefreshPatPrompt)
-	  - "Last fetched: N min ago" indicator
-	  - View label + "X issues (read-only)" status
+	Remote view (sub-phase 6F → Remote Edit Mode cut-over). Same
+	three-region chrome as the local view (AppShell → TopBar + LeftRail
+	+ main canvas), now write-capable. The EditToolbar (cut-over) sits
+	at the top of the canvas and provides:
+	  - "New issue" / "Import .md" / "Refresh" / "Push now" (when the
+	    commit queue has pending writes)
+	  - Provider pill, edit-branch label, pending-write badge
 	  - "Sign out" affordance (modeStore.signOut + goto('/'))
-	The sign-out action ALSO lives in the TopBar settings menu; the
-	toolbar copy is the second affordance called out by the brief.
 
 	The onMount guard ensures we redirect to `/` if the user lands on
 	the remote route without an active remote session (e.g. deep link
@@ -28,7 +27,7 @@
 	import GraphView from '$lib/components/GraphView.svelte';
 	import TreeView from '$lib/components/TreeView.svelte';
 	import FilterUrlSync from '$lib/components/FilterUrlSync.svelte';
-	import RemoteToolbar from '$lib/components/RemoteToolbar.svelte';
+	import EditToolbar from '$lib/components/EditToolbar.svelte';
 
 	const stores = getStores();
 
@@ -41,7 +40,7 @@
 
 <div class="flex h-full flex-col">
 	<FilterUrlSync />
-	<RemoteToolbar />
+	<EditToolbar />
 
 	<div class="flex-1 overflow-y-auto pb-12">
 		{#if stores.view.view === 'list'}

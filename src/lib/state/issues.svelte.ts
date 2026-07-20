@@ -31,7 +31,7 @@
  *  - `byId` is a `Map<id, LoadedIssue>` rebuilt on every access from
  *    `issues` (small dataset, v0 is fine). Same pattern as `byType` in
  *    templates.svelte.ts.
- *  - `byStatus` groups issues by `issue.status` (a `Status.id` from the
+ *  - `byStatus` groups issues by `issue.fields.status` (a `Status.id` from the
  *    config store). Issues with a status that the current config does
  *    not recognise are still included under their own status key — the
  *    validator surfaces the "unknown status" error separately.
@@ -51,6 +51,7 @@
  *    errors will surface (validator throws on undefined templates).
  */
 import type { Config, Issue, LoadedIssue, Template } from '../types/index.ts';
+import { FIELD_TO_YAML } from '../types/index.ts';
 import {
 	createIssue,
 	loadIssues,
@@ -68,6 +69,17 @@ import type {
 import type { ConfigStore } from './config.svelte.ts';
 import type { StateContext } from './_context.ts';
 import type { TemplatesStore } from './templates.svelte.ts';
+
+/**
+ * Names of every frontmatter key that lives under `Issue.fields` (i.e.
+ * every key from `FIELD_TO_YAML` except `id` and `integrityHash`, which
+ * stay at the top level). Used by `applyPatch` to route legacy
+ * top-level patch keys (`{ title: 'X' }`, `{ status: 'open' }`, …)
+ * to `issue.fields.<key>` for back-compat with pre-nesting callers.
+ */
+const SYSTEM_FIELD_KEYS: ReadonlySet<string> = new Set(
+	Object.keys(FIELD_TO_YAML).filter((k) => k !== 'id' && k !== 'integrityHash')
+);
 
 /**
  * Deep-clone an `Issue` for use as a snapshot. Uses the structured-clone
@@ -417,10 +429,10 @@ export function createIssuesStore(
 		const created = await createIssue(
 			requireWritable(adapter),
 			{
-				title: loadedIssue.title || 'Imported Issue',
-				issueType: loadedIssue.issueType || 'bug',
-				author: loadedIssue.author || 'imported',
-				status: loadedIssue.status || defaultStatus(),
+				title: loadedIssue.fields.title || 'Imported Issue',
+				issueType: loadedIssue.fields.issueType || 'bug',
+				author: loadedIssue.fields.author || 'imported',
+				status: loadedIssue.fields.status || defaultStatus(),
 				customFields: loadedIssue.customFields,
 				sections: loadedIssue.sections
 			},
@@ -432,18 +444,49 @@ export function createIssuesStore(
 
 	/**
 	 * Apply a patch to the in-memory issue. The patch is shallow-merged via
-	 * `Object.assign` for most fields; `customFields` (the only place where
-	 * deep-merge actually matters) is deep-merged so callers can do
-	 * `update(id, { customFields: { severity: 'high' } })` without losing
-	 * other keys.
+	 * `Object.assign` for most fields; `customFields` and `fields` (the
+	 * only places where deep-merge actually matters) are deep-merged so
+	 * callers can do `update(id, { customFields: { severity: 'high' } })`
+	 * or `update(id, { fields: { title: 'X' } })` without losing other
+	 * keys.
+	 *
+	 * Back-compat: a system key written at the top level of the patch
+	 * (`{ title: 'X' }`, `{ status: 'open' }`, …) is transparently routed
+	 * to `issue.fields.<key>`. This keeps older call sites — including
+	 * the bulk of the test suite that was written against the pre-nesting
+	 * interface — working without churn. New callers should prefer the
+	 * explicit nested shape.
 	 */
 	function applyPatch(issue: Issue, patch: IssuePatch): void {
-		// Pull customFields out of the top-level merge so we can deep-merge
-		// it in place — a wholesale assignment via Object.assign would
-		// replace the map reference and break any held reference (the
-		// editor draft in Phase 8 holds a pointer to the same object).
-		const { customFields: customFieldsPatch, ...rest } = patch;
+		// Pull `fields` and `customFields` out of the top-level merge so we
+		// can deep-merge them in place — a wholesale assignment via
+		// `Object.assign` would replace the references and break any held
+		// pointer (the editor draft in Phase 8 holds a reference to both).
+		const {
+			fields: fieldsPatch,
+			customFields: customFieldsPatch,
+			sections,
+			integrityWarning,
+			integrityHash,
+			id,
+			...rest
+		} = patch;
 		Object.assign(issue, rest);
+		if (sections !== undefined && Array.isArray(sections)) {
+			issue.sections = sections as Issue['sections'];
+		}
+		if (integrityWarning !== undefined && typeof integrityWarning === 'boolean') {
+			issue.integrityWarning = integrityWarning;
+		}
+		if (integrityHash !== undefined) {
+			issue.integrityHash = integrityHash as Issue['integrityHash'];
+		}
+		if (id !== undefined && typeof id === 'number') {
+			issue.id = id;
+		}
+		if (fieldsPatch && typeof fieldsPatch === 'object' && !Array.isArray(fieldsPatch)) {
+			Object.assign(issue.fields, fieldsPatch);
+		}
 		if (
 			customFieldsPatch &&
 			typeof customFieldsPatch === 'object' &&
@@ -453,6 +496,16 @@ export function createIssuesStore(
 			for (const [k, v] of Object.entries(cfPatch)) {
 				issue.customFields[k] = v as never;
 			}
+		}
+		// Back-compat: any remaining system key at the top level of the
+		// patch is routed to `issue.fields`. This is intentionally a
+		// separate pass so the destructured `rest` above stays clean and
+		// any future top-level Issue property (id, customFields, etc.)
+		// doesn't silently fall through to `fields`.
+		for (const key of Object.keys(rest)) {
+			if (!SYSTEM_FIELD_KEYS.has(key)) continue;
+			if (fieldsPatch && typeof fieldsPatch === 'object' && key in fieldsPatch) continue;
+			(issue.fields as Record<string, unknown>)[key] = rest[key];
 		}
 	}
 
@@ -467,7 +520,7 @@ export function createIssuesStore(
 			snapshots.set(id, cloneIssue(loaded.issue));
 		}
 		applyPatch(loaded.issue, patch);
-		loaded.issue.updatedDate = todayIso();
+		loaded.issue.fields.updatedDate = todayIso();
 		dirty.add(id);
 		bumpDirty();
 		// The integrity hash will be recomputed by serializeIssue() during
@@ -626,9 +679,9 @@ export function createIssuesStore(
 			for (const s of cfg.statuses) map.set(s.id, []);
 		}
 		for (const li of issues) {
-			const bucket = map.get(li.issue.status);
+			const bucket = map.get(li.issue.fields.status);
 			if (bucket) bucket.push(li);
-			else map.set(li.issue.status, [li]);
+			else map.set(li.issue.fields.status, [li]);
 		}
 		// Freeze each bucket so a consumer that `.push()`s to a returned
 		// array does not silently corrupt store state. The cast at the

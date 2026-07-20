@@ -80,7 +80,14 @@ describe('clearRemoteCache — active session', () => {
 			editBranch: 'quill-md',
 			author: { name: 'Test User', email: 'test@example.com' },
 			adapter: fakeAdapter as unknown as remote.ReadonlyRemoteAdapter,
-			cacheKey: 'pending-key' as unknown as CacheKey
+			cacheKey: 'pending-key' as unknown as CacheKey,
+			parsed: {
+				providerId: 'github',
+				owner: 'acme',
+				repo: 'widgets',
+				baseUrl: 'https://api.github.com',
+				canonicalUrl: 'https://github.com/acme/widgets'
+			}
 		});
 		await mode.openRemote({ url: makeRepoUrl(), branch: makeBranch() }, 'test-pat');
 		clearCacheSpy.mockClear();

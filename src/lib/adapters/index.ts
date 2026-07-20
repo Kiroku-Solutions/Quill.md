@@ -10,7 +10,12 @@
  * refuses branches that try to use a non-Adapter as one.
  */
 
-export type { DirectoryEntry, DirectoryAdapter } from './directory-adapter.ts';
+export type {
+	DirectoryEntry,
+	DirectoryAdapter,
+	ReadOnlyDirectoryAdapter,
+	WritableDirectoryAdapter
+} from './directory-adapter.ts';
 export { normalizePath, splitPath, assertNoControlChars } from './directory-adapter.ts';
 
 export {
@@ -77,6 +82,12 @@ export {
 	type RepoUrl,
 	type Sha
 } from './remote.ts';
+
+export {
+	RemoteWritableAdapter,
+	type RemoteWritableAdapterDeps,
+	type ShaLookup
+} from './remote-writable.ts';
 
 // New (Strategy-pattern) provider exports — the canonical replacement for
 // the isomorphic-git-backed adapter above.

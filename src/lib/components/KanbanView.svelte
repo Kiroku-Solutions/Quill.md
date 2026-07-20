@@ -1,7 +1,7 @@
 <!--
 	KanbanView.svelte — columns from `config.statuses`, cards as
 	buttons, with full drag-and-drop + keyboard parity (sub-phase
-	6E, ERS FR-6, NFR-4).
+	6E, ERS FR-6, NFR-4, Remote Edit Mode cut-over).
 
 	Drag-and-drop: uses the native HTML5 Drag & Drop API. Zero
 	external dependencies. During drag, only two lightweight
@@ -15,9 +15,14 @@
 	move within a column. WAI-ARIA pickup/drop pattern with Space /
 	Enter, F2 / `o` to open the editor.
 
-	Read-only guard: in Remote Mode (`modeStore.mode === 'remote'`)
-	`draggable` is `false`, the drop handler is a no-op, and the
-	keyboard reorder is a no-op.
+	Remote Edit Mode (FR-5): Kanban drags write through the same
+	adapter as the editor. In Local Mode, the adapter is
+	`LocalFsAdapter` (synchronous, immediate). In Remote Mode, the
+	adapter is `RemoteWritableAdapter` and `writeTextFile` enqueues
+	the change against the commit queue — multiple drags within the
+	2-second debounce window coalesce into one `commitBatch` per FR-16.
+	A failed flush surfaces as a `RemoteConflictError` on the toolbar
+	(preserving the queue for retry after Pull-to-refresh).
 
 	Performance: with 500 issues across 5 columns, drag operations
 	touch exactly 2 scalar `$state` values. No array copies, no Map
@@ -30,11 +35,8 @@
 	import { getStores } from '$lib/state';
 	import { t } from '$lib/ui/strings';
 	import type { LoadedIssue } from '$lib/types';
-	import Tooltip from '$lib/ui/Tooltip.svelte';
 
-	const { issues, filter, config, editor, mode } = getStores();
-
-	const isReadOnly = $derived(mode.mode === 'remote');
+	const { issues, filter, config, editor } = getStores();
 
 	let rows = $state<readonly LoadedIssue[]>([]);
 	let columns = $state<ReadonlyArray<{ id: string; color?: string; category?: string }>>([]);
@@ -58,27 +60,27 @@
 	const groups = $derived.by(() => {
 		if (groupBy === 'sprint') {
 			const sprintIssues = Array.from(issues.byId.values()).filter(
-				(li) => li.issue.issueType === 'sprint'
+				(li) => li.issue.fields.issueType === 'sprint'
 			);
 			const definedGroups = sprintIssues.map((s) => ({
 				id: `sprint-${s.issue.id}`,
-				title: s.issue.title,
+				title: s.issue.fields.title,
 				match: (issue: import('$lib/types').Issue) =>
-					issue.relations.some((r) => r.id === s.issue.id) ||
-					s.issue.relations.some((r) => r.id === issue.id)
+					issue.fields.relations.some((r) => r.id === s.issue.id) ||
+					s.issue.fields.relations.some((r) => r.id === issue.id)
 			}));
 			return [...definedGroups, { id: 'unassigned', title: 'Sin Asignar', match: () => true }];
 		}
 		if (groupBy === 'epic') {
 			const epicIssues = Array.from(issues.byId.values()).filter(
-				(li) => li.issue.issueType === 'epic'
+				(li) => li.issue.fields.issueType === 'epic'
 			);
 			const definedGroups = epicIssues.map((e) => ({
 				id: `epic-${e.issue.id}`,
-				title: e.issue.title,
+				title: e.issue.fields.title,
 				match: (issue: import('$lib/types').Issue) =>
-					issue.relations.some((r) => r.id === e.issue.id) ||
-					e.issue.relations.some((r) => r.id === issue.id)
+					issue.fields.relations.some((r) => r.id === e.issue.id) ||
+					e.issue.fields.relations.some((r) => r.id === issue.id)
 			}));
 			return [...definedGroups, { id: 'unassigned', title: 'Sin Asignar', match: () => true }];
 		}
@@ -100,9 +102,9 @@
 					: groups[0];
 
 			if (group) {
-				const bucket = result[group.id][li.issue.status];
+				const bucket = result[group.id][li.issue.fields.status];
 				if (bucket) bucket.push(li);
-				else result[group.id][li.issue.status] = [li];
+				else result[group.id][li.issue.fields.status] = [li];
 			}
 		}
 		return result;
@@ -119,7 +121,7 @@
 	const epicsById = $derived.by(() => {
 		const map = new Map<number, LoadedIssue>();
 		for (const li of issues.byId.values()) {
-			if (li.issue.issueType === 'epic') {
+			if (li.issue.fields.issueType === 'epic') {
 				map.set(li.issue.id, li);
 			}
 		}
@@ -127,10 +129,10 @@
 	});
 
 	function epicFor(li: LoadedIssue): string | null {
-		const rel = li.issue.relations.find((r) => r.type === 'parent');
+		const rel = li.issue.fields.relations.find((r) => r.type === 'parent');
 		if (!rel) return null;
 		const epic = epicsById.get(rel.id);
-		return epic ? epic.issue.title : null;
+		return epic ? epic.issue.fields.title : null;
 	}
 
 	$effect(() => {
@@ -154,14 +156,14 @@
 				if (f.q) {
 					const needle = f.q.toLowerCase();
 					if (
-						!li.issue.title.toLowerCase().includes(needle) &&
+						!li.issue.fields.title.toLowerCase().includes(needle) &&
 						!li.issue.sections.some((s) => s.markdown.toLowerCase().includes(needle))
 					) {
 						return false;
 					}
 				}
-				if (f.type && li.issue.issueType !== f.type) return false;
-				if (f.sprintId && li.issue.sprintId !== f.sprintId) return false;
+				if (f.type && li.issue.fields.issueType !== f.type) return false;
+				if (f.sprintId && li.issue.fields.sprintId !== f.sprintId) return false;
 				return true;
 			});
 		});
@@ -185,7 +187,7 @@
 	// object spreads, no Map rebuilds.
 
 	function onDragStart(e: DragEvent, li: LoadedIssue): void {
-		if (isReadOnly || !e.dataTransfer) return;
+		if (!e.dataTransfer) return;
 
 		// Hide the native drag ghost so we can render our own animated one
 		const emptyImg = new Image();
@@ -210,7 +212,7 @@
 	}
 
 	function onDragOver(e: DragEvent, groupId: string, colId: string): void {
-		if (isReadOnly || draggedId === null) return;
+		if (draggedId === null) return;
 		e.preventDefault();
 		if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
 		const target = `${groupId}:${colId}`;
@@ -233,8 +235,7 @@
 		e.preventDefault();
 		dropTargetId = null;
 
-		if (isReadOnly || draggedId === null) {
-			draggedId = null;
+		if (draggedId === null) {
 			return;
 		}
 
@@ -291,13 +292,13 @@
 	function storesUpdateAndSave(id: number, newStatus: string): void {
 		const li = findLoaded(id);
 		if (!li) return;
-		const oldStatus = li.issue.status;
+		const oldStatus = li.issue.fields.status;
 		if (oldStatus === newStatus) return;
-		issues.update(id, { status: newStatus });
+		issues.update(id, { fields: { status: newStatus } });
 
 		issues.save(id).catch((err) => {
 			console.error('Save failed during DND:', err);
-			issues.update(id, { status: oldStatus });
+			issues.update(id, { fields: { status: oldStatus } });
 		});
 	}
 
@@ -309,12 +310,13 @@
 	}
 
 	/**
-	 * WAI-ARIA DnD pickup handshake. Idempotent in read-only mode
-	 * (Remote): `announce` runs so the screen-reader user still
-	 * hears feedback; the store update is the no-op the read-only
-	 * guard already enforces. Returns `true` if the event was
-	 * consumed by the DnD pattern (caller should NOT also handle
-	 * it as a plain keyboard action).
+	 * WAI-ARIA DnD pickup handshake. The keyboard reorder verb is
+	 * always available in Remote Edit Mode (FR-5) — Kanban drags land
+	 * as commits on the edit branch via the same path as the editor
+	 * Save button. `announce` runs so the screen-reader user always
+	 * hears feedback. Returns `true` if the event was consumed by the
+	 * DnD pattern (caller should NOT also handle it as a plain
+	 * keyboard action).
 	 */
 	function handlePickupToggle(li: LoadedIssue): boolean {
 		const id = li.issue.id;
@@ -324,12 +326,9 @@
 			return true;
 		}
 		if (pickedUpId === id) {
-			// Drop in place — no status change, just clear the
-			// pickup. In read-only mode there is nothing to undo;
-			// announce "dropped" so the user gets the same
-			// feedback as a successful move.
+			// Drop in place — no status change, just clear the pickup.
 			pickedUpId = null;
-			announcement = t('kanban.dropped', { id, col: li.issue.status });
+			announcement = t('kanban.dropped', { id, col: li.issue.fields.status });
 			return true;
 		}
 		// Pick up a different card; replace the lifted one.
@@ -339,7 +338,7 @@
 	}
 
 	function onCardKeydown(e: KeyboardEvent, li: LoadedIssue): void {
-		const colIdx = findColumnForStatus(li.issue.status);
+		const colIdx = findColumnForStatus(li.issue.fields.status);
 		if (colIdx < 0) return;
 
 		let targetGroup = groups[0];
@@ -349,7 +348,7 @@
 		}
 		if (!targetGroup) return;
 
-		const colCards = groupedCards[targetGroup.id]?.[li.issue.status] ?? [];
+		const colCards = groupedCards[targetGroup.id]?.[li.issue.fields.status] ?? [];
 		const withinIdx = colCards.findIndex((c) => c.issue.id === li.issue.id);
 
 		// Escape cancels an active pickup. Outside of pickup mode
@@ -415,13 +414,11 @@
 
 		const lifted = pickedUpId === li.issue.id;
 
-		if (isReadOnly) {
-			// Read-only: move the visual focus only — no store update.
-			if (targetCard) focusCard(targetCard.issue.id);
-			return;
-		}
 		if (targetColIdx !== colIdx) {
 			// Cross-column move: update the focused card's status.
+			// In Local Mode this is a synchronous `LocalFsAdapter.write`;
+			// in Remote Mode the call enqueues against the commit
+			// queue and the debounce coalesces multiple drags.
 			checkDoDAndSave(li.issue.id, targetCol.id);
 			if (lifted) {
 				// Implicit drop: the arrow key finishes the lift.
@@ -496,39 +493,20 @@
 			ondragleave={(e) => onDragLeave(e, group.id, col.id)}
 			ondrop={(e) => onDrop(e, group.id, col.id)}
 		>
-			{#if isReadOnly}
-				<Tooltip text={t('kanban.readOnlyTooltip')} position="bottom">
-					<div class="mb-3 flex items-center justify-between">
-						<h3
-							class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
-							data-testid="kanban-column-header"
-						>
-							{col.id}
-						</h3>
-						<span
-							class="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-widest"
-							style="background-color: {col.color ?? 'var(--color-cb-muted)'}; color: #fff"
-						>
-							{colCards.length}
-						</span>
-					</div>
-				</Tooltip>
-			{:else}
-				<div class="mb-3 flex items-center justify-between">
-					<h3
-						class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
-						data-testid="kanban-column-header"
-					>
-						{col.id}
-					</h3>
-					<span
-						class="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-widest"
-						style="background-color: {col.color ?? 'var(--color-cb-muted)'}; color: #fff"
-					>
-						{colCards.length}
-					</span>
-				</div>
-			{/if}
+			<div class="mb-3 flex items-center justify-between">
+				<h3
+					class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
+					data-testid="kanban-column-header"
+				>
+					{col.id}
+				</h3>
+				<span
+					class="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-widest"
+					style="background-color: {col.color ?? 'var(--color-cb-muted)'}; color: #fff"
+				>
+					{colCards.length}
+				</span>
+			</div>
 			<div class="space-y-2" role={colCards.length > 0 ? 'list' : undefined}>
 				{#each colCards as li (li.issue.id)}
 					{@const isLifted = pickedUpId === li.issue.id}
@@ -537,10 +515,8 @@
 					<li role="listitem">
 						<button
 							type="button"
-							draggable={!isReadOnly}
-							class="flex w-full flex-col rounded-xl p-4 text-left transition-shadow duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset {isReadOnly
-								? ''
-								: 'cursor-grab active:animate-shake active:cursor-grabbing'}
+							draggable={true}
+							class="flex w-full cursor-grab flex-col rounded-xl p-4 text-left transition-shadow duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset active:animate-shake active:cursor-grabbing
 								{isDragging
 								? 'opacity-0'
 								: isJustDropped
@@ -555,7 +531,7 @@
 							aria-describedby={isLifted ? 'kanban-activate-hint' : undefined}
 							aria-label={t('kanban.cardAria', {
 								id: li.issue.id,
-								title: li.issue.title,
+								title: li.issue.fields.title,
 								col: col.id
 							})}
 							onclick={() => open(li.issue.id)}
@@ -579,14 +555,14 @@
 									{/if}
 									<span
 										class="shrink-0 rounded bg-foreground/5 px-2 py-0.5 text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
-										>{li.issue.issueType}</span
+										>{li.issue.fields.issueType}</span
 									>
 								</div>
 							</div>
 							<div class="mb-3 text-sm leading-snug font-medium text-foreground">
-								{li.issue.title}
+								{li.issue.fields.title}
 							</div>
-							{#if li.issue.assignee}
+							{#if li.issue.fields.assignee}
 								<div
 									class="mt-auto flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
 								>
@@ -598,7 +574,7 @@
 											d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
 										></path></svg
 									>
-									{li.issue.assignee}
+									{li.issue.fields.assignee}
 								</div>
 							{/if}
 							{#if isLifted}
@@ -641,12 +617,14 @@
 						{/if}
 						<span
 							class="shrink-0 rounded bg-foreground/5 px-2 py-0.5 text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
-							>{li.issue.issueType}</span
+							>{li.issue.fields.issueType}</span
 						>
 					</div>
 				</div>
-				<div class="mb-3 text-sm leading-snug font-medium text-foreground">{li.issue.title}</div>
-				{#if li.issue.assignee}
+				<div class="mb-3 text-sm leading-snug font-medium text-foreground">
+					{li.issue.fields.title}
+				</div>
+				{#if li.issue.fields.assignee}
 					<div class="mt-auto flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
 						<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 							><path
@@ -656,7 +634,7 @@
 								d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
 							></path></svg
 						>
-						{li.issue.assignee}
+						{li.issue.fields.assignee}
 					</div>
 				{/if}
 			</div>

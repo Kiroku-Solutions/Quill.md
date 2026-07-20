@@ -82,20 +82,22 @@ const CONFIG: Config = {
 function makeIssue(id: number, status: string, title: string): Issue {
 	return {
 		id,
-		title,
-		author: 'tester',
-		creationDate: '2026-01-01',
-		updatedDate: '2026-01-01',
-		issueType: 'task',
-		status,
-		assignee: null,
-		labels: [],
-		relations: [],
-		startDate: null,
-		endDate: null,
-		duration: null,
-		sprintId: null,
-		estimate: null,
+		fields: {
+			title,
+			author: 'tester',
+			creationDate: '2026-01-01',
+			updatedDate: '2026-01-01',
+			issueType: 'task',
+			status,
+			assignee: null,
+			labels: [],
+			relations: [],
+			startDate: null,
+			endDate: null,
+			duration: null,
+			sprintId: null,
+			estimate: null
+		},
 		integrityHash: null,
 		customFields: {},
 		sections: [],
@@ -106,14 +108,14 @@ function makeIssue(id: number, status: string, title: string): Issue {
 function buildStub(issues: readonly Issue[], mode: 'local' | 'remote'): StoreGraph {
 	const loaded: LoadedIssue[] = issues.map((iss) => ({
 		issue: iss,
-		sourcePath: `.quill.md/issues/${String(iss.id).padStart(4, '0')}-${iss.title.toLowerCase()}.md`
+		sourcePath: `.quill.md/issues/${String(iss.id).padStart(4, '0')}-${iss.fields.title.toLowerCase()}.md`
 	}));
 	const byId = new Map<number, LoadedIssue>(loaded.map((li) => [li.issue.id, li]));
 	const byStatus = new Map<string, LoadedIssue[]>();
 	for (const li of loaded) {
-		const bucket = byStatus.get(li.issue.status);
+		const bucket = byStatus.get(li.issue.fields.status);
 		if (bucket) bucket.push(li);
-		else byStatus.set(li.issue.status, [li]);
+		else byStatus.set(li.issue.fields.status, [li]);
 	}
 	return {
 		mode: {
@@ -125,9 +127,24 @@ function buildStub(issues: readonly Issue[], mode: 'local' | 'remote'): StoreGra
 			proxyWarning: null,
 			editBranch: null,
 			providerId: null,
+			parentSha: null,
 			lastFetchedAt: null,
 			localAdapter: null,
 			remoteAdapter: null,
+			commitQueue: {
+				depth: 0,
+				lastFlushAt: null,
+				lastError: null,
+				flushing: false,
+				active: false,
+				start: () => undefined,
+				setSession: () => undefined,
+				stop: () => undefined,
+				enqueue: () => undefined,
+				flushNow: () => Promise.resolve(),
+				clear: () => undefined,
+				pendingSnapshot: () => []
+			},
 			bootstrap: () => Promise.resolve(),
 			openLocalFolder: () => Promise.resolve(),
 			switchFolder: () => Promise.resolve(null),
@@ -186,9 +203,9 @@ function buildStub(issues: readonly Issue[], mode: 'local' | 'remote'): StoreGra
 							v.filter((x) => x.issue.id !== id)
 						);
 					}
-					const bucket = byStatus.get(li.issue.status);
+					const bucket = byStatus.get(li.issue.fields.status);
 					if (bucket) bucket.push(li);
-					else byStatus.set(li.issue.status, [li]);
+					else byStatus.set(li.issue.fields.status, [li]);
 				}
 			},
 			save: () => Promise.resolve(),
@@ -295,7 +312,7 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 		await userEvent.keyboard('{ArrowRight}');
 
 		expect(updateCalls).toHaveLength(1);
-		expect(updateCalls[0]).toEqual({ id: 1, patch: { status: 'in_progress' } });
+		expect(updateCalls[0]).toEqual({ id: 1, patch: { fields: { status: 'in_progress' } } });
 	});
 
 	it('opens the editor when a card is clicked', async () => {
@@ -332,10 +349,10 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 
 		await userEvent.keyboard('{ArrowLeft}');
 
-		expect(updateCalls).toEqual([{ id: 2, patch: { status: 'open' } }]);
+		expect(updateCalls).toEqual([{ id: 2, patch: { fields: { status: 'open' } } }]);
 	});
 
-	it('is a no-op for keyboard reorder in Remote Mode (read-only guard)', async () => {
+	it('keyboard reorder commits in Remote Mode (FR-5 / FR-16)', async () => {
 		activeStub = buildStub(
 			[
 				makeIssue(1, 'open', 'First issue'),
@@ -352,8 +369,16 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 
 		await userEvent.keyboard('{ArrowRight}');
 
-		// No store update should have been issued.
-		expect(updateCalls).toEqual([]);
+		// Remote Edit Mode: keyboard reorder is no longer a no-op.
+		// The store update fires; the commit queue coalesces with
+		// subsequent drags within the debounce window.
+		expect(updateCalls).toEqual([{ id: 1, patch: { fields: { status: 'in_progress' } } }]);
+		// F2 still opens the editor in Remote Mode. Focus follows the
+		// move onto the next card in the destination column (card 2
+		// was already in `in_progress` and occupies the slot card 1
+		// just moved into), so F2 opens card 2's editor.
+		await userEvent.keyboard('{F2}');
+		expect(openCalls).toEqual([{ id: 2 }]);
 	});
 
 	// ─── Step 8 — WAI-ARIA DnD keyboard parity (NFR-4) ──────────────────
@@ -429,7 +454,7 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 		await userEvent.keyboard('{ArrowRight}');
 
 		expect(updateCalls).toHaveLength(1);
-		expect(updateCalls[0]).toEqual({ id: 1, patch: { status: 'in_progress' } });
+		expect(updateCalls[0]).toEqual({ id: 1, patch: { fields: { status: 'in_progress' } } });
 
 		// The lifted flag is cleared on the implicit drop.
 		expect(firstCard?.getAttribute('data-lifted')).toBe('false');
@@ -493,7 +518,7 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 		expect(openCalls).toEqual([{ id: 1 }]);
 	});
 
-	it('is a no-op for the pickup handshake in Remote Mode', async () => {
+	it('pickup handshake commits in Remote Mode (FR-5 / FR-16)', async () => {
 		activeStub = buildStub(
 			[makeIssue(1, 'open', 'First issue'), makeIssue(2, 'in_progress', 'Second issue')],
 			'remote'
@@ -503,12 +528,17 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 		const firstCard = document.querySelector<HTMLElement>('[data-card-id="1"]');
 		firstCard?.focus();
 
+		// Pickup is purely UI (no store update) — same as Local Mode.
 		await userEvent.keyboard(' ');
-
-		// Still no store update — the read-only guard applies.
 		expect(updateCalls).toEqual([]);
-		// F2 still opens the editor even in Remote Mode.
+
+		// A subsequent arrow with the lift active commits the move.
+		await userEvent.keyboard('{ArrowRight}');
+		expect(updateCalls).toEqual([{ id: 1, patch: { fields: { status: 'in_progress' } } }]);
+
+		// F2 opens the editor of the focused card. Focus follows the
+		// move onto card 2 (the next card in the destination column).
 		await userEvent.keyboard('{F2}');
-		expect(openCalls).toEqual([{ id: 1 }]);
+		expect(openCalls).toEqual([{ id: 2 }]);
 	});
 });

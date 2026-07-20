@@ -52,20 +52,22 @@ export function buildDefaultIssue(
 	const today = input.today ?? new Date().toISOString().slice(0, 10);
 	return {
 		id: nextIssueId(existing),
-		title: input.title,
-		author: input.author,
-		creationDate: today,
-		updatedDate: today,
-		issueType: input.issueType,
-		status: input.status ?? 'open',
-		assignee: null,
-		labels: [],
-		relations: [],
-		startDate: null,
-		endDate: null,
-		duration: null,
-		sprintId: null,
-		estimate: null,
+		fields: {
+			title: input.title,
+			author: input.author,
+			creationDate: today,
+			updatedDate: today,
+			issueType: input.issueType,
+			status: input.status ?? 'open',
+			assignee: null,
+			labels: [],
+			relations: [],
+			startDate: null,
+			endDate: null,
+			duration: null,
+			sprintId: null,
+			estimate: null
+		},
 		integrityHash: null,
 		// `FrontmatterValue` is a recursive union; custom fields from a UI
 		// may arrive as `unknown` (the patch path is widened). The
@@ -115,5 +117,5 @@ export async function createIssue(
 	existingIssues: ReadonlyArray<{ id: number }>
 ): Promise<LoadedIssue> {
 	const issue = buildDefaultIssue(input, existingIssues);
-	return saveIssue(adapter, issue, issuePath(issue.id, issue.title));
+	return saveIssue(adapter, issue, issuePath(issue.id, issue.fields.title));
 }

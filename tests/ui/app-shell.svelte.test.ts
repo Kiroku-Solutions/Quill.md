@@ -103,9 +103,24 @@ function buildStub(opts: { integrityCount: number; activeHandleName?: string }):
 			proxyWarning: null,
 			editBranch: null,
 			providerId: null,
+			parentSha: null,
 			lastFetchedAt: null,
 			localAdapter: null,
 			remoteAdapter: null,
+			commitQueue: {
+				depth: 0,
+				lastFlushAt: null,
+				lastError: null,
+				flushing: false,
+				active: false,
+				start: () => undefined,
+				setSession: () => undefined,
+				stop: () => undefined,
+				enqueue: () => undefined,
+				flushNow: () => Promise.resolve(),
+				clear: () => undefined,
+				pendingSnapshot: () => []
+			},
 			bootstrap: () => Promise.resolve(),
 			openLocalFolder: () => Promise.resolve(),
 			switchFolder: () => Promise.resolve(null),
@@ -254,7 +269,10 @@ describe('AppShell — three-region layout', () => {
 		renderShell('remote');
 
 		const topbar = page.getByTestId('topbar');
-		await expect.element(topbar.getByText('Remote (read-only)')).toBeInTheDocument();
+		// The "Remote" text appears in two places (the mode badge and the
+		// project-name indicator). Use an exact match on the badge to
+		// disambiguate.
+		await expect.element(topbar.getByText('Remote', { exact: true })).toBeInTheDocument();
 	});
 
 	it('shows the Setup badge in the TopBar for wizard mode', async () => {

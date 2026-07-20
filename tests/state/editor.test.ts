@@ -61,9 +61,41 @@ const VALID_TASK = JSON.stringify({
 	sections: []
 });
 
-function makeIssue(overrides: Partial<Issue> = {}): Issue {
-	return {
-		id: 1,
+/**
+ * Accepts both `{ fields: { title: 'X' } }` (new nested shape) and
+ * `{ title: 'X' }` (legacy flat shape) for back-compat. Legacy system
+ * keys at the top level are routed to `issue.fields.<key>`. Test-only
+ * helper — production code uses the strict nested shape.
+ */
+function makeIssue(overrides: Record<string, unknown> = {}): Issue {
+	const LEGACY_FIELDS = [
+		'title',
+		'author',
+		'creationDate',
+		'updatedDate',
+		'issueType',
+		'status',
+		'assignee',
+		'labels',
+		'relations',
+		'startDate',
+		'endDate',
+		'duration',
+		'sprintId',
+		'estimate'
+	] as const;
+	const legacy: Record<string, unknown> = {};
+	for (const k of LEGACY_FIELDS) {
+		if (k in overrides) {
+			legacy[k] = overrides[k];
+			delete overrides[k];
+		}
+	}
+	const overrideFields =
+		typeof overrides['fields'] === 'object' && overrides['fields'] !== null
+			? (overrides['fields'] as Record<string, unknown>)
+			: {};
+	const fields = {
 		title: 'First issue',
 		author: 'jane',
 		creationDate: '2026-01-15',
@@ -78,11 +110,26 @@ function makeIssue(overrides: Partial<Issue> = {}): Issue {
 		duration: null,
 		sprintId: null,
 		estimate: null,
+		...legacy,
+		...overrideFields
+	} as Issue['fields'];
+	const overrideSections = Array.isArray(overrides['sections'])
+		? (overrides['sections'] as Issue['sections'])
+		: null;
+	const overrideCustomFields = overrides['customFields'];
+	delete overrides['sections'];
+	delete overrides['customFields'];
+	return {
+		id: 1,
+		...overrides,
+		fields,
 		integrityHash: null,
-		customFields: {},
-		sections: [{ name: 'Description', markdown: 'Initial description.' }],
-		integrityWarning: false,
-		...overrides
+		customFields:
+			overrideCustomFields && typeof overrideCustomFields === 'object'
+				? (overrideCustomFields as Record<string, unknown> as Issue['customFields'])
+				: {},
+		sections: overrideSections ?? [{ name: 'Description', markdown: 'Initial description.' }],
+		integrityWarning: false
 	};
 }
 
@@ -139,18 +186,18 @@ describe('createEditorStore — open', () => {
 
 		stores.editor.open(1);
 		expect(stores.editor.activeId).toBe(1);
-		expect(stores.editor.draft?.issue.title).toBe('Original');
+		expect(stores.editor.draft?.issue.fields.title).toBe('Original');
 		expect(stores.editor.isDirty).toBe(false);
 
 		// Mutate the draft — the source must be unchanged.
 		const draft = stores.editor.draft as LoadedIssue;
-		draft.issue.title = 'Mutated';
+		draft.issue.fields.title = 'Mutated';
 		stores.editor.patchField('title', 'Mutated');
 		expect(stores.editor.isDirty).toBe(true);
 
-		expect(stores.issues.byId.get(1)?.issue.title).toBe('Original');
+		expect(stores.issues.byId.get(1)?.issue.fields.title).toBe('Original');
 		// The draft has the mutation.
-		expect(stores.editor.draft?.issue.title).toBe('Mutated');
+		expect(stores.editor.draft?.issue.fields.title).toBe('Mutated');
 	});
 
 	it('close() on an unknown id is a no-op that resets the store', async () => {
@@ -175,7 +222,7 @@ describe('createEditorStore — patchField', () => {
 		});
 		stores.editor.open(1);
 		stores.editor.patchField('title', 'B');
-		expect(stores.editor.draft?.issue.title).toBe('B');
+		expect(stores.editor.draft?.issue.fields.title).toBe('B');
 		expect(stores.editor.isDirty).toBe(true);
 	});
 
@@ -259,7 +306,7 @@ describe('createEditorStore — save', () => {
 		expect(onDisk).toContain('title: B');
 		// After save the draft is re-cloned from the (re-parsed) issues
 		// store, so it should reflect the new state too.
-		expect(stores.editor.draft?.issue.title).toBe('B');
+		expect(stores.editor.draft?.issue.fields.title).toBe('B');
 	});
 
 	it('is a no-op when there is no active id', async () => {
@@ -281,12 +328,12 @@ describe('createEditorStore — discard', () => {
 		});
 		stores.editor.open(1);
 		stores.editor.patchField('title', 'B');
-		expect(stores.editor.draft?.issue.title).toBe('B');
+		expect(stores.editor.draft?.issue.fields.title).toBe('B');
 		expect(stores.editor.isDirty).toBe(true);
 
 		stores.editor.discard();
 
-		expect(stores.editor.draft?.issue.title).toBe('A');
+		expect(stores.editor.draft?.issue.fields.title).toBe('A');
 		expect(stores.editor.isDirty).toBe(false);
 	});
 
@@ -298,7 +345,7 @@ describe('createEditorStore — discard', () => {
 		stores.editor.patchField('title', 'B');
 		stores.editor.discard();
 		// Source untouched (we never saved).
-		expect(stores.issues.byId.get(1)?.issue.title).toBe('A');
+		expect(stores.issues.byId.get(1)?.issue.fields.title).toBe('A');
 	});
 });
 

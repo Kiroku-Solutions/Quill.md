@@ -54,37 +54,38 @@ function buildFrontmatter(issue: Issue, hash: string | null): Record<string, unk
 
 /** Pull the YAML-compatible value for a system key out of the Issue. */
 function yamlValueFor(issue: Issue, yamlKey: string): unknown {
+	const f = issue.fields;
 	switch (yamlKey) {
 		case FIELD_TO_YAML.id:
 			return issue.id > 0 ? issue.id : undefined;
 		case FIELD_TO_YAML.title:
-			return issue.title ? issue.title : undefined;
+			return f.title ? f.title : undefined;
 		case FIELD_TO_YAML.author:
-			return issue.author ? issue.author : undefined;
+			return f.author ? f.author : undefined;
 		case FIELD_TO_YAML.creationDate:
-			return issue.creationDate ? issue.creationDate : undefined;
+			return f.creationDate ? f.creationDate : undefined;
 		case FIELD_TO_YAML.updatedDate:
-			return issue.updatedDate ? issue.updatedDate : undefined;
+			return f.updatedDate ? f.updatedDate : undefined;
 		case FIELD_TO_YAML.issueType:
-			return issue.issueType ? issue.issueType : undefined;
+			return f.issueType ? f.issueType : undefined;
 		case FIELD_TO_YAML.status:
-			return issue.status ? issue.status : undefined;
+			return f.status ? f.status : undefined;
 		case FIELD_TO_YAML.assignee:
-			return issue.assignee ?? undefined;
+			return f.assignee ?? undefined;
 		case FIELD_TO_YAML.labels:
-			return issue.labels.length > 0 ? issue.labels : undefined;
+			return f.labels.length > 0 ? f.labels : undefined;
 		case FIELD_TO_YAML.relations:
-			return issue.relations.length > 0 ? issue.relations : undefined;
+			return f.relations.length > 0 ? f.relations : undefined;
 		case FIELD_TO_YAML.startDate:
-			return issue.startDate ?? undefined;
+			return f.startDate ?? undefined;
 		case FIELD_TO_YAML.endDate:
-			return issue.endDate ?? undefined;
+			return f.endDate ?? undefined;
 		case FIELD_TO_YAML.duration:
-			return issue.duration ?? undefined;
+			return f.duration ?? undefined;
 		case FIELD_TO_YAML.sprintId:
-			return issue.sprintId ?? undefined;
+			return f.sprintId ?? undefined;
 		case FIELD_TO_YAML.estimate:
-			return issue.estimate ?? undefined;
+			return f.estimate ?? undefined;
 		default:
 			return undefined;
 	}

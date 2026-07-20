@@ -106,20 +106,22 @@ const CONFIG: Config = {
 function makeIssue(): Issue {
 	return {
 		id: 42,
-		title: 'Test issue',
-		author: 'tester',
-		creationDate: '2026-01-01',
-		updatedDate: '2026-01-01',
-		issueType: 'task',
-		status: 'open',
-		assignee: null,
-		labels: [],
-		relations: [],
-		startDate: null,
-		endDate: null,
-		duration: null,
-		sprintId: null,
-		estimate: null,
+		fields: {
+			title: 'Test issue',
+			author: 'tester',
+			creationDate: '2026-01-01',
+			updatedDate: '2026-01-01',
+			issueType: 'task',
+			status: 'open',
+			assignee: null,
+			labels: [],
+			relations: [],
+			startDate: null,
+			endDate: null,
+			duration: null,
+			sprintId: null,
+			estimate: null
+		},
 		integrityHash: null,
 		customFields: {},
 		sections: [],
@@ -191,9 +193,24 @@ function buildStub(opts: StubOpts = {}): StoreGraph {
 			proxyWarning: null,
 			editBranch: null,
 			providerId: null,
+			parentSha: null,
 			lastFetchedAt: null,
 			localAdapter: null,
 			remoteAdapter: null,
+			commitQueue: {
+				depth: 0,
+				lastFlushAt: null,
+				lastError: null,
+				flushing: false,
+				active: false,
+				start: () => undefined,
+				setSession: () => undefined,
+				stop: () => undefined,
+				enqueue: () => undefined,
+				flushNow: () => Promise.resolve(),
+				clear: () => undefined,
+				pendingSnapshot: () => []
+			},
 			bootstrap: () => Promise.resolve(),
 			openLocalFolder: () => Promise.resolve(),
 			switchFolder: () => Promise.resolve(null),
@@ -253,14 +270,14 @@ function buildStub(opts: StubOpts = {}): StoreGraph {
 			patchField: (key: string, value: unknown) => {
 				patchCalls.push({ key, value });
 				// Mirror the real editor store: system keys land on
-				// `draft.issue` directly, everything else on
+				// `draft.issue.fields`, everything else on
 				// `draft.issue.customFields`. The chip-multi-select
 				// toggle in `FormFields` reads back from the draft to
 				// decide whether a chip is selected; without this
 				// mirror the second click always starts from the
 				// original empty list and re-pushes.
 				if (SYSTEM_KEYS.has(key)) {
-					(loaded.issue as unknown as Record<string, unknown>)[key] = value;
+					(loaded.issue.fields as unknown as Record<string, unknown>)[key] = value;
 				} else {
 					loaded.issue.customFields[key] = value as never;
 				}

@@ -24,9 +24,12 @@ const KANBAN_DEBOUNCE_MS = 2000;
 
 export interface QueuedWrite {
 	readonly path: string;
-	readonly content: string;
-	readonly expectedSha: string | null;
+	/** Required for upserts; absent for deletes. */
+	readonly content?: string;
+	/** Optimistic-concurrency SHA captured at enqueue time (best-effort). */
+	readonly expectedSha?: string | null;
 	readonly delete?: boolean;
+	/** Required for deletes; the file's blob SHA on the remote. */
 	readonly previousSha?: string;
 	readonly description: string;
 }
@@ -45,7 +48,20 @@ export interface CommitQueueStore {
 	readonly lastFlushAt: number | null;
 	readonly lastError: Error | null;
 	readonly flushing: boolean;
+	/**
+	 * Whether the queue is bound to an active remote session. Drives the
+	 * `EditToolbar` provider / branch pills and gates `enqueue` / `flushNow`
+	 * to no-ops when no session is bound.
+	 */
+	readonly active: boolean;
 	start(state: QueueState): void;
+	/**
+	 * Update the session metadata (PAT / parent SHA / parsed URL / branch /
+	 * author) without dropping pending writes. Used by `refreshRemote`
+	 * after a successful re-fetch — the in-flight Kanban drags survive
+	 * across a refresh, but they commit against the new parent SHA.
+	 */
+	setSession(state: QueueState): void;
 	stop(): void;
 	enqueue(write: QueuedWrite): void;
 	flushNow(message: string): Promise<void>;
@@ -71,6 +87,15 @@ export function createCommitQueueStore(): CommitQueueStore {
 		state = s;
 		queue.length = 0;
 		bump();
+		lastError = null;
+	}
+
+	function setSession(s: QueueState): void {
+		// Update the active session's metadata without dropping pending
+		// writes. Used by `refreshRemote` after a successful re-fetch —
+		// the queue's `pendingSnapshot` survives across the refresh, and
+		// the next `flushNow` builds on top of the new parent SHA.
+		state = s;
 		lastError = null;
 	}
 
@@ -121,7 +146,7 @@ export function createCommitQueueStore(): CommitQueueStore {
 				return {
 					action: 'upsert' as const,
 					path: q.path,
-					content: q.content
+					content: q.content ?? ''
 				};
 			});
 
@@ -198,7 +223,11 @@ export function createCommitQueueStore(): CommitQueueStore {
 		get flushing() {
 			return flushing;
 		},
+		get active() {
+			return state !== null;
+		},
 		start,
+		setSession,
 		stop,
 		enqueue,
 		flushNow,

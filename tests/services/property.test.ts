@@ -109,20 +109,22 @@ function randIssue(rng: () => number): Issue {
 
 	return {
 		id,
-		title,
-		author: pick(rng, ['jane', 'john', 'alex']),
-		creationDate,
-		updatedDate,
-		issueType,
-		status,
-		assignee,
-		labels,
-		relations,
-		startDate,
-		endDate,
-		duration,
-		sprintId: null,
-		estimate: null,
+		fields: {
+			title,
+			author: pick(rng, ['jane', 'john', 'alex']),
+			creationDate,
+			updatedDate,
+			issueType,
+			status,
+			assignee,
+			labels,
+			relations,
+			startDate,
+			endDate,
+			duration,
+			sprintId: null,
+			estimate: null
+		},
 		integrityHash: null, // serializer recomputes
 		customFields,
 		sections,
@@ -138,19 +140,27 @@ async function assertRoundTrip(issue: Issue, iteration: number, seed: number): P
 
 	// Property 1: scalar fields preserved.
 	expect(reparsed.issue.id, `iter ${iteration} seed ${seed} id`).toBe(issue.id);
-	expect(reparsed.issue.title, `iter ${iteration} seed ${seed} title`).toBe(issue.title);
-	expect(reparsed.issue.author, `iter ${iteration} seed ${seed} author`).toBe(issue.author);
-	expect(reparsed.issue.creationDate, `iter ${iteration} seed ${seed} creation`).toBe(
-		issue.creationDate
+	expect(reparsed.issue.fields.title, `iter ${iteration} seed ${seed} title`).toBe(
+		issue.fields.title
 	);
-	expect(reparsed.issue.updatedDate, `iter ${iteration} seed ${seed} updated`).toBe(
-		issue.updatedDate
+	expect(reparsed.issue.fields.author, `iter ${iteration} seed ${seed} author`).toBe(
+		issue.fields.author
 	);
-	expect(reparsed.issue.issueType, `iter ${iteration} seed ${seed} issueType`).toBe(
-		issue.issueType
+	expect(reparsed.issue.fields.creationDate, `iter ${iteration} seed ${seed} creation`).toBe(
+		issue.fields.creationDate
 	);
-	expect(reparsed.issue.status, `iter ${iteration} seed ${seed} status`).toBe(issue.status);
-	expect(reparsed.issue.assignee, `iter ${iteration} seed ${seed} assignee`).toBe(issue.assignee);
+	expect(reparsed.issue.fields.updatedDate, `iter ${iteration} seed ${seed} updated`).toBe(
+		issue.fields.updatedDate
+	);
+	expect(reparsed.issue.fields.issueType, `iter ${iteration} seed ${seed} issueType`).toBe(
+		issue.fields.issueType
+	);
+	expect(reparsed.issue.fields.status, `iter ${iteration} seed ${seed} status`).toBe(
+		issue.fields.status
+	);
+	expect(reparsed.issue.fields.assignee, `iter ${iteration} seed ${seed} assignee`).toBe(
+		issue.fields.assignee
+	);
 
 	// Property 2: integrity hash is recomputed and well-formed.
 	expect(reparsed.issue.integrityHash, `iter ${iteration} seed ${seed} hash`).not.toBeNull();
@@ -219,20 +229,22 @@ describe('property-based — parser ↔ serializer round-trip', () => {
 		const edgeCases: Issue[] = [
 			{
 				id: 1,
-				title: 'Bare minimum',
-				author: 'jane',
-				creationDate: '2026-01-01',
-				updatedDate: '2026-01-01',
-				issueType: 'task',
-				status: 'open',
-				assignee: null,
-				labels: [],
-				relations: [],
-				startDate: null,
-				endDate: null,
-				duration: null,
-				sprintId: null,
-				estimate: null,
+				fields: {
+					title: 'Bare minimum',
+					author: 'jane',
+					creationDate: '2026-01-01',
+					updatedDate: '2026-01-01',
+					issueType: 'task',
+					status: 'open',
+					assignee: null,
+					labels: [],
+					relations: [],
+					startDate: null,
+					endDate: null,
+					duration: null,
+					sprintId: null,
+					estimate: null
+				},
 				integrityHash: null,
 				customFields: {},
 				sections: [],
@@ -240,20 +252,22 @@ describe('property-based — parser ↔ serializer round-trip', () => {
 			},
 			{
 				id: 2,
-				title: 'All custom fields',
-				author: 'jane',
-				creationDate: '2026-01-01',
-				updatedDate: '2026-01-01',
-				issueType: 'task',
-				status: 'open',
-				assignee: 'jane',
-				labels: ['a', 'b'],
-				relations: [{ type: 'relates_to', id: 1 }],
-				startDate: '2026-01-01',
-				endDate: '2026-01-02',
-				duration: null,
-				sprintId: null,
-				estimate: null,
+				fields: {
+					title: 'All custom fields',
+					author: 'jane',
+					creationDate: '2026-01-01',
+					updatedDate: '2026-01-01',
+					issueType: 'task',
+					status: 'open',
+					assignee: 'jane',
+					labels: ['a', 'b'],
+					relations: [{ type: 'relates_to', id: 1 }],
+					startDate: '2026-01-01',
+					endDate: '2026-01-02',
+					duration: null,
+					sprintId: null,
+					estimate: null
+				},
 				integrityHash: null,
 				customFields: { severity: 'high', priority: 'p1', area: 'frontend' },
 				sections: [{ name: 'Single', markdown: 'single section body' }],
@@ -264,10 +278,10 @@ describe('property-based — parser ↔ serializer round-trip', () => {
 			const serialized = await serializeIssue(issue);
 			const reparsed = await parseIssueFile(serialized, `${issue.id}.md`);
 			expect(reparsed.issue.id).toBe(issue.id);
-			expect(reparsed.issue.title).toBe(issue.title);
+			expect(reparsed.issue.fields.title).toBe(issue.fields.title);
 			expect(reparsed.issue.sections.length).toBe(issue.sections.length);
-			expect(reparsed.issue.labels).toEqual(issue.labels);
-			expect(reparsed.issue.relations).toEqual(issue.relations);
+			expect(reparsed.issue.fields.labels).toEqual(issue.fields.labels);
+			expect(reparsed.issue.fields.relations).toEqual(issue.fields.relations);
 			expect(reparsed.issue.integrityHash).toMatch(/^sha256:[0-9a-f]{64}$/);
 			expect(reparsed.issue.integrityWarning).toBe(false);
 		}

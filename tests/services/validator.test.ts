@@ -44,20 +44,22 @@ const config: Config = {
 function makeIssue(id: number, relations: readonly Relation[] = []): Issue {
 	return {
 		id,
-		title: `Issue ${id}`,
-		author: 'tester',
-		creationDate: '2026-01-01',
-		updatedDate: '2026-01-01',
-		issueType: 'task',
-		status: 'open',
-		assignee: null,
-		labels: [],
-		relations: relations.map((r) => ({ ...r })),
-		startDate: null,
-		endDate: null,
-		duration: null,
-		sprintId: null,
-		estimate: null,
+		fields: {
+			title: `Issue ${id}`,
+			author: 'tester',
+			creationDate: '2026-01-01',
+			updatedDate: '2026-01-01',
+			issueType: 'task',
+			status: 'open',
+			assignee: null,
+			labels: [],
+			relations: relations.map((r) => ({ ...r })),
+			startDate: null,
+			endDate: null,
+			duration: null,
+			sprintId: null,
+			estimate: null
+		},
 		integrityHash: null,
 		customFields: {},
 		sections: [],
@@ -187,7 +189,8 @@ describe('validateIssue — basic field rules', () => {
 	});
 
 	it('rejects empty titles', () => {
-		const issue = { ...makeIssue(1), title: '   ' };
+		const base = makeIssue(1);
+		const issue: Issue = { ...base, fields: { ...base.fields, title: '   ' } };
 		const result = validateIssue(issue, baseContext);
 		expect(result.errors.some((e) => e.field === 'title' && /required/i.test(e.message))).toBe(
 			true
@@ -195,7 +198,8 @@ describe('validateIssue — basic field rules', () => {
 	});
 
 	it('rejects unknown status against the config', () => {
-		const issue = { ...makeIssue(1), status: 'mystery' };
+		const base = makeIssue(1);
+		const issue: Issue = { ...base, fields: { ...base.fields, status: 'mystery' } };
 		const result = validateIssue(issue, baseContext);
 		expect(
 			result.errors.some((e) => e.field === 'status' && /Unknown status/i.test(e.message))

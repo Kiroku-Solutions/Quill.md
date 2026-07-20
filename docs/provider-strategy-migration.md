@@ -346,3 +346,46 @@ deletion does not affect code.
    helps on reopen, but the app is still online-only at the
    open step (a network call is needed to discover the latest
    SHA and fetch deltas).
+
+## 7. UI cut-over (post-migration)
+
+The Strategy migration shipped with the lower layers complete
+(`RepoProvider`, `CommitQueueStore`, orphan-branch creation,
+`RemoteFileChange`) but the UI was still v0 read-only — the
+`/remote` route mounted a refresh-only `RemoteToolbar`, Save /
+Discard / Delete buttons in `EditorPanel` were disabled, and
+KanbanView rejected drag input in remote mode. The cut-over in
+this repo completes the migration on the UI side:
+
+1. **New `RemoteWritableAdapter`** (`src/lib/adapters/remote-writable.ts`)
+   implements `WritableDirectoryAdapter` over a read-only snapshot,
+   delegating reads to the snapshot and queueing writes through
+   the singleton `CommitQueueStore`. The adapter maintains an
+   in-memory overlay so in-flight edits are visible to
+   `parseIssueFile` before the queue flushes.
+2. **`ModeStore` owns the queue lifecycle.** `openRemote` builds
+   the writable adapter and starts the queue; `refreshRemote`
+   rebuilds the adapter and re-arms the queue with the new parent
+   SHA (pending writes survive); `signOut` stops the queue and
+   drops the PAT. The queue is exposed as `ModeStore.commitQueue`
+   so the toolbar (pending-depth badge, conflict Alert) and the
+   editor (per-save flush bypassing the debounce) can read it.
+3. **`EditToolbar` is the unified toolbar for both Local and
+   Remote modes.** The legacy `LocalToolbar.svelte` and
+   `RemoteToolbar.svelte` were deleted. Both `/local` and `/remote`
+   mount `EditToolbar`. Remote-only surfaces: provider pill,
+   edit-branch label, pending-depth badge, "Push now", PAT prompt
+   on Refresh, "Sign out". Local-only surface: trash count + Empty.
+4. **Editor and Kanban are fully writable in remote mode.**
+   Save / Discard / Delete always render in `EditorPanel`; a
+   deferred `RemoteConflictError` surfaces inline as an Alert so
+   the user does not have to close the panel. KanbanView's drag
+   handlers route through `adapter.writeTextFile` which enqueues;
+   the debounce coalesces multiple drags into one `commitBatch`.
+5. **`i18n` strings updated.** `modeBadge.remote` → `'Remote'`;
+   `localToolbar.*` and `remoteToolbar.*` collapsed into
+   `editToolbar.*`; read-only tooltips deleted.
+
+The ERS v3.0 spec is now fully realised end-to-end: FR-5
+(Remote Edit Mode), FR-16 (commit lifecycle), and FR-17 (edit-branch
+advisory) all have working implementations at every layer.

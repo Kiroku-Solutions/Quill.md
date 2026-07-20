@@ -3,11 +3,12 @@
  * of the app is active.
  *
  * Reactivity: `mode`, `activeHandle`, `localAdapter`, `remoteAdapter`,
- * `proxyWarning`, `lastFetchedAt` are Svelte 5 `$state` slots;
- * `recentHandles` is `$state.raw` (the array is replaced wholesale on
- * every refresh — a deep proxy would interfere with the HandleRecord
- * shape). The PAT lives ONLY in the `_patScope` closure variable — it
- * is deliberately **not** a rune, so it is invisible to the reactivity
+ * `proxyWarning`, `lastFetchedAt`, `parentSha` are Svelte 5 `$state`
+ * slots; `recentHandles` is `$state.raw` (the array is replaced
+ * wholesale on every refresh — a deep proxy would interfere with the
+ * HandleRecord shape). The PAT lives ONLY in the `_patScope` closure
+ * variable AND in the singleton `CommitQueueStore` — both are
+ * deliberately **not** runes, so they are invisible to the reactivity
  * graph (NFR-2 security contract).
  *
  * Three modes:
@@ -15,17 +16,24 @@
  *               a local folder or paste a remote URL.
  *  - `local`  : a local folder handle is active. All stores read/write
  *               through the FSA-backed adapter rooted at the folder.
- *  - `remote` : a remote Git repository has been cloned (read-only).
- *               Stores read through the LightningFS-backed adapter.
+ *  - `remote` : a remote Git repository has been opened on the edit
+ *               branch (FR-5). Stores read/write through a
+ *               {@link RemoteWritableAdapter} that fronts the read-only
+ *               snapshot and queues mutations against the singleton
+ *               commit queue (FR-16).
  *
  * Security contract (NFR-2):
- *  - A Personal Access Token (PAT) is consumed **only** inside the
- *    `openRemote(creds, pat)` closure, used by `fetchSubtree`, and then
- *    dropped on return. There is no `pat: string` property anywhere on
- *    `ModeStore`. The only public surface for credential state is
- *    `hasRemoteCredentials: boolean`.
- *  - The `proxyWarning` accessor (FR-12) is safe to expose: it contains
- *    only the proxy host, never the PAT or the Authorization header.
+ *  - The PAT exists in two places: (a) sessionStorage under
+ *    `quill-md.remote-pat` for silent restore on page refresh, and
+ *    (b) the `CommitQueueStore`'s internal `QueueState`, which is the
+ *    sole carrier for write-path auth. Both are cleared on `signOut`
+ *    and on tab close.
+ *  - There is no `pat: string` property anywhere on `ModeStore`. The
+ *    only public surface for credential state is
+ *    `hasRemoteCredentials: boolean` and the `commitQueue` (which
+ *    holds the PAT internally).
+ *  - The `proxyWarning` accessor is safe to expose: it contains only
+ *    the proxy host, never the PAT or the Authorization header.
  *
  * Persisted folder handles (ERS §5.5) live in IndexedDB. The store
  * reads/writes them via `handleStore` (Step 4) on `bootstrap()` and
@@ -41,12 +49,15 @@ import {
 	type RepoUrl,
 	type Branch
 } from '../adapters/remote.ts';
+import { RemoteWritableAdapter } from '../adapters/remote-writable.ts';
+import {
+	createCommitQueueStore,
+	type CommitQueueStore,
+	type QueueState
+} from './commit-queue.svelte.ts';
 import { clearPat, readPat, readSessionMeta, writePat, writeSessionMeta } from './pat-storage.ts';
 import type { HandleRecord } from '../adapters/handle-store.ts';
-import type {
-	ReadOnlyDirectoryAdapter,
-	WritableDirectoryAdapter
-} from '../adapters/directory-adapter.ts';
+import type { WritableDirectoryAdapter } from '../adapters/directory-adapter.ts';
 import { isFsaAvailable } from '../adapters/feature-detect.ts';
 import { StateError } from './errors.ts';
 import type { StateContext } from './_context.ts';
@@ -103,7 +114,7 @@ export interface ModeStore {
 	/**
 	 * Wall-clock timestamp (`Date.now()`) of the last successful
 	 * `openRemote` / `refreshRemote` call. `null` when no remote is
-	 * active, or after `signOut()`. Surfaced by the `RemoteToolbar` as
+	 * active, or after `signOut()`. Surfaced by the `EditToolbar` as
 	 * the "Last fetched" indicator. Updated atomically with
 	 * `remoteAdapter` so the toolbar's `formatRelative` read stays
 	 * consistent with the adapter it is reading through.
@@ -113,12 +124,34 @@ export interface ModeStore {
 	readonly remoteUrl: RepoUrl | null;
 	/** Writable adapter bound when a local folder handle is active. */
 	readonly localAdapter: WritableDirectoryAdapter | null;
-	/** Read-only adapter bound when a remote repository is open. */
-	readonly remoteAdapter: ReadOnlyDirectoryAdapter | null;
+	/**
+	 * Writable adapter bound when a remote repository is open.
+	 *
+	 * The remote mode is now write-capable (FR-5, FR-16): writes go
+	 * through the {@link RemoteWritableAdapter}, which translates
+	 * `writeTextFile` / `removeFile` / `moveFile` into queued commits
+	 * against the edit branch. The underlying read-only snapshot is
+	 * kept inside the writable adapter for read fallback.
+	 */
+	readonly remoteAdapter: WritableDirectoryAdapter | null;
+	/**
+	 * The singleton {@link CommitQueueStore} bound to the active remote
+	 * session. The toolbar reads `depth` for the pending-write badge
+	 * and `lastError` for the conflict Alert. The `start` / `setSession`
+	 * / `stop` lifecycle is driven by `openRemote` / `refreshRemote` /
+	 * `signOut`; consumers should never call those directly.
+	 */
+	readonly commitQueue: CommitQueueStore;
 	/** Edit branch the remote mode is committing to (`quill-md` by default). */
 	readonly editBranch: string | null;
 	/** Provider id the remote session is using (`github` / `gitlab`). */
 	readonly providerId: string | null;
+	/**
+	 * The branch tip SHA the next `commitBatch` will build on. Updated
+	 * after every successful flush (and on `refreshRemote`). Surfaced
+	 * for tests; not consumed by the UI today.
+	 */
+	readonly parentSha: string | null;
 
 	readonly bootstrap: () => Promise<void>;
 	readonly openLocalFolder: (handle: FileSystemDirectoryHandle) => Promise<void>;
@@ -231,7 +264,7 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 	let activeHandle = $state<FileSystemDirectoryHandle | null>(null);
 	let recentHandles = $state.raw<HandleRecord[]>([]);
 	let localAdapter = $state<WritableDirectoryAdapter | null>(null);
-	let remoteAdapter = $state<ReadOnlyDirectoryAdapter | null>(null);
+	let remoteAdapter = $state<WritableDirectoryAdapter | null>(null);
 	// Edit branch the remote mode commits to. Default `quill-md`; settable
 	// via `openRemote({editBranch})`. Surfaced in the TopBar / EditToolbar.
 	let editBranch = $state<string | null>(null);
@@ -244,10 +277,17 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 	// to expose on the public surface — see the `proxyWarning` getter.
 	let proxyWarning = $state<string | null>(null);
 	// Timestamp (Date.now()) of the last successful remote fetch. Used by
-	// the RemoteToolbar's "Last fetched: N min ago" indicator. Atomically
+	// the EditToolbar's "Last fetched: N min ago" indicator. Atomically
 	// bumped with `remoteAdapter` so the toolbar's `formatRelative` read
 	// stays consistent with the adapter it is reading through.
 	let lastFetchedAt = $state<number | null>(null);
+	// Current branch tip SHA the queue will build on. Surfaced for tests;
+	// the UI does not read it today.
+	let parentSha = $state<string | null>(null);
+	// Singleton commit queue — started in `openRemote`, re-armed in
+	// `refreshRemote`, stopped in `signOut`. The queue holds the PAT
+	// for the duration of the session (cleared on `signOut` / tab close).
+	const commitQueue = createCommitQueueStore();
 	// PAT lives ONLY in this closure. Never read after openRemote returns.
 	// Deliberately NOT a rune — keeping it out of the reactivity graph is
 	// a security boundary (NFR-2): no consumer can subscribe to a PAT slot
@@ -370,26 +410,26 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 
 	/**
 	 * Consume a raw PAT and return the (non-secret) credentials pair plus
-	 * a read-only remote adapter and the proxy-warning text.
+	 * the read-only remote adapter and the rest of the fetch result.
 	 *
 	 * PAT lifetime contract (NFR-2):
 	 *  - The `pat` parameter exists ONLY in this function's argument list.
-	 *  - It is forwarded to `isomorphic-git` via `fetchSubtree`'s `onAuth`
-	 *    callback and then dropped on return.
+	 *  - It is forwarded to the provider via `fetchSubtree` and then
+	 *    dropped on return.
 	 *  - Nothing outside this function ever observes the PAT value. The
 	 *    returned `scope` is the non-secret `(url, branch)` pair, which
 	 *    the rest of the app uses as the "I have remote credentials"
 	 *    signal without ever seeing the secret.
-	 *  - The returned `adapter` is a read-only surface; there is no path
-	 *    by which a PAT could be carried through it.
+	 *  - The returned `adapter` is the read-only snapshot; the writable
+	 *    surface is layered on top by the caller (`openRemote` /
+	 *    `refreshRemote`).
 	 */
 	async function consumePatAndFetch(
 		creds: RemoteCredentials,
 		pat: string
 	): Promise<{
-		adapter: ReadOnlyDirectoryAdapter;
-		scope: { url: RepoUrl; branch: Branch };
 		fetchResult: Awaited<ReturnType<typeof fetchSubtree>>;
+		scope: { url: RepoUrl; branch: Branch };
 	}> {
 		const author =
 			creds.authorName || creds.authorEmail
@@ -408,22 +448,32 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 			commitAuthor: author
 		});
 		return {
-			adapter: fetchResult.adapter,
-			scope: { url: creds.url, branch: creds.branch },
-			fetchResult
+			fetchResult,
+			scope: { url: creds.url, branch: creds.branch }
 		};
 	}
 
 	async function openRemote(creds: RemoteCredentials, pat: string): Promise<void> {
-		const { adapter, scope, fetchResult } = await consumePatAndFetch(creds, pat);
+		const { fetchResult, scope } = await consumePatAndFetch(creds, pat);
 		_patScope = scope;
-		remoteAdapter = adapter;
+		// Bind the writable adapter that fronts the read-only snapshot.
+		// The writable adapter is what the issues store / editor / Kanban
+		// read and write through; its `readTextFile` / `listDirectory`
+		// delegate to the snapshot, and its mutations enqueue against the
+		// commit queue started below.
+		const writable = new RemoteWritableAdapter({
+			readOnly: fetchResult.adapter,
+			queue: commitQueue
+		});
+		remoteAdapter = writable;
 		editBranch = fetchResult.editBranch;
 		providerId = fetchResult.providerId;
+		parentSha = fetchResult.sha;
 		// No CORS proxy warning in the new architecture — provider REST
 		// APIs ship permissive CORS. The `proxyWarning` slot is kept
 		// (always null) for backwards compatibility with consumers that
 		// read it (e.g. TopBar's `ProxyWarningBanner` mount guard).
+		proxyWarning = null;
 		proxyWarning = null;
 		// Stamp the fetch timestamp so the toolbar can show "Last fetched".
 		lastFetchedAt = Date.now();
@@ -442,7 +492,20 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 			displayName: fetchResult.author.name,
 			authorLogin: fetchResult.author.name
 		});
-		// Remote Mode is read-only; clear any local session markers.
+		// Start the commit queue with the active session's metadata.
+		// The queue holds the PAT for the duration of the session — it is
+		// the only place the PAT lives past the openRemote return boundary
+		// (apart from sessionStorage), and `stop()` drops it on `signOut`.
+		const queueState: QueueState = {
+			providerId: fetchResult.providerId,
+			parsed: fetchResult.parsed,
+			editBranch: fetchResult.editBranch,
+			author: fetchResult.author,
+			pat,
+			parentSha: fetchResult.sha
+		};
+		commitQueue.start(queueState);
+		// Remote Mode is write-capable (FR-5); clear any local session markers.
 		activeHandle = null;
 		localAdapter = null;
 		mode = 'remote';
@@ -476,22 +539,37 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 		// rejection the existing adapter remains bound and the user keeps
 		// their cached subtree.
 		const previousAdapter = remoteAdapter;
-		let nextAdapter: ReadOnlyDirectoryAdapter;
+		let fetchResult: Awaited<ReturnType<typeof consumePatAndFetch>>['fetchResult'];
 		try {
-			const result = await consumePatAndFetch(scope, pat);
-			nextAdapter = result.adapter;
-			editBranch = result.fetchResult.editBranch;
-			providerId = result.fetchResult.providerId;
+			const next = await consumePatAndFetch(scope, pat);
+			fetchResult = next.fetchResult;
+			editBranch = fetchResult.editBranch;
+			providerId = fetchResult.providerId;
 		} catch (cause) {
 			// Re-throw with the existing adapter left in place. Do NOT
 			// clear `lastFetchedAt` — it still describes the cache the
 			// user is reading through.
 			throw cause instanceof Error ? cause : new StateError('internal', String(cause), { cause });
 		}
-		// Commit: swap adapter, bump timestamp.
-		remoteAdapter = nextAdapter;
+		// Commit: swap adapter, bump timestamp, re-arm the queue with the
+		// new parent SHA. The queue's pending writes survive the refresh
+		// (per `setSession` semantics); only the session metadata rotates.
+		const writable = new RemoteWritableAdapter({
+			readOnly: fetchResult.adapter,
+			queue: commitQueue
+		});
+		remoteAdapter = writable;
+		parentSha = fetchResult.sha;
 		proxyWarning = null;
 		lastFetchedAt = Date.now();
+		commitQueue.setSession({
+			providerId: fetchResult.providerId,
+			parsed: fetchResult.parsed,
+			editBranch: fetchResult.editBranch,
+			author: fetchResult.author,
+			pat,
+			parentSha: fetchResult.sha
+		});
 		await onRefreshSuccess();
 		// `previousAdapter` is captured to make the rollback contract
 		// explicit; it is not used after the swap because the old
@@ -500,6 +578,9 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 	}
 
 	async function signOut(): Promise<void> {
+		// Stop the commit queue first so a pending flush cannot land a
+		// commit after the PAT is cleared from sessionStorage.
+		commitQueue.stop();
 		_patScope = null;
 		remoteAdapter = null;
 		activeHandle = null;
@@ -508,6 +589,7 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 		lastFetchedAt = null;
 		editBranch = null;
 		providerId = null;
+		parentSha = null;
 		clearPat();
 		await handles.clearActive();
 		await readRecent();
@@ -580,11 +662,17 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 		get remoteAdapter() {
 			return remoteAdapter;
 		},
+		get commitQueue() {
+			return commitQueue;
+		},
 		get editBranch() {
 			return editBranch;
 		},
 		get providerId() {
 			return providerId;
+		},
+		get parentSha() {
+			return parentSha;
 		},
 		bootstrap,
 		openLocalFolder,

@@ -43,7 +43,7 @@ describe('buildDefaultIssue', () => {
 			{ title: 'Hello', issueType: 'task', author: 'jane' },
 			noExisting
 		);
-		expect(issue.status).toBe('open');
+		expect(issue.fields.status).toBe('open');
 	});
 
 	it('respects an explicit input.status', () => {
@@ -51,7 +51,7 @@ describe('buildDefaultIssue', () => {
 			{ title: 'Hello', issueType: 'task', author: 'jane', status: 'in_progress' },
 			noExisting
 		);
-		expect(issue.status).toBe('in_progress');
+		expect(issue.fields.status).toBe('in_progress');
 	});
 
 	it('copies customFields into a fresh object (no shared mutation)', () => {
@@ -77,8 +77,8 @@ describe('buildDefaultIssue', () => {
 			{ title: 'Hello', issueType: 'task', author: 'jane', today },
 			noExisting
 		);
-		expect(issue.creationDate).toBe('2026-06-24');
-		expect(issue.updatedDate).toBe('2026-06-24');
+		expect(issue.fields.creationDate).toBe('2026-06-24');
+		expect(issue.fields.updatedDate).toBe('2026-06-24');
 	});
 
 	it('uses nextIssueId(existing) when assigning the id', () => {
@@ -115,7 +115,7 @@ describe('createIssue — write + reparse round-trip', () => {
 		);
 
 		expect(li.issue.id).toBe(1);
-		expect(li.issue.title).toBe('New thing');
+		expect(li.issue.fields.title).toBe('New thing');
 		expect(li.sourcePath).toBe('.quill.md/issues/0001-new-thing.md');
 
 		// The file must exist on disk after the call.
@@ -139,7 +139,7 @@ describe('createIssue — write + reparse round-trip', () => {
 			{ title: 'T', issueType: 'mystery-type', author: 'jane', today: '2026-06-24' },
 			[]
 		);
-		expect(li.issue.issueType).toBe('mystery-type');
+		expect(li.issue.fields.issueType).toBe('mystery-type');
 		expect(li.issue.integrityWarning).toBe(false);
 	});
 });
@@ -153,20 +153,22 @@ describe('saveIssue — overwrite + last-write-wins', () => {
 	function baseIssue(): Issue {
 		return {
 			id: 1,
-			title: 'Hello',
-			author: 'jane',
-			creationDate: '2026-01-01',
-			updatedDate: '2026-01-01',
-			issueType: 'task',
-			status: 'open',
-			assignee: null,
-			labels: [],
-			relations: [],
-			startDate: null,
-			endDate: null,
-			duration: null,
-			sprintId: null,
-			estimate: null,
+			fields: {
+				title: 'Hello',
+				author: 'jane',
+				creationDate: '2026-01-01',
+				updatedDate: '2026-01-01',
+				issueType: 'task',
+				status: 'open',
+				assignee: null,
+				labels: [],
+				relations: [],
+				startDate: null,
+				endDate: null,
+				duration: null,
+				sprintId: null,
+				estimate: null
+			},
 			integrityHash: null,
 			customFields: {},
 			sections: [],
@@ -177,13 +179,16 @@ describe('saveIssue — overwrite + last-write-wins', () => {
 	it('overwrites an existing file in place (same sourcePath)', async () => {
 		const path = '.quill.md/issues/0001-hello.md';
 		const li1 = await saveIssue(fs, baseIssue(), path);
-		expect(li1.issue.title).toBe('Hello');
+		expect(li1.issue.fields.title).toBe('Hello');
 
-		const updated: Issue = { ...baseIssue(), title: 'Hello, world!', status: 'in_progress' };
+		const updated: Issue = {
+			...baseIssue(),
+			fields: { ...baseIssue().fields, title: 'Hello, world!', status: 'in_progress' }
+		};
 		const li2 = await saveIssue(fs, updated, path);
 
-		expect(li2.issue.title).toBe('Hello, world!');
-		expect(li2.issue.status).toBe('in_progress');
+		expect(li2.issue.fields.title).toBe('Hello, world!');
+		expect(li2.issue.fields.status).toBe('in_progress');
 		// Only one file remains under the issues dir.
 		const entries = await fs.listDirectory(ISSUES_DIR);
 		expect(entries.filter((e) => e.kind === 'file')).toHaveLength(1);
@@ -195,9 +200,21 @@ describe('saveIssue — overwrite + last-write-wins', () => {
 		// serialise. Here we await each save in turn to exercise the
 		// "last write wins" semantics deterministically.
 		const path = '.quill.md/issues/0001-hello.md';
-		await saveIssue(fs, { ...baseIssue(), title: 'First' }, path);
-		await saveIssue(fs, { ...baseIssue(), title: 'Second' }, path);
-		await saveIssue(fs, { ...baseIssue(), title: 'Third' }, path);
+		await saveIssue(
+			fs,
+			{ ...baseIssue(), fields: { ...baseIssue().fields, title: 'First' } },
+			path
+		);
+		await saveIssue(
+			fs,
+			{ ...baseIssue(), fields: { ...baseIssue().fields, title: 'Second' } },
+			path
+		);
+		await saveIssue(
+			fs,
+			{ ...baseIssue(), fields: { ...baseIssue().fields, title: 'Third' } },
+			path
+		);
 
 		const final = await fs.readTextFile(path);
 		expect(final).toContain('title: Third');

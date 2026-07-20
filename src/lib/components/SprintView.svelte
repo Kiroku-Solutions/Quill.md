@@ -15,7 +15,7 @@
 	const allIssues = $derived(issues.issues.map((li) => li.issue));
 
 	// Find Sprints
-	const sprints = $derived(allIssues.filter((i) => i.issueType === 'sprint'));
+	const sprints = $derived(allIssues.filter((i) => i.fields.issueType === 'sprint'));
 
 	// Currently selected Sprint ID
 	let selectedSprintId = $state<number | null>(null);
@@ -30,24 +30,24 @@
 	const selectedSprint = $derived(sprints.find((s) => s.id === selectedSprintId) ?? null);
 
 	// Find all user stories
-	const allStories = $derived(allIssues.filter((i) => i.issueType === 'user-story'));
+	const allStories = $derived(allIssues.filter((i) => i.fields.issueType === 'user-story'));
 
 	// Find stories belonging to the selected Sprint
 	const sprintStories = $derived.by(() => {
 		if (!selectedSprint) return [];
 		return allStories.filter((story) => {
-			const linksToSprint = story.relations.some((r) => r.id === selectedSprint.id);
-			const sprintLinksToStory = selectedSprint.relations.some((r) => r.id === story.id);
+			const linksToSprint = story.fields.relations.some((r) => r.id === selectedSprint.id);
+			const sprintLinksToStory = selectedSprint.fields.relations.some((r) => r.id === story.id);
 			return linksToSprint || sprintLinksToStory;
 		});
 	});
 
-	const epics = $derived(allIssues.filter((i) => i.issueType === 'epic'));
+	const epics = $derived(allIssues.filter((i) => i.fields.issueType === 'epic'));
 
 	function hasEpicParent(story: Issue): boolean {
 		return epics.some((epic) => {
-			const linksToEpic = story.relations.some((r) => r.id === epic.id);
-			const epicLinksToStory = epic.relations.some((r) => r.id === story.id);
+			const linksToEpic = story.fields.relations.some((r) => r.id === epic.id);
+			const epicLinksToStory = epic.fields.relations.some((r) => r.id === story.id);
 			return linksToEpic || epicLinksToStory;
 		});
 	}
@@ -57,8 +57,8 @@
 		allStories.filter((story) => {
 			if (!hasEpicParent(story)) return false;
 			return !sprints.some((sprint) => {
-				const linksToSprint = story.relations.some((r) => r.id === sprint.id);
-				const sprintLinksToStory = sprint.relations.some((r) => r.id === story.id);
+				const linksToSprint = story.fields.relations.some((r) => r.id === sprint.id);
+				const sprintLinksToStory = sprint.fields.relations.some((r) => r.id === story.id);
 				return linksToSprint || sprintLinksToStory;
 			});
 		})
@@ -69,8 +69,8 @@
 		allStories.filter((story) => {
 			if (hasEpicParent(story)) return false;
 			return !sprints.some((sprint) => {
-				const linksToSprint = story.relations.some((r) => r.id === sprint.id);
-				const sprintLinksToStory = sprint.relations.some((r) => r.id === story.id);
+				const linksToSprint = story.fields.relations.some((r) => r.id === sprint.id);
+				const sprintLinksToStory = sprint.fields.relations.some((r) => r.id === story.id);
 				return linksToSprint || sprintLinksToStory;
 			});
 		})
@@ -79,13 +79,15 @@
 	// Metrics for each Sprint (helper)
 	function getSprintMetrics(sprint: Issue) {
 		const related = allStories.filter((story) => {
-			const linksToSprint = story.relations.some((r) => r.id === sprint.id);
-			const sprintLinksToStory = sprint.relations.some((r) => r.id === story.id);
+			const linksToSprint = story.fields.relations.some((r) => r.id === sprint.id);
+			const sprintLinksToStory = sprint.fields.relations.some((r) => r.id === story.id);
 			return linksToSprint || sprintLinksToStory;
 		});
 		const count = related.length;
-		const points = related.reduce((acc, story) => acc + (Number(story.estimate) || 0), 0);
-		const completed = related.filter((s) => s.status === 'done' || s.status === 'closed').length;
+		const points = related.reduce((acc, story) => acc + (Number(story.fields.estimate) || 0), 0);
+		const completed = related.filter(
+			(s) => s.fields.status === 'done' || s.fields.status === 'closed'
+		).length;
 		const progress = count > 0 ? Math.round((completed / count) * 100) : 0;
 		return { count, points, progress };
 	}
@@ -94,31 +96,34 @@
 
 	async function linkStory(storyId: number) {
 		if (!selectedSprint || !isWritable) return;
-		const nextSprintRelations = [...selectedSprint.relations, { type: 'relates_to', id: storyId }];
-		issues.update(selectedSprint.id, { relations: nextSprintRelations });
+		const nextSprintRelations = [
+			...selectedSprint.fields.relations,
+			{ type: 'relates_to', id: storyId }
+		];
+		issues.update(selectedSprint.id, { fields: { relations: nextSprintRelations } });
 		await issues.save(selectedSprint.id);
 
 		const story = allStories.find((s) => s.id === storyId);
 		if (story) {
 			const nextStoryRelations = [
-				...story.relations,
+				...story.fields.relations,
 				{ type: 'relates_to', id: selectedSprint.id }
 			];
-			issues.update(storyId, { relations: nextStoryRelations });
+			issues.update(storyId, { fields: { relations: nextStoryRelations } });
 			await issues.save(storyId);
 		}
 	}
 
 	async function unlinkStory(storyId: number) {
 		if (!selectedSprint || !isWritable) return;
-		const nextSprintRelations = selectedSprint.relations.filter((r) => r.id !== storyId);
-		issues.update(selectedSprint.id, { relations: nextSprintRelations });
+		const nextSprintRelations = selectedSprint.fields.relations.filter((r) => r.id !== storyId);
+		issues.update(selectedSprint.id, { fields: { relations: nextSprintRelations } });
 		await issues.save(selectedSprint.id);
 
 		const story = allStories.find((s) => s.id === storyId);
 		if (story) {
-			const nextStoryRelations = story.relations.filter((r) => r.id !== selectedSprint.id);
-			issues.update(storyId, { relations: nextStoryRelations });
+			const nextStoryRelations = story.fields.relations.filter((r) => r.id !== selectedSprint.id);
+			issues.update(storyId, { fields: { relations: nextStoryRelations } });
 			await issues.save(storyId);
 		}
 	}
@@ -157,15 +162,15 @@
 								<div class="flex items-center gap-2">
 									<Milestone class="h-4 w-4 text-warning" />
 									<h4 class="font-display text-sm font-semibold text-foreground">
-										{sprint.title}
+										{sprint.fields.title}
 									</h4>
 								</div>
-								<Badge variant="primary" size="sm">{sprint.status}</Badge>
+								<Badge variant="primary" size="sm">{sprint.fields.status}</Badge>
 							</div>
 
 							<div class="flex items-center gap-2 text-xs text-muted-foreground">
 								<Calendar class="h-3.5 w-3.5" />
-								<span>{sprint.startDate ?? '—'} · {sprint.endDate ?? '—'}</span>
+								<span>{sprint.fields.startDate ?? '—'} · {sprint.fields.endDate ?? '—'}</span>
 							</div>
 
 							<div class="mt-1 grid grid-cols-2 gap-2 border-t border-border/40 pt-2 text-xs">
@@ -208,10 +213,10 @@
 									onclick={() => openIssue(selectedSprint.id)}
 									class="cursor-pointer text-left font-display text-lg font-bold text-foreground hover:opacity-85 focus-visible:underline focus-visible:outline-none"
 								>
-									{selectedSprint.title}
+									{selectedSprint.fields.title}
 								</button>
 							</div>
-							<Badge variant="primary">{selectedSprint.status}</Badge>
+							<Badge variant="primary">{selectedSprint.fields.status}</Badge>
 						</div>
 
 						<div class="grid grid-cols-3 gap-4 text-center">
@@ -272,19 +277,20 @@
 										<div class="flex items-center gap-2 truncate">
 											<BookOpen class="h-4 w-4 shrink-0 text-primary" />
 											<span class="text-xs font-semibold text-muted-foreground">#{story.id}</span>
-											<span class="truncate text-sm font-medium text-foreground">{story.title}</span
+											<span class="truncate text-sm font-medium text-foreground"
+												>{story.fields.title}</span
 											>
 										</div>
 										<div class="flex items-center gap-3">
-											{#if story.estimate}
+											{#if story.fields.estimate}
 												<span
 													class="rounded bg-muted px-2.5 py-0.5 text-xs font-bold text-foreground"
 												>
-													{story.estimate}
+													{story.fields.estimate}
 													{t('sprint.pointsUnit')}
 												</span>
 											{/if}
-											<Badge variant="primary" size="sm">{story.status}</Badge>
+											<Badge variant="primary" size="sm">{story.fields.status}</Badge>
 
 											{#if isWritable}
 												<button
@@ -338,14 +344,14 @@
 													<span class="text-xs font-semibold text-muted-foreground"
 														>#{story.id}</span
 													>
-													<span class="truncate text-sm text-foreground">{story.title}</span>
+													<span class="truncate text-sm text-foreground">{story.fields.title}</span>
 												</div>
 												<div class="flex items-center gap-3">
-													{#if story.estimate}
+													{#if story.fields.estimate}
 														<span
 															class="rounded bg-muted px-2.5 py-0.5 text-xs font-bold text-foreground"
 														>
-															{story.estimate}
+															{story.fields.estimate}
 															{t('sprint.pointsUnit')}
 														</span>
 													{/if}
@@ -386,14 +392,14 @@
 													<span class="text-xs font-semibold text-muted-foreground"
 														>#{story.id}</span
 													>
-													<span class="truncate text-sm text-foreground">{story.title}</span>
+													<span class="truncate text-sm text-foreground">{story.fields.title}</span>
 												</div>
 												<div class="flex items-center gap-3">
-													{#if story.estimate}
+													{#if story.fields.estimate}
 														<span
 															class="rounded bg-muted px-2.5 py-0.5 text-xs font-bold text-foreground"
 														>
-															{story.estimate}
+															{story.fields.estimate}
 															{t('sprint.pointsUnit')}
 														</span>
 													{/if}

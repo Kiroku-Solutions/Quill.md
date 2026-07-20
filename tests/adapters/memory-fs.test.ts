@@ -329,20 +329,20 @@ After submitting valid credentials, the user is redirected to a
 
 		const issue = loaded?.issue;
 		expect(issue?.id).toBe(42);
-		expect(issue?.title).toBe('Fix login redirect');
-		expect(issue?.author).toBe('jane');
-		expect(issue?.creationDate).toBe('2026-10-20');
-		expect(issue?.updatedDate).toBe('2026-10-21');
-		expect(issue?.issueType).toBe('bug');
-		expect(issue?.status).toBe('in_progress');
-		expect(issue?.assignee).toBe('jane');
-		expect(issue?.labels).toEqual(['security', 'frontend']);
-		expect(issue?.relations).toEqual([
+		expect(issue?.fields.title).toBe('Fix login redirect');
+		expect(issue?.fields.author).toBe('jane');
+		expect(issue?.fields.creationDate).toBe('2026-10-20');
+		expect(issue?.fields.updatedDate).toBe('2026-10-21');
+		expect(issue?.fields.issueType).toBe('bug');
+		expect(issue?.fields.status).toBe('in_progress');
+		expect(issue?.fields.assignee).toBe('jane');
+		expect(issue?.fields.labels).toEqual(['security', 'frontend']);
+		expect(issue?.fields.relations).toEqual([
 			{ type: 'blocks', id: 45 },
 			{ type: 'relates_to', id: 7 }
 		]);
-		expect(issue?.startDate).toBe('2026-10-20');
-		expect(issue?.duration).toBe(3);
+		expect(issue?.fields.startDate).toBe('2026-10-20');
+		expect(issue?.fields.duration).toBe(3);
 
 		// Template-defined custom fields survive the round-trip.
 		expect(issue?.customFields['severity']).toBe('high');

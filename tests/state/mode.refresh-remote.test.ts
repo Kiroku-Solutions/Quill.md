@@ -58,11 +58,20 @@ function makeFakeAdapter(label: string): remoteGit.ReadonlyRemoteAdapter {
 		listDirectory: vi.fn(async () => []),
 		headSha: vi.fn(async () => 'pending' as remoteGit.Sha),
 		exists: vi.fn(async () => false),
+		blobShaFor: vi.fn(async () => null),
 		// `label` is only here so the test can tell the adapters apart
 		// when asserting which one is bound after the refresh.
 		[Symbol.toPrimitive]: () => label
 	} as unknown as remoteGit.ReadonlyRemoteAdapter;
 }
+
+const PARSED = {
+	providerId: 'github',
+	owner: 'acme',
+	repo: 'widgets',
+	baseUrl: 'https://api.github.com',
+	canonicalUrl: KNOWN_URL
+};
 
 describe('createModeStore — refreshRemote (sub-phase 6F)', () => {
 	let store: ReturnType<typeof createModeStore>;
@@ -101,7 +110,8 @@ describe('createModeStore — refreshRemote (sub-phase 6F)', () => {
 			cacheKey: `${KNOWN_URL}|${KNOWN_BRANCH}|pending` as remoteGit.CacheKey,
 			providerId: 'github',
 			editBranch: 'quill-md',
-			author: { name: 'Test User', email: 'test@example.com' }
+			author: { name: 'Test User', email: 'test@example.com' },
+			parsed: PARSED
 		});
 		await store.openRemote({ url: KNOWN_URL, branch: KNOWN_BRANCH }, KNOWN_PAT);
 
@@ -113,7 +123,8 @@ describe('createModeStore — refreshRemote (sub-phase 6F)', () => {
 			cacheKey: `${KNOWN_URL}|${KNOWN_BRANCH}|pending` as remoteGit.CacheKey,
 			providerId: 'github',
 			editBranch: 'quill-md',
-			author: { name: 'Test User', email: 'test@example.com' }
+			author: { name: 'Test User', email: 'test@example.com' },
+			parsed: PARSED
 		});
 
 		await store.refreshRemote(REFRESH_PAT);
@@ -127,8 +138,15 @@ describe('createModeStore — refreshRemote (sub-phase 6F)', () => {
 		expect(secondCall.url).toBe(KNOWN_URL);
 		expect(secondCall.branch).toBe(KNOWN_BRANCH);
 
-		// Adapter was swapped to the refreshed one.
-		expect(store.remoteAdapter).toBe(refreshedAdapter);
+		// Remote Edit Mode cut-over: `remoteAdapter` is now a
+		// `RemoteWritableAdapter` that fronts the read-only snapshot
+		// (the queue coalesces writes). Verify the wrapper was swapped
+		// to one that delegates to the refreshed snapshot, not that
+		// the read-only adapter itself is bound.
+		const writable = store.remoteAdapter as unknown as {
+			readOnly: remoteGit.ReadonlyRemoteAdapter;
+		};
+		expect(writable.readOnly).toBe(refreshedAdapter);
 		// Proxy warning was updated.
 		expect(store.proxyWarning).toBe(null);
 		// onRefreshSuccess fires after both openRemote (1×) and refreshRemote

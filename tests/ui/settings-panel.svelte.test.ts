@@ -103,6 +103,7 @@ function buildStub(opts: {
 			proxyWarning: null,
 			editBranch: null,
 			providerId: null,
+			parentSha: null,
 			lastFetchedAt: null,
 			localAdapter: opts.hasLocalAdapter
 				? ({
@@ -114,6 +115,20 @@ function buildStub(opts: {
 					} as never)
 				: null,
 			remoteAdapter: null,
+			commitQueue: {
+				depth: 0,
+				lastFlushAt: null,
+				lastError: null,
+				flushing: false,
+				active: false,
+				start: () => undefined,
+				setSession: () => undefined,
+				stop: () => undefined,
+				enqueue: () => undefined,
+				flushNow: () => Promise.resolve(),
+				clear: () => undefined,
+				pendingSnapshot: () => []
+			},
 			bootstrap: () => Promise.resolve(),
 			openLocalFolder: () => Promise.resolve(),
 			switchFolder: () => Promise.resolve(null),

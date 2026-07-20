@@ -49,20 +49,22 @@ const CONFIG: Config = {
 function makeIssue(id: number, status: string, title: string): Issue {
 	return {
 		id,
-		title,
-		author: 'tester',
-		creationDate: '2026-01-01',
-		updatedDate: '2026-01-01',
-		issueType: 'task',
-		status,
-		assignee: null,
-		labels: [],
-		relations: [],
-		startDate: null,
-		endDate: null,
-		duration: null,
-		sprintId: null,
-		estimate: null,
+		fields: {
+			title,
+			author: 'tester',
+			creationDate: '2026-01-01',
+			updatedDate: '2026-01-01',
+			issueType: 'task',
+			status,
+			assignee: null,
+			labels: [],
+			relations: [],
+			startDate: null,
+			endDate: null,
+			duration: null,
+			sprintId: null,
+			estimate: null
+		},
 		integrityHash: null,
 		customFields: {},
 		sections: [],
@@ -73,7 +75,7 @@ function makeIssue(id: number, status: string, title: string): Issue {
 function buildStub(issues: readonly Issue[]): StoreGraph {
 	const loaded: LoadedIssue[] = issues.map((iss) => ({
 		issue: iss,
-		sourcePath: `.quill.md/issues/${String(iss.id).padStart(4, '0')}-${iss.title.toLowerCase()}.md`
+		sourcePath: `.quill.md/issues/${String(iss.id).padStart(4, '0')}-${iss.fields.title.toLowerCase()}.md`
 	}));
 	return {
 		mode: {
@@ -85,9 +87,24 @@ function buildStub(issues: readonly Issue[]): StoreGraph {
 			proxyWarning: null,
 			editBranch: null,
 			providerId: null,
+			parentSha: null,
 			lastFetchedAt: null,
 			localAdapter: null,
 			remoteAdapter: null,
+			commitQueue: {
+				depth: 0,
+				lastFlushAt: null,
+				lastError: null,
+				flushing: false,
+				active: false,
+				start: () => undefined,
+				setSession: () => undefined,
+				stop: () => undefined,
+				enqueue: () => undefined,
+				flushNow: () => Promise.resolve(),
+				clear: () => undefined,
+				pendingSnapshot: () => []
+			},
 			bootstrap: () => Promise.resolve(),
 			openLocalFolder: () => Promise.resolve(),
 			switchFolder: () => Promise.resolve(null),

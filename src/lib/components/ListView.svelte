@@ -34,12 +34,12 @@
 		Array.from(issues.byId.values())
 			.filter((li) => {
 				const f = filter.filter;
-				if (f.status && li.issue.status !== f.status) return false;
-				if (f.type && li.issue.issueType !== f.type) return false;
+				if (f.status && li.issue.fields.status !== f.status) return false;
+				if (f.type && li.issue.fields.issueType !== f.type) return false;
 				if (f.q) {
 					const needle = f.q.toLowerCase();
 					if (
-						!li.issue.title.toLowerCase().includes(needle) &&
+						!li.issue.fields.title.toLowerCase().includes(needle) &&
 						!li.issue.sections.some((s) => s.markdown.toLowerCase().includes(needle))
 					) {
 						return false;
@@ -54,11 +54,11 @@
 					case 'id':
 						return (a.issue.id - b.issue.id) * dir;
 					case 'title':
-						return a.issue.title.localeCompare(b.issue.title) * dir;
+						return a.issue.fields.title.localeCompare(b.issue.fields.title) * dir;
 					case 'status':
-						return a.issue.status.localeCompare(b.issue.status) * dir;
+						return a.issue.fields.status.localeCompare(b.issue.fields.status) * dir;
 					case 'updated_date':
-						return a.issue.updatedDate.localeCompare(b.issue.updatedDate) * dir;
+						return a.issue.fields.updatedDate.localeCompare(b.issue.fields.updatedDate) * dir;
 				}
 			})
 	);
@@ -68,27 +68,27 @@
 	const groups = $derived.by(() => {
 		if (groupBy === 'sprint') {
 			const sprintIssues = Array.from(issues.byId.values()).filter(
-				(li) => li.issue.issueType === 'sprint'
+				(li) => li.issue.fields.issueType === 'sprint'
 			);
 			const definedGroups = sprintIssues.map((s) => ({
 				id: `sprint-${s.issue.id}`,
-				title: s.issue.title,
+				title: s.issue.fields.title,
 				match: (issue: import('$lib/types').Issue) =>
-					issue.relations.some((r) => r.id === s.issue.id) ||
-					s.issue.relations.some((r) => r.id === issue.id)
+					issue.fields.relations.some((r) => r.id === s.issue.id) ||
+					s.issue.fields.relations.some((r) => r.id === issue.id)
 			}));
 			return [...definedGroups, { id: 'unassigned', title: 'Sin Asignar', match: () => true }];
 		}
 		if (groupBy === 'epic') {
 			const epicIssues = Array.from(issues.byId.values()).filter(
-				(li) => li.issue.issueType === 'epic'
+				(li) => li.issue.fields.issueType === 'epic'
 			);
 			const definedGroups = epicIssues.map((e) => ({
 				id: `epic-${e.issue.id}`,
-				title: e.issue.title,
+				title: e.issue.fields.title,
 				match: (issue: import('$lib/types').Issue) =>
-					issue.relations.some((r) => r.id === e.issue.id) ||
-					e.issue.relations.some((r) => r.id === issue.id)
+					issue.fields.relations.some((r) => r.id === e.issue.id) ||
+					e.issue.fields.relations.some((r) => r.id === issue.id)
 			}));
 			return [...definedGroups, { id: 'unassigned', title: 'Sin Asignar', match: () => true }];
 		}
@@ -264,7 +264,7 @@
 							tabindex="0"
 							role="button"
 							data-row-id={li.issue.id}
-							aria-label={t('list.rowAria', { id: li.issue.id, title: li.issue.title })}
+							aria-label={t('list.rowAria', { id: li.issue.id, title: li.issue.fields.title })}
 							onclick={() => open(li.issue.id)}
 							onkeydown={(e) =>
 								onRowKeydown(
@@ -275,11 +275,11 @@
 							<td class="px-4 py-3 font-mono text-xs text-muted-foreground"
 								>{li.issue.id.toString().padStart(4, '0')}</td
 							>
-							<td class="min-w-[20rem] truncate px-4 py-3 font-medium">{li.issue.title}</td>
+							<td class="min-w-[20rem] truncate px-4 py-3 font-medium">{li.issue.fields.title}</td>
 							<td class="px-4 py-3"
 								><span
 									class="rounded bg-foreground/5 px-2 py-0.5 text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
-									>{li.issue.issueType}</span
+									>{li.issue.fields.issueType}</span
 								></td
 							>
 							<td class="px-4 py-3">
@@ -287,19 +287,19 @@
 									class="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-widest"
 									style="background-color: var(--status-color, var(--color-cb-muted)); color: #fff"
 								>
-									{li.issue.status}
+									{li.issue.fields.status}
 								</span>
 							</td>
-							<td class="px-4 py-3">{li.issue.assignee ?? '—'}</td>
+							<td class="px-4 py-3">{li.issue.fields.assignee ?? '—'}</td>
 							<td class="px-4 py-3">
-								{#each li.issue.labels as l (l)}
+								{#each li.issue.fields.labels as l (l)}
 									<span
 										class="mr-1 rounded border border-border px-1.5 py-0.5 text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
 										>{l}</span
 									>
 								{/each}
 							</td>
-							<td class="px-4 py-3 text-xs text-muted-foreground">{li.issue.updatedDate}</td>
+							<td class="px-4 py-3 text-xs text-muted-foreground">{li.issue.fields.updatedDate}</td>
 						</tr>
 					{/each}
 					{#if groupRows.length === 0 && (groupBy === 'none' || group.id !== 'unassigned')}

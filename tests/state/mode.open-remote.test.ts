@@ -88,9 +88,17 @@ describe('createModeStore — openRemote PAT hygiene (NFR-2, end-to-end)', () =>
 				readTextFile: vi.fn(async () => '[]'),
 				listDirectory: vi.fn(async () => []),
 				headSha: vi.fn(async () => 'pending' as remote.Sha),
-				exists: vi.fn(async () => false)
+				exists: vi.fn(async () => false),
+				blobShaFor: vi.fn(async () => null)
 			},
-			cacheKey: 'https://github.com/example/repo|main|pending' as remote.CacheKey
+			cacheKey: 'https://github.com/example/repo|main|pending' as remote.CacheKey,
+			parsed: {
+				providerId: 'github',
+				owner: 'example',
+				repo: 'repo',
+				baseUrl: 'https://api.github.com',
+				canonicalUrl: 'https://github.com/example/repo'
+			}
 		});
 		consoleInfoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined);
 		consoleDebugSpy = vi.spyOn(console, 'debug').mockImplementation(() => undefined);
@@ -129,7 +137,7 @@ describe('createModeStore — openRemote PAT hygiene (NFR-2, end-to-end)', () =>
 		expect(JSON.stringify(Object.keys(store))).not.toMatch(/pat|token/i);
 	});
 
-	it('sets hasRemoteCredentials=true and binds a read-only adapter after openRemote', async () => {
+	it('sets hasRemoteCredentials=true and binds a writable adapter after openRemote', async () => {
 		await store.openRemote(
 			{
 				url: 'https://github.com/example/repo' as remote.RepoUrl,
@@ -140,12 +148,15 @@ describe('createModeStore — openRemote PAT hygiene (NFR-2, end-to-end)', () =>
 		expect(store.hasRemoteCredentials).toBe(true);
 		expect(store.mode).toBe('remote');
 		expect(store.remoteAdapter).not.toBeNull();
-		// Read-only contract: the remote adapter does NOT implement writeTextFile.
-		// The TypeScript system enforces this; the runtime check below documents
-		// the contract so a future contributor cannot silently re-add it.
+		// Remote Edit Mode (FR-5): the bound adapter is writable — it
+		// fronts a read-only snapshot and queues mutations against the
+		// commit queue. The contract used to be "read-only"; see
+		// `docs/provider-strategy-migration.md` for the migration.
 		expect(
-			(store.remoteAdapter as unknown as { writeTextFile?: unknown }).writeTextFile
-		).toBeUndefined();
+			typeof (store.remoteAdapter as unknown as { writeTextFile?: unknown }).writeTextFile
+		).toBe('function');
+		// The commit queue is active and bound to the session.
+		expect(store.commitQueue.active).toBe(true);
 	});
 
 	it('signOut clears hasRemoteCredentials and unbinds the adapter', async () => {

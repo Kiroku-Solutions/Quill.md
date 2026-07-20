@@ -27,10 +27,7 @@
 		setStores
 	} from '$lib/state';
 	import { handleStore, LocalFsAdapter } from '$lib/adapters';
-	import type {
-		ReadOnlyDirectoryAdapter,
-		WritableDirectoryAdapter
-	} from '$lib/adapters/directory-adapter';
+	import type { WritableDirectoryAdapter } from '$lib/adapters/directory-adapter';
 	import { isFsaAvailable } from '$lib/adapters/feature-detect';
 
 	let { children } = $props();
@@ -72,20 +69,24 @@
 		}
 	});
 	// Adapter provider that resolves to the active adapter (local or
-	// remote). The return type is the union of `WritableDirectoryAdapter |
-	// ReadOnlyDirectoryAdapter | null` so the read-only remote adapter is
-	// not dishonestly cast to the writable shape. Local Mode returns the
-	// FSA-backed writable adapter; Remote Mode returns the
-	// provider-driven read-only adapter; on the home screen (no folder
-	// / no remote open) the provider returns `null` and the data stores
-	// stay in their 'idle' status.
-	const adapterProvider = (): WritableDirectoryAdapter | ReadOnlyDirectoryAdapter | null => {
+	// remote). Both Local Mode and Remote Mode now expose a writable
+	// adapter (`LocalFsAdapter` and `RemoteWritableAdapter` respectively),
+	// so the issues / config / templates stores read and write through
+	// the same uniform contract. Remote writes land as commits on the
+	// edit branch via the singleton commit queue. On the home screen
+	// (no folder / no remote open) the provider returns `null` and the
+	// data stores stay in their 'idle' status.
+	const adapterProvider = (): WritableDirectoryAdapter | null => {
 		return mode.localAdapter ?? mode.remoteAdapter ?? null;
 	};
 	const config = createConfigStore(adapterProvider);
 	const templates = createTemplatesStore(adapterProvider);
 	const issues = createIssuesStore(adapterProvider, { config, templates });
-	const editor = createEditorStore({ issues, config, templates });
+	// Pass the mode store's commit queue so the editor's per-save
+	// button bypasses the debounce in Remote Edit Mode (FR-16). The
+	// queue is a singleton on the mode store — passing it here is just
+	// an indirection, not a separate instance.
+	const editor = createEditorStore({ issues, config, templates, commitQueue: mode.commitQueue });
 	const filter = createFilterStore();
 	const view = createViewStore();
 	const theme = createThemeStore();

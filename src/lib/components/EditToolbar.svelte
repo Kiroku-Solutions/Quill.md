@@ -29,10 +29,14 @@
 	import Trash from '@lucide/svelte/icons/trash-2';
 	import NewIssueModal from './NewIssueModal.svelte';
 	import EmptyTrashModal from './EmptyTrashModal.svelte';
-	import { getStores, createCommitQueueStore } from '$lib/state';
+	import { getStores } from '$lib/state';
 
 	const stores = getStores();
-	const commitQueue = createCommitQueueStore();
+	// The commit queue is a singleton owned by the mode store
+	// (`ModeStore.commitQueue`). Lifecycle (`start` / `setSession` /
+	// `stop`) is driven by `openRemote` / `refreshRemote` / `signOut`.
+	// We just read it for the pending-depth badge and the conflict alert.
+	const commitQueue = stores.mode.commitQueue;
 
 	const isRemote = $derived(stores.mode.mode === 'remote');
 	const viewLabel = $derived(stores.view.view);
@@ -150,7 +154,7 @@
 			stores.editor.open(newId);
 		} catch (e) {
 			if (e instanceof DOMException && e.name === 'AbortError') return;
-			refreshError = t('localToolbar.importIssueFailed', { msg: (e as Error).message });
+			refreshError = t('editToolbar.importIssueFailed', { msg: (e as Error).message });
 		} finally {
 			importing = false;
 		}
@@ -175,7 +179,7 @@
 	data-testid="edit-toolbar"
 >
 	<Button variant="primary" size="sm" onclick={openNewIssue} data-testid="toolbar-new-issue">
-		{t('localToolbar.newIssue')}
+		{t('editToolbar.newIssue')}
 	</Button>
 	<Button
 		variant="secondary"
@@ -184,7 +188,7 @@
 		onclick={handleImport}
 		data-testid="toolbar-import-issue"
 	>
-		{t('localToolbar.importIssue')}
+		{t('editToolbar.importIssue')}
 	</Button>
 
 	<Button
@@ -237,7 +241,7 @@
 
 	<div class="ml-auto flex items-center gap-2">
 		{#if !isRemote}
-			<Tooltip text={t('localToolbar.trashAria', { n: trashCount })} position="bottom">
+			<Tooltip text={t('editToolbar.trashAria', { n: trashCount })} position="bottom">
 				<button
 					type="button"
 					class="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
@@ -245,9 +249,9 @@
 					data-testid="toolbar-trash"
 				>
 					<Trash class="h-4 w-4" aria-hidden="true" />
-					<span>{t('localToolbar.trashButton', { n: trashCount })}</span>
+					<span>{t('editToolbar.trashButton', { n: trashCount })}</span>
 					<span class="opacity-40">·</span>
-					<span>{t('localToolbar.trashEmptyLabel')}</span>
+					<span>{t('editToolbar.trashEmptyLabel')}</span>
 				</button>
 			</Tooltip>
 		{/if}
@@ -263,7 +267,7 @@
 		{#if isRemote}
 			<Button variant="ghost" size="sm" onclick={signOut} data-testid="toolbar-signout">
 				<LogOut class="mr-1 h-4 w-4" aria-hidden="true" />
-				{t('remoteToolbar.signOut')}
+				{t('editToolbar.signOut')}
 			</Button>
 		{/if}
 	</div>

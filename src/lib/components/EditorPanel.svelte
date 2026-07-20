@@ -1,17 +1,25 @@
 <!--
-	EditorPanel.svelte — the editor side drawer (sub-phase 6G).
+	EditorPanel.svelte — the editor side drawer (sub-phase 6G,
+	Remote Edit Mode cut-over).
 
 	Layout: header (id + title + close ×) → integrity warning →
+	conflict Alert (when the remote commit queue reports a failure) →
 	Tabs (Form / Write / Preview) → footer (Save / Discard / close).
 	ESC closes the panel while it is open. The active section lives
 	in local `$state`; `editor.patchSection` is the only write path.
 
-	Read-only guard: in Remote Mode the Save / Discard buttons are
-	disabled with tooltips (6F inheritance).
+	Remote Edit Mode (FR-5): the Save / Discard / Delete actions work
+	in both Local and Remote Mode. The Save button commits through the
+	same writable adapter as the issues store — Local Mode writes
+	through `LocalFsAdapter`, Remote Mode queues a write against the
+	commit queue via `RemoteWritableAdapter`. A conflict from the
+	remote commit queue surfaces inline as an Alert so the user does
+	not have to close the panel to learn the save failed.
 -->
 <script lang="ts">
 	import { getStores } from '$lib/state';
 	import { t } from '$lib/ui/strings';
+	import { isAnyRemoteError } from '$lib/adapters/feature-detect';
 	import Alert from '$lib/ui/Alert.svelte';
 	import Button from '$lib/ui/Button.svelte';
 	import IconButton from '$lib/ui/IconButton.svelte';
@@ -32,7 +40,9 @@
 
 	const active = $derived(editor.activeId !== null ? editor.draft : null);
 
-	const template = $derived(active ? (templates.byType.get(active.issue.issueType) ?? null) : null);
+	const template = $derived(
+		active ? (templates.byType.get(active.issue.fields.issueType) ?? null) : null
+	);
 
 	/** The header suppresses its own title input when the template declares one. */
 	const templateHasTitleField = $derived(
@@ -55,7 +65,15 @@
 
 	const sectionNav = $derived(sections.map((s) => ({ id: s.name, label: s.name })));
 
-	const isReadOnly = $derived(mode.mode === 'remote');
+	const isRemote = $derived(mode.mode === 'remote');
+	/**
+	 * The remote commit queue surfaces deferred conflicts as `lastError`.
+	 * Render an Alert inside the panel so the user does not have to
+	 * close the editor and look at the toolbar to learn the save
+	 * failed. The toolbar also renders the same error.
+	 */
+	const queueError = $derived(isRemote ? mode.commitQueue.lastError : null);
+	const isRemoteError = $derived(queueError !== null && isAnyRemoteError(queueError));
 
 	const tabList = $derived([
 		{ id: 'form' as TabId, label: t('editor.tabs.form') },
@@ -80,6 +98,14 @@
 	}
 	function close(): void {
 		editor.close();
+	}
+	async function pullToRefresh(): Promise<void> {
+		// Open the PAT prompt via a "soft" refresh: we re-trigger the
+		// toolbar's Refresh handler by navigating away and back, but the
+		// simpler path is to just show the alert and let the user click
+		// Refresh in the toolbar (which mounts the PAT prompt). Keep
+		// this stub for future expansion (e.g. an inline PAT input).
+		void close();
 	}
 
 	/** ESC closes the panel while it is open. */
@@ -108,12 +134,12 @@
 			<span class="font-mono text-xs opacity-60">{idBadge}</span>
 			{#if !templateHasTitleField}
 				<Input
-					value={active.issue.title}
+					value={active.issue.fields.title}
 					oninput={(e) => editor.patchField('title', (e.currentTarget as HTMLInputElement).value)}
 					class="flex-1"
 				/>
 			{:else}
-				<div class="flex-1 text-sm font-semibold">{active.issue.title}</div>
+				<div class="flex-1 text-sm font-semibold">{active.issue.fields.title}</div>
 			{/if}
 			<IconButton label={t('editor.closeAria')} onclick={close} data-testid="editor-panel-close">
 				<X class="h-4 w-4" aria-hidden="true" />
@@ -124,6 +150,17 @@
 			<div class="px-2 pt-2" data-testid="editor-panel-integrity-warning">
 				<Alert variant="warning">
 					{t('integrity.editorWarning')}
+				</Alert>
+			</div>
+		{/if}
+
+		{#if isRemoteError && queueError}
+			<div class="px-2 pt-2" data-testid="editor-panel-remote-conflict">
+				<Alert variant="error">
+					{queueError.message}
+					<Button variant="secondary" size="sm" class="ml-2" onclick={pullToRefresh}>
+						{t('common.refresh')}
+					</Button>
 				</Alert>
 			</div>
 		{/if}
@@ -190,50 +227,41 @@
 			class="flex items-center gap-3 border-t border-border bg-surface px-6 py-4"
 			data-testid="editor-panel-footer"
 		>
-			{#if isReadOnly}
-				<Tooltip text={t('editor.readOnlySaveTooltip')} position="top">
-					<Button variant="primary" size="sm" disabled>{t('common.save')}</Button>
-				</Tooltip>
-				<Tooltip text={t('editor.readOnlyDiscardTooltip')} position="top">
-					<Button variant="ghost" size="sm" disabled>{t('common.discard')}</Button>
-				</Tooltip>
-			{:else}
-				<Tooltip text={t('editor.deleteTooltip') ?? 'Delete this issue'} position="top">
-					<Button
-						variant="ghost"
-						size="sm"
-						class="text-error hover:bg-error/10 hover:text-error"
-						onclick={() => {
-							if (editor.activeId !== null) {
-								const id = editor.activeId;
-								editor.close();
-								void issues.remove(id);
-							}
-						}}
-						data-testid="editor-panel-delete"
-					>
-						{t('common.delete') ?? 'Delete'}
-					</Button>
-				</Tooltip>
-				<Button
-					variant="primary"
-					size="sm"
-					disabled={!canSave}
-					onclick={save}
-					data-testid="editor-panel-save"
-				>
-					{t('common.save')}
-				</Button>
+			<Tooltip text={t('editor.deleteTooltip') ?? 'Delete this issue'} position="top">
 				<Button
 					variant="ghost"
 					size="sm"
-					disabled={!canDiscard}
-					onclick={discard}
-					data-testid="editor-panel-discard"
+					class="text-error hover:bg-error/10 hover:text-error"
+					onclick={() => {
+						if (editor.activeId !== null) {
+							const id = editor.activeId;
+							editor.close();
+							void issues.remove(id);
+						}
+					}}
+					data-testid="editor-panel-delete"
 				>
-					{t('common.discard')}
+					{t('common.delete') ?? 'Delete'}
 				</Button>
-			{/if}
+			</Tooltip>
+			<Button
+				variant="primary"
+				size="sm"
+				disabled={!canSave}
+				onclick={save}
+				data-testid="editor-panel-save"
+			>
+				{t('common.save')}
+			</Button>
+			<Button
+				variant="ghost"
+				size="sm"
+				disabled={!canDiscard}
+				onclick={discard}
+				data-testid="editor-panel-discard"
+			>
+				{t('common.discard')}
+			</Button>
 
 			{#if editor.errors.length > 0}
 				<Tooltip

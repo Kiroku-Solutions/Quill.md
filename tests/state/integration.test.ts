@@ -63,9 +63,35 @@ const VALID_TASK = JSON.stringify({
 	sections: [{ id: 1, key: 'description', name: 'Description', obligatory: true }]
 });
 
-function seedIssue(overrides: Partial<Issue>): Issue {
-	return {
-		id: 1,
+function seedIssue(overrides: Record<string, unknown>): Issue {
+	const LEGACY_FIELDS = [
+		'title',
+		'author',
+		'creationDate',
+		'updatedDate',
+		'issueType',
+		'status',
+		'assignee',
+		'labels',
+		'relations',
+		'startDate',
+		'endDate',
+		'duration',
+		'sprintId',
+		'estimate'
+	] as const;
+	const legacy: Record<string, unknown> = {};
+	for (const k of LEGACY_FIELDS) {
+		if (k in overrides) {
+			legacy[k] = overrides[k];
+			delete overrides[k];
+		}
+	}
+	const overrideFields =
+		typeof overrides['fields'] === 'object' && overrides['fields'] !== null
+			? (overrides['fields'] as Record<string, unknown>)
+			: {};
+	const fields = {
 		title: 'Seed issue',
 		author: 'jane',
 		creationDate: '2026-01-15',
@@ -80,11 +106,26 @@ function seedIssue(overrides: Partial<Issue>): Issue {
 		duration: null,
 		sprintId: null,
 		estimate: null,
+		...legacy,
+		...overrideFields
+	} as Issue['fields'];
+	const overrideSections = Array.isArray(overrides['sections'])
+		? (overrides['sections'] as Issue['sections'])
+		: null;
+	const overrideCustomFields = overrides['customFields'];
+	delete overrides['sections'];
+	delete overrides['customFields'];
+	return {
+		id: 1,
+		...overrides,
+		fields,
 		integrityHash: null,
-		customFields: {},
-		sections: [{ name: 'Description', markdown: 'Initial.' }],
-		integrityWarning: false,
-		...overrides
+		customFields:
+			overrideCustomFields && typeof overrideCustomFields === 'object'
+				? (overrideCustomFields as Record<string, unknown> as Issue['customFields'])
+				: {},
+		sections: overrideSections ?? [{ name: 'Description', markdown: 'Initial description.' }],
+		integrityWarning: false
 	};
 }
 
@@ -164,7 +205,7 @@ describe('state layer integration — full CRUD journey', () => {
 		await issues.load();
 		expect(issues.status).toBe('ready');
 		expect(issues.issues).toHaveLength(1);
-		expect(issues.byId.get(1)?.issue.title).toBe('Original seed');
+		expect(issues.byId.get(1)?.issue.fields.title).toBe('Original seed');
 		expect(issues.integrityWarnings).toHaveLength(0);
 
 		// ── Create a new issue ──────────────────────────────────────────
@@ -182,7 +223,7 @@ describe('state layer integration — full CRUD journey', () => {
 		expect(editor.activeId).toBeNull();
 		editor.open(newId);
 		expect(editor.activeId).toBe(newId);
-		expect(editor.draft?.issue.title).toBe('Newly created');
+		expect(editor.draft?.issue.fields.title).toBe('Newly created');
 		expect(editor.isDirty).toBe(false);
 
 		editor.patchField('title', 'Edited title');
@@ -209,7 +250,7 @@ describe('state layer integration — full CRUD journey', () => {
 
 		const reloaded = issues2.byId.get(newId);
 		expect(reloaded).toBeDefined();
-		expect(reloaded?.issue.title).toBe('Edited title');
+		expect(reloaded?.issue.fields.title).toBe('Edited title');
 		expect(reloaded?.issue.customFields['severity']).toBe('critical');
 		expect(reloaded?.issue.sections.find((s) => s.name === 'Description')?.markdown).toBe(
 			'Patched body content.'
@@ -229,7 +270,7 @@ describe('state layer integration — full CRUD journey', () => {
 		expect(editor.isDirty).toBe(true);
 		editor.discard();
 		expect(editor.isDirty).toBe(false);
-		expect(editor.draft?.issue.title).toBe('Original seed');
+		expect(editor.draft?.issue.fields.title).toBe('Original seed');
 
 		// ── Close ───────────────────────────────────────────────────────
 		editor.close();

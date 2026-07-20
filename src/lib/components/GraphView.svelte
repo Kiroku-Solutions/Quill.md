@@ -14,12 +14,12 @@
 		const allIssues = Array.from(issues.byId.values());
 		const matchedIssues = allIssues.filter((li) => {
 			const f = filter.filter;
-			if (f.status && li.issue.status !== f.status) return false;
-			if (f.type && li.issue.issueType !== f.type) return false;
+			if (f.status && li.issue.fields.status !== f.status) return false;
+			if (f.type && li.issue.fields.issueType !== f.type) return false;
 			if (f.q) {
 				const needle = f.q.toLowerCase();
 				if (
-					!li.issue.title.toLowerCase().includes(needle) &&
+					!li.issue.fields.title.toLowerCase().includes(needle) &&
 					!li.issue.sections.some((s) => s.markdown.toLowerCase().includes(needle))
 				) {
 					return false;
@@ -34,14 +34,16 @@
 
 		if (hasActiveFilter) {
 			for (const li of matchedIssues) {
-				for (const rel of li.issue.relations) {
+				for (const rel of li.issue.fields.relations) {
 					const target = issues.byId.get(Number(rel.id));
 					if (target) filteredSet.add(target);
 				}
 			}
 			for (const li of allIssues) {
 				if (
-					li.issue.relations.some((r) => matchedIssues.some((m) => m.issue.id === Number(r.id)))
+					li.issue.fields.relations.some((r) =>
+						matchedIssues.some((m) => m.issue.id === Number(r.id))
+					)
 				) {
 					filteredSet.add(li);
 				}
@@ -55,27 +57,31 @@
 
 		let groupNodes: import('$lib/types').LoadedIssue[] = [];
 		if (groupBy === 'epic') {
-			groupNodes = Array.from(issues.byId.values()).filter((li) => li.issue.issueType === 'epic');
+			groupNodes = Array.from(issues.byId.values()).filter(
+				(li) => li.issue.fields.issueType === 'epic'
+			);
 		} else if (groupBy === 'sprint') {
-			groupNodes = Array.from(issues.byId.values()).filter((li) => li.issue.issueType === 'sprint');
+			groupNodes = Array.from(issues.byId.values()).filter(
+				(li) => li.issue.fields.issueType === 'sprint'
+			);
 		}
 
 		for (const li of filteredIssues) {
 			const issue = li.issue;
-			const tmpl = templates.byType.get(issue.issueType);
+			const tmpl = templates.byType.get(issue.fields.issueType);
 
 			let color: string | undefined = tmpl?.color || '#888888';
 			let groupId: string | undefined = undefined;
 
 			if (groupBy !== 'none') {
-				if (issue.issueType === groupBy) {
+				if (issue.fields.issueType === groupBy) {
 					groupId = String(issue.id);
 					color = undefined; // Auto-color by group
 				} else {
 					const relatedGroup = groupNodes.find(
 						(g) =>
-							issue.relations.some((r) => r.id === g.issue.id) ||
-							g.issue.relations.some((r) => r.id === issue.id)
+							issue.fields.relations.some((r) => r.id === g.issue.id) ||
+							g.issue.fields.relations.some((r) => r.id === issue.id)
 					);
 					if (relatedGroup) {
 						groupId = String(relatedGroup.issue.id);
@@ -89,12 +95,12 @@
 
 			nodes.push({
 				id: String(issue.id),
-				name: issue.title,
+				name: issue.fields.title,
 				color,
 				groupId
 			});
 
-			for (const rel of issue.relations) {
+			for (const rel of issue.fields.relations) {
 				const targetId = String(rel.id);
 				if (validNodeIds.has(targetId)) {
 					links.push({ source: String(issue.id), target: targetId, name: rel.type });

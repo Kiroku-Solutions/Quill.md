@@ -20,11 +20,41 @@ import { describe, expect, it } from 'vitest';
 import { canonicalForm, serializeIssue } from '$lib/services/serializer';
 import { parseIssueFile } from '$lib/services/parser';
 import { computeIntegrityHash, stripIntegrityHashLine } from '$lib/services/integrity';
-import type { Issue } from '$lib/types';
+import type { FrontmatterValue, Issue } from '$lib/types';
 
-function makeIssue(overrides: Partial<Issue> = {}): Issue {
-	return {
-		id: 42,
+/**
+ * Accepts both `{ fields: { title: 'X' } }` (new nested shape) and
+ * `{ title: 'X' }` (legacy flat shape) for back-compat.
+ */
+function makeIssue(overrides: Record<string, unknown> = {}): Issue {
+	const LEGACY_FIELDS = [
+		'title',
+		'author',
+		'creationDate',
+		'updatedDate',
+		'issueType',
+		'status',
+		'assignee',
+		'labels',
+		'relations',
+		'startDate',
+		'endDate',
+		'duration',
+		'sprintId',
+		'estimate'
+	] as const;
+	const legacy: Record<string, unknown> = {};
+	for (const k of LEGACY_FIELDS) {
+		if (k in overrides) {
+			legacy[k] = overrides[k];
+			delete overrides[k];
+		}
+	}
+	const overrideFields =
+		typeof overrides['fields'] === 'object' && overrides['fields'] !== null
+			? (overrides['fields'] as Record<string, unknown>)
+			: {};
+	const fields = {
 		title: 'Default title',
 		author: 'jane',
 		creationDate: '2026-06-25',
@@ -42,14 +72,30 @@ function makeIssue(overrides: Partial<Issue> = {}): Issue {
 		startDate: '2026-10-20',
 		endDate: null,
 		duration: 3,
+		...legacy,
+		...overrideFields
+	} as Issue['fields'];
+	const DEFAULT_SECTIONS: Issue['sections'] = [
+		{ name: 'Description', markdown: '# Login form\n\nBody of description.' },
+		{ name: 'Steps to reproduce', markdown: '1. Step one.\n2. Step two.' }
+	];
+	const overrideSections = Array.isArray(overrides['sections'])
+		? (overrides['sections'] as Issue['sections'])
+		: null;
+	delete overrides['sections'];
+	const overrideCustomFields = overrides['customFields'];
+	delete overrides['customFields'];
+	return {
+		id: 42,
+		...overrides,
+		fields,
 		integrityHash: null,
-		customFields: { severity: 'high', priority: 'p1' },
-		sections: [
-			{ name: 'Description', markdown: '# Login form\n\nBody of description.' },
-			{ name: 'Steps to reproduce', markdown: '1. Step one.\n2. Step two.' }
-		],
-		integrityWarning: false,
-		...overrides
+		customFields:
+			overrideCustomFields && typeof overrideCustomFields === 'object'
+				? (overrideCustomFields as Record<string, FrontmatterValue>)
+				: { severity: 'high', priority: 'p1' },
+		sections: overrideSections ?? DEFAULT_SECTIONS,
+		integrityWarning: false
 	};
 }
 
@@ -180,17 +226,17 @@ describe('serializeIssue — round-trip via parseIssueFile', () => {
 		const reloaded = await parseIssueFile(text, 'memory://round-trip');
 
 		expect(reloaded.issue.id).toBe(original.id);
-		expect(reloaded.issue.title).toBe(original.title);
-		expect(reloaded.issue.author).toBe(original.author);
-		expect(reloaded.issue.creationDate).toBe(original.creationDate);
-		expect(reloaded.issue.updatedDate).toBe(original.updatedDate);
-		expect(reloaded.issue.issueType).toBe(original.issueType);
-		expect(reloaded.issue.status).toBe(original.status);
-		expect(reloaded.issue.assignee).toBe(original.assignee);
-		expect(reloaded.issue.labels).toEqual(original.labels);
-		expect(reloaded.issue.relations).toEqual(original.relations);
-		expect(reloaded.issue.startDate).toBe(original.startDate);
-		expect(reloaded.issue.duration).toBe(original.duration);
+		expect(reloaded.issue.fields.title).toBe(original.fields.title);
+		expect(reloaded.issue.fields.author).toBe(original.fields.author);
+		expect(reloaded.issue.fields.creationDate).toBe(original.fields.creationDate);
+		expect(reloaded.issue.fields.updatedDate).toBe(original.fields.updatedDate);
+		expect(reloaded.issue.fields.issueType).toBe(original.fields.issueType);
+		expect(reloaded.issue.fields.status).toBe(original.fields.status);
+		expect(reloaded.issue.fields.assignee).toBe(original.fields.assignee);
+		expect(reloaded.issue.fields.labels).toEqual(original.fields.labels);
+		expect(reloaded.issue.fields.relations).toEqual(original.fields.relations);
+		expect(reloaded.issue.fields.startDate).toBe(original.fields.startDate);
+		expect(reloaded.issue.fields.duration).toBe(original.fields.duration);
 		expect(reloaded.issue.sections.map((s) => s.name)).toEqual(
 			original.sections.map((s) => s.name)
 		);

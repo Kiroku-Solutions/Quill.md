@@ -60,12 +60,13 @@ import { validateIssue, type ValidationError } from '../services/validator.ts';
 import type { ConfigStore } from './config.svelte.ts';
 import type { TemplatesStore } from './templates.svelte.ts';
 import type { IssuesStore } from './issues.svelte.ts';
+import type { CommitQueueStore } from './commit-queue.svelte.ts';
 
 /**
- * System frontmatter keys live on `Issue` directly; everything else is a
- * template-defined custom field. Derived from `FIELD_TO_YAML` so a new
- * system field added to the type layer is automatically picked up here
- * (no hand-maintained list to drift).
+ * System frontmatter keys live on `Issue.fields`; everything else is a
+ * template-defined custom field on `Issue.customFields`. Derived from
+ * `FIELD_TO_YAML` so a new system field added to the type layer is
+ * automatically picked up here (no hand-maintained list to drift).
  *
  * Note: `SYSTEM_FRONTMATTER_KEY_ORDER` (snake_case YAML keys) is the
  * on-disk equivalent. We use `FIELD_TO_YAML` keys here because the editor
@@ -119,6 +120,19 @@ export interface EditorStoreDeps {
 	readonly issues: IssuesStore;
 	readonly config: ConfigStore;
 	readonly templates: TemplatesStore;
+	/**
+	 * Optional commit queue (Remote Edit Mode only). When supplied, the
+	 * editor's `save()` bypasses the queue's debounce window so each
+	 * per-save click produces one commit on the edit branch with a
+	 * per-file message (FR-16). Kanban drags do not pass through here
+	 * — they call `issues.save()` directly, which enqueues but lets the
+	 * debounce coalesce multiple drags into one commit.
+	 *
+	 * Omit this dep in Local Mode (or in tests that don't exercise the
+	 * remote write path) — the editor will then behave exactly as
+	 * before, without any flush-after-save.
+	 */
+	readonly commitQueue?: CommitQueueStore;
 }
 
 /**
@@ -129,7 +143,7 @@ export interface EditorStoreDeps {
  * is no async bootstrap.
  */
 export function createEditorStore(deps: EditorStoreDeps): EditorStore {
-	const { issues } = deps;
+	const { issues, commitQueue } = deps;
 
 	let activeId = $state<number | null>(null);
 	let draft = $state.raw<LoadedIssue | null>(null);
@@ -166,7 +180,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 			// `undefined` here — clearing a system field is a different
 			// verb and the parser/serializer reject it.
 			if (value === undefined) return;
-			Object.assign(draft.issue, { [key]: value });
+			Object.assign(draft.issue.fields, { [key]: value });
 		} else {
 			if (value === undefined) {
 				delete draft.issue.customFields[key];
@@ -201,6 +215,19 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		// for `discard()` and flips the dirty flag.
 		issues.update(activeId, cloneIssueFields(draft.issue));
 		await issues.save(activeId);
+		// Remote Edit Mode (FR-16): bypass the commit queue's debounce
+		// so this per-save click produces one commit on the edit branch
+		// with a per-file message. The queue's `flushNow` never throws
+		// — conflicts surface as `commitQueue.lastError`, which the
+		// EditorPanel / EditToolbar render as an Alert. We do not gate
+		// the post-save UI refresh on flush success: the in-memory issue
+		// is already re-parsed and the overlay reflects the pending
+		// write, so the user sees a consistent view either way.
+		if (commitQueue && commitQueue.active && commitQueue.depth > 0) {
+			const refreshed = issues.byId.get(activeId);
+			const path = refreshed?.sourcePath ?? `issue ${String(activeId).padStart(4, '0')}`;
+			await commitQueue.flushNow(`chore(quill.md): update ${path}`);
+		}
 		// After a successful save, the issues store has re-parsed the
 		// file (with a fresh integrity hash). Re-clone into the draft
 		// so the editor's view is consistent with disk.
@@ -266,10 +293,11 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
  *
  * Driven by `FIELD_TO_YAML` as the single source of truth for system fields:
  * adding a new system field to `types/issue.ts` automatically flows through
- * this helper — no hand-maintained list to drift. `customFields` and
- * `sections` are not in `FIELD_TO_YAML` (they are not system fields per
- * ERS §6.1), so they are handled explicitly after the loop, along with
- * the FR-15 `integrityWarning` flag.
+ * this helper — no hand-maintained list to drift. `id` and `integrityHash`
+ * are special — they stay at the top level of `Issue` (they're identity /
+ * file-integrity, not frontmatter), so they go directly into `out`. All
+ * other system keys (title, author, status, …) live under `issue.fields`
+ * and are merged into a single nested `fields` sub-object in the patch.
  *
  * `customFields` is spread into a new map and `sections` is deep-cloned
  * element-by-element so the patch is a snapshot, not a live reference
@@ -277,9 +305,17 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
  */
 function cloneIssueFields(issue: Issue): Partial<Issue> {
 	const out: Record<string, unknown> = {};
+	const fieldsPatch: Record<string, unknown> = {};
 	for (const camel of Object.keys(FIELD_TO_YAML)) {
-		out[camel] = issue[camel as keyof Issue];
+		if (camel === 'id') {
+			out.id = issue.id;
+		} else if (camel === 'integrityHash') {
+			out.integrityHash = issue.integrityHash;
+		} else {
+			fieldsPatch[camel] = (issue.fields as Record<string, unknown>)[camel];
+		}
 	}
+	out.fields = fieldsPatch;
 	out.customFields = { ...issue.customFields };
 	out.sections = issue.sections.map((s) => ({ ...s }));
 	out.integrityWarning = issue.integrityWarning;

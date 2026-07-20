@@ -17,19 +17,19 @@
 	const allIssues = $derived(issues.issues.map((li) => li.issue));
 
 	// Grouping logic for Epics
-	const epics = $derived(allIssues.filter((i) => i.issueType === 'epic'));
+	const epics = $derived(allIssues.filter((i) => i.fields.issueType === 'epic'));
 	// Grouping logic for Use Cases
-	const useCases = $derived(allIssues.filter((i) => i.issueType === 'use-case'));
+	const useCases = $derived(allIssues.filter((i) => i.fields.issueType === 'use-case'));
 	// List of User Stories
-	const stories = $derived(allIssues.filter((i) => i.issueType === 'user-story'));
+	const stories = $derived(allIssues.filter((i) => i.fields.issueType === 'user-story'));
 
 	// Helper to find stories linked to an Epic
 	function getEpicStories(epicId: number) {
 		return stories.filter((story) => {
-			const linksToEpic = story.relations.some((r) => r.id === epicId);
+			const linksToEpic = story.fields.relations.some((r) => r.id === epicId);
 			const epicLinksToStory = epics
 				.find((e) => e.id === epicId)
-				?.relations.some((r) => r.id === story.id);
+				?.fields.relations.some((r) => r.id === story.id);
 			return linksToEpic || epicLinksToStory;
 		});
 	}
@@ -37,10 +37,10 @@
 	// Helper to find stories linked to a Use Case
 	function getUseCaseStories(useCaseId: number) {
 		return stories.filter((story) => {
-			const linksToUseCase = story.relations.some((r) => r.id === useCaseId);
+			const linksToUseCase = story.fields.relations.some((r) => r.id === useCaseId);
 			const useCaseLinksToStory = useCases
 				.find((uc) => uc.id === useCaseId)
-				?.relations.some((r) => r.id === story.id);
+				?.fields.relations.some((r) => r.id === story.id);
 			return linksToUseCase || useCaseLinksToStory;
 		});
 	}
@@ -49,13 +49,13 @@
 	const unparentedStories = $derived(
 		stories.filter((story) => {
 			const hasEpicParent = epics.some((epic) => {
-				const linksToEpic = story.relations.some((r) => r.id === epic.id);
-				const epicLinksToStory = epic.relations.some((r) => r.id === story.id);
+				const linksToEpic = story.fields.relations.some((r) => r.id === epic.id);
+				const epicLinksToStory = epic.fields.relations.some((r) => r.id === story.id);
 				return linksToEpic || epicLinksToStory;
 			});
 			const hasUseCaseParent = useCases.some((uc) => {
-				const linksToUseCase = story.relations.some((r) => r.id === uc.id);
-				const useCaseLinksToStory = uc.relations.some((r) => r.id === story.id);
+				const linksToUseCase = story.fields.relations.some((r) => r.id === uc.id);
+				const useCaseLinksToStory = uc.fields.relations.some((r) => r.id === story.id);
 				return linksToUseCase || useCaseLinksToStory;
 			});
 			return !hasEpicParent && !hasUseCaseParent;
@@ -111,10 +111,10 @@
 									<FolderOpen class="h-4 w-4" />
 								</span>
 								<h3 class="font-display font-semibold text-foreground">
-									#{epic.id} · {epic.title}
+									#{epic.id} · {epic.fields.title}
 								</h3>
 							</div>
-							<Badge variant="primary" size="sm">{epic.status}</Badge>
+							<Badge variant="primary" size="sm">{epic.fields.status}</Badge>
 						</div>
 
 						<!-- Stories List -->
@@ -136,7 +136,7 @@
 											<span class="shrink-0 text-xs font-semibold text-muted-foreground"
 												>#{story.id}</span
 											>
-											<span class="truncate text-sm text-foreground">{story.title}</span>
+											<span class="truncate text-sm text-foreground">{story.fields.title}</span>
 										</div>
 										<div class="flex items-center gap-3">
 											{#if story.customFields.story_points}
@@ -164,7 +164,7 @@
 											<span
 												class="rounded bg-success/15 px-2 py-0.5 text-xs font-semibold text-success"
 											>
-												{story.status}
+												{story.fields.status}
 											</span>
 											<ChevronRight class="h-4 w-4 text-muted-foreground/50" />
 										</div>
@@ -192,10 +192,10 @@
 									<FileText class="h-4 w-4" />
 								</span>
 								<h3 class="font-display font-semibold text-foreground">
-									#{uc.id} · {uc.title}
+									#{uc.id} · {uc.fields.title}
 								</h3>
 							</div>
-							<Badge variant="primary" size="sm">{uc.status}</Badge>
+							<Badge variant="primary" size="sm">{uc.fields.status}</Badge>
 						</div>
 
 						<!-- Stories List -->
@@ -217,7 +217,7 @@
 											<span class="shrink-0 text-xs font-semibold text-muted-foreground"
 												>#{story.id}</span
 											>
-											<span class="truncate text-sm text-foreground">{story.title}</span>
+											<span class="truncate text-sm text-foreground">{story.fields.title}</span>
 										</div>
 										<div class="flex items-center gap-3">
 											{#if story.customFields.story_points}
@@ -245,7 +245,7 @@
 											<span
 												class="rounded bg-success/15 px-2 py-0.5 text-xs font-semibold text-success"
 											>
-												{story.status}
+												{story.fields.status}
 											</span>
 											<ChevronRight class="h-4 w-4 text-muted-foreground/50" />
 										</div>
@@ -286,7 +286,7 @@
 									<span class="shrink-0 text-xs font-semibold text-muted-foreground"
 										>#{story.id}</span
 									>
-									<span class="truncate text-sm text-foreground">{story.title}</span>
+									<span class="truncate text-sm text-foreground">{story.fields.title}</span>
 								</div>
 								<div class="flex items-center gap-3">
 									{#if story.customFields.story_points}
@@ -313,7 +313,7 @@
 									<span
 										class="rounded bg-success/15 px-2 py-0.5 text-xs font-semibold text-success"
 									>
-										{story.status}
+										{story.fields.status}
 									</span>
 									<ChevronRight class="h-4 w-4 text-muted-foreground/50" />
 								</div>
