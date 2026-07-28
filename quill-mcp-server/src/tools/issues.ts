@@ -12,24 +12,32 @@ function getIssuesDir() {
 export async function listIssues() {
 	const issuesDir = getIssuesDir();
 	try {
-		const files = await fs.readdir(issuesDir);
 		const issues = [];
-		for (const file of files) {
-			if (!file.endsWith('.md')) continue;
-			const content = await fs.readFile(path.join(issuesDir, file), 'utf-8');
-			const match = content.match(/^---\n([\s\S]*?)\n---/);
-			if (match) {
-				try {
-					const frontmatter = yaml.load(match[1]) as Record<string, unknown>;
-					issues.push({
-						id: frontmatter.id,
-						title: frontmatter.title,
-						issueType: frontmatter.issueType,
-						status: frontmatter.status,
-						filename: file
-					});
-				} catch (e) {
-					// ignore parsing error
+		const dirs = [issuesDir, path.join(issuesDir, 'open'), path.join(issuesDir, 'closed')];
+		for (const dir of dirs) {
+			let files: string[] = [];
+			try {
+				files = await fs.readdir(dir);
+			} catch (e) {
+				continue;
+			}
+			for (const file of files) {
+				if (!file.endsWith('.md')) continue;
+				const content = await fs.readFile(path.join(dir, file), 'utf-8');
+				const match = content.match(/^---\n([\s\S]*?)\n---/);
+				if (match) {
+					try {
+						const frontmatter = yaml.load(match[1]) as Record<string, unknown>;
+						issues.push({
+							id: frontmatter.id,
+							title: frontmatter.title,
+							issueType: frontmatter.issueType,
+							status: frontmatter.status,
+							filename: file
+						});
+					} catch (e) {
+						// ignore parsing error
+					}
 				}
 			}
 		}
@@ -47,17 +55,29 @@ export async function listIssues() {
 export async function readIssue(issueId: string) {
 	const issuesDir = getIssuesDir();
 	try {
-		const files = await fs.readdir(issuesDir);
-		const file = files.find((f) => f.startsWith(`${issueId}-`) && f.endsWith('.md'));
-		if (!file) {
+		const dirs = [issuesDir, path.join(issuesDir, 'open'), path.join(issuesDir, 'closed')];
+		let foundContent: string | null = null;
+		for (const dir of dirs) {
+			let files: string[] = [];
+			try {
+				files = await fs.readdir(dir);
+			} catch (e) {
+				continue;
+			}
+			const file = files.find((f) => f.startsWith(`${issueId}-`) && f.endsWith('.md'));
+			if (file) {
+				foundContent = await fs.readFile(path.join(dir, file), 'utf-8');
+				break;
+			}
+		}
+		if (!foundContent) {
 			return {
 				content: [{ type: 'text' as const, text: `Issue ID ${issueId} not found` }],
 				isError: true
 			};
 		}
-		const content = await fs.readFile(path.join(issuesDir, file), 'utf-8');
 		return {
-			content: [{ type: 'text' as const, text: content }]
+			content: [{ type: 'text' as const, text: foundContent }]
 		};
 	} catch (error: any) {
 		return {
@@ -162,8 +182,29 @@ export async function createIssue(
 
 		const serialized = await serializeIssue(issue);
 		const filename = buildIssueFilename(issue.id, issue.title);
-		await fs.mkdir(issuesDir, { recursive: true });
-		await fs.writeFile(path.join(issuesDir, filename), serialized);
+
+		let category = 'open';
+		try {
+			const configContent = await fs.readFile(path.join(dir, '.quill.md', 'config.json'), 'utf-8');
+			const config = JSON.parse(configContent);
+			const st = config?.statuses?.find((s: any) => s.id === status);
+			if (st && (st.category === 'done' || st.category === 'cancelled')) {
+				category = 'closed';
+			}
+		} catch (e) {
+			if (
+				status === 'done' ||
+				status === 'closed' ||
+				status === 'cancelled' ||
+				status === 'rejected'
+			) {
+				category = 'closed';
+			}
+		}
+
+		const targetDir = path.join(issuesDir, category);
+		await fs.mkdir(targetDir, { recursive: true });
+		await fs.writeFile(path.join(targetDir, filename), serialized);
 
 		return {
 			content: [

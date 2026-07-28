@@ -68,7 +68,6 @@ export const es: Translations = {
 			kanban: 'Kanban',
 			gantt: 'Gantt',
 			graph: 'Grafo',
-			tree: 'Árbol',
 			backlog: 'Backlog',
 			sprint: 'Planificador Sprint'
 		},

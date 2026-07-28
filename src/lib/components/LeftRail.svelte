@@ -40,8 +40,7 @@
 		{ id: 'list', label: t('leftrail.view.list') },
 		{ id: 'kanban', label: t('leftrail.view.kanban') },
 		{ id: 'gantt', label: t('leftrail.view.gantt') },
-		{ id: 'graph', label: t('leftrail.view.graph') },
-		{ id: 'tree', label: t('leftrail.view.tree') }
+		{ id: 'graph', label: t('leftrail.view.graph') }
 	] as const);
 
 	const warningCount = $derived(stores.issues.integrityWarnings.length);
@@ -55,7 +54,7 @@
 	}
 
 	function onViewChange(id: string): void {
-		if (id === 'list' || id === 'kanban' || id === 'gantt' || id === 'graph' || id === 'tree') {
+		if (id === 'list' || id === 'kanban' || id === 'gantt' || id === 'graph') {
 			stores.view.setView(id as any);
 			closeMobileNav();
 		}

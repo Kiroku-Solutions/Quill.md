@@ -25,7 +25,7 @@ export async function createTemplate(templateJsonStr) {
 				} else if (t.color) {
 					usedColors.add(t.color.toLowerCase());
 				}
-			} catch {
+			} catch (e) {
 				// Ignore unparseable files
 			}
 		}

@@ -25,7 +25,7 @@ import {
 } from '$lib/services/issue-trash';
 import type { Issue } from '$lib/types';
 
-const ISSUE_PATH = '.quill.md/issues/0007-fix-login.md';
+const ISSUE_PATH = '.quill.md/issues/open/0007-fix-login.md';
 
 function makeIssue(
 	id = '7',
@@ -73,8 +73,8 @@ describe('moveIssueToTrash — issue source path', () => {
 	it('removes the file from the source location after the move', async () => {
 		await moveIssueToTrash(fs, makeIssue(), ISSUE_PATH, 1_700_000_000_000);
 		// The source path no longer exists; the only file under
-		// `.quill.md/issues/` is gone.
-		const issuesEntries = await fs.listDirectory('.quill.md/issues');
+		// `.quill.md/issues/open/` is gone.
+		const issuesEntries = await fs.listDirectory('.quill.md/issues/open');
 		expect(issuesEntries).toEqual([]);
 	});
 });

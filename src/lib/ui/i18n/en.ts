@@ -67,7 +67,6 @@ export const en = {
 			kanban: 'Kanban',
 			gantt: 'Gantt',
 			graph: 'Graph',
-			tree: 'Tree',
 			backlog: 'Backlog',
 			sprint: 'Sprint Planner'
 		},

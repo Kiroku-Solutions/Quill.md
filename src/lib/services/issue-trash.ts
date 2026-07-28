@@ -56,7 +56,11 @@ export async function moveIssueToTrash(
 	now: number = Date.now()
 ): Promise<string> {
 	const { parent } = splitPath(sourcePath);
-	if (parent === '.quill.md/issues') {
+	if (
+		parent === '.quill.md/issues' ||
+		parent === '.quill.md/issues/open' ||
+		parent === '.quill.md/issues/closed'
+	) {
 		const trashPath = trashedIssuePath(issue, now);
 		await adapter.moveFile(sourcePath, trashPath);
 		return trashPath;

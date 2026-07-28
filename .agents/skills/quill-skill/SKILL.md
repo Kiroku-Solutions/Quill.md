@@ -67,10 +67,11 @@ Always use strict Gherkin syntax in the `acceptance` section. Do not use generic
 
 **D. Relational Integrity**
 - Use the `relations` array to link issues. Do NOT use a `parentId` field.
-- Example: `relations: [{ type: "parent", id: 1 }]`
+- **CRITICAL**: Issue IDs are **UUID strings** (e.g. `"bfe0f1a7-c8cd-4902-9f64-54676ce9eaec"`), NOT sequential numbers. Always capture the UUID returned in the `create` response.
+- Example: `relations: [{ type: "parent", id: "<UUID-of-Epic>" }]`
 - Valid relation types: `parent`, `child`, `blocks`, `depends_on`, `relates_to`.
-- To nest Stories under an Epic, use `[{ type: "parent", id: <Epic_ID> }]`.
-- To link a Test Case to a Story, use `[{ type: "relates_to", id: <Story_ID> }]`.
+- To nest Stories under an Epic, use `[{ type: "parent", id: "<UUID-of-Epic>" }]`.
+- To link a Test Case to a Story, use `[{ type: "relates_to", id: "<UUID-of-Story>" }]`.
 
 **E. Diagrams and UML**
 - The project natively supports Mermaid.js for UML diagrams.
@@ -91,7 +92,7 @@ Whenever invoked for project planning, execute this exact Chain of Thought:
    - For each Epic, draft the User Stories.
 4. **Writing Phase**:
    - Invoke `quill_create_issue` serially. 
-   - *CRITICAL*: Capture the returned `ID` of the Epics so you can pass them as `{ type: "parent", id: <Epic_ID> }` to the subsequent User Stories.
+   - *CRITICAL*: The response contains the UUID string ID of the new issue (e.g. `"bfe0f1a7-c8cd-4902-9f64-54676ce9eaec"`). Capture it exactly and pass it as `{ type: "parent", id: "<UUID>" }` to the subsequent User Stories. Never use numbers.
 5. **Quality Assurance Phase**:
    - For the most critical (P0) stories, generate explicit Test Case issues and link them to the story using `{ type: "relates_to", id: <Story_ID> }`.
 

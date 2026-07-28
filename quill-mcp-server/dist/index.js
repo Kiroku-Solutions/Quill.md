@@ -25,7 +25,7 @@ server.tool(
 	'quill_read_issue',
 	'Reads the full content of a specific Quill.md issue.',
 	{
-		issueId: z.number().describe('The ID of the issue to read')
+		issueId: z.string().describe('The ID of the issue to read')
 	},
 	async ({ issueId }) => {
 		return await readIssue(issueId);
@@ -42,7 +42,7 @@ server.tool(
 			.record(z.string())
 			.describe('A dictionary mapping section names to their markdown content'),
 		relations: z
-			.array(z.object({ type: z.string(), id: z.number() }))
+			.array(z.object({ type: z.string(), id: z.string() }))
 			.optional()
 			.describe('Array of relations to other issues'),
 		customFields: z.record(z.any()).optional().describe('Optional dictionary for custom fields')
