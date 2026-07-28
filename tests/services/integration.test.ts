@@ -103,20 +103,22 @@ async function seedFixtures(
 async function renderFixtureIssue(id: number, title: string): Promise<string> {
 	const issue: Issue = {
 		id,
-		title,
-		author: 'jane',
-		creationDate: '2026-10-20',
-		updatedDate: '2026-10-20',
-		issueType: 'task',
-		status: 'open',
-		assignee: null,
-		labels: [],
-		relations: [],
-		startDate: null,
-		endDate: null,
-		duration: null,
-		sprintId: null,
-		estimate: null,
+		fields: {
+			title,
+			author: 'jane',
+			creationDate: '2026-10-20',
+			updatedDate: '2026-10-20',
+			issueType: 'task',
+			status: 'open',
+			assignee: null,
+			labels: [],
+			relations: [],
+			startDate: null,
+			endDate: null,
+			duration: null,
+			sprintId: null,
+			estimate: null
+		},
 		integrityHash: null,
 		customFields: {},
 		sections: [{ name: 'Description', markdown: `Body of ${title}.` }],
@@ -171,21 +173,23 @@ describe('integration — create → save → re-read', () => {
 		// 2. Compose a new issue from a template (task) + the loaded config.
 		const title = 'Add login screen';
 		const newIssue: Issue = {
-			sprintId: null,
-			estimate: null,
 			id: nextId,
-			title,
-			author: 'jane',
-			creationDate: '2026-10-22',
-			updatedDate: '2026-10-22',
-			issueType: 'task',
-			status: VALID_CONFIG.default_status,
-			assignee: null,
-			labels: ['frontend'],
-			relations: [],
-			startDate: null,
-			endDate: null,
-			duration: 2,
+			fields: {
+				sprintId: null,
+				estimate: null,
+				title,
+				author: 'jane',
+				creationDate: '2026-10-22',
+				updatedDate: '2026-10-22',
+				issueType: 'task',
+				status: VALID_CONFIG.default_status,
+				assignee: null,
+				labels: ['frontend'],
+				relations: [],
+				startDate: null,
+				endDate: null,
+				duration: 2
+			},
 			integrityHash: null,
 			customFields: { priority: 'p1' },
 			sections: [
@@ -197,7 +201,7 @@ describe('integration — create → save → re-read', () => {
 
 		// 3. Serialize and write through the adapter.
 		const serialized = await serializeIssue(newIssue);
-		const filename = buildIssueFilename(newIssue.id, newIssue.title);
+		const filename = buildIssueFilename(newIssue.id, newIssue.fields.title);
 		const fullPath = `.quill.md/issues/${filename}`;
 		await fs.writeTextFile(fullPath, serialized);
 
@@ -210,8 +214,8 @@ describe('integration — create → save → re-read', () => {
 
 		// 5. Re-parse the on-disk form to verify it round-trips.
 		const reparsed = await parseIssueFile(serialized, fullPath);
-		expect(reparsed.issue.title).toBe(title);
-		expect(reparsed.issue.labels).toEqual(['frontend']);
+		expect(reparsed.issue.fields.title).toBe(title);
+		expect(reparsed.issue.fields.labels).toEqual(['frontend']);
 		expect(reparsed.issue.customFields['priority']).toBe('p1');
 		expect(reparsed.issue.sections.map((s) => s.name)).toEqual([
 			'Description',
@@ -227,7 +231,7 @@ describe('integration — create → save → re-read', () => {
 		const issues = await loadIssues(fs);
 		expect(issues).toHaveLength(3);
 		expect(issues.map((li) => li.issue.id)).toEqual([1, 2, 3]);
-		expect(issues.map((li) => li.issue.title)).toEqual(['Issue 1', 'Issue 2', 'Issue 3']);
+		expect(issues.map((li) => li.issue.fields.title)).toEqual(['Issue 1', 'Issue 2', 'Issue 3']);
 	});
 
 	it('updates an existing issue in place and the change is picked up on reload', async () => {
@@ -239,9 +243,12 @@ describe('integration — create → save → re-read', () => {
 		// Mutate: change status to in_progress + add a label.
 		const updated: Issue = {
 			...original.issue,
-			status: 'in_progress',
-			updatedDate: '2026-10-23',
-			labels: ['security', 'frontend'],
+			fields: {
+				...original.issue.fields,
+				status: 'in_progress',
+				updatedDate: '2026-10-23',
+				labels: ['security', 'frontend']
+			},
 			integrityHash: null
 		};
 		await fs.writeTextFile(sourcePath, await serializeIssue(updated));
@@ -249,9 +256,9 @@ describe('integration — create → save → re-read', () => {
 		// Re-read.
 		const after = await loadIssues(fs);
 		expect(after).toHaveLength(1);
-		expect(after[0]?.issue.status).toBe('in_progress');
-		expect(after[0]?.issue.labels).toEqual(['security', 'frontend']);
-		expect(after[0]?.issue.updatedDate).toBe('2026-10-23');
+		expect(after[0]?.issue.fields.status).toBe('in_progress');
+		expect(after[0]?.issue.fields.labels).toEqual(['security', 'frontend']);
+		expect(after[0]?.issue.fields.updatedDate).toBe('2026-10-23');
 	});
 });
 
@@ -320,21 +327,23 @@ describe('integration — multi-template workflow', () => {
 		expect(bug).toBeDefined();
 
 		const taskIssue: Issue = {
-			sprintId: null,
-			estimate: null,
 			id: 1,
-			title: 'Implement login',
-			author: 'jane',
-			creationDate: '2026-10-22',
-			updatedDate: '2026-10-22',
-			issueType: 'task',
-			status: 'open',
-			assignee: 'jane',
-			labels: ['frontend'],
-			relations: [],
-			startDate: null,
-			endDate: null,
-			duration: 5,
+			fields: {
+				sprintId: null,
+				estimate: null,
+				title: 'Implement login',
+				author: 'jane',
+				creationDate: '2026-10-22',
+				updatedDate: '2026-10-22',
+				issueType: 'task',
+				status: 'open',
+				assignee: 'jane',
+				labels: ['frontend'],
+				relations: [],
+				startDate: null,
+				endDate: null,
+				duration: 5
+			},
 			integrityHash: null,
 			customFields: { priority: 'p1' },
 			sections: [{ name: 'Description', markdown: 'task body' }],
@@ -342,20 +351,22 @@ describe('integration — multi-template workflow', () => {
 		};
 		const bugIssue: Issue = {
 			id: 2,
-			title: 'Login crash',
-			author: 'jose',
-			creationDate: '2026-10-22',
-			updatedDate: '2026-10-22',
-			issueType: 'bug',
-			status: 'open',
-			assignee: null,
-			labels: ['security'],
-			relations: [],
-			startDate: null,
-			endDate: null,
-			duration: null,
-			sprintId: null,
-			estimate: null,
+			fields: {
+				title: 'Login crash',
+				author: 'jose',
+				creationDate: '2026-10-22',
+				updatedDate: '2026-10-22',
+				issueType: 'bug',
+				status: 'open',
+				assignee: null,
+				labels: ['security'],
+				relations: [],
+				startDate: null,
+				endDate: null,
+				duration: null,
+				sprintId: null,
+				estimate: null
+			},
 			integrityHash: null,
 			customFields: { severity: 'high' },
 			sections: [{ name: 'Description', markdown: 'bug body' }],
@@ -363,11 +374,11 @@ describe('integration — multi-template workflow', () => {
 		};
 
 		await fs.writeTextFile(
-			`.quill.md/issues/${buildIssueFilename(taskIssue.id, taskIssue.title)}`,
+			`.quill.md/issues/${buildIssueFilename(taskIssue.id, taskIssue.fields.title)}`,
 			await serializeIssue(taskIssue)
 		);
 		await fs.writeTextFile(
-			`.quill.md/issues/${buildIssueFilename(bugIssue.id, bugIssue.title)}`,
+			`.quill.md/issues/${buildIssueFilename(bugIssue.id, bugIssue.fields.title)}`,
 			await serializeIssue(bugIssue)
 		);
 
@@ -387,24 +398,26 @@ describe('integration — round-trip via serialize → write → read → parse'
 		await seedFixtures(fs);
 
 		const original: Issue = {
-			sprintId: null,
-			estimate: null,
 			id: 42,
-			title: 'Fix login redirect',
-			author: 'jane',
-			creationDate: '2026-10-20',
-			updatedDate: '2026-10-21',
-			issueType: 'bug',
-			status: 'in_progress',
-			assignee: 'jane',
-			labels: ['security', 'frontend'],
-			relations: [
-				{ type: 'blocks', id: 45 },
-				{ type: 'relates_to', id: 7 }
-			],
-			startDate: '2026-10-20',
-			endDate: '2026-10-25',
-			duration: 3,
+			fields: {
+				sprintId: null,
+				estimate: null,
+				title: 'Fix login redirect',
+				author: 'jane',
+				creationDate: '2026-10-20',
+				updatedDate: '2026-10-21',
+				issueType: 'bug',
+				status: 'in_progress',
+				assignee: 'jane',
+				labels: ['security', 'frontend'],
+				relations: [
+					{ type: 'blocks', id: 45 },
+					{ type: 'relates_to', id: 7 }
+				],
+				startDate: '2026-10-20',
+				endDate: '2026-10-25',
+				duration: 3
+			},
 			integrityHash: null,
 			customFields: { severity: 'high', priority: 'p1' },
 			sections: [
@@ -414,16 +427,16 @@ describe('integration — round-trip via serialize → write → read → parse'
 			integrityWarning: false
 		};
 
-		const path = `.quill.md/issues/${buildIssueFilename(original.id, original.title)}`;
+		const path = `.quill.md/issues/${buildIssueFilename(original.id, original.fields.title)}`;
 		await fs.writeTextFile(path, await serializeIssue(original));
 
 		const reloaded = await loadIssues(fs);
 		expect(reloaded).toHaveLength(1);
 		const li = reloaded[0]!;
 		expect(li.issue.id).toBe(original.id);
-		expect(li.issue.title).toBe(original.title);
-		expect(li.issue.assignee).toBe(original.assignee);
-		expect(li.issue.relations).toEqual(original.relations);
+		expect(li.issue.fields.title).toBe(original.fields.title);
+		expect(li.issue.fields.assignee).toBe(original.fields.assignee);
+		expect(li.issue.fields.relations).toEqual(original.fields.relations);
 		expect(li.issue.customFields).toEqual(original.customFields);
 		expect(li.issue.sections.map((s) => s.name)).toEqual(['Description', 'Steps to reproduce']);
 		expect(li.issue.integrityHash).toMatch(/^sha256:[a-f0-9]{64}$/);

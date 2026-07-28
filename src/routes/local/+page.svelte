@@ -1,14 +1,19 @@
 <!--
-	Local view (sub-phase 6E). The three-region chrome (TopBar +
-	LeftRail + main canvas) is in `AppShell.svelte`. The page itself
-	is a thin composition: the LocalToolbar above the active view
-	(List / Kanban / Gantt) — the view switcher lives in the LeftRail
-	(6C). The EditorPanel mounts at the end of the canvas; its
-	internal markup is a fixed-position aside that overlays the canvas.
+	Local view (sub-phase 6E → Remote Edit Mode cut-over). The
+	three-region chrome (TopBar + LeftRail + main canvas) is in
+	`AppShell.svelte`. The page itself is a thin composition: the
+	EditToolbar above the active view (List / Kanban / Gantt) — the
+	view switcher lives in the LeftRail (6C). The EditorPanel mounts
+	at the end of the canvas; its internal markup is a fixed-position
+	aside that overlays the canvas.
 
-	The inline new-title / new-type inputs and the createIssue flow
-	moved to the LocalToolbar in 6E; the toolbar opens a type-picker
-	modal instead.
+	After the Remote Edit Mode cut-over, the toolbar is the unified
+	`EditToolbar` for both Local and Remote modes. The toolbar branches
+	on `mode.mode === 'remote'` internally — Local mode shows the
+	trash affordance and skips the provider / branch pills; Remote
+	mode shows the provider / branch pills and the pending-write
+	badge. The toolbar file lives next to the layout; this page is
+	a thin composition.
 
 	The onMount guard ensures we redirect to `/` if the user lands on
 	the local route without an active folder (e.g. deep link with
@@ -29,7 +34,7 @@
 	import TreeView from '$lib/components/TreeView.svelte';
 	import EditorPanel from '$lib/components/EditorPanel.svelte';
 	import FilterUrlSync from '$lib/components/FilterUrlSync.svelte';
-	import LocalToolbar from '$lib/components/LocalToolbar.svelte';
+	import EditToolbar from '$lib/components/EditToolbar.svelte';
 
 	const stores = getStores();
 
@@ -44,7 +49,7 @@
 
 <div class="flex h-full flex-col">
 	<FilterUrlSync />
-	<LocalToolbar />
+	<EditToolbar />
 
 	<div class="flex-1 overflow-y-auto pb-12">
 		{#if stores.view.view === 'list'}

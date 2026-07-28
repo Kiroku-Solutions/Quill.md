@@ -72,7 +72,8 @@ describe('defaultConfig', () => {
 		expect(cfg.kanban.columns).toEqual(['open', 'in_progress', 'in_review', 'done']);
 		expect(cfg.gantt.group_by).toBe('issue_type');
 		expect(cfg.gantt.default_view).toBe('months');
-		expect(cfg.remote.cors_proxy).toBe('https://cors.isomorphic-git.org');
+		expect(cfg.remote.provider).toBe('github');
+		expect(cfg.remote.edit_branch).toBe('quill-md');
 	});
 
 	it('returns a fresh object on every call (no shared mutation)', () => {

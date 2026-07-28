@@ -17,6 +17,10 @@ export type AdapterErrorType =
 	| 'validation'
 	| 'remote-fetch'
 	| 'remote-auth'
+	| 'remote-conflict'
+	| 'remote-branch-missing'
+	| 'remote-commit-rejected'
+	| 'remote-unsupported-host'
 	| 'render';
 
 /**
@@ -115,5 +119,57 @@ export class RenderError extends AdapterError {
 
 	constructor(message: string, cause?: unknown) {
 		super(`Markdown render failed: ${message}`, { cause });
+	}
+}
+
+/**
+ * Optimistic-concurrency collision: the file at `path` was modified on the
+ * remote between the time we read it and the time we tried to write it.
+ * The local draft is preserved; the caller should re-fetch and retry.
+ */
+export class RemoteConflictError extends AdapterError {
+	readonly type = 'remote-conflict' as const;
+	readonly path: string;
+	readonly expectedSha?: string;
+
+	constructor(path: string, expectedSha?: string, cause?: unknown) {
+		super(`Remote changed at "${path}" (conflict). Pull to refresh, then retry.`, { cause });
+		this.path = path;
+		this.expectedSha = expectedSha;
+	}
+}
+
+/** The edit branch does not exist on the remote (and create-on-demand is off). */
+export class RemoteBranchMissingError extends AdapterError {
+	readonly type = 'remote-branch-missing' as const;
+	readonly branch: string;
+
+	constructor(branch: string, cause?: unknown) {
+		super(`Branch "${branch}" does not exist on the remote`, { cause });
+		this.branch = branch;
+	}
+}
+
+/** The provider rejected the commit (e.g. 422 on protected branch, 401 on bad PAT). */
+export class RemoteCommitRejectedError extends AdapterError {
+	readonly type = 'remote-commit-rejected' as const;
+	readonly status?: number;
+
+	constructor(message: string, options?: { status?: number; cause?: unknown }) {
+		super(message, { cause: options?.cause });
+		this.status = options?.status;
+	}
+}
+
+/** The URL host is not supported by any registered provider. */
+export class RemoteUnsupportedHostError extends AdapterError {
+	readonly type = 'remote-unsupported-host' as const;
+	readonly host: string;
+
+	constructor(host: string, cause?: unknown) {
+		super(`Unsupported repository host: ${host}. Pick a provider from the dropdown to continue.`, {
+			cause
+		});
+		this.host = host;
 	}
 }

@@ -1,4 +1,4 @@
-import type { Config, Issue, RelationType, Template } from '../types/index.ts';
+import type { Config, FrontmatterValue, Issue, RelationType, Template } from '../types/index.ts';
 import { RELATION_TYPES } from '../types/index.ts';
 
 const STRICT_RELATION_TYPES: ReadonlySet<RelationType> = new Set<RelationType>([
@@ -50,7 +50,7 @@ function detectCycles(issues: readonly Issue[]): Map<number, number[]> {
 	const adjacency = new Map<number, number[]>();
 	for (const issue of issues) {
 		const edges: number[] = [];
-		for (const rel of issue.relations) {
+		for (const rel of issue.fields.relations) {
 			if (!STRICT_RELATION_TYPES.has(rel.type)) continue;
 			if (!byId.has(rel.id)) continue; // dangling edges are reported separately
 			edges.push(rel.id);
@@ -100,49 +100,55 @@ function detectCycles(issues: readonly Issue[]): Map<number, number[]> {
 export function validateIssue(issue: Issue, ctx: ValidationContext): ValidationResult {
 	const errors: ValidationError[] = [];
 
-	const template = ctx.templates.find((t) => t.id === issue.issueType);
+	const template = ctx.templates.find((t) => t.id === issue.fields.issueType);
 	if (!template) {
-		pushError(errors, 'issue_type', `Unknown issue type: "${issue.issueType}"`);
+		pushError(errors, 'issue_type', `Unknown issue type: "${issue.fields.issueType}"`);
 	} else {
+		const allFields = {
+			...(issue.fields as unknown as Record<string, FrontmatterValue>),
+			...issue.customFields
+		};
+
 		for (const field of template.fields) {
 			if (!field.obligatory) continue;
-			const value = (issue.customFields as Record<string, unknown>)[field.key];
+			const value = allFields[field.key];
 			if (isEmptyValue(value)) {
 				pushError(errors, field.key, `${field.name} is required`);
 			}
 		}
 		for (const section of template.sections) {
 			if (!section.obligatory) continue;
-			const found = issue.sections.find((s) => s.name === section.name);
+			const found = issue.sections.find((s) => s.name === section.key);
 			if (!found || found.markdown.trim() === '') {
 				pushError(errors, section.key, `${section.name} is required`);
 			}
 		}
 	}
 
-	if (issue.title.trim() === '') {
+	if (issue.fields.title.trim() === '') {
 		pushError(errors, 'title', 'Title is required');
 	}
-	if (issue.creationDate.trim() === '') {
+	if (issue.fields.creationDate.trim() === '') {
 		pushError(errors, 'creation_date', 'Creation date is required');
 	}
-	if (issue.updatedDate.trim() === '') {
+	if (issue.fields.updatedDate.trim() === '') {
 		pushError(errors, 'updated_date', 'Updated date is required');
 	}
-	if (issue.author.trim() === '') {
+	if (issue.fields.author.trim() === '') {
 		pushError(errors, 'author', 'Author is required');
 	}
 	if (issue.id <= 0) {
 		pushError(errors, 'id', 'Id must be a positive integer');
 	}
 
-	if (!ctx.config.statuses.some((s) => s.id === issue.status)) {
-		pushError(errors, 'status', `Unknown status: "${issue.status}"`);
+	if (!ctx.config.statuses.some((s) => s.id === issue.fields.status)) {
+		pushError(errors, 'status', `Unknown status: "${issue.fields.status}"`);
 	}
 
+	// TODO: Optimize this to not be executed every time the validator is run
 	const ids = new Set(ctx.allIssues.map((i) => i.id));
-	for (let i = 0; i < issue.relations.length; i++) {
-		const rel = issue.relations[i];
+	for (let i = 0; i < issue.fields.relations.length; i++) {
+		const rel = issue.fields.relations[i];
 		if (!rel) continue;
 		if (!RELATION_TYPES.includes(rel.type)) {
 			pushError(errors, `relations[${i}].type`, `Unknown relation type: "${rel.type}"`);

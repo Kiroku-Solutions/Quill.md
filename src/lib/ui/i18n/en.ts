@@ -42,7 +42,7 @@ export const en = {
 
 	modeBadge: {
 		local: 'Local',
-		remote: 'Remote (read-only)',
+		remote: 'Remote',
 		setup: 'Setup',
 		home: 'Home',
 		firstRunSetup: 'First-run setup'
@@ -98,7 +98,8 @@ export const en = {
 			'Pick a folder on your machine to edit items stored under .quill.md/. Requires a Chromium-based browser.',
 		openLocalButton: 'Open local folder',
 		openRemoteTitle: 'Browse a remote repository',
-		openRemoteBody: 'Read-only access to items hosted on any Git provider.',
+		openRemoteBody:
+			'Edit items stored in any Git provider. Each save lands as a commit on the `quill-md` branch.',
 		openRemoteButton: 'Open remote',
 		remoteUrlPlaceholder: 'https://github.com/owner/repo',
 		remoteBranchPlaceholder: 'main',
@@ -132,25 +133,25 @@ export const en = {
 		}
 	},
 
-	localToolbar: {
+	editToolbar: {
 		newIssue: '+ New',
 		importIssue: 'Import .md',
 		importIssueFailed: (params: Params) => `Failed to import: ${params.msg}`,
 		refresh: '↻ Refresh',
-		refreshReadOnlyTooltip: 'Read-only — sign out to edit locally',
 		trashButton: (params: Params) => `Trash (${params.n})`,
 		trashEmptyLabel: 'Empty',
 		trashAria: (params: Params) =>
-			`Trash contains ${params.n} ${params.n === 1 ? 'file' : 'files'}. Click to empty.`
-	},
-
-	remoteToolbar: {
-		view: (params: Params) => `${params.n} ${params.n === 1 ? 'item' : 'items'} (read-only)`,
+			`Trash contains ${params.n} ${params.n === 1 ? 'file' : 'files'}. Click to empty.`,
+		pushNow: (params: Params) => `Push now (${params.n})`,
 		signOut: 'Sign out',
 		lastFetchedAria: (params: Params) => `Last fetched ${params.label}`,
 		lastFetched: (params: Params) => `Last fetched: ${params.label}`,
 		notYetFetched: 'Not yet fetched',
-		dismissErrorAria: 'Dismiss error'
+		dismissErrorAria: 'Dismiss error',
+		providerLabel: (params: Params) =>
+			params.provider === 'github' ? 'GitHub' : params.provider === 'gitlab' ? 'GitLab' : 'Remote',
+		editBranchLabel: (params: Params) => params.branch,
+		pullToRefresh: 'Pull to refresh'
 	},
 
 	refreshPatPrompt: {
@@ -191,8 +192,6 @@ export const en = {
 		sectionsAria: 'Sections',
 		noSectionsEdit: 'No sections to edit.',
 		noSectionsPreview: 'No sections to preview.',
-		readOnlySaveTooltip: 'Read-only — open locally to save',
-		readOnlyDiscardTooltip: 'Read-only — open locally to discard',
 		deleteTooltip: 'Move to trash',
 		unsaved: 'Unsaved changes',
 		footerClose: 'Close'
@@ -274,7 +273,6 @@ export const en = {
 
 	kanban: {
 		cardAria: (params: Params) => `Item ${params.id}: ${params.title} in column ${params.col}`,
-		readOnlyTooltip: 'Read-only — open this item locally to change its status',
 		pickedUp: (params: Params) =>
 			`Picked up item ${params.id}. Use arrow keys to move, Space or Enter to drop, Escape to cancel.`,
 		dropped: (params: Params) => `Dropped item ${params.id} in column ${params.col}`,

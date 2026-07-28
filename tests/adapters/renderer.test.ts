@@ -14,9 +14,15 @@
  *  - Error paths: empty output for non-empty input is a RenderError
  */
 
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { JSDOM } from 'jsdom';
-import { __resetPurifierForTests, renderMarkdown, renderSafeHtml } from '$lib/adapters/renderer';
+import { marked } from 'marked';
+import {
+	__getPurifierForTests,
+	__resetPurifierForTests,
+	renderMarkdown,
+	renderSafeHtml
+} from '$lib/adapters/renderer';
 import { RenderError } from '$lib/adapters/errors';
 
 let originalWindow: unknown;
@@ -151,9 +157,11 @@ describe('renderMarkdown — error paths', () => {
 	});
 
 	it('throws RenderError if marked itself throws', () => {
-		// marked's parser is robust; the throw arm is defensive. We just
-		// assert the happy path is intact.
-		expect(() => renderMarkdown('hello')).not.toThrow();
+		const spy = vi.spyOn(marked, 'parse').mockImplementationOnce(() => {
+			throw new Error('boom');
+		});
+		expect(() => renderMarkdown('hello')).toThrow(RenderError);
+		expect(spy).toHaveBeenCalledTimes(1);
 	});
 });
 
@@ -195,11 +203,16 @@ describe('renderSafeHtml', () => {
 	});
 
 	it('throws RenderError if sanitisation throws', () => {
-		// No easy way to make DOMPurify throw; the catch arm is reached
-		// only by the `if (err) reject(err)` of the underlying library.
-		// We assert the success path; the throw path is covered by
-		// the integration via real-world misuse.
-		expect(typeof renderSafeHtml('ok')).toBe('string');
+		const sanitizer = __getPurifierForTests().sanitize;
+		const spy = vi.spyOn(__getPurifierForTests(), 'sanitize').mockImplementation(() => {
+			throw new Error('boom');
+		});
+		try {
+			expect(() => renderSafeHtml('ok')).toThrow(RenderError);
+		} finally {
+			spy.mockRestore();
+			void sanitizer;
+		}
 	});
 });
 

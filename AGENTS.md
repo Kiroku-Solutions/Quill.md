@@ -1,6 +1,6 @@
 # AGENTS.md
 
-quill\.md is a SvelteKit \+ Svelte 5 client-side web app for managing repository-stored issues. Full spec: `docs/ers.md` (skim it before making scope changes — it defines Local Edit Mode, Remote Read-Only Mode via `isomorphic-git`, three views, and the `.quill.md/` config tree).
+quill\.md is a SvelteKit \+ Svelte 5 client-side web app for managing repository-stored issues. Full spec: `docs/ers.md` (skim it before making scope changes — it defines Local Edit Mode, Remote Edit Mode via provider REST Strategies, three views, and the `.quill.md/` config tree). Migration history: `docs/provider-strategy-migration.md` (isomorphic-git → Strategy pattern) and `docs/octokit-migration.md` (hand-rolled GitHub REST → `@octokit/rest`).
 
 ## Stack
 
@@ -9,6 +9,7 @@ quill\.md is a SvelteKit \+ Svelte 5 client-side web app for managing repository
 - Tailwind CSS 4 — **CSS-first config** (no `tailwind.config.*`); stylesheet is `src/routes/layout.css`
 - Vite 8, Vitest 4, ESLint 10 (flat config), Prettier 3
 - Package manager: **pnpm** (`pnpm-lock.yaml`). `.npmrc` has `engine-strict=true` — Node must satisfy the engines range or install will fail.
+- Remote Git transport: `@octokit/rest` + `@octokit/plugin-throttling` + `@octokit/plugin-retry` (GitHub provider only; GitLab provider is still hand-rolled — see `docs/octokit-migration.md` §7 follow-ups).
 
 ## Commands
 
@@ -45,6 +46,8 @@ Runes are mandatory outside `node_modules`. Use `$props()`, `$state()`, `$derive
 Prettier (`pnpm format`): **tabs**, **single quotes**, **no trailing comma**, **print width 100**. Ignores `pnpm-lock.yaml` (and other lockfiles) plus `/static/`.
 
 ESLint flat config disables `no-undef` (TypeScript handles it) and runs `eslint-config-prettier` last so Prettier owns formatting. Do not add style rules to ESLint.
+
+All code, including comments, should be written in English. No literal user-facing strings are written in the code, but rather referenced using t(key) as specified in `/src/lib/ui/strings.ts`.
 
 ## Architecture notes that aren't obvious
 

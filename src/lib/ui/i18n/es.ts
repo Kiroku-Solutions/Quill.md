@@ -43,7 +43,7 @@ export const es: Translations = {
 
 	modeBadge: {
 		local: 'Local',
-		remote: 'Remoto (solo lectura)',
+		remote: 'Remoto',
 		setup: 'Configuración',
 		home: 'Inicio',
 		firstRunSetup: 'Configuración inicial'
@@ -99,7 +99,8 @@ export const es: Translations = {
 			'Elige una carpeta en tu máquina para editar elementos guardados en .quill.md/. Requiere un navegador basado en Chromium.',
 		openLocalButton: 'Abrir carpeta local',
 		openRemoteTitle: 'Explorar un repositorio remoto',
-		openRemoteBody: 'Acceso de solo lectura a elementos alojados en cualquier proveedor de Git.',
+		openRemoteBody:
+			'Edita elementos almacenados en cualquier proveedor de Git. Cada guardado se materializa como un commit en la rama `quill-md`.',
 		openRemoteButton: 'Abrir remoto',
 		remoteUrlPlaceholder: 'https://github.com/owner/repo',
 		remoteBranchPlaceholder: 'main',
@@ -132,25 +133,29 @@ export const es: Translations = {
 		}
 	},
 
-	localToolbar: {
+	editToolbar: {
 		newIssue: '+ Nuevo',
 		importIssue: 'Importar .md',
 		importIssueFailed: (params: Params) => `Error al importar: ${params.msg}`,
 		refresh: '↻ Refrescar',
-		refreshReadOnlyTooltip: 'Solo lectura — cierra sesión para editar localmente',
 		trashButton: (params: Params) => `Papelera (${params.n})`,
 		trashEmptyLabel: 'Vacía',
 		trashAria: (params: Params) =>
-			`La papelera contiene ${params.n} archivo${params.n === 1 ? '' : 's'}. Clic para vaciar.`
-	},
-
-	remoteToolbar: {
-		view: (params: Params) => `${params.n} elemento${params.n === 1 ? '' : 's'} (solo lectura)`,
+			`La papelera contiene ${params.n} archivo${params.n === 1 ? '' : 's'}. Clic para vaciar.`,
+		pushNow: (params: Params) => `Publicar ahora (${params.n})`,
 		signOut: 'Cerrar sesión',
 		lastFetchedAria: (params: Params) => `Última sincronización ${params.label}`,
 		lastFetched: (params: Params) => `Última sincronización: ${params.label}`,
 		notYetFetched: 'No sincronizado aún',
-		dismissErrorAria: 'Ocultar error'
+		dismissErrorAria: 'Ocultar error',
+		providerLabel: (params: Params) =>
+			params.provider === 'github'
+				? 'GitHub'
+				: params.provider === 'gitlab'
+					? 'GitLab'
+					: ('Remoto' as 'Remote'),
+		editBranchLabel: (params: Params) => params.branch,
+		pullToRefresh: 'Re-sincronizar'
 	},
 
 	refreshPatPrompt: {
@@ -191,8 +196,6 @@ export const es: Translations = {
 		sectionsAria: 'Secciones',
 		noSectionsEdit: 'No hay secciones para editar.',
 		noSectionsPreview: 'No hay secciones para previsualizar.',
-		readOnlySaveTooltip: 'Solo lectura — abre localmente para guardar',
-		readOnlyDiscardTooltip: 'Solo lectura — abre localmente para descartar',
 		deleteTooltip: 'Mover a papelera',
 		unsaved: 'Cambios sin guardar',
 		footerClose: 'Cerrar'
@@ -276,7 +279,6 @@ export const es: Translations = {
 
 	kanban: {
 		cardAria: (params: Params) => `Elemento ${params.id}: ${params.title} en columna ${params.col}`,
-		readOnlyTooltip: 'Solo lectura — abre este elemento localmente para cambiar su estado',
 		pickedUp: (params: Params) =>
 			`Elemento ${params.id} recogido. Usa las flechas para mover, Espacio o Enter para soltar, Escape para cancelar.`,
 		dropped: (params: Params) => `Elemento ${params.id} soltado en columna ${params.col}`,

@@ -44,7 +44,7 @@
 			d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z"
 		/>
 	</svg>
-	<h2 class="text-xl font-display text-foreground mt-2">{title}</h2>
+	<h2 class="mt-2 font-display text-xl text-foreground">{title}</h2>
 	{#if body}
 		<p class="max-w-md text-base text-muted-foreground">{body}</p>
 	{/if}

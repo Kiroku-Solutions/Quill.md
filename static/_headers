@@ -33,14 +33,12 @@
 #  - `img-src 'self' data: blob:` — Markdown rendering and
 #    inline image previews use `data:` URIs (favicons, embedded
 #    SVGs) and `blob:` (DOMPurify image sinks).
-#  - `connect-src 'self' https://cors.isomorphic-git.org
-#     https://*.github.com https://*.gitlab.com` — Remote Mode's
-#    CORS proxy plus the Git provider HTTP transport. The
-#    wildcard host entries are non-negotiable per the audit:
-#    `modeStore.openRemote()` POSTs to whatever the user typed,
-#    which is always `*.github.com` or `*.gitlab.com` for the
-#    supported providers. `self` is required for SvelteKit's
-#    data fetching.
+#  - `connect-src 'self' https://api.github.com https://gitlab.com
+#     https://*.githubusercontent.com` — Remote Mode's provider
+#    REST endpoints (GitHub + GitLab ship permissive CORS, so no
+#    proxy is needed). `*.githubusercontent.com` is included for
+#    raw file downloads. Self-hosted GitLab / GitHub Enterprise
+#    users need to extend this list with their instance host.
 #  - `object-src 'none'` — defence-in-depth against `<object>` /
 #    `<embed>` (Flash is dead, but the directive costs nothing).
 #  - `base-uri 'none'` — no `<base>` injection. The brief's v0
@@ -87,7 +85,7 @@
 	Cross-Origin-Opener-Policy: same-origin
 	Cross-Origin-Embedder-Policy: require-corp
 	Cross-Origin-Resource-Policy: same-origin
-	Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'nonce-__CSP_NONCE__'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://cors.isomorphic-git.org https://*.github.com https://*.gitlab.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';
+	Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'nonce-__CSP_NONCE__'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://api.github.com https://gitlab.com https://*.githubusercontent.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';
 
 /_app/immutable/*
 	Cache-Control: public, max-age=31536000, immutable

@@ -30,8 +30,28 @@ export interface GanttConfig {
 	default_view: string;
 }
 
+/**
+ * Remote-mode configuration. v0 required a `cors_proxy` field because the
+ * isomorphic-git transport went through a CORS proxy. The provider
+ * REST APIs ship permissive CORS, so the field is now optional and
+ * legacy values are ignored.
+ *
+ * v1 additions (FR-5/FR-16/FR-17):
+ *  - `provider`: explicit provider id ('github' or 'gitlab') when the user
+ *    wants to override URL-based auto-detection.
+ *  - `edit_branch`: branch the app commits to (default `quill-md`).
+ *  - `custom_base_url`: self-hosted instances — base URL for the API.
+ *  - `commit_author_name` / `commit_author_email`: optional overrides for
+ *    the commit author identity (otherwise derived from the provider's
+ *    authenticated user).
+ */
 export interface RemoteConfig {
-	cors_proxy: string;
+	cors_proxy?: string;
+	provider?: 'github' | 'gitlab';
+	edit_branch?: string;
+	custom_base_url?: string;
+	commit_author_name?: string;
+	commit_author_email?: string;
 }
 
 export interface Config {

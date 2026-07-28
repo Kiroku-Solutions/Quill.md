@@ -71,9 +71,43 @@ const VALID_TASK = JSON.stringify({
 	sections: []
 });
 
-function makeIssue(overrides: Partial<Issue> = {}): Issue {
-	return {
-		id: 1,
+/**
+ * The override parameter accepts BOTH the new nested shape
+ * (`{ fields: { title: 'X' } }`) and the legacy flat shape
+ * (`{ title: 'X' }`) for back-compat with tests written against the
+ * pre-nesting interface. Legacy system keys at the top level are
+ * routed to `issue.fields.<key>`. This is purely a test-side concern;
+ * the production Issue type requires the nested shape.
+ */
+function makeIssue(overrides: Record<string, unknown> = {}): Issue {
+	const LEGACY_FIELDS = [
+		'title',
+		'author',
+		'creationDate',
+		'updatedDate',
+		'issueType',
+		'status',
+		'assignee',
+		'labels',
+		'relations',
+		'startDate',
+		'endDate',
+		'duration',
+		'sprintId',
+		'estimate'
+	] as const;
+	const legacy: Record<string, unknown> = {};
+	for (const k of LEGACY_FIELDS) {
+		if (k in overrides) {
+			legacy[k] = overrides[k];
+			delete overrides[k];
+		}
+	}
+	const overrideFields =
+		typeof overrides['fields'] === 'object' && overrides['fields'] !== null
+			? (overrides['fields'] as Record<string, unknown>)
+			: {};
+	const fields = {
 		title: 'First issue',
 		author: 'jane',
 		creationDate: '2026-01-15',
@@ -88,11 +122,26 @@ function makeIssue(overrides: Partial<Issue> = {}): Issue {
 		duration: null,
 		sprintId: null,
 		estimate: null,
+		...legacy,
+		...overrideFields
+	} as Issue['fields'];
+	const overrideSections = Array.isArray(overrides['sections'])
+		? (overrides['sections'] as Issue['sections'])
+		: null;
+	const overrideCustomFields = overrides['customFields'];
+	delete overrides['sections'];
+	delete overrides['customFields'];
+	return {
+		id: 1,
+		...overrides,
+		fields,
 		integrityHash: null,
-		customFields: {},
-		sections: [{ name: 'Description', markdown: 'Initial description.' }],
-		integrityWarning: false,
-		...overrides
+		customFields:
+			overrideCustomFields && typeof overrideCustomFields === 'object'
+				? (overrideCustomFields as Record<string, unknown> as Issue['customFields'])
+				: {},
+		sections: overrideSections ?? [{ name: 'Description', markdown: 'Initial description.' }],
+		integrityWarning: false
 	};
 }
 
@@ -140,8 +189,8 @@ describe('createIssuesStore — load happy path', () => {
 		expect(issues.status).toBe('ready');
 		expect(issues.issues).toHaveLength(2);
 		expect(issues.byId.size).toBe(2);
-		expect(issues.byId.get(1)?.issue.title).toBe('Alpha');
-		expect(issues.byId.get(2)?.issue.title).toBe('Beta');
+		expect(issues.byId.get(1)?.issue.fields.title).toBe('Alpha');
+		expect(issues.byId.get(2)?.issue.fields.title).toBe('Beta');
 		expect(issues.integrityWarnings).toHaveLength(0);
 	});
 });
@@ -216,7 +265,7 @@ describe('createIssuesStore — update', () => {
 
 		const after = fs.snapshot().files['.quill.md/issues/0001-original.md'];
 		expect(after).toBe(before);
-		expect(issues.issues[0]?.issue.title).toBe('Renamed');
+		expect(issues.issues[0]?.issue.fields.title).toBe('Renamed');
 	});
 });
 
@@ -248,7 +297,7 @@ describe('createIssuesStore — save round-trip', () => {
 		await issues2.load();
 
 		const refreshed = issues2.byId.get(1);
-		expect(refreshed?.issue.title).toBe('After');
+		expect(refreshed?.issue.fields.title).toBe('After');
 		expect(refreshed?.issue.integrityWarning).toBe(false);
 	});
 });
@@ -435,7 +484,7 @@ describe('createIssuesStore — load supersede', () => {
 
 		expect(issues.status).toBe('ready');
 		expect(issues.issues).toHaveLength(2);
-		expect(issues.issues.map((li) => li.issue.title).sort()).toEqual(['B', 'C']);
+		expect(issues.issues.map((li) => li.issue.fields.title).sort()).toEqual(['B', 'C']);
 	});
 });
 
@@ -537,13 +586,13 @@ describe('createIssuesStore — discard reverts in-memory state', () => {
 		const originalSnapshot = issues.byId.get(1)?.issue;
 
 		issues.update(1, { title: 'Edited', customFields: { severity: 'critical' } });
-		expect(issues.byId.get(1)?.issue.title).toBe('Edited');
+		expect(issues.byId.get(1)?.issue.fields.title).toBe('Edited');
 		expect(issues.byId.get(1)?.issue.customFields['severity']).toBe('critical');
 
 		issues.discard(1);
 
 		const after = issues.byId.get(1)?.issue;
-		expect(after?.title).toBe(originalSnapshot?.title);
+		expect(after?.fields.title).toBe(originalSnapshot?.fields.title);
 		expect(after?.customFields).toEqual(originalSnapshot?.customFields);
 		expect(issues.dirty.has(1)).toBe(false);
 	});
@@ -596,8 +645,8 @@ describe('createIssuesStore — concurrent save on different ids', () => {
 		// Both should be on disk with the new titles.
 		const reloaded = await makeStores(fs);
 		await reloaded.issues.load();
-		expect(reloaded.issues.byId.get(1)?.issue.title).toBe('One edited');
-		expect(reloaded.issues.byId.get(2)?.issue.title).toBe('Two edited');
+		expect(reloaded.issues.byId.get(1)?.issue.fields.title).toBe('One edited');
+		expect(reloaded.issues.byId.get(2)?.issue.fields.title).toBe('Two edited');
 		expect(order).toEqual([1, 2]);
 	});
 });

@@ -23,12 +23,6 @@
 	"engines": {
 		"node": ">=20"
 	},
-	"pnpm": {
-		"overrides": {
-			"cookie": "^0.7.0",
-			"js-yaml": "^4.2.0"
-		}
-	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
 		"@sveltejs/adapter-static": "^3.0.10",
@@ -63,14 +57,15 @@
 	},
 	"dependencies": {
 		"3d-force-graph": "^1.80.0",
-		"@isomorphic-git/lightning-fs": "^4.6.2",
 		"@lucide/svelte": "^1.21.0",
+		"@octokit/plugin-retry": "^8.1.0",
+		"@octokit/plugin-throttling": "^11.0.3",
+		"@octokit/request-error": "^7.1.0",
+		"@octokit/rest": "^22.0.1",
 		"async-lock": "^1.4.1",
-		"buffer": "^6.0.3",
 		"dompurify": "^3.4.11",
 		"force-graph": "^1.51.4",
 		"idb": "^8.0.3",
-		"isomorphic-git": "^1.38.5",
 		"js-yaml": "^4.2.0",
 		"marked": "^18.0.5",
 		"mermaid": "^11.16.0"

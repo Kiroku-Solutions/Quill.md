@@ -16,13 +16,7 @@ interface ShowDirectoryPickerOptions {
 	readonly id?: string;
 	readonly mode?: 'read' | 'readwrite';
 	readonly startIn?:
-		| FileSystemHandle
-		| 'desktop'
-		| 'documents'
-		| 'downloads'
-		| 'music'
-		| 'pictures'
-		| 'videos';
+		FileSystemHandle | 'desktop' | 'documents' | 'downloads' | 'music' | 'pictures' | 'videos';
 }
 
 /** Result of `window.showDirectoryPicker()`. */

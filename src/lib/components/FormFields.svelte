@@ -20,7 +20,7 @@
 	const { editor, issues, templates, config } = getStores();
 
 	const template = $derived(
-		editor.draft ? (templates.byType.get(editor.draft.issue.issueType) ?? null) : null
+		editor.draft ? (templates.byType.get(editor.draft.issue.fields.issueType) ?? null) : null
 	);
 
 	const issue = $derived(editor.draft ? (editor.draft.issue as Issue) : null);
@@ -44,29 +44,29 @@
 		if (!issue) return undefined;
 		switch (field.key) {
 			case 'title':
-				return issue.title;
+				return issue.fields.title;
 			case 'author':
-				return issue.author;
+				return issue.fields.author;
 			case 'issueType':
-				return issue.issueType;
+				return issue.fields.issueType;
 			case 'status':
-				return issue.status;
+				return issue.fields.status;
 			case 'assignee':
-				return issue.assignee ?? '';
+				return issue.fields.assignee ?? '';
 			case 'labels':
-				return issue.labels;
+				return issue.fields.labels;
 			case 'relations':
-				return issue.relations.map((r: Relation) => r.id);
+				return issue.fields.relations.map((r: Relation) => r.id);
 			case 'start_date':
-				return issue.startDate ?? '';
+				return issue.fields.startDate ?? '';
 			case 'end_date':
-				return issue.endDate ?? '';
+				return issue.fields.endDate ?? '';
 			case 'duration':
-				return issue.duration ?? '';
+				return issue.fields.duration ?? '';
 			case 'sprint_id':
-				return issue.sprintId ?? '';
+				return issue.fields.sprintId ?? '';
 			case 'estimate':
-				return issue.estimate ?? '';
+				return issue.fields.estimate ?? '';
 			default:
 				return issue.customFields[field.key];
 		}
@@ -89,7 +89,7 @@
 
 	function relationTitle(id: number): string {
 		const li = issues.byId.get(id);
-		return li ? li.issue.title : `#${id}`;
+		return li ? li.issue.fields.title : `#${id}`;
 	}
 
 	function relationOptions(field: TemplateField): Option[] {
@@ -100,9 +100,13 @@
 				if (
 					!field.allowed_targets ||
 					Object.keys(field.allowed_targets).length === 0 ||
-					li.issue.issueType in field.allowed_targets
+					li.issue.fields.issueType in field.allowed_targets
 				) {
-					out.push({ id: String(li.issue.id), name: li.issue.title, type: li.issue.issueType });
+					out.push({
+						id: String(li.issue.id),
+						name: li.issue.fields.title,
+						type: li.issue.fields.issueType
+					});
 				}
 			}
 		}
@@ -129,13 +133,15 @@
 
 	function changeRelationType(id: number, newType: string): void {
 		if (!issue) return;
-		const next = issue.relations.map((r) => (r.id === id ? { ...r, type: newType as any } : r));
+		const next = issue.fields.relations.map((r) =>
+			r.id === id ? { ...r, type: newType as any } : r
+		);
 		editor.patchField('relations', next);
 	}
 
 	function removeRelation(id: number): void {
 		if (!issue) return;
-		const next = issue.relations.filter((r) => r.id !== id);
+		const next = issue.fields.relations.filter((r) => r.id !== id);
 		editor.patchField('relations', next);
 	}
 
@@ -145,8 +151,8 @@
 	function addRelation(): void {
 		if (!issue || !newRelationId) return;
 		const id = Number(newRelationId);
-		if (issue.relations.some((r) => r.id === id)) return;
-		const next = [...issue.relations, { type: newRelationType as any, id }];
+		if (issue.fields.relations.some((r) => r.id === id)) return;
+		const next = [...issue.fields.relations, { type: newRelationType as any, id }];
 		editor.patchField('relations', next);
 		newRelationId = '';
 		newRelationType = 'relates_to';
@@ -159,10 +165,10 @@
 		if (field.options_source === 'issues.sprints') {
 			return issues.issues
 				.map((li) => li.issue)
-				.filter((i) => i.issueType === 'sprint')
+				.filter((i) => i.fields.issueType === 'sprint')
 				.map((s) => ({
 					id: String(s.id),
-					name: s.title
+					name: s.fields.title
 				}));
 		}
 		return (field.options ?? []).map((o) => ({ id: o, name: o }));
@@ -182,13 +188,13 @@
 	});
 	const currentTypeName = $derived.by(() => {
 		if (!editor.draft) return '';
-		const id = editor.draft.issue.issueType;
+		const id = editor.draft.issue.fields.issueType;
 		return templates.templates.find((t) => t.id === id)?.name ?? id;
 	});
 
 	function onTypeChangeAttempt(next: string): void {
 		if (!editor.draft) return;
-		if (next === editor.draft.issue.issueType) {
+		if (next === editor.draft.issue.fields.issueType) {
 			pendingType = null;
 			return;
 		}
@@ -214,24 +220,24 @@
 
 	const sprintStories = $derived.by(() => {
 		void editor.errors; // React to patches
-		if (!issue || issue.issueType !== 'sprint') return [];
+		if (!issue || issue.fields.issueType !== 'sprint') return [];
 		const all = issues.issues.map((li) => li.issue);
 		return all.filter((other) => {
-			if (other.issueType !== 'user-story') return false;
+			if (other.fields.issueType !== 'user-story') return false;
 			// check if Sprint links to this story
-			const linksToOther = issue.relations.some((r) => r.id === other.id);
+			const linksToOther = issue.fields.relations.some((r) => r.id === other.id);
 			// check if story links to this Sprint
-			const otherLinksToSprint = other.relations.some((r) => r.id === issue.id);
+			const otherLinksToSprint = other.fields.relations.some((r) => r.id === issue.id);
 			return linksToOther || otherLinksToSprint;
 		});
 	});
 
 	const storyCount = $derived(sprintStories.length);
 	const storyPoints = $derived(
-		sprintStories.reduce((acc, story) => acc + (story.estimate || 0), 0)
+		sprintStories.reduce((acc, story) => acc + (story.fields.estimate || 0), 0)
 	);
 	const completedCount = $derived(
-		sprintStories.filter((s) => s.status === 'done' || s.status === 'closed').length
+		sprintStories.filter((s) => s.fields.status === 'done' || s.fields.status === 'closed').length
 	);
 	const avance = $derived(storyCount > 0 ? Math.round((completedCount / storyCount) * 100) : 0);
 
@@ -240,46 +246,46 @@
 
 {#if template && issue}
 	<div class="flex flex-col gap-6" data-testid="form-fields">
-		{#if issue.issueType === 'sprint'}
+		{#if issue.fields.issueType === 'sprint'}
 			<div
 				class="overflow-hidden rounded-xl border border-border bg-surface p-5 shadow-soft transition-all duration-[var(--motion-base)]"
 			>
-				<div class="flex items-center justify-between border-b border-border/60 pb-3 mb-4">
-					<h3 class="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+				<div class="mb-4 flex items-center justify-between border-b border-border/60 pb-3">
+					<h3 class="text-xs font-bold tracking-wider text-muted-foreground uppercase">
 						{t('sprint.progress')}
 					</h3>
-					<span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-warning/10 text-warning">
-						{issue.title}
+					<span class="rounded-full bg-warning/10 px-2 py-0.5 text-[11px] font-bold text-warning">
+						{issue.fields.title}
 					</span>
 				</div>
 
-				<div class="grid grid-cols-3 gap-4 mb-4">
+				<div class="mb-4 grid grid-cols-3 gap-4">
 					<div class="flex flex-col">
-						<span class="text-[10px] uppercase font-bold tracking-wider text-muted-foreground"
+						<span class="text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
 							>{t('sprint.stories')}</span
 						>
-						<span class="text-2xl font-display font-bold text-foreground mt-1">{storyCount}</span>
+						<span class="mt-1 font-display text-2xl font-bold text-foreground">{storyCount}</span>
 					</div>
 					<div class="flex flex-col">
-						<span class="text-[10px] uppercase font-bold tracking-wider text-muted-foreground"
+						<span class="text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
 							>{t('sprint.points')}</span
 						>
-						<span class="text-2xl font-display font-bold text-foreground mt-1"
+						<span class="mt-1 font-display text-2xl font-bold text-foreground"
 							>{storyPoints} {t('sprint.pointsUnit')}</span
 						>
 					</div>
 					<div class="flex flex-col">
-						<span class="text-[10px] uppercase font-bold tracking-wider text-muted-foreground"
+						<span class="text-[10px] font-bold tracking-wider text-muted-foreground uppercase"
 							>{t('sprint.progressLabel')}</span
 						>
-						<span class="text-2xl font-display font-bold text-success mt-1">{avance}%</span>
+						<span class="mt-1 font-display text-2xl font-bold text-success">{avance}%</span>
 					</div>
 				</div>
 
 				<!-- Progress Bar -->
-				<div class="w-full bg-muted rounded-full h-2 overflow-hidden">
+				<div class="h-2 w-full overflow-hidden rounded-full bg-muted">
 					<div
-						class="bg-success h-full transition-all duration-[var(--motion-base)] ease-out"
+						class="h-full bg-success transition-all duration-[var(--motion-base)] ease-out"
 						style="width: {avance}%"
 					></div>
 				</div>
@@ -291,7 +297,7 @@
 			{@const value = currentValue(field)}
 			<div class="flex flex-col gap-1" data-field-key={field.key} data-field-type={field.type}>
 				<label for={fid} class="flex items-center pb-1">
-					<span class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+					<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
 						{field.name}
 						{#if field.obligatory}<span class="text-error" aria-hidden="true">&nbsp;*</span>
 							<span class="sr-only">{t('common.required')}</span>{/if}
@@ -302,7 +308,7 @@
 					<input
 						id={fid}
 						type={field.type}
-						class="w-full bg-background text-foreground rounded-md border {err
+						class="w-full rounded-md border bg-background text-foreground {err
 							? 'border-error ring-1 ring-error'
 							: 'border-border focus:border-transparent'} px-3 py-2 text-sm focus:outline-none {ringClass} transition-shadow"
 						value={(value as string | undefined) ?? ''}
@@ -317,7 +323,7 @@
 					<input
 						id={fid}
 						type="number"
-						class="w-full bg-background text-foreground rounded-md border {err
+						class="w-full rounded-md border bg-background text-foreground {err
 							? 'border-error ring-1 ring-error'
 							: 'border-border focus:border-transparent'} px-3 py-2 text-sm focus:outline-none {ringClass} transition-shadow"
 						value={value === null || value === undefined ? '' : String(value)}
@@ -341,9 +347,9 @@
 					<div class="relative w-full">
 						<select
 							id={fid}
-							class="w-full appearance-none bg-background text-foreground rounded-md border {err
+							class="w-full appearance-none rounded-md border bg-background text-foreground {err
 								? 'border-error ring-1 ring-error'
-								: 'border-border focus:border-transparent'} pl-3 pr-10 py-2 text-sm focus:outline-none {ringClass} transition-shadow"
+								: 'border-border focus:border-transparent'} py-2 pr-10 pl-3 text-sm focus:outline-none {ringClass} transition-shadow"
 							value={(value as string | undefined) ?? ''}
 							aria-invalid={err ? 'true' : undefined}
 							onchange={(e) => {
@@ -351,7 +357,7 @@
 								if (systemKeyFor(field.key) === 'issueType') {
 									onTypeChangeAttempt(v);
 									if (e.currentTarget instanceof HTMLSelectElement && issue) {
-										e.currentTarget.value = issue.issueType;
+										e.currentTarget.value = issue.fields.issueType;
 									}
 									return;
 								}
@@ -395,15 +401,15 @@
 						id={fid}
 						role="group"
 						aria-label={field.name}
-						class="flex flex-wrap gap-1 {err ? 'rounded ring-1 ring-error p-1' : ''}"
+						class="flex flex-wrap gap-1 {err ? 'rounded p-1 ring-1 ring-error' : ''}"
 					>
 						{#each opts as opt (opt.id)}
 							{@const on = selected.includes(opt.id)}
 							<button
 								type="button"
-								class="px-2 py-1 rounded-full text-[11px] font-bold tracking-widest border transition-colors {ringClass} {on
-									? 'bg-foreground text-background border-foreground'
-									: 'bg-transparent text-muted-foreground border-border hover:border-muted'}"
+								class="rounded-full border px-2 py-1 text-[11px] font-bold tracking-widest transition-colors {ringClass} {on
+									? 'border-foreground bg-foreground text-background'
+									: 'border-border bg-transparent text-muted-foreground hover:border-muted'}"
 								aria-pressed={on}
 								onclick={() => toggleMulti(field, opt.id)}
 							>
@@ -414,16 +420,16 @@
 				{:else if field.type === 'relations'}
 					{@const currentRelations = (() => {
 						void editor.errors;
-						return issue?.relations ?? [];
+						return issue?.fields.relations ?? [];
 					})()}
 					<div
 						id={fid}
-						class="flex flex-col gap-3 border rounded-md border-border p-3 {err
+						class="flex flex-col gap-3 rounded-md border border-border p-3 {err
 							? 'border-error ring-1 ring-error'
 							: ''}"
 					>
 						{#each currentRelations as rel (rel.id)}
-							{@const relTargetIssueType = issues.byId.get(rel.id)?.issue.issueType}
+							{@const relTargetIssueType = issues.byId.get(rel.id)?.issue.fields.issueType}
 							{@const allowedRelTypes =
 								relTargetIssueType &&
 								field.allowed_targets &&
@@ -432,9 +438,9 @@
 									? field.allowed_targets[relTargetIssueType]
 									: RELATION_TYPES}
 							<div class="flex items-center gap-2">
-								<div class="flex-1 min-w-0">
+								<div class="min-w-0 flex-1">
 									<select
-										class="w-full appearance-none bg-surface text-foreground rounded border border-border pl-2 pr-6 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+										class="w-full appearance-none rounded border border-border bg-surface py-1.5 pr-6 pl-2 text-xs text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 										value={rel.type}
 										onchange={(e) => changeRelationType(rel.id, e.currentTarget.value)}
 									>
@@ -444,18 +450,18 @@
 									</select>
 								</div>
 								<span
-									class="text-sm font-medium text-foreground truncate flex-1"
+									class="flex-1 truncate text-sm font-medium text-foreground"
 									title={relationTitle(rel.id)}
 								>
 									{relationTitle(rel.id)}
 								</span>
 								<button
 									type="button"
-									class="text-muted-foreground hover:text-error transition-colors p-1"
+									class="p-1 text-muted-foreground transition-colors hover:text-error"
 									aria-label={t('formFields.removeRelationAria')}
 									onclick={() => removeRelation(rel.id)}
 								>
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+									<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
 											stroke-linecap="round"
 											stroke-linejoin="round"
@@ -468,11 +474,11 @@
 						{/each}
 
 						<div
-							class="flex flex-col sm:flex-row gap-2 items-start sm:items-center mt-1 border-t border-border pt-3"
+							class="mt-1 flex flex-col items-start gap-2 border-t border-border pt-3 sm:flex-row sm:items-center"
 						>
-							<div class="flex-1 min-w-0 relative w-full sm:w-auto">
+							<div class="relative w-full min-w-0 flex-1 sm:w-auto">
 								<select
-									class="w-full appearance-none bg-background text-foreground rounded border border-border pl-2 pr-8 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+									class="w-full appearance-none rounded border border-border bg-background py-1.5 pr-8 pl-2 text-xs text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 									bind:value={newRelationId}
 								>
 									<option value="">{t('formFields.selectPlaceholder')}</option>
@@ -495,7 +501,8 @@
 							</div>
 
 							{#if newRelationId}
-								{@const targetIssueType = issues.byId.get(Number(newRelationId))?.issue.issueType}
+								{@const targetIssueType = issues.byId.get(Number(newRelationId))?.issue.fields
+									.issueType}
 								{@const allowedRelTypesForNew =
 									targetIssueType &&
 									field.allowed_targets &&
@@ -503,9 +510,9 @@
 									field.allowed_targets[targetIssueType].length > 0
 										? field.allowed_targets[targetIssueType]
 										: RELATION_TYPES}
-								<div class="flex-1 min-w-0 relative w-full sm:w-auto">
+								<div class="relative w-full min-w-0 flex-1 sm:w-auto">
 									<select
-										class="w-full appearance-none bg-background text-foreground rounded border border-border pl-2 pr-8 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+										class="w-full appearance-none rounded border border-border bg-background py-1.5 pr-8 pl-2 text-xs text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 										bind:value={newRelationType}
 									>
 										{#each allowedRelTypesForNew as rType}
@@ -529,7 +536,7 @@
 
 							<button
 								type="button"
-								class="px-3 py-1.5 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors text-xs font-bold shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+								class="shrink-0 rounded bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
 								title={t('formFields.addRelation')}
 								disabled={!newRelationId}
 								onclick={addRelation}
@@ -541,7 +548,7 @@
 				{/if}
 
 				{#if err}
-					<p class="text-error text-xs font-medium" role="alert">{err}</p>
+					<p class="text-xs font-medium text-error" role="alert">{err}</p>
 				{/if}
 			</div>
 		{/each}
@@ -553,7 +560,7 @@
 				{t('formFields.changeTypeTitle')}
 			</h3>
 			<p
-				class="px-4 py-3 bg-[var(--color-cb-yellow)]/10 text-foreground border border-[var(--color-cb-yellow)] rounded-md text-sm my-4 font-medium"
+				class="my-4 rounded-md border border-[var(--color-cb-yellow)] bg-[var(--color-cb-yellow)]/10 px-4 py-3 text-sm font-medium text-foreground"
 			>
 				{t('formFields.changeTypeBody', { old: currentTypeName, new: pendingTypeName })}
 			</p>

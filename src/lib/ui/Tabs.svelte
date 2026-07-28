@@ -80,7 +80,7 @@
 <div
 	role="tablist"
 	aria-orientation="horizontal"
-	class="flex items-center gap-6 border-b border-border w-full {extraClass}"
+	class="flex w-full items-center gap-6 border-b border-border {extraClass}"
 >
 	{#each tabs as tab, i (tab.id)}
 		{@const isActive = tab.id === value}
@@ -90,7 +90,7 @@
 			id="tab-{tab.id}"
 			aria-selected={isActive}
 			tabindex={isActive ? 0 : -1}
-			class="px-1 py-4 font-sans text-sm font-semibold transition-colors duration-[var(--motion-fast)] ease-[var(--ease-out)] border-b-2 -mb-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset {isActive
+			class="-mb-[1px] border-b-2 px-1 py-4 font-sans text-sm font-semibold transition-colors duration-[var(--motion-fast)] ease-[var(--ease-out)] focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset {isActive
 				? 'border-primary text-primary'
 				: 'border-transparent text-muted-foreground hover:text-foreground'}"
 			onclick={() => focusAndActivate(i)}

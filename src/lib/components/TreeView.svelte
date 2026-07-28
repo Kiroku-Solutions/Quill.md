@@ -13,12 +13,12 @@
 		const allIssues = Array.from(issues.byId.values());
 		const matchedIssues = allIssues.filter((li) => {
 			const f = filter.filter;
-			if (f.status && li.issue.status !== f.status) return false;
-			if (f.type && li.issue.issueType !== f.type) return false;
+			if (f.status && li.issue.fields.status !== f.status) return false;
+			if (f.type && li.issue.fields.issueType !== f.type) return false;
 			if (f.q) {
 				const needle = f.q.toLowerCase();
 				if (
-					!li.issue.title.toLowerCase().includes(needle) &&
+					!li.issue.fields.title.toLowerCase().includes(needle) &&
 					!li.issue.sections.some((s) => s.markdown.toLowerCase().includes(needle))
 				) {
 					return false;
@@ -33,14 +33,16 @@
 
 		if (hasActiveFilter) {
 			for (const li of matchedIssues) {
-				for (const rel of li.issue.relations) {
+				for (const rel of li.issue.fields.relations) {
 					const target = issues.byId.get(Number(rel.id));
 					if (target) filteredSet.add(target);
 				}
 			}
 			for (const li of allIssues) {
 				if (
-					li.issue.relations.some((r) => matchedIssues.some((m) => m.issue.id === Number(r.id)))
+					li.issue.fields.relations.some((r) =>
+						matchedIssues.some((m) => m.issue.id === Number(r.id))
+					)
 				) {
 					filteredSet.add(li);
 				}
@@ -54,27 +56,31 @@
 
 		let groupNodes: import('$lib/types').LoadedIssue[] = [];
 		if (groupBy === 'epic') {
-			groupNodes = Array.from(issues.byId.values()).filter((li) => li.issue.issueType === 'epic');
+			groupNodes = Array.from(issues.byId.values()).filter(
+				(li) => li.issue.fields.issueType === 'epic'
+			);
 		} else if (groupBy === 'sprint') {
-			groupNodes = Array.from(issues.byId.values()).filter((li) => li.issue.issueType === 'sprint');
+			groupNodes = Array.from(issues.byId.values()).filter(
+				(li) => li.issue.fields.issueType === 'sprint'
+			);
 		}
 
 		for (const li of filteredIssues) {
 			const issue = li.issue;
-			const tmpl = templates.byType.get(issue.issueType);
+			const tmpl = templates.byType.get(issue.fields.issueType);
 
 			let color: string | undefined = tmpl?.color || '#888888';
 			let groupId: string | undefined = undefined;
 
 			if (groupBy !== 'none') {
-				if (issue.issueType === groupBy) {
+				if (issue.fields.issueType === groupBy) {
 					groupId = String(issue.id);
 					color = undefined; // Auto-color by group
 				} else {
 					const relatedGroup = groupNodes.find(
 						(g) =>
-							issue.relations.some((r) => r.id === g.issue.id) ||
-							g.issue.relations.some((r) => r.id === issue.id)
+							issue.fields.relations.some((r) => r.id === g.issue.id) ||
+							g.issue.fields.relations.some((r) => r.id === issue.id)
 					);
 					if (relatedGroup) {
 						groupId = String(relatedGroup.issue.id);
@@ -88,12 +94,12 @@
 
 			nodes.push({
 				id: String(issue.id),
-				name: issue.title,
+				name: issue.fields.title,
 				color,
 				groupId
 			});
 
-			for (const rel of issue.relations) {
+			for (const rel of issue.fields.relations) {
 				const targetId = String(rel.id);
 				if (validNodeIds.has(targetId)) {
 					links.push({ source: String(issue.id), target: targetId, name: rel.type });
@@ -184,11 +190,11 @@
 					const fontSize = 12 / globalScale;
 					ctx.font = `${fontSize}px Inter, sans-serif`;
 					const textWidth = ctx.measureText(label).width;
-					
+
 					const h = 26 / globalScale;
-					const w = textWidth + (20 / globalScale);
-					const x = node.x - w/2;
-					const y = node.y - h/2;
+					const w = textWidth + 20 / globalScale;
+					const x = node.x - w / 2;
+					const y = node.y - h / 2;
 					const radius = 6 / globalScale;
 
 					ctx.beginPath();
@@ -197,7 +203,7 @@
 					} else {
 						ctx.rect(x, y, w, h); // Fallback
 					}
-					
+
 					// Background
 					ctx.fillStyle = theme.theme === 'dark' ? '#18181b' : '#ffffff';
 					ctx.fill();
@@ -218,16 +224,18 @@
 					ctx.fillStyle = theme.theme === 'dark' ? '#f4f4f5' : '#18181b';
 					ctx.fillText(label, node.x, node.y);
 				})
-				.nodePointerAreaPaint((node: any, color: string, ctx: CanvasRenderingContext2D, globalScale: number) => {
-					const label = node.name.length > 22 ? node.name.slice(0, 20) + '...' : node.name;
-					const fontSize = 12 / globalScale;
-					ctx.font = `${fontSize}px Inter, sans-serif`;
-					const textWidth = ctx.measureText(label).width;
-					const h = 26 / globalScale;
-					const w = textWidth + (20 / globalScale);
-					ctx.fillStyle = color;
-					ctx.fillRect(node.x - w/2, node.y - h/2, w, h);
-				});
+				.nodePointerAreaPaint(
+					(node: any, color: string, ctx: CanvasRenderingContext2D, globalScale: number) => {
+						const label = node.name.length > 22 ? node.name.slice(0, 20) + '...' : node.name;
+						const fontSize = 12 / globalScale;
+						ctx.font = `${fontSize}px Inter, sans-serif`;
+						const textWidth = ctx.measureText(label).width;
+						const h = 26 / globalScale;
+						const w = textWidth + 20 / globalScale;
+						ctx.fillStyle = color;
+						ctx.fillRect(node.x - w / 2, node.y - h / 2, w, h);
+					}
+				);
 
 			// Spread out horizontally to prevent overlap of the wide cards
 			if (currentGraph.d3Force('charge')) {
@@ -237,9 +245,9 @@
 				currentGraph.d3Force('link').distance(20);
 			}
 
-			// Apply an explicit collision force using a custom d3 force if needed, 
+			// Apply an explicit collision force using a custom d3 force if needed,
 			// but a massive charge is usually enough to keep them apart in DAG mode.
-			
+
 			currentGraph.graphData(data);
 
 			if (container) {
@@ -284,6 +292,6 @@
 	});
 </script>
 
-<div class="relative w-full h-full bg-surface overflow-hidden">
+<div class="relative h-full w-full overflow-hidden bg-surface">
 	<div bind:this={container} class="absolute inset-0"></div>
 </div>
