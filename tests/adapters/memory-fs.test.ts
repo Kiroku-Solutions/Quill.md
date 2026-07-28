@@ -328,7 +328,7 @@ After submitting valid credentials, the user is redirected to a
 		expect(loaded?.sourcePath).toBe('.quill.md/issues/0042-fix-login-redirect.md');
 
 		const issue = loaded?.issue;
-		expect(issue?.id).toBe(42);
+		expect(issue?.id).toBe('42');
 		expect(issue?.fields.title).toBe('Fix login redirect');
 		expect(issue?.fields.author).toBe('jane');
 		expect(issue?.fields.creationDate).toBe('2026-10-20');
@@ -368,7 +368,7 @@ After submitting valid credentials, the user is redirected to a
 
 	it('handles multiple issues in a single directory', async () => {
 		const fs = new MemoryFsAdapter();
-		const mkIssue = (id: number, title: string) => `---
+		const mkIssue = (id: string, title: string) => `---
 id: ${id}
 title: "${title}"
 author: "jose"
@@ -390,7 +390,7 @@ content for ${title}
 		await fs.writeTextFile('.quill.md/issues/0003-third.md', mkIssue(3, 'third'));
 
 		const issues = await loadIssues(fs);
-		expect(issues.map((i) => i.issue.id)).toEqual([1, 2, 3]);
+		expect(issues.map((i) => i.issue.id)).toEqual(['1', '2', '3']);
 	});
 });
 

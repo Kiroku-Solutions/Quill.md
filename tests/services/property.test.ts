@@ -73,7 +73,7 @@ function randDate(rng: () => number): string {
 }
 
 function randIssue(rng: () => number): Issue {
-	const id = randInt(rng, 1, 99999);
+	const id = String(randInt(rng, 1, 99999));
 	const title = `Random issue ${id}: ${pick(rng, ['fix', 'add', 'refactor', 'document'])} ${pick(rng, ['login', 'redirect', 'theme', 'parser', 'Gantt'])}`;
 	const creationDate = randDate(rng);
 	const updatedDate = randDate(rng);
@@ -87,7 +87,7 @@ function randIssue(rng: () => number): Issue {
 	const relCount = randInt(rng, 0, 2);
 	const relations = Array.from({ length: relCount }, () => ({
 		type: pick(rng, RELATION_TYPES),
-		id: randInt(rng, 1, 99999)
+		id: String(randInt(rng, 1, 99999))
 	}));
 
 	const startDate = randDate(rng);
@@ -228,7 +228,7 @@ describe('property-based — parser ↔ serializer round-trip', () => {
 		// `labels: []` and `relations: []` are omitted) must handle.
 		const edgeCases: Issue[] = [
 			{
-				id: 1,
+				id: '1',
 				fields: {
 					title: 'Bare minimum',
 					author: 'jane',
@@ -251,7 +251,7 @@ describe('property-based — parser ↔ serializer round-trip', () => {
 				integrityWarning: false
 			},
 			{
-				id: 2,
+				id: '2',
 				fields: {
 					title: 'All custom fields',
 					author: 'jane',
@@ -261,7 +261,7 @@ describe('property-based — parser ↔ serializer round-trip', () => {
 					status: 'open',
 					assignee: 'jane',
 					labels: ['a', 'b'],
-					relations: [{ type: 'relates_to', id: 1 }],
+					relations: [{ type: 'relates_to', id: '1' }],
 					startDate: '2026-01-01',
 					endDate: '2026-01-02',
 					duration: null,

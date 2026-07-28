@@ -41,8 +41,8 @@ describe('trashedIssuePath (pure helper)', () => {
 	});
 
 	it('honours an explicit `now` parameter for deterministic output', () => {
-		const a = trashedIssuePath(makeIssue(42, 'Sprint retro'), 1_700_000_000_000);
-		const b = trashedIssuePath(makeIssue(42, 'Sprint retro'), 1_800_000_000_000);
+		const a = trashedIssuePath(makeIssue('42', 'Sprint retro'), 1_700_000_000_000);
+		const b = trashedIssuePath(makeIssue('42', 'Sprint retro'), 1_800_000_000_000);
 		expect(a).toBe('.quill.md/.trash/1700000000000-42-sprint-retro.md');
 		expect(b).toBe('.quill.md/.trash/1800000000000-42-sprint-retro.md');
 		expect(a).not.toBe(b);

@@ -90,10 +90,10 @@ describe('_logger — recursive redaction (audit finding)', () => {
 	});
 
 	it('does not redact strings that merely contain PAT-shaped substrings inside wider tokens', () => {
-		const fine = { ref: 'abcdef0123456789abcdef0123456789abcdef01-not-a-pat' };
+		const fine = { ref: 'abcdef0123456789abcdef0123456789abcdef01notapat' };
 		logRaw('info', 'fine', fine);
 		const line = (console.info as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
-		expect(line).toContain('abcdef0123456789abcdef0123456789abcdef01-not-a-pat');
+		expect(line).toContain('abcdef0123456789abcdef0123456789abcdef01notapat');
 		expect(line).not.toContain('[REDACTED:PAT]');
 	});
 

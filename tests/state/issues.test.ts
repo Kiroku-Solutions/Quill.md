@@ -179,8 +179,8 @@ describe('createIssuesStore — load happy path', () => {
 	let fs: MemoryFsAdapter;
 	beforeEach(async () => {
 		fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1, title: 'Alpha' }));
-		await seedIssueFile(fs, makeIssue({ id: 2, title: 'Beta' }));
+		await seedIssueFile(fs, makeIssue({ id: '1', title: 'Alpha' }));
+		await seedIssueFile(fs, makeIssue({ id: '2', title: 'Beta' }));
 	});
 
 	it('populates issues and byId from disk', async () => {
@@ -189,8 +189,8 @@ describe('createIssuesStore — load happy path', () => {
 		expect(issues.status).toBe('ready');
 		expect(issues.issues).toHaveLength(2);
 		expect(issues.byId.size).toBe(2);
-		expect(issues.byId.get(1)?.issue.fields.title).toBe('Alpha');
-		expect(issues.byId.get(2)?.issue.fields.title).toBe('Beta');
+		expect(issues.byId.get('1')?.issue.fields.title).toBe('Alpha');
+		expect(issues.byId.get('2')?.issue.fields.title).toBe('Beta');
 		expect(issues.integrityWarnings).toHaveLength(0);
 	});
 });
@@ -201,7 +201,7 @@ describe('createIssuesStore — load happy path', () => {
 describe('createIssuesStore — load partial failure', () => {
 	it('a malformed file produces an integrityWarning, not an exception', async () => {
 		const fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1, title: 'Good' }));
+		await seedIssueFile(fs, makeIssue({ id: '1', title: 'Good' }));
 		// A file with no frontmatter at all — parser treats the whole text as
 		// content and produces an issue with all-default fields and no hash,
 		// which trips `integrityWarning: true`.
@@ -252,7 +252,7 @@ describe('createIssuesStore — create', () => {
 describe('createIssuesStore — update', () => {
 	it('marks dirty but does not touch disk', async () => {
 		const fs = new MemoryFsAdapter();
-		const original = await serializeIssue(makeIssue({ id: 1, title: 'Original' }));
+		const original = await serializeIssue(makeIssue({ id: '1', title: 'Original' }));
 		await fs.writeTextFile('.quill.md/issues/0001-original.md', original);
 
 		const { issues } = await makeStores(fs);
@@ -260,8 +260,8 @@ describe('createIssuesStore — update', () => {
 		const before = fs.snapshot().files['.quill.md/issues/0001-original.md'];
 		expect(before).toBeDefined();
 
-		issues.update(1, { title: 'Renamed' });
-		expect(issues.dirty.has(1)).toBe(true);
+		issues.update('1', { title: 'Renamed' });
+		expect(issues.dirty.has('1')).toBe(true);
 
 		const after = fs.snapshot().files['.quill.md/issues/0001-original.md'];
 		expect(after).toBe(before);
@@ -275,14 +275,14 @@ describe('createIssuesStore — update', () => {
 describe('createIssuesStore — save round-trip', () => {
 	it('produces an integrityWarning=false record after save + reload', async () => {
 		const fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1, title: 'Before' }));
+		await seedIssueFile(fs, makeIssue({ id: '1', title: 'Before' }));
 
 		const { issues } = await makeStores(fs);
 		await issues.load();
-		issues.update(1, { title: 'After' });
-		await issues.save(1);
+		issues.update('1', { title: 'After' });
+		await issues.save('1');
 
-		expect(issues.dirty.has(1)).toBe(false);
+		expect(issues.dirty.has('1')).toBe(false);
 
 		// Reload via a fresh store to ensure the on-disk hash matches the
 		// canonical form (no warning).
@@ -296,7 +296,7 @@ describe('createIssuesStore — save round-trip', () => {
 		});
 		await issues2.load();
 
-		const refreshed = issues2.byId.get(1);
+		const refreshed = issues2.byId.get('1');
 		expect(refreshed?.issue.fields.title).toBe('After');
 		expect(refreshed?.issue.integrityWarning).toBe(false);
 	});
@@ -308,20 +308,20 @@ describe('createIssuesStore — save round-trip', () => {
 describe('createIssuesStore — concurrent save', () => {
 	it('two save() calls in quick succession join onto one in-flight promise', async () => {
 		const fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1, title: 'X' }));
+		await seedIssueFile(fs, makeIssue({ id: '1', title: 'X' }));
 
 		const { issues } = await makeStores(fs);
 		await issues.load();
-		issues.update(1, { title: 'X2' });
+		issues.update('1', { title: 'X2' });
 
-		const p1 = issues.save(1);
-		const p2 = issues.save(1);
+		const p1 = issues.save('1');
+		const p2 = issues.save('1');
 		await expect(p1).resolves.toBeUndefined();
 		await expect(p2).resolves.toBeUndefined();
 
 		// Both promises should be the same reference (the plan §C.4 / state-of-the-art §3.2).
 		expect(p1).toBe(p2);
-		expect(issues.pendingSaves.has(1)).toBe(false);
+		expect(issues.pendingSaves.has('1')).toBe(false);
 	});
 });
 
@@ -331,17 +331,17 @@ describe('createIssuesStore — concurrent save', () => {
 describe('createIssuesStore — remove', () => {
 	it('moves the file to .trash and drops it from issues/dirty/errors', async () => {
 		const fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1, title: 'Doomed' }));
+		await seedIssueFile(fs, makeIssue({ id: '1', title: 'Doomed' }));
 
 		const { issues } = await makeStores(fs);
 		await issues.load();
-		issues.update(1, { title: 'Doomed still' });
+		issues.update('1', { title: 'Doomed still' });
 
-		await issues.remove(1);
+		await issues.remove('1');
 		expect(issues.issues).toHaveLength(0);
-		expect(issues.dirty.has(1)).toBe(false);
-		expect(issues.pendingSaves.has(1)).toBe(false);
-		expect(issues.errors.has(1)).toBe(false);
+		expect(issues.dirty.has('1')).toBe(false);
+		expect(issues.pendingSaves.has('1')).toBe(false);
+		expect(issues.errors.has('1')).toBe(false);
 
 		const snap = fs.snapshot();
 		// seedIssueFile names the file `<padded>-issue.md`, so the trashed
@@ -363,11 +363,11 @@ describe('createIssuesStore — validate', () => {
 		const fs = new MemoryFsAdapter();
 		// issueType 'bug' has obligatory severity field; leaving it empty
 		// should produce a validation error.
-		await seedIssueFile(fs, makeIssue({ id: 1, issueType: 'bug', title: 'Bug no severity' }));
+		await seedIssueFile(fs, makeIssue({ id: '1', issueType: 'bug', title: 'Bug no severity' }));
 
 		const { issues } = await makeStores(fs);
 		await issues.load();
-		const errs = issues.validate(1);
+		const errs = issues.validate('1');
 		expect(errs.length).toBeGreaterThan(0);
 		expect(errs.some((e) => e.field === 'severity')).toBe(true);
 	});
@@ -386,7 +386,7 @@ describe('createIssuesStore — validate', () => {
 		);
 		const { issues } = await makeStores(fs);
 		await issues.load();
-		const errs = issues.validate(1);
+		const errs = issues.validate('1');
 		expect(errs).toEqual([]);
 	});
 });
@@ -397,9 +397,9 @@ describe('createIssuesStore — validate', () => {
 describe('createIssuesStore — byStatus', () => {
 	it('groups issues by their status field', async () => {
 		const fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1, status: 'open' }));
-		await seedIssueFile(fs, makeIssue({ id: 2, status: 'open' }));
-		await seedIssueFile(fs, makeIssue({ id: 3, status: 'closed' }));
+		await seedIssueFile(fs, makeIssue({ id: '1', status: 'open' }));
+		await seedIssueFile(fs, makeIssue({ id: '2', status: 'open' }));
+		await seedIssueFile(fs, makeIssue({ id: '3', status: 'closed' }));
 
 		const { issues } = await makeStores(fs);
 		await issues.load();
@@ -414,16 +414,16 @@ describe('createIssuesStore — byStatus', () => {
 describe('createIssuesStore — discard', () => {
 	it('clears the dirty flag without writing to disk', async () => {
 		const fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1, title: 'X' }));
+		await seedIssueFile(fs, makeIssue({ id: '1', title: 'X' }));
 
 		const { issues } = await makeStores(fs);
 		await issues.load();
-		issues.update(1, { title: 'Y' });
-		expect(issues.dirty.has(1)).toBe(true);
+		issues.update('1', { title: 'Y' });
+		expect(issues.dirty.has('1')).toBe(true);
 		const before = fs.snapshot().files['.quill.md/issues/0001-x.md'];
 
-		issues.discard(1);
-		expect(issues.dirty.has(1)).toBe(false);
+		issues.discard('1');
+		expect(issues.dirty.has('1')).toBe(false);
 		const after = fs.snapshot().files['.quill.md/issues/0001-x.md'];
 		expect(after).toBe(before);
 	});
@@ -438,7 +438,7 @@ describe('createIssuesStore — integrityWarnings', () => {
 		// Serialize a real issue, then overwrite integrity_hash with a fake
 		// value. The parser compares the stored hash to the recomputed one
 		// over the canonical form and flips integrityWarning.
-		const issue = makeIssue({ id: 1, title: 'Tampered' });
+		const issue = makeIssue({ id: '1', title: 'Tampered' });
 		const canonical = canonicalForm(issue);
 		const realHash = await computeIntegrityHash(canonical);
 		const text = await serializeIssue(issue);
@@ -461,11 +461,11 @@ describe('createIssuesStore — load supersede', () => {
 		// mid-flight and call load() twice. The second wins; the first does
 		// not flip status to 'ready' on its own.
 		const fs1 = new MemoryFsAdapter();
-		await seedIssueFile(fs1, makeIssue({ id: 1, title: 'A' }));
+		await seedIssueFile(fs1, makeIssue({ id: '1', title: 'A' }));
 
 		const fs2 = new MemoryFsAdapter();
-		await seedIssueFile(fs2, makeIssue({ id: 1, title: 'B' }));
-		await seedIssueFile(fs2, makeIssue({ id: 2, title: 'C' }));
+		await seedIssueFile(fs2, makeIssue({ id: '1', title: 'B' }));
+		await seedIssueFile(fs2, makeIssue({ id: '2', title: 'C' }));
 
 		let current = fs1;
 		const config = createConfigStore(() => current);
@@ -508,9 +508,9 @@ describe('createIssuesStore — save validation failure', () => {
 		const { issues } = await makeStores(fs);
 		await issues.load();
 
-		await expect(issues.save(1)).rejects.toThrow(/Validation failed/);
-		expect(issues.errors.has(1)).toBe(true);
-		expect(issues.errors.get(1)?.some((e) => e.field === 'severity')).toBe(true);
+		await expect(issues.save('1')).rejects.toThrow(/Validation failed/);
+		expect(issues.errors.has('1')).toBe(true);
+		expect(issues.errors.get('1')?.some((e) => e.field === 'severity')).toBe(true);
 	});
 });
 
@@ -520,8 +520,8 @@ describe('createIssuesStore — save validation failure', () => {
 describe('createIssuesStore — byStatus with unknown status', () => {
 	it('surfaces issues with a status not in config.statuses under their own key', async () => {
 		const fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1, status: 'open' }));
-		await seedIssueFile(fs, makeIssue({ id: 2, status: 'mystery' })); // not in VALID_CONFIG
+		await seedIssueFile(fs, makeIssue({ id: '1', status: 'open' }));
+		await seedIssueFile(fs, makeIssue({ id: '2', status: 'mystery' })); // not in VALID_CONFIG
 
 		const { issues } = await makeStores(fs);
 		await issues.load();
@@ -533,7 +533,7 @@ describe('createIssuesStore — byStatus with unknown status', () => {
 
 	it('frozen bucket rejects .push() so consumers cannot corrupt store state', async () => {
 		const fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1, status: 'open' }));
+		await seedIssueFile(fs, makeIssue({ id: '1', status: 'open' }));
 		const { issues } = await makeStores(fs);
 		await issues.load();
 		const bucket = issues.byStatus.get('open');
@@ -563,7 +563,7 @@ describe('createIssuesStore — validate on unloaded store', () => {
 		const issues = createIssuesStore(() => fs, { config, templates });
 
 		// No load() called yet — store is empty.
-		expect(issues.validate(99)).toEqual([]);
+		expect(issues.validate('99')).toEqual([]);
 	});
 });
 
@@ -583,18 +583,18 @@ describe('createIssuesStore — discard reverts in-memory state', () => {
 		);
 		const { issues } = await makeStores(fs);
 		await issues.load();
-		const originalSnapshot = issues.byId.get(1)?.issue;
+		const originalSnapshot = issues.byId.get('1')?.issue;
 
-		issues.update(1, { title: 'Edited', customFields: { severity: 'critical' } });
-		expect(issues.byId.get(1)?.issue.fields.title).toBe('Edited');
-		expect(issues.byId.get(1)?.issue.customFields['severity']).toBe('critical');
+		issues.update('1', { title: 'Edited', customFields: { severity: 'critical' } });
+		expect(issues.byId.get('1')?.issue.fields.title).toBe('Edited');
+		expect(issues.byId.get('1')?.issue.customFields['severity']).toBe('critical');
 
-		issues.discard(1);
+		issues.discard('1');
 
-		const after = issues.byId.get(1)?.issue;
+		const after = issues.byId.get('1')?.issue;
 		expect(after?.fields.title).toBe(originalSnapshot?.fields.title);
 		expect(after?.customFields).toEqual(originalSnapshot?.customFields);
-		expect(issues.dirty.has(1)).toBe(false);
+		expect(issues.dirty.has('1')).toBe(false);
 	});
 });
 
@@ -604,18 +604,18 @@ describe('createIssuesStore — discard reverts in-memory state', () => {
 describe('createIssuesStore — applyPatch reference identity', () => {
 	it('preserves the customFields map reference across an update', async () => {
 		const fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1, customFields: { severity: 'low' } }));
+		await seedIssueFile(fs, makeIssue({ id: '1', customFields: { severity: 'low' } }));
 		const { issues } = await makeStores(fs);
 		await issues.load();
-		const heldRef = issues.byId.get(1)?.issue.customFields;
+		const heldRef = issues.byId.get('1')?.issue.customFields;
 		expect(heldRef).toBeDefined();
 
-		issues.update(1, { customFields: { priority: 'p1' } });
+		issues.update('1', { customFields: { priority: 'p1' } });
 
 		// Same map object — the per-key assignment in applyPatch preserves
 		// identity. (A wholesale reassignment would break any held reference,
 		// including the editor's draft buffer in Phase 8.)
-		expect(issues.byId.get(1)?.issue.customFields).toBe(heldRef);
+		expect(issues.byId.get('1')?.issue.customFields).toBe(heldRef);
 		expect(heldRef?.['severity']).toBe('low'); // untouched key preserved
 		expect(heldRef?.['priority']).toBe('p1'); // new key added in place
 	});
@@ -627,17 +627,17 @@ describe('createIssuesStore — applyPatch reference identity', () => {
 describe('createIssuesStore — concurrent save on different ids', () => {
 	it('two save() calls for distinct ids both succeed and run concurrently', async () => {
 		const fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1, title: 'One' }));
-		await seedIssueFile(fs, makeIssue({ id: 2, title: 'Two' }));
+		await seedIssueFile(fs, makeIssue({ id: '1', title: 'One' }));
+		await seedIssueFile(fs, makeIssue({ id: '2', title: 'Two' }));
 		const { issues } = await makeStores(fs);
 		await issues.load();
 
 		const order: number[] = [];
 		// Mark both dirty before awaiting saves so the writes actually run.
-		issues.update(1, { title: 'One edited' });
-		issues.update(2, { title: 'Two edited' });
+		issues.update('1', { title: 'One edited' });
+		issues.update('2', { title: 'Two edited' });
 
-		const [r1, r2] = await Promise.all([issues.save(1), issues.save(2)]);
+		const [r1, r2] = await Promise.all([issues.save('1'), issues.save('2')]);
 		order.push(1, 2);
 		expect(r1).toBeUndefined();
 		expect(r2).toBeUndefined();
@@ -645,9 +645,9 @@ describe('createIssuesStore — concurrent save on different ids', () => {
 		// Both should be on disk with the new titles.
 		const reloaded = await makeStores(fs);
 		await reloaded.issues.load();
-		expect(reloaded.issues.byId.get(1)?.issue.fields.title).toBe('One edited');
-		expect(reloaded.issues.byId.get(2)?.issue.fields.title).toBe('Two edited');
-		expect(order).toEqual([1, 2]);
+		expect(reloaded.issues.byId.get('1')?.issue.fields.title).toBe('One edited');
+		expect(reloaded.issues.byId.get('2')?.issue.fields.title).toBe('Two edited');
+		expect(order).toEqual(['1', '2']);
 	});
 });
 
@@ -657,15 +657,15 @@ describe('createIssuesStore — concurrent save on different ids', () => {
 describe('createIssuesStore — save before config load', () => {
 	it('save() throws an actionable error if the config store is not loaded', async () => {
 		const fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1 }));
+		await seedIssueFile(fs, makeIssue({ id: '1' }));
 		// Construct a fresh config + templates + issues store without
 		// calling .load() on config or templates.
 		const config = createConfigStore(() => fs);
 		const templates = createTemplatesStore(() => fs);
 		const issues = createIssuesStore(() => fs, { config, templates });
 		await issues.load();
-		issues.update(1, { title: 'Edited' });
-		await expect(issues.save(1)).rejects.toThrow(/Cannot validate: config store is not loaded/);
+		issues.update('1', { title: 'Edited' });
+		await expect(issues.save('1')).rejects.toThrow(/Cannot validate: config store is not loaded/);
 	});
 });
 
@@ -675,19 +675,19 @@ describe('createIssuesStore — save before config load', () => {
 describe('createIssuesStore — validate before config load', () => {
 	it('validate() returns an empty error list without throwing when config is unloaded', async () => {
 		const fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1 }));
+		await seedIssueFile(fs, makeIssue({ id: '1' }));
 		const config = createConfigStore(() => fs);
 		const templates = createTemplatesStore(() => fs);
 		const issues = createIssuesStore(() => fs, { config, templates });
 		await issues.load();
-		expect(issues.validate(1)).toEqual([]);
+		expect(issues.validate('1')).toEqual([]);
 	});
 
 	it('validate() returns an empty error list for an unknown id without throwing', async () => {
 		const fs = new MemoryFsAdapter();
 		const { issues } = await makeStores(fs);
 		await issues.load();
-		expect(issues.validate(9999)).toEqual([]);
+		expect(issues.validate('9999')).toEqual([]);
 	});
 });
 
@@ -697,7 +697,7 @@ describe('createIssuesStore — validate before config load', () => {
 describe('createIssuesStore — ctx signal aborts in-flight load', () => {
 	it('aborting the ctx.signal mid-load sets status back to idle and keeps the previous issue set', async () => {
 		const fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1 }));
+		await seedIssueFile(fs, makeIssue({ id: '1' }));
 		const controller = new AbortController();
 		const ctx = createStateContext(fs, controller.signal);
 		const config = createConfigStore(() => fs);
@@ -717,7 +717,7 @@ describe('createIssuesStore — ctx signal aborts in-flight load', () => {
 
 	it('without a ctx.signal the store completes a normal load (regression)', async () => {
 		const fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1 }));
+		await seedIssueFile(fs, makeIssue({ id: '1' }));
 		const ctx = createStateContext(fs);
 		const config = createConfigStore(() => fs);
 		const templates = createTemplatesStore(() => fs);
@@ -734,7 +734,7 @@ describe('createIssuesStore — ctx signal aborts in-flight load', () => {
 describe('createIssuesStore — load error state', () => {
 	it('non-abort error during load surfaces status="error" + the error object', async () => {
 		const fs = new MemoryFsAdapter();
-		await seedIssueFile(fs, makeIssue({ id: 1 }));
+		await seedIssueFile(fs, makeIssue({ id: '1' }));
 		// Force readTextFile to throw — `listDirectory` swallows its own
 		// errors (treats missing dir as empty), but a read failure inside
 		// the parse loop propagates out of `loadIssues` and is caught by

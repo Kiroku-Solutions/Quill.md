@@ -205,7 +205,7 @@ describe('state layer integration — full CRUD journey', () => {
 		await issues.load();
 		expect(issues.status).toBe('ready');
 		expect(issues.issues).toHaveLength(1);
-		expect(issues.byId.get(1)?.issue.fields.title).toBe('Original seed');
+		expect(issues.byId.get('1')?.issue.fields.title).toBe('Original seed');
 		expect(issues.integrityWarnings).toHaveLength(0);
 
 		// ── Create a new issue ──────────────────────────────────────────
@@ -261,11 +261,11 @@ describe('state layer integration — full CRUD journey', () => {
 		expect(issues2.integrityWarnings).toHaveLength(0);
 
 		// The seeded issue should also have stayed clean (not touched).
-		const seedReloaded = issues2.byId.get(1);
+		const seedReloaded = issues2.byId.get('1');
 		expect(seedReloaded?.issue.integrityWarning).toBe(false);
 
 		// ── Discard (round-trip the editor) ─────────────────────────────
-		editor.open(1);
+		editor.open('1');
 		editor.patchField('title', 'Will be discarded');
 		expect(editor.isDirty).toBe(true);
 		editor.discard();
@@ -317,7 +317,7 @@ describe('state layer integration — full CRUD journey', () => {
 		await issues.load();
 
 		const editor = createEditorStore({ issues, config, templates });
-		editor.open(1);
+		editor.open('1');
 		editor.patchField('title', 'Hash integrity check');
 		await editor.save();
 
@@ -327,6 +327,6 @@ describe('state layer integration — full CRUD journey', () => {
 		await templates2.load();
 		const issues2 = createIssuesStore(() => fs, { config: config2, templates: templates2 });
 		await issues2.load();
-		expect(issues2.byId.get(1)?.issue.integrityWarning).toBe(false);
+		expect(issues2.byId.get('1')?.issue.integrityWarning).toBe(false);
 	});
 });

@@ -104,7 +104,7 @@ const CONFIG: Config = {
 	remote: { cors_proxy: '' }
 };
 
-function makeIssue(id: number, status: string, title: string, type = 'task'): Issue {
+function makeIssue(id: string, status: string, title: string, type = 'task'): Issue {
 	return {
 		id,
 		fields: {
@@ -130,7 +130,7 @@ function makeIssue(id: number, status: string, title: string, type = 'task'): Is
 	};
 }
 
-function makeLoaded(id: number, status: string, title: string): LoadedIssue {
+function makeLoaded(id: string, status: string, title: string): LoadedIssue {
 	return {
 		issue: makeIssue(id, status, title),
 		sourcePath: `.quill.md/issues/${String(id).padStart(4, '0')}-${title.toLowerCase()}.md`
@@ -179,7 +179,7 @@ function buildStub(opts: {
 	integrityCount?: number;
 	recentHandles?: HandleRecord[];
 	issues?: LoadedIssue[];
-	activeEditorId?: number | null;
+	activeEditorId?: string | null;
 	settingsOpen?: boolean;
 	mobileNavOpen?: boolean;
 }): StoreGraph {
@@ -289,7 +289,7 @@ function buildStub(opts: {
 			isDirty: activeEditorId !== null,
 			integrityWarning: false,
 			errors: [],
-			open: (id: number) => {
+			open: (id: string) => {
 				openCalls.push({ id });
 			},
 			close: () => {},
@@ -448,9 +448,9 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 		activeStub = buildStub({
 			mode: 'local',
 			issues: [
-				makeLoaded(1, 'open', 'First issue'),
-				makeLoaded(2, 'in_progress', 'Second issue'),
-				makeLoaded(3, 'done', 'Third issue')
+				makeLoaded('1', 'open', 'First issue'),
+				makeLoaded('2', 'in_progress', 'Second issue'),
+				makeLoaded('3', 'done', 'Third issue')
 			]
 		});
 		render(AppShell, { mode: 'local' });
@@ -467,9 +467,9 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 		activeStub = buildStub({
 			mode: 'local',
 			issues: [
-				makeLoaded(1, 'open', 'First issue'),
-				makeLoaded(2, 'in_progress', 'Second issue'),
-				makeLoaded(3, 'open', 'Third issue')
+				makeLoaded('1', 'open', 'First issue'),
+				makeLoaded('2', 'in_progress', 'Second issue'),
+				makeLoaded('3', 'open', 'Third issue')
 			]
 		});
 		render(AppShell, { mode: 'local' });
@@ -487,7 +487,7 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 	it('local gantt view — no serious or critical axe violations', async () => {
 		activeStub = buildStub({
 			mode: 'local',
-			issues: [makeLoaded(1, 'open', 'First issue'), makeLoaded(2, 'in_progress', 'Second issue')]
+			issues: [makeLoaded('1', 'open', 'First issue'), makeLoaded('2', 'in_progress', 'Second issue')]
 		});
 		render(AppShell, { mode: 'local' });
 		if (activeStub) (activeStub.view as { view: string }).view = 'gantt';
@@ -509,7 +509,7 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 		// tooltip.
 		activeStub = buildStub({
 			mode: 'local',
-			issues: [makeLoaded(1, 'open', 'First issue'), makeLoaded(2, 'in_progress', 'Second issue')]
+			issues: [makeLoaded('1', 'open', 'First issue'), makeLoaded('2', 'in_progress', 'Second issue')]
 		});
 		render(AppShell, { mode: 'local' });
 		if (activeStub) (activeStub.view as { view: string }).view = 'gantt';
@@ -533,11 +533,11 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 	});
 
 	it('editor panel — no serious or critical axe violations', async () => {
-		const li = makeLoaded(1, 'open', 'A real issue');
+		const li = makeLoaded('1', 'open', 'A real issue');
 		activeStub = buildStub({
 			mode: 'local',
 			issues: [li],
-			activeEditorId: 1
+			activeEditorId: '1'
 		});
 		render(AppShell, { mode: 'local' });
 		render(LocalPage);
@@ -579,7 +579,7 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 	it('remote list view — no serious or critical axe violations', async () => {
 		activeStub = buildStub({
 			mode: 'remote',
-			issues: [makeLoaded(1, 'open', 'Read-only issue')]
+			issues: [makeLoaded('1', 'open', 'Read-only issue')]
 		});
 		render(AppShell, { mode: 'remote' });
 		render(RemotePage);
@@ -618,24 +618,24 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 			{
 				label: 'local-list',
 				mode: 'local',
-				issues: [makeLoaded(1, 'open', 'A'), makeLoaded(2, 'in_progress', 'B')]
+				issues: [makeLoaded('1', 'open', 'A'), makeLoaded('2', 'in_progress', 'B')]
 			},
 			{
 				label: 'local-kanban',
 				mode: 'local',
-				issues: [makeLoaded(1, 'open', 'A'), makeLoaded(2, 'in_progress', 'B')],
+				issues: [makeLoaded('1', 'open', 'A'), makeLoaded('2', 'in_progress', 'B')],
 				view: 'kanban'
 			},
 			{
 				label: 'local-gantt',
 				mode: 'local',
-				issues: [makeLoaded(1, 'open', 'A'), makeLoaded(2, 'in_progress', 'B')],
+				issues: [makeLoaded('1', 'open', 'A'), makeLoaded('2', 'in_progress', 'B')],
 				view: 'gantt'
 			},
 			{
 				label: 'editor',
 				mode: 'local',
-				issues: [makeLoaded(1, 'open', 'A real issue')],
+				issues: [makeLoaded('1', 'open', 'A real issue')],
 				editorId: 1
 			},
 			{ label: 'wizard', mode: 'home', route: 'wizard' },
@@ -645,7 +645,7 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 				route: 'settings',
 				recentHandles: [makeHandle('recent-1', 'acme-projects')]
 			},
-			{ label: 'remote-list', mode: 'remote', issues: [makeLoaded(1, 'open', 'Read-only')] }
+			{ label: 'remote-list', mode: 'remote', issues: [makeLoaded('1', 'open', 'Read-only')] }
 		];
 
 		const summary: Array<{

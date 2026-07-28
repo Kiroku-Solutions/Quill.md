@@ -46,7 +46,7 @@ const CONFIG: Config = {
 	remote: { cors_proxy: '' }
 };
 
-function makeIssue(id: number, status: string, title: string): Issue {
+function makeIssue(id: string, status: string, title: string): Issue {
 	return {
 		id,
 		fields: {
@@ -157,7 +157,7 @@ function buildStub(issues: readonly Issue[]): StoreGraph {
 			isDirty: false,
 			integrityWarning: false,
 			errors: [],
-			open: (id: number) => {
+			open: (id: string) => {
 				openCalls.push({ id });
 			},
 			close: () => {},
@@ -208,9 +208,9 @@ describe('ListView — keyboard nav (NFR-4)', () => {
 
 	it('renders one row per issue with the filter pill count', async () => {
 		activeStub = buildStub([
-			makeIssue(1, 'open', 'First issue'),
-			makeIssue(2, 'open', 'Second issue'),
-			makeIssue(3, 'open', 'Third issue')
+			makeIssue('1', 'open', 'First issue'),
+			makeIssue('2', 'open', 'Second issue'),
+			makeIssue('3', 'open', 'Third issue')
 		]);
 		render(ListView);
 
@@ -219,9 +219,9 @@ describe('ListView — keyboard nav (NFR-4)', () => {
 
 	it('auto-focuses the first row on mount', async () => {
 		activeStub = buildStub([
-			makeIssue(1, 'open', 'First issue'),
-			makeIssue(2, 'open', 'Second issue'),
-			makeIssue(3, 'open', 'Third issue')
+			makeIssue('1', 'open', 'First issue'),
+			makeIssue('2', 'open', 'Second issue'),
+			makeIssue('3', 'open', 'Third issue')
 		]);
 		render(ListView);
 
@@ -232,9 +232,9 @@ describe('ListView — keyboard nav (NFR-4)', () => {
 
 	it('moves focus to the next row on ArrowDown', async () => {
 		activeStub = buildStub([
-			makeIssue(1, 'open', 'First issue'),
-			makeIssue(2, 'open', 'Second issue'),
-			makeIssue(3, 'open', 'Third issue')
+			makeIssue('1', 'open', 'First issue'),
+			makeIssue('2', 'open', 'Second issue'),
+			makeIssue('3', 'open', 'Third issue')
 		]);
 		render(ListView);
 
@@ -252,9 +252,9 @@ describe('ListView — keyboard nav (NFR-4)', () => {
 
 	it('moves focus to the previous row on ArrowUp', async () => {
 		activeStub = buildStub([
-			makeIssue(1, 'open', 'First issue'),
-			makeIssue(2, 'open', 'Second issue'),
-			makeIssue(3, 'open', 'Third issue')
+			makeIssue('1', 'open', 'First issue'),
+			makeIssue('2', 'open', 'Second issue'),
+			makeIssue('3', 'open', 'Third issue')
 		]);
 		render(ListView);
 
@@ -277,9 +277,9 @@ describe('ListView — keyboard nav (NFR-4)', () => {
 
 	it('opens the editor when Enter is pressed on a focused row', async () => {
 		activeStub = buildStub([
-			makeIssue(1, 'open', 'First issue'),
-			makeIssue(2, 'open', 'Second issue'),
-			makeIssue(3, 'open', 'Third issue')
+			makeIssue('1', 'open', 'First issue'),
+			makeIssue('2', 'open', 'Second issue'),
+			makeIssue('3', 'open', 'Third issue')
 		]);
 		render(ListView);
 
@@ -289,6 +289,6 @@ describe('ListView — keyboard nav (NFR-4)', () => {
 
 		await userEvent.keyboard('{Enter}');
 
-		expect(openCalls).toEqual([{ id: 1 }]);
+		expect(openCalls).toEqual([{ id: '1' }]);
 	});
 });

@@ -41,7 +41,7 @@ interface UpdateCall {
 	patch: Record<string, unknown>;
 }
 interface OpenCall {
-	id: number;
+	id: string;
 }
 
 let activeStub: StoreGraph | null = null;
@@ -79,7 +79,7 @@ const CONFIG: Config = {
 	remote: { cors_proxy: '' }
 };
 
-function makeIssue(id: number, status: string, title: string): Issue {
+function makeIssue(id: string, status: string, title: string): Issue {
 	return {
 		id,
 		fields: {
@@ -110,7 +110,7 @@ function buildStub(issues: readonly Issue[], mode: 'local' | 'remote'): StoreGra
 		issue: iss,
 		sourcePath: `.quill.md/issues/${String(iss.id).padStart(4, '0')}-${iss.fields.title.toLowerCase()}.md`
 	}));
-	const byId = new Map<number, LoadedIssue>(loaded.map((li) => [li.issue.id, li]));
+	const byId = new Map<string, LoadedIssue>(loaded.map((li) => [li.issue.id, li]));
 	const byStatus = new Map<string, LoadedIssue[]>();
 	for (const li of loaded) {
 		const bucket = byStatus.get(li.issue.fields.status);
@@ -189,8 +189,8 @@ function buildStub(issues: readonly Issue[], mode: 'local' | 'remote'): StoreGra
 			load: () => Promise.resolve(),
 			create: () => Promise.resolve(1 as never),
 			importIssue: () => Promise.resolve(1 as never),
-			update: (id: number, patch: Record<string, unknown>) => {
-				updateCalls.push({ id, patch });
+			update: (id: string, patch: Record<string, unknown>) => {
+				updateCalls.push({ id: String(id), patch });
 				const li = byId.get(id);
 				if (li) {
 					// Mirror the store's behaviour: update in memory.
@@ -219,7 +219,7 @@ function buildStub(issues: readonly Issue[], mode: 'local' | 'remote'): StoreGra
 			isDirty: false,
 			integrityWarning: false,
 			errors: [],
-			open: (id: number) => {
+			open: (id: string) => {
 				openCalls.push({ id });
 			},
 			close: () => {},
@@ -274,9 +274,9 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 	it('renders one card per column with the status as the column key', async () => {
 		activeStub = buildStub(
 			[
-				makeIssue(1, 'open', 'First issue'),
-				makeIssue(2, 'in_progress', 'Second issue'),
-				makeIssue(3, 'closed', 'Third issue')
+				makeIssue('1', 'open', 'First issue'),
+				makeIssue('2', 'in_progress', 'Second issue'),
+				makeIssue('3', 'closed', 'Third issue')
 			],
 			'local'
 		);
@@ -292,9 +292,9 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 	it('moves a card to the next column on ArrowRight and updates the store', async () => {
 		activeStub = buildStub(
 			[
-				makeIssue(1, 'open', 'First issue'),
-				makeIssue(2, 'in_progress', 'Second issue'),
-				makeIssue(3, 'closed', 'Third issue')
+				makeIssue('1', 'open', 'First issue'),
+				makeIssue('2', 'in_progress', 'Second issue'),
+				makeIssue('3', 'closed', 'Third issue')
 			],
 			'local'
 		);
@@ -312,15 +312,15 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 		await userEvent.keyboard('{ArrowRight}');
 
 		expect(updateCalls).toHaveLength(1);
-		expect(updateCalls[0]).toEqual({ id: 1, patch: { fields: { status: 'in_progress' } } });
+		expect(updateCalls[0]).toEqual({ id: '1', patch: { fields: { status: 'in_progress' } } });
 	});
 
 	it('opens the editor when a card is clicked', async () => {
 		activeStub = buildStub(
 			[
-				makeIssue(1, 'open', 'First issue'),
-				makeIssue(2, 'in_progress', 'Second issue'),
-				makeIssue(3, 'closed', 'Third issue')
+				makeIssue('1', 'open', 'First issue'),
+				makeIssue('2', 'in_progress', 'Second issue'),
+				makeIssue('3', 'closed', 'Third issue')
 			],
 			'local'
 		);
@@ -329,15 +329,15 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 		const firstCard = page.getByTestId('kanban-card').first();
 		await firstCard.click();
 
-		expect(openCalls).toEqual([{ id: 1 }]);
+		expect(openCalls).toEqual([{ id: '1' }]);
 	});
 
 	it('moves a card to the previous column on ArrowLeft', async () => {
 		activeStub = buildStub(
 			[
-				makeIssue(1, 'open', 'First issue'),
-				makeIssue(2, 'in_progress', 'Second issue'),
-				makeIssue(3, 'closed', 'Third issue')
+				makeIssue('1', 'open', 'First issue'),
+				makeIssue('2', 'in_progress', 'Second issue'),
+				makeIssue('3', 'closed', 'Third issue')
 			],
 			'local'
 		);
@@ -349,15 +349,15 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 
 		await userEvent.keyboard('{ArrowLeft}');
 
-		expect(updateCalls).toEqual([{ id: 2, patch: { fields: { status: 'open' } } }]);
+		expect(updateCalls).toEqual([{ id: '2', patch: { fields: { status: 'open' } } }]);
 	});
 
 	it('keyboard reorder commits in Remote Mode (FR-5 / FR-16)', async () => {
 		activeStub = buildStub(
 			[
-				makeIssue(1, 'open', 'First issue'),
-				makeIssue(2, 'in_progress', 'Second issue'),
-				makeIssue(3, 'closed', 'Third issue')
+				makeIssue('1', 'open', 'First issue'),
+				makeIssue('2', 'in_progress', 'Second issue'),
+				makeIssue('3', 'closed', 'Third issue')
 			],
 			'remote'
 		);
@@ -372,13 +372,13 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 		// Remote Edit Mode: keyboard reorder is no longer a no-op.
 		// The store update fires; the commit queue coalesces with
 		// subsequent drags within the debounce window.
-		expect(updateCalls).toEqual([{ id: 1, patch: { fields: { status: 'in_progress' } } }]);
+		expect(updateCalls).toEqual([{ id: '1', patch: { fields: { status: 'in_progress' } } }]);
 		// F2 still opens the editor in Remote Mode. Focus follows the
 		// move onto the next card in the destination column (card 2
 		// was already in `in_progress` and occupies the slot card 1
 		// just moved into), so F2 opens card 2's editor.
 		await userEvent.keyboard('{F2}');
-		expect(openCalls).toEqual([{ id: 2 }]);
+		expect(openCalls).toEqual([{ id: '2' }]);
 	});
 
 	// ─── Step 8 — WAI-ARIA DnD keyboard parity (NFR-4) ──────────────────
@@ -390,7 +390,7 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 
 	it('picks up a card on Space and announces the pickup (aria-live)', async () => {
 		activeStub = buildStub(
-			[makeIssue(1, 'open', 'First issue'), makeIssue(2, 'in_progress', 'Second issue')],
+			[makeIssue('1', 'open', 'First issue'), makeIssue('2', 'in_progress', 'Second issue')],
 			'local'
 		);
 		render(KanbanDndHarness);
@@ -413,7 +413,7 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 
 	it('drops a lifted card on a second Space and announces the drop', async () => {
 		activeStub = buildStub(
-			[makeIssue(1, 'open', 'First issue'), makeIssue(2, 'in_progress', 'Second issue')],
+			[makeIssue('1', 'open', 'First issue'), makeIssue('2', 'in_progress', 'Second issue')],
 			'local'
 		);
 		render(KanbanDndHarness);
@@ -438,9 +438,9 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 	it('moves a lifted card with ArrowRight and commits on the implicit drop', async () => {
 		activeStub = buildStub(
 			[
-				makeIssue(1, 'open', 'First issue'),
-				makeIssue(2, 'in_progress', 'Second issue'),
-				makeIssue(3, 'closed', 'Third issue')
+				makeIssue('1', 'open', 'First issue'),
+				makeIssue('2', 'in_progress', 'Second issue'),
+				makeIssue('3', 'closed', 'Third issue')
 			],
 			'local'
 		);
@@ -454,7 +454,7 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 		await userEvent.keyboard('{ArrowRight}');
 
 		expect(updateCalls).toHaveLength(1);
-		expect(updateCalls[0]).toEqual({ id: 1, patch: { fields: { status: 'in_progress' } } });
+		expect(updateCalls[0]).toEqual({ id: '1', patch: { fields: { status: 'in_progress' } } });
 
 		// The lifted flag is cleared on the implicit drop.
 		expect(firstCard?.getAttribute('data-lifted')).toBe('false');
@@ -464,7 +464,7 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 
 	it('cancels a pickup on Escape and announces the cancellation', async () => {
 		activeStub = buildStub(
-			[makeIssue(1, 'open', 'First issue'), makeIssue(2, 'in_progress', 'Second issue')],
+			[makeIssue('1', 'open', 'First issue'), makeIssue('2', 'in_progress', 'Second issue')],
 			'local'
 		);
 		render(KanbanDndHarness);
@@ -486,7 +486,7 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 
 	it('opens the editor on F2 (the WAI-ARIA activate verb)', async () => {
 		activeStub = buildStub(
-			[makeIssue(1, 'open', 'First issue'), makeIssue(2, 'in_progress', 'Second issue')],
+			[makeIssue('1', 'open', 'First issue'), makeIssue('2', 'in_progress', 'Second issue')],
 			'local'
 		);
 		render(KanbanDndHarness);
@@ -496,7 +496,7 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 
 		await userEvent.keyboard('{F2}');
 
-		expect(openCalls).toEqual([{ id: 1 }]);
+		expect(openCalls).toEqual([{ id: '1' }]);
 		// F2 is not a pickup — the card stays un-lifted.
 		expect(firstCard?.getAttribute('data-lifted')).toBe('false');
 		// F2 is not a DnD move — no store update.
@@ -505,7 +505,7 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 
 	it('opens the editor on the `o` mnemonic key', async () => {
 		activeStub = buildStub(
-			[makeIssue(1, 'open', 'First issue'), makeIssue(2, 'in_progress', 'Second issue')],
+			[makeIssue('1', 'open', 'First issue'), makeIssue('2', 'in_progress', 'Second issue')],
 			'local'
 		);
 		render(KanbanDndHarness);
@@ -515,12 +515,12 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 
 		await userEvent.keyboard('o');
 
-		expect(openCalls).toEqual([{ id: 1 }]);
+		expect(openCalls).toEqual([{ id: '1' }]);
 	});
 
 	it('pickup handshake commits in Remote Mode (FR-5 / FR-16)', async () => {
 		activeStub = buildStub(
-			[makeIssue(1, 'open', 'First issue'), makeIssue(2, 'in_progress', 'Second issue')],
+			[makeIssue('1', 'open', 'First issue'), makeIssue('2', 'in_progress', 'Second issue')],
 			'remote'
 		);
 		render(KanbanDndHarness);
@@ -534,11 +534,11 @@ describe('KanbanView — keyboard parity (NFR-4)', () => {
 
 		// A subsequent arrow with the lift active commits the move.
 		await userEvent.keyboard('{ArrowRight}');
-		expect(updateCalls).toEqual([{ id: 1, patch: { fields: { status: 'in_progress' } } }]);
+		expect(updateCalls).toEqual([{ id: '1', patch: { fields: { status: 'in_progress' } } }]);
 
 		// F2 opens the editor of the focused card. Focus follows the
 		// move onto card 2 (the next card in the destination column).
 		await userEvent.keyboard('{F2}');
-		expect(openCalls).toEqual([{ id: 2 }]);
+		expect(openCalls).toEqual([{ id: '2' }]);
 	});
 });

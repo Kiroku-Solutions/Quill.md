@@ -82,7 +82,7 @@ export function buildDefaultIssue(
 export function issuePath(issue: Issue, config: Config | null): string {
 	let category = 'open';
 	if (config) {
-		const st = config.statuses.find((s) => s.id === issue.fields.status);
+		const st = config?.statuses?.find((s) => s.id === issue.fields.status);
 		if (st && (st.category === 'done' || st.category === 'cancelled')) {
 			category = 'closed';
 		}

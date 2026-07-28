@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import yaml from 'js-yaml';
+import crypto from 'node:crypto';
 import { serializeIssue, buildIssueFilename, Issue } from '../services/serializer.js';
 
 function getIssuesDir() {
@@ -43,7 +44,7 @@ export async function listIssues() {
 	}
 }
 
-export async function readIssue(issueId: number) {
+export async function readIssue(issueId: string) {
 	const issuesDir = getIssuesDir();
 	try {
 		const files = await fs.readdir(issuesDir);
@@ -71,7 +72,7 @@ export async function createIssue(
 	issueType: string,
 	status: string,
 	sections: Record<string, string>,
-	relations?: Array<{ type: string; id: number }>,
+	relations?: Array<{ type: string; id: string }>,
 	customFields?: Record<string, unknown>
 ) {
 	const issuesDir = getIssuesDir();
@@ -131,17 +132,7 @@ export async function createIssue(
 		}
 		// --- END STRICT VALIDATION ---
 
-		// Generate new ID
-		let maxId = 0;
-		const files = await fs.readdir(issuesDir).catch(() => []);
-		for (const file of files) {
-			const match = file.match(/^(\d+)-/);
-			if (match) {
-				const id = parseInt(match[1], 10);
-				if (id > maxId) maxId = id;
-			}
-		}
-		const newId = maxId + 1;
+		const newId = crypto.randomUUID();
 
 		const issueSections = Object.entries(sections).map(([name, markdown]) => ({
 			name,

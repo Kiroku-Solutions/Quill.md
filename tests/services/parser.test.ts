@@ -33,7 +33,7 @@ async function withValidHash(text: string): Promise<string> {
 describe('parseIssueFile — file shape', () => {
 	it('returns default-shaped Issue for an empty file', async () => {
 		const { issue, sourcePath } = await parseIssueFile('', 'memory://empty.md');
-		expect(issue.id).toBe(0);
+		expect(issue.id).toBe('0');
 		expect(issue.fields.title).toBe('');
 		expect(issue.fields.author).toBe('');
 		expect(issue.fields.creationDate).toBe('');
@@ -45,9 +45,9 @@ describe('parseIssueFile — file shape', () => {
 	});
 
 	it('parses frontmatter-only files with no body sections', async () => {
-		const text = '---\nid: 5\ntitle: Foo\nstatus: open\n---\n';
+		const text = '---\nid: '5'\ntitle: Foo\nstatus: open\n---\n';
 		const { issue } = await parseIssueFile(text, 'memory://fm-only.md');
-		expect(issue.id).toBe(5);
+		expect(issue.id).toBe('5');
 		expect(issue.fields.title).toBe('Foo');
 		expect(issue.fields.status).toBe('open');
 		expect(issue.sections).toEqual([]);
@@ -126,36 +126,36 @@ describe('parseIssueFile — relations (FR-9)', () => {
 
 	it('parses all five valid relation types', async () => {
 		const text = withRelations(
-			'  - type: parent\n    id: 2\n' +
-				'  - type: child\n    id: 3\n' +
-				'  - type: blocks\n    id: 4\n' +
-				'  - type: depends_on\n    id: 5\n' +
-				'  - type: relates_to\n    id: 6\n'
+			'  - type: parent\n    id: '2'\n' +
+				'  - type: child\n    id: '3'\n' +
+				'  - type: blocks\n    id: '4'\n' +
+				'  - type: depends_on\n    id: '5'\n' +
+				'  - type: relates_to\n    id: '6'\n'
 		);
 		const { issue } = await parseIssueFile(text, 'memory://relations.md');
 		expect(issue.fields.relations).toEqual([
-			{ type: 'parent', id: 2 },
-			{ type: 'child', id: 3 },
-			{ type: 'blocks', id: 4 },
-			{ type: 'depends_on', id: 5 },
-			{ type: 'relates_to', id: 6 }
+			{ type: 'parent', id: '2' },
+			{ type: 'child', id: '3' },
+			{ type: 'blocks', id: '4' },
+			{ type: 'depends_on', id: '5' },
+			{ type: 'relates_to', id: '6' }
 		]);
 	});
 
 	it('drops relations with an unknown type', async () => {
 		const text = withRelations(
-			'  - type: parent\n    id: 2\n' + '  - type: frobnitz\n    id: 99\n'
+			'  - type: parent\n    id: '2'\n' + '  - type: frobnitz\n    id: 99\n'
 		);
 		const { issue } = await parseIssueFile(text, 'memory://bad-type.md');
-		expect(issue.fields.relations).toEqual([{ type: 'parent', id: 2 }]);
+		expect(issue.fields.relations).toEqual([{ type: 'parent', id: '2' }]);
 	});
 
 	it('drops relations with a non-numeric id', async () => {
 		const text = withRelations(
-			'  - type: parent\n    id: "not-a-number"\n' + '  - type: child\n    id: 5\n'
+			'  - type: parent\n    id: "not-a-number"\n' + '  - type: child\n    id: '5'\n'
 		);
 		const { issue } = await parseIssueFile(text, 'memory://bad-id.md');
-		expect(issue.fields.relations).toEqual([{ type: 'child', id: 5 }]);
+		expect(issue.fields.relations).toEqual([{ type: 'child', id: '5' }]);
 	});
 
 	it('returns [] when relations is not an array', async () => {
@@ -216,7 +216,7 @@ describe('parseIssueFile — custom fields', () => {
 		const text = '---\nid: 7\ntitle: T\nstatus: open\nlabels: [a]\n---\n';
 		const { issue } = await parseIssueFile(text, 'memory://syskey.md');
 		expect(issue.customFields).toEqual({});
-		expect(issue.id).toBe(7);
+		expect(issue.id).toBe('7');
 		expect(issue.fields.title).toBe('T');
 		expect(issue.fields.status).toBe('open');
 		expect(issue.fields.labels).toEqual(['a']);

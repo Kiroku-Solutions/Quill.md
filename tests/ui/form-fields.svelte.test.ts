@@ -105,7 +105,7 @@ const CONFIG: Config = {
 
 function makeIssue(): Issue {
 	return {
-		id: 42,
+		id: '42',
 		fields: {
 			title: 'Test issue',
 			author: 'tester',
@@ -144,7 +144,7 @@ const TASK_TEMPLATE: Template = {
 	default_status: 'open',
 	fields: [
 		{
-			id: 1,
+			id: '1',
 			key: 'summary',
 			type: 'text',
 			name: 'Summary',
@@ -181,7 +181,7 @@ function buildStub(opts: StubOpts = {}): StoreGraph {
 	const errors = opts.errors ?? [];
 	const byType = new Map<string, Template>();
 	byType.set(tpl.id, tpl);
-	const byId = new Map<number, LoadedIssue>();
+	const byId = new Map<string, LoadedIssue>();
 	byId.set(loaded.issue.id, loaded);
 	return {
 		mode: {
@@ -452,7 +452,7 @@ describe('FormFields — template-driven form rows', () => {
 			...TASK_TEMPLATE.fields,
 			{
 				id: 0,
-				key: 'description',
+			key: 'description',
 				type: 'longtext',
 				name: 'Description',
 				obligatory: false

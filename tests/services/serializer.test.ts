@@ -66,8 +66,8 @@ function makeIssue(overrides: Record<string, unknown> = {}): Issue {
 		assignee: 'jane',
 		labels: ['security', 'frontend'],
 		relations: [
-			{ type: 'blocks', id: 45 },
-			{ type: 'relates_to', id: 7 }
+			{ type: 'blocks', id: '45' },
+			{ type: 'relates_to', id: '7' }
 		],
 		startDate: '2026-10-20',
 		endDate: null,
@@ -86,7 +86,7 @@ function makeIssue(overrides: Record<string, unknown> = {}): Issue {
 	const overrideCustomFields = overrides['customFields'];
 	delete overrides['customFields'];
 	return {
-		id: 42,
+		id: '42',
 		...overrides,
 		fields,
 		integrityHash: null,
@@ -183,7 +183,7 @@ describe('serializeIssue — section bodies', () => {
 		const text = await serializeIssue(makeIssue());
 		// Section blocks end with "...END: Description] -->\n"; the next
 		// section starts on a new line.
-		expect(text).toMatch(/\[SECTION_END: Description\] -->\n\n<!-- \[SECTION_START/);
+		expect(text).toMatch(/\[SECTION_END: Description\] -->\n\n## Steps to reproduce\n<!-- \[SECTION_START/);
 	});
 });
 

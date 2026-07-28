@@ -61,12 +61,12 @@ const VALID_TASK_TEMPLATE: Template = {
 	color: '#0f0',
 	default_status: 'open',
 	fields: [
-		{ id: 1, key: 'priority', type: 'text', name: 'Priority', obligatory: false },
-		{ id: 2, key: 'story_points', type: 'number', name: 'Story Points', obligatory: false }
+		{ id: '1', key: 'priority', type: 'text', name: 'Priority', obligatory: false },
+		{ id: '2', key: 'story_points', type: 'number', name: 'Story Points', obligatory: false }
 	],
 	sections: [
-		{ id: 1, key: 'description', name: 'Description', obligatory: true },
-		{ id: 2, key: 'acceptance', name: 'Acceptance Criteria', obligatory: false }
+		{ id: '1', key: 'description', name: 'Description', obligatory: true },
+		{ id: '2', key: 'acceptance', name: 'Acceptance Criteria', obligatory: false }
 	]
 };
 
@@ -76,10 +76,10 @@ const VALID_BUG_TEMPLATE: Template = {
 	icon: 'bug',
 	color: '#f00',
 	default_status: 'open',
-	fields: [{ id: 1, key: 'severity', type: 'text', name: 'Severity', obligatory: true }],
+	fields: [{ id: '1', key: 'severity', type: 'text', name: 'Severity', obligatory: true }],
 	sections: [
-		{ id: 1, key: 'description', name: 'Description', obligatory: true },
-		{ id: 2, key: 'steps', name: 'Steps to reproduce', obligatory: false }
+		{ id: '1', key: 'description', name: 'Description', obligatory: true },
+		{ id: '2', key: 'steps', name: 'Steps to reproduce', obligatory: false }
 	]
 };
 
@@ -95,12 +95,12 @@ async function seedFixtures(
 	if (opts.includeIssues && opts.includeIssues > 0) {
 		for (let i = 1; i <= opts.includeIssues; i++) {
 			const md = await renderFixtureIssue(i, `Issue ${i}`);
-			await fs.writeTextFile(`.quill.md/issues/${buildIssueFilename(i, `Issue ${i}`)}`, md);
+			await fs.writeTextFile(`.quill.md/issues/${buildIssueFilename(String(i), `Issue ${i}`)}`, md);
 		}
 	}
 }
 
-async function renderFixtureIssue(id: number, title: string): Promise<string> {
+async function renderFixtureIssue(id: string, title: string): Promise<string> {
 	const issue: Issue = {
 		id,
 		fields: {
@@ -301,7 +301,7 @@ describe('integration — delete (move-to-trash)', () => {
 		const kept = before[1]!;
 
 		await moveToTrash(fs, moved.sourcePath);
-		expect(await emptyTrash(fs)).toBe(1);
+		expect(await emptyTrash(fs)).toBe('1');
 
 		const after = await loadIssues(fs);
 		expect(after).toHaveLength(1);
@@ -327,7 +327,7 @@ describe('integration — multi-template workflow', () => {
 		expect(bug).toBeDefined();
 
 		const taskIssue: Issue = {
-			id: 1,
+			id: '1',
 			fields: {
 				sprintId: null,
 				estimate: null,
@@ -350,7 +350,7 @@ describe('integration — multi-template workflow', () => {
 			integrityWarning: false
 		};
 		const bugIssue: Issue = {
-			id: 2,
+			id: '2',
 			fields: {
 				title: 'Login crash',
 				author: 'jose',
@@ -385,8 +385,8 @@ describe('integration — multi-template workflow', () => {
 		const issues = await loadIssues(fs);
 		expect(issues).toHaveLength(2);
 
-		const loadedTask = issues.find((li) => li.issue.id === 1);
-		const loadedBug = issues.find((li) => li.issue.id === 2);
+		const loadedTask = issues.find((li) => li.issue.id === '1');
+		const loadedBug = issues.find((li) => li.issue.id === '2');
 		expect(loadedTask?.issue.customFields['priority']).toBe('p1');
 		expect(loadedBug?.issue.customFields['severity']).toBe('high');
 	});
