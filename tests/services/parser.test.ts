@@ -33,10 +33,11 @@ async function withValidHash(text: string): Promise<string> {
 describe('parseIssueFile — file shape', () => {
 	it('returns default-shaped Issue for an empty file', async () => {
 		const { issue, sourcePath } = await parseIssueFile('', 'memory://empty.md');
-		expect(issue.id).toBe(0);
-		expect(issue.title).toBe('');
-		expect(issue.author).toBe('');
-		expect(issue.creationDate).toBe('');
+		// Empty frontmatter → id field is absent → asString returns ''
+		expect(issue.id).toBe('');
+		expect(issue.fields.title).toBe('');
+		expect(issue.fields.author).toBe('');
+		expect(issue.fields.creationDate).toBe('');
 		expect(issue.sections).toEqual([]);
 		expect(issue.customFields).toEqual({});
 		// No integrity_hash line at all → warning.
@@ -45,11 +46,11 @@ describe('parseIssueFile — file shape', () => {
 	});
 
 	it('parses frontmatter-only files with no body sections', async () => {
-		const text = '---\nid: 5\ntitle: Foo\nstatus: open\n---\n';
+		const text = '---\nid: "5"\ntitle: Foo\nstatus: open\n---\n';
 		const { issue } = await parseIssueFile(text, 'memory://fm-only.md');
-		expect(issue.id).toBe(5);
-		expect(issue.title).toBe('Foo');
-		expect(issue.status).toBe('open');
+		expect(issue.id).toBe('5');
+		expect(issue.fields.title).toBe('Foo');
+		expect(issue.fields.status).toBe('open');
 		expect(issue.sections).toEqual([]);
 	});
 
@@ -126,42 +127,48 @@ describe('parseIssueFile — relations (FR-9)', () => {
 
 	it('parses all five valid relation types', async () => {
 		const text = withRelations(
-			'  - type: parent\n    id: 2\n' +
-				'  - type: child\n    id: 3\n' +
-				'  - type: blocks\n    id: 4\n' +
-				'  - type: depends_on\n    id: 5\n' +
-				'  - type: relates_to\n    id: 6\n'
+			'  - type: parent\n    id: "2"\n' +
+				'  - type: child\n    id: "3"\n' +
+				'  - type: blocks\n    id: "4"\n' +
+				'  - type: depends_on\n    id: "5"\n' +
+				'  - type: relates_to\n    id: "6"\n'
 		);
 		const { issue } = await parseIssueFile(text, 'memory://relations.md');
-		expect(issue.relations).toEqual([
-			{ type: 'parent', id: 2 },
-			{ type: 'child', id: 3 },
-			{ type: 'blocks', id: 4 },
-			{ type: 'depends_on', id: 5 },
-			{ type: 'relates_to', id: 6 }
+		expect(issue.fields.relations).toEqual([
+			{ type: 'parent', id: '2' },
+			{ type: 'child', id: '3' },
+			{ type: 'blocks', id: '4' },
+			{ type: 'depends_on', id: '5' },
+			{ type: 'relates_to', id: '6' }
 		]);
 	});
 
 	it('drops relations with an unknown type', async () => {
 		const text = withRelations(
-			'  - type: parent\n    id: 2\n' + '  - type: frobnitz\n    id: 99\n'
+			'  - type: parent\n    id: "2"\n' + '  - type: frobnitz\n    id: 99\n'
 		);
 		const { issue } = await parseIssueFile(text, 'memory://bad-type.md');
-		expect(issue.relations).toEqual([{ type: 'parent', id: 2 }]);
+		expect(issue.fields.relations).toEqual([{ type: 'parent', id: '2' }]);
 	});
 
-	it('drops relations with a non-numeric id', async () => {
+	it('accepts relations with any non-empty string id (UUID migration)', async () => {
+		// Since Issue IDs are now UUIDs (arbitrary strings), the parser accepts
+		// any non-empty string as a valid relation id — numeric strings and
+		// opaque strings alike. Only null/empty ids are dropped.
 		const text = withRelations(
-			'  - type: parent\n    id: "not-a-number"\n' + '  - type: child\n    id: 5\n'
+			'  - type: parent\n    id: "not-a-number"\n' + '  - type: child\n    id: "5"\n'
 		);
-		const { issue } = await parseIssueFile(text, 'memory://bad-id.md');
-		expect(issue.relations).toEqual([{ type: 'child', id: 5 }]);
+		const { issue } = await parseIssueFile(text, 'memory://any-string-id.md');
+		expect(issue.fields.relations).toEqual([
+			{ type: 'parent', id: 'not-a-number' },
+			{ type: 'child', id: '5' }
+		]);
 	});
 
 	it('returns [] when relations is not an array', async () => {
 		const text = '---\nid: 1\ntitle: T\nrelations: "not an array"\n---\n';
 		const { issue } = await parseIssueFile(text, 'memory://not-array.md');
-		expect(issue.relations).toEqual([]);
+		expect(issue.fields.relations).toEqual([]);
 	});
 });
 
@@ -170,24 +177,24 @@ describe('parseIssueFile — date fields', () => {
 		const text =
 			'---\nid: 1\ncreation_date: 2026-01-15\nupdated_date: "2026-02-20"\nstart_date: 2026-03-01\nend_date: null\n---\n';
 		const { issue } = await parseIssueFile(text, 'memory://date-str.md');
-		expect(issue.creationDate).toBe('2026-01-15');
-		expect(issue.updatedDate).toBe('2026-02-20');
-		expect(issue.startDate).toBe('2026-03-01');
-		expect(issue.endDate).toBeNull();
+		expect(issue.fields.creationDate).toBe('2026-01-15');
+		expect(issue.fields.updatedDate).toBe('2026-02-20');
+		expect(issue.fields.startDate).toBe('2026-03-01');
+		expect(issue.fields.endDate).toBeNull();
 	});
 
 	it('accepts numeric epoch timestamps (ms) for the same fields', async () => {
 		// 1736899200000 ms = 2025-01-15T00:00:00Z.
 		const text = '---\nid: 1\ncreation_date: 1736899200000\n---\n';
 		const { issue } = await parseIssueFile(text, 'memory://date-num.md');
-		expect(issue.creationDate).toBe('2025-01-15');
+		expect(issue.fields.creationDate).toBe('2025-01-15');
 	});
 
 	it('returns null for null / missing nullable date fields', async () => {
 		const text = '---\nid: 1\nstart_date: null\n---\n';
 		const { issue } = await parseIssueFile(text, 'memory://date-null.md');
-		expect(issue.startDate).toBeNull();
-		expect(issue.endDate).toBeNull();
+		expect(issue.fields.startDate).toBeNull();
+		expect(issue.fields.endDate).toBeNull();
 	});
 
 	it('returns "" for missing required date fields (creationDate / updatedDate)', async () => {
@@ -195,8 +202,8 @@ describe('parseIssueFile — date fields', () => {
 		// render a placeholder without a separate "missing" branch.
 		const text = '---\nid: 1\ntitle: T\n---\n';
 		const { issue } = await parseIssueFile(text, 'memory://date-missing.md');
-		expect(issue.creationDate).toBe('');
-		expect(issue.updatedDate).toBe('');
+		expect(issue.fields.creationDate).toBe('');
+		expect(issue.fields.updatedDate).toBe('');
 	});
 });
 
@@ -216,9 +223,9 @@ describe('parseIssueFile — custom fields', () => {
 		const text = '---\nid: 7\ntitle: T\nstatus: open\nlabels: [a]\n---\n';
 		const { issue } = await parseIssueFile(text, 'memory://syskey.md');
 		expect(issue.customFields).toEqual({});
-		expect(issue.id).toBe(7);
-		expect(issue.title).toBe('T');
-		expect(issue.status).toBe('open');
-		expect(issue.labels).toEqual(['a']);
+		expect(issue.id).toBe('7');
+		expect(issue.fields.title).toBe('T');
+		expect(issue.fields.status).toBe('open');
+		expect(issue.fields.labels).toEqual(['a']);
 	});
 });

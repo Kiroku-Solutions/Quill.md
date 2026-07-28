@@ -58,27 +58,27 @@
 	const groupsMatchList = $derived.by(() => {
 		if (globalGroupBy === 'sprint') {
 			const sprintIssues = Array.from(issues.byId.values()).filter(
-				(li) => li.issue.issueType === 'sprint'
+				(li) => li.issue.fields.issueType === 'sprint'
 			);
 			const definedGroups = sprintIssues.map((s) => ({
 				id: `sprint-${s.issue.id}`,
-				title: s.issue.title,
+				title: s.issue.fields.title,
 				match: (issue: import('$lib/types').Issue) =>
-					issue.relations.some((r) => r.id === s.issue.id) ||
-					s.issue.relations.some((r) => r.id === issue.id)
+					issue.fields.relations.some((r) => r.id === s.issue.id) ||
+					s.issue.fields.relations.some((r) => r.id === issue.id)
 			}));
 			return [...definedGroups, { id: 'unassigned', title: 'Sin Asignar', match: () => true }];
 		}
 		if (globalGroupBy === 'epic') {
 			const epicIssues = Array.from(issues.byId.values()).filter(
-				(li) => li.issue.issueType === 'epic'
+				(li) => li.issue.fields.issueType === 'epic'
 			);
 			const definedGroups = epicIssues.map((e) => ({
 				id: `epic-${e.issue.id}`,
-				title: e.issue.title,
+				title: e.issue.fields.title,
 				match: (issue: import('$lib/types').Issue) =>
-					issue.relations.some((r) => r.id === e.issue.id) ||
-					e.issue.relations.some((r) => r.id === issue.id)
+					issue.fields.relations.some((r) => r.id === e.issue.id) ||
+					e.issue.fields.relations.some((r) => r.id === issue.id)
 			}));
 			return [...definedGroups, { id: 'unassigned', title: 'Sin Asignar', match: () => true }];
 		}
@@ -97,12 +97,12 @@
 				).config?.gantt?.group_by ?? 'issueType';
 
 			const filtered = all.filter((li) => {
-				if (f.status && li.issue.status !== f.status) return false;
-				if (f.type && li.issue.issueType !== f.type) return false;
+				if (f.status && li.issue.fields.status !== f.status) return false;
+				if (f.type && li.issue.fields.issueType !== f.type) return false;
 				if (f.q) {
 					const n = f.q.toLowerCase();
 					if (
-						!li.issue.title.toLowerCase().includes(n) &&
+						!li.issue.fields.title.toLowerCase().includes(n) &&
 						!li.issue.sections.some((s) => s.markdown.toLowerCase().includes(n))
 					)
 						return false;
@@ -112,15 +112,15 @@
 
 			const dated: LoadedIssue[] = [];
 			const notDated: LoadedIssue[] = [];
-			for (const li of filtered) (li.issue.startDate ? dated : notDated).push(li);
+			for (const li of filtered) (li.issue.fields.startDate ? dated : notDated).push(li);
 
 			let lo = Infinity;
 			let hi = -Infinity;
 			for (const li of dated) {
-				const s = Date.parse(li.issue.startDate!);
-				const e = li.issue.endDate
-					? Date.parse(li.issue.endDate)
-					: s + (li.issue.duration ?? 1) * MS_DAY;
+				const s = Date.parse(li.issue.fields.startDate!);
+				const e = li.issue.fields.endDate
+					? Date.parse(li.issue.fields.endDate)
+					: s + (li.issue.fields.duration ?? 1) * MS_DAY;
 				if (s < lo) lo = s;
 				if (e > hi) hi = e;
 			}
@@ -154,14 +154,14 @@
 				for (const g of groupsMatchList) {
 					const items = groups.get(g.title);
 					if (items) {
-						items.sort((a, b) => a.issue.id - b.issue.id);
+						items.sort((a, b) => a.issue.id.localeCompare(b.issue.id));
 						items.forEach((issue, i) => out.push({ group: g.title, issue, rowInGroup: i }));
 						groups.delete(g.title);
 					}
 				}
 			}
 			for (const [group, items] of groups) {
-				items.sort((a, b) => a.issue.id - b.issue.id);
+				items.sort((a, b) => a.issue.id.localeCompare(b.issue.id));
 				items.forEach((issue, i) => out.push({ group, issue, rowInGroup: i }));
 			}
 			return { grouped: out, undated: notDated, minMs, maxMs };
@@ -202,10 +202,10 @@
 			const out: Bar[] = [];
 			for (const r of grouped) {
 				const li = r.issue;
-				const s = Date.parse(li.issue.startDate!);
-				const e = li.issue.endDate
-					? Date.parse(li.issue.endDate)
-					: s + (li.issue.duration ?? 1) * MS_DAY;
+				const s = Date.parse(li.issue.fields.startDate!);
+				const e = li.issue.fields.endDate
+					? Date.parse(li.issue.fields.endDate)
+					: s + (li.issue.fields.duration ?? 1) * MS_DAY;
 				const x = xFor(s);
 				out.push({
 					id: brandIssueId(li.issue.id),
@@ -213,13 +213,13 @@
 					y: yFor(gi.get(r.group) ?? 0, r.rowInGroup),
 					w: Math.max(8, xFor(e) - x),
 					h: BAR_H,
-					title: li.issue.title,
-					type: li.issue.issueType,
-					status: li.issue.status,
+					title: li.issue.fields.title,
+					type: li.issue.fields.issueType,
+					status: li.issue.fields.status,
 					group: r.group,
-					startDate: li.issue.startDate,
-					endDate: li.issue.endDate,
-					duration: li.issue.duration
+					startDate: li.issue.fields.startDate,
+					endDate: li.issue.fields.endDate,
+					duration: li.issue.fields.duration
 				});
 			}
 			return out;
@@ -230,7 +230,7 @@
 
 	const arrows = $derived<readonly { d: string }[]>(
 		grouped.flatMap((r) =>
-			r.issue.issue.relations
+			r.issue.issue.fields.relations
 				.filter((rel) => rel.type === 'blocks' || rel.type === 'depends_on')
 				.flatMap((rel) => {
 					const from = indexed.get(brandIssueId(r.issue.issue.id));
@@ -402,12 +402,12 @@
 		</div>
 	{/if}
 
-	<details class="rounded-xl border border-border bg-surface p-5 text-sm mt-8">
+	<details class="mt-8 rounded-xl border border-border bg-surface p-5 text-sm">
 		<summary class="cursor-pointer font-bold text-foreground">{t('gantt.fallbackSummary')}</summary>
-		<div class="mt-4 overflow-x-auto border border-border rounded-lg bg-background shadow-sm">
+		<div class="mt-4 overflow-x-auto rounded-lg border border-border bg-background shadow-sm">
 			<table class="w-full text-left text-sm whitespace-nowrap">
 				<thead
-					class="bg-surface border-b border-border text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+					class="border-b border-border bg-surface text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 				>
 					<tr>
 						<th class="px-4 py-3">{t('gantt.fallbackHeaders.id')}</th>
@@ -419,13 +419,13 @@
 						<th class="px-4 py-3">{t('gantt.fallbackHeaders.endOrDuration')}</th>
 					</tr>
 				</thead>
-				<tbody class="divide-y divide-hairline">
+				<tbody class="divide-hairline divide-y">
 					{#each bars as bar (bar.id)}
 						<tr
-							class="hover:bg-surface transition-colors cursor-pointer text-foreground"
+							class="cursor-pointer text-foreground transition-colors hover:bg-surface"
 							onclick={() => open(bar.id)}
 						>
-							<td class="font-mono text-xs text-muted-foreground px-4 py-3"
+							<td class="px-4 py-3 font-mono text-xs text-muted-foreground"
 								>{bar.id.toString().padStart(4, '0')}</td
 							>
 							<td class="px-4 py-3">{bar.title}</td>
@@ -441,20 +441,20 @@
 					{/each}
 					{#each undated as li (li.issue.id)}
 						<tr
-							class="hover:bg-surface transition-colors cursor-pointer text-muted-foreground"
+							class="cursor-pointer text-muted-foreground transition-colors hover:bg-surface"
 							onclick={() => open(brandIssueId(li.issue.id))}
 						>
-							<td class="font-mono text-xs px-4 py-3">{li.issue.id.toString().padStart(4, '0')}</td>
-							<td class="px-4 py-3">{li.issue.title}</td>
-							<td class="px-4 py-3">{li.issue.issueType}</td>
-							<td class="px-4 py-3">{li.issue.status}</td>
-							<td colspan="2" class="italic px-4 py-3">{t('gantt.fallbackNotScheduled')}</td>
+							<td class="px-4 py-3 font-mono text-xs">{li.issue.id.toString().padStart(4, '0')}</td>
+							<td class="px-4 py-3">{li.issue.fields.title}</td>
+							<td class="px-4 py-3">{li.issue.fields.issueType}</td>
+							<td class="px-4 py-3">{li.issue.fields.status}</td>
+							<td colspan="2" class="px-4 py-3 italic">{t('gantt.fallbackNotScheduled')}</td>
 							<td class="px-4 py-3">—</td>
 						</tr>
 					{/each}
 					{#if bars.length === 0 && undated.length === 0}
 						<tr>
-							<td colspan="7" class="py-12 text-center text-muted-foreground font-medium italic"
+							<td colspan="7" class="py-12 text-center font-medium text-muted-foreground italic"
 								>{t('gantt.fallbackEmpty')}</td
 							>
 						</tr>

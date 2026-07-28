@@ -97,14 +97,14 @@
 	onkeydown={onKeydown}
 	onclose={() => onCancel()}
 >
-	<div class="bg-surface border border-border rounded-xl shadow-xl w-full max-w-sm p-6 relative">
-		<h2 class="text-lg font-bold text-foreground tracking-tight">{t('refreshPatPrompt.title')}</h2>
+	<div class="relative w-full max-w-sm rounded-xl border border-border bg-surface p-6 shadow-xl">
+		<h2 class="text-lg font-bold tracking-tight text-foreground">{t('refreshPatPrompt.title')}</h2>
 		<p class="mt-2 text-sm text-muted-foreground">
 			{t('refreshPatPrompt.body')}
 		</p>
 		<form onsubmit={onSubmit} class="mt-6 flex flex-col gap-4">
 			<label class="flex flex-col gap-1.5">
-				<span class="text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+				<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 					>{t('refreshPatPrompt.label')}</span
 				>
 				<input
@@ -116,13 +116,13 @@
 					disabled={loading}
 					required
 					data-testid="refresh-pat-prompt-input"
-					class="w-full bg-background text-foreground rounded-md border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+					class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 				/>
 			</label>
-			<div class="flex justify-end gap-3 mt-2">
+			<div class="mt-2 flex justify-end gap-3">
 				<button
 					type="button"
-					class="px-4 py-2 rounded-md text-sm font-semibold text-muted-foreground hover:bg-foreground/5 hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+					class="rounded-md px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset disabled:cursor-not-allowed disabled:opacity-50"
 					onclick={onCancel}
 					disabled={loading}
 					data-testid="refresh-pat-prompt-cancel"
@@ -131,13 +131,13 @@
 				</button>
 				<button
 					type="submit"
-					class="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+					class="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
 					disabled={loading || pat.trim() === ''}
 					data-testid="refresh-pat-prompt-submit"
 				>
 					{#if loading}
 						<svg
-							class="animate-spin -ml-1 mr-2 h-4 w-4 text-current inline-block"
+							class="mr-2 -ml-1 inline-block h-4 w-4 animate-spin text-current"
 							xmlns="http://www.w3.org/2000/svg"
 							fill="none"
 							viewBox="0 0 24 24"

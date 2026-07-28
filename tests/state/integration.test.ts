@@ -63,9 +63,35 @@ const VALID_TASK = JSON.stringify({
 	sections: [{ id: 1, key: 'description', name: 'Description', obligatory: true }]
 });
 
-function seedIssue(overrides: Partial<Issue>): Issue {
-	return {
-		id: 1,
+function seedIssue(overrides: Record<string, unknown>): Issue {
+	const LEGACY_FIELDS = [
+		'title',
+		'author',
+		'creationDate',
+		'updatedDate',
+		'issueType',
+		'status',
+		'assignee',
+		'labels',
+		'relations',
+		'startDate',
+		'endDate',
+		'duration',
+		'sprintId',
+		'estimate'
+	] as const;
+	const legacy: Record<string, unknown> = {};
+	for (const k of LEGACY_FIELDS) {
+		if (k in overrides) {
+			legacy[k] = overrides[k];
+			delete overrides[k];
+		}
+	}
+	const overrideFields =
+		typeof overrides['fields'] === 'object' && overrides['fields'] !== null
+			? (overrides['fields'] as Record<string, unknown>)
+			: {};
+	const fields = {
 		title: 'Seed issue',
 		author: 'jane',
 		creationDate: '2026-01-15',
@@ -80,11 +106,26 @@ function seedIssue(overrides: Partial<Issue>): Issue {
 		duration: null,
 		sprintId: null,
 		estimate: null,
+		...legacy,
+		...overrideFields
+	} as Issue['fields'];
+	const overrideSections = Array.isArray(overrides['sections'])
+		? (overrides['sections'] as Issue['sections'])
+		: null;
+	const overrideCustomFields = overrides['customFields'];
+	delete overrides['sections'];
+	delete overrides['customFields'];
+	return {
+		id: '1',
+		...overrides,
+		fields,
 		integrityHash: null,
-		customFields: {},
-		sections: [{ name: 'Description', markdown: 'Initial.' }],
-		integrityWarning: false,
-		...overrides
+		customFields:
+			overrideCustomFields && typeof overrideCustomFields === 'object'
+				? (overrideCustomFields as Record<string, unknown> as Issue['customFields'])
+				: {},
+		sections: overrideSections ?? [{ name: 'Description', markdown: 'Initial description.' }],
+		integrityWarning: false
 	};
 }
 
@@ -132,7 +173,7 @@ describe('state layer integration — full CRUD journey', () => {
 
 		const seedText = await serializeIssue(
 			seedIssue({
-				id: 1,
+				id: '1',
 				title: 'Original seed',
 				issueType: 'task',
 				sections: [{ name: 'Description', markdown: 'Original body.' }]
@@ -164,7 +205,7 @@ describe('state layer integration — full CRUD journey', () => {
 		await issues.load();
 		expect(issues.status).toBe('ready');
 		expect(issues.issues).toHaveLength(1);
-		expect(issues.byId.get(1)?.issue.title).toBe('Original seed');
+		expect(issues.byId.get('1')?.issue.fields.title).toBe('Original seed');
 		expect(issues.integrityWarnings).toHaveLength(0);
 
 		// ── Create a new issue ──────────────────────────────────────────
@@ -173,16 +214,21 @@ describe('state layer integration — full CRUD journey', () => {
 			issueType: 'bug',
 			author: 'jane'
 		});
-		expect(newId).toBe(2); // next id after the seeded 1
+		// UUID migration: create() now returns a UUID string, not a sequential number
+		expect(newId).toEqual(expect.any(String));
+		expect(newId.length).toBeGreaterThan(0);
 		expect(issues.issues).toHaveLength(2);
-		expect(fs.snapshot().files['.quill.md/issues/0002-newly-created.md']).toBeDefined();
+		const newIssueFiles = Object.keys(fs.snapshot().files).filter(
+			(f) => f.startsWith('.quill.md/issues/') && f.includes('newly-created')
+		);
+		expect(newIssueFiles).toHaveLength(1);
 
 		// ── Open in the editor, patch, save ─────────────────────────────
 		const editor = createEditorStore({ issues, config, templates });
 		expect(editor.activeId).toBeNull();
 		editor.open(newId);
 		expect(editor.activeId).toBe(newId);
-		expect(editor.draft?.issue.title).toBe('Newly created');
+		expect(editor.draft?.issue.fields.title).toBe('Newly created');
 		expect(editor.isDirty).toBe(false);
 
 		editor.patchField('title', 'Edited title');
@@ -209,7 +255,7 @@ describe('state layer integration — full CRUD journey', () => {
 
 		const reloaded = issues2.byId.get(newId);
 		expect(reloaded).toBeDefined();
-		expect(reloaded?.issue.title).toBe('Edited title');
+		expect(reloaded?.issue.fields.title).toBe('Edited title');
 		expect(reloaded?.issue.customFields['severity']).toBe('critical');
 		expect(reloaded?.issue.sections.find((s) => s.name === 'Description')?.markdown).toBe(
 			'Patched body content.'
@@ -220,16 +266,16 @@ describe('state layer integration — full CRUD journey', () => {
 		expect(issues2.integrityWarnings).toHaveLength(0);
 
 		// The seeded issue should also have stayed clean (not touched).
-		const seedReloaded = issues2.byId.get(1);
+		const seedReloaded = issues2.byId.get('1');
 		expect(seedReloaded?.issue.integrityWarning).toBe(false);
 
 		// ── Discard (round-trip the editor) ─────────────────────────────
-		editor.open(1);
+		editor.open('1');
 		editor.patchField('title', 'Will be discarded');
 		expect(editor.isDirty).toBe(true);
 		editor.discard();
 		expect(editor.isDirty).toBe(false);
-		expect(editor.draft?.issue.title).toBe('Original seed');
+		expect(editor.draft?.issue.fields.title).toBe('Original seed');
 
 		// ── Close ───────────────────────────────────────────────────────
 		editor.close();
@@ -260,8 +306,8 @@ describe('state layer integration — full CRUD journey', () => {
 		expect(snap.files['.quill.md/issues/0002-doomed.md']).toBeUndefined();
 		const trashFiles = Object.keys(snap.files).filter((p) => p.startsWith('.quill.md/.trash/'));
 		expect(trashFiles).toHaveLength(1);
-		// ERS §6.5: `<timestamp>-<id>-<slug>.md` — id=2, slug=doomed.
-		expect(trashFiles[0]).toMatch(/\.quill\.md\/\.trash\/\d+-2-doomed\.md$/);
+		// ERS §6.5: `<timestamp>-<id>-<slug>.md` — id is now a UUID string, slug=doomed.
+		expect(trashFiles[0]).toMatch(/\.quill\.md\/\.trash\/\d+-.+-doomed\.md$/);
 	});
 
 	it('save round-trip via editor.save() preserves integrity hash (FR-15)', async () => {
@@ -276,7 +322,7 @@ describe('state layer integration — full CRUD journey', () => {
 		await issues.load();
 
 		const editor = createEditorStore({ issues, config, templates });
-		editor.open(1);
+		editor.open('1');
 		editor.patchField('title', 'Hash integrity check');
 		await editor.save();
 
@@ -286,6 +332,6 @@ describe('state layer integration — full CRUD journey', () => {
 		await templates2.load();
 		const issues2 = createIssuesStore(() => fs, { config: config2, templates: templates2 });
 		await issues2.load();
-		expect(issues2.byId.get(1)?.issue.integrityWarning).toBe(false);
+		expect(issues2.byId.get('1')?.issue.integrityWarning).toBe(false);
 	});
 });

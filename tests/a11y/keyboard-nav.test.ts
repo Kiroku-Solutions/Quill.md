@@ -25,7 +25,7 @@ import type { StoreGraph } from '../../src/lib/state/context';
 import type { Config, Issue, LoadedIssue, Template } from '../../src/lib/types';
 
 let activeStub: StoreGraph | null = null;
-const openCalls: { id: number }[] = [];
+const openCalls: { id: string }[] = [];
 const setCalls: Array<{ q?: string; status?: string; type?: string }> = [];
 
 vi.mock('$lib/state', () => ({
@@ -37,7 +37,7 @@ vi.mock('$lib/state', () => ({
 		activeStub = s;
 		return s;
 	},
-	brandIssueId: (id: number) => id as never
+	brandIssueId: (id: string) => id as never
 }));
 
 vi.mock('$lib/adapters', () => ({
@@ -88,23 +88,25 @@ const TEMPLATES: Template[] = [
 	}
 ];
 
-function makeIssue(id: number, status: string, title: string): Issue {
+function makeIssue(id: string, status: string, title: string): Issue {
 	return {
 		id,
-		title,
-		author: 'tester',
-		creationDate: '2026-01-01',
-		updatedDate: '2026-01-15',
-		issueType: 'task',
-		status,
-		assignee: null,
-		labels: [],
-		relations: [],
-		startDate: null,
-		endDate: null,
-		duration: null,
-		sprintId: null,
-		estimate: null,
+		fields: {
+			title,
+			author: 'tester',
+			creationDate: '2026-01-01',
+			updatedDate: '2026-01-15',
+			issueType: 'task',
+			status,
+			assignee: null,
+			labels: [],
+			relations: [],
+			startDate: null,
+			endDate: null,
+			duration: null,
+			sprintId: null,
+			estimate: null
+		},
 		integrityHash: null,
 		customFields: {},
 		sections: [],
@@ -112,7 +114,7 @@ function makeIssue(id: number, status: string, title: string): Issue {
 	};
 }
 
-function makeLoaded(id: number, status: string, title: string): LoadedIssue {
+function makeLoaded(id: string, status: string, title: string): LoadedIssue {
 	return {
 		issue: makeIssue(id, status, title),
 		sourcePath: `.quill.md/issues/${id}.md`
@@ -122,11 +124,11 @@ function makeLoaded(id: number, status: string, title: string): LoadedIssue {
 function buildStub(opts: {
 	mode: 'home' | 'local' | 'remote';
 	issues?: LoadedIssue[];
-	activeEditorId?: number | null;
+	activeEditorId?: string | null;
 }): StoreGraph {
 	const loaded = opts.issues ?? [];
 	const aeid = opts.activeEditorId ?? null;
-	const updateLog: Array<{ id: number; patch: object }> = [];
+	const updateLog: Array<{ id: string; patch: object }> = [];
 	return {
 		mode: {
 			mode: opts.mode,
@@ -138,6 +140,9 @@ function buildStub(opts: {
 			hasRemoteCredentials: opts.mode === 'remote',
 			remoteUrl: null,
 			proxyWarning: null,
+			editBranch: null,
+			providerId: null,
+			parentSha: null,
 			lastFetchedAt: null,
 			localAdapter:
 				opts.mode === 'local'
@@ -150,6 +155,20 @@ function buildStub(opts: {
 						} as never)
 					: null,
 			remoteAdapter: null,
+			commitQueue: {
+				depth: 0,
+				lastFlushAt: null,
+				lastError: null,
+				flushing: false,
+				active: false,
+				start: () => undefined,
+				setSession: () => undefined,
+				stop: () => undefined,
+				enqueue: () => undefined,
+				flushNow: () => Promise.resolve(),
+				clear: () => undefined,
+				pendingSnapshot: () => []
+			},
 			bootstrap: () => Promise.resolve(),
 			openLocalFolder: () => Promise.resolve(),
 			switchFolder: () => Promise.resolve(null),
@@ -191,8 +210,8 @@ function buildStub(opts: {
 			create: () => Promise.resolve(1 as never),
 			importIssue: () => Promise.resolve(1 as never),
 			// Mutate the loaded array in place so the test can observe
-			// the status update via `byId.get(1).issue.status`.
-			update: (id: number, patch: object) => {
+			// the status update via `byId.get('1').issue.fields.status`.
+			update: (id: string, patch: object) => {
 				updateLog.push({ id, patch });
 				const li = loaded.find((l) => l.issue.id === id);
 				if (li) {
@@ -210,7 +229,7 @@ function buildStub(opts: {
 			isDirty: aeid !== null,
 			integrityWarning: false,
 			errors: [],
-			open: (id: number) => {
+			open: (id: string) => {
 				openCalls.push({ id });
 			},
 			close: () => {},
@@ -273,7 +292,7 @@ describe('Step 6 — keyboard-only walkthrough (NFR-4)', () => {
 	it('Toolbar New issue button is reachable by Tab and opens the type-picker modal on Enter', async () => {
 		activeStub = buildStub({
 			mode: 'local',
-			issues: [makeLoaded(1, 'open', 'First issue')]
+			issues: [makeLoaded('1', 'open', 'First issue')]
 		});
 		render(AppShell, { mode: 'local' });
 		render(LocalPage);
@@ -292,7 +311,7 @@ describe('Step 6 — keyboard-only walkthrough (NFR-4)', () => {
 	it('FilterBar search input is reachable and the search filter mutates the store', async () => {
 		activeStub = buildStub({
 			mode: 'local',
-			issues: [makeLoaded(1, 'open', 'Searchable')]
+			issues: [makeLoaded('1', 'open', 'Searchable')]
 		});
 		render(AppShell, { mode: 'local' });
 		render(LocalPage);
@@ -316,7 +335,7 @@ describe('Step 6 — keyboard-only walkthrough (NFR-4)', () => {
 	it('ListView keyboard: Enter on a focused row opens the editor', async () => {
 		activeStub = buildStub({
 			mode: 'local',
-			issues: [makeLoaded(1, 'open', 'First issue'), makeLoaded(2, 'open', 'Second issue')]
+			issues: [makeLoaded('1', 'open', 'First issue'), makeLoaded('2', 'open', 'Second issue')]
 		});
 		render(AppShell, { mode: 'local' });
 		render(LocalPage);
@@ -330,16 +349,16 @@ describe('Step 6 — keyboard-only walkthrough (NFR-4)', () => {
 		await userEvent.keyboard('{Enter}');
 
 		await expect.poll(() => openCalls.length).toBeGreaterThan(0);
-		expect(openCalls).toEqual([{ id: 1 }]);
+		expect(openCalls).toEqual([{ id: '1' }]);
 	});
 
 	it('ListView keyboard: ArrowDown moves focus to the next row', async () => {
 		activeStub = buildStub({
 			mode: 'local',
 			issues: [
-				makeLoaded(1, 'open', 'First issue'),
-				makeLoaded(2, 'open', 'Second issue'),
-				makeLoaded(3, 'open', 'Third issue')
+				makeLoaded('1', 'open', 'First issue'),
+				makeLoaded('2', 'open', 'Second issue'),
+				makeLoaded('3', 'open', 'Third issue')
 			]
 		});
 		render(AppShell, { mode: 'local' });
@@ -361,9 +380,9 @@ describe('Step 6 — keyboard-only walkthrough (NFR-4)', () => {
 		activeStub = buildStub({
 			mode: 'local',
 			issues: [
-				makeLoaded(1, 'open', 'A'),
-				makeLoaded(2, 'in_progress', 'B'),
-				makeLoaded(3, 'done', 'C')
+				makeLoaded('1', 'open', 'A'),
+				makeLoaded('2', 'in_progress', 'B'),
+				makeLoaded('3', 'done', 'C')
 			]
 		});
 		// Switch the view store to kanban before rendering the route.
@@ -385,8 +404,9 @@ describe('Step 6 — keyboard-only walkthrough (NFR-4)', () => {
 		await expect
 			.poll(
 				() => {
-					const li = activeStub?.issues.byId.get(1) as { issue: { status: string } } | undefined;
-					return li?.issue.status;
+					const li = activeStub?.issues.byId.get('1') as
+						{ issue: { fields: { status: string } } } | undefined;
+					return li?.issue.fields.status;
 				},
 				{ timeout: 2000 }
 			)
@@ -394,8 +414,8 @@ describe('Step 6 — keyboard-only walkthrough (NFR-4)', () => {
 	});
 
 	it('EditorPanel is keyboard-dismissable via Escape', async () => {
-		const li = makeLoaded(1, 'open', 'A');
-		activeStub = buildStub({ mode: 'local', issues: [li], activeEditorId: 1 });
+		const li = makeLoaded('1', 'open', 'A');
+		activeStub = buildStub({ mode: 'local', issues: [li], activeEditorId: '1' });
 		render(AppShell, { mode: 'local' });
 		render(LocalPage);
 		adoptIntoMain();

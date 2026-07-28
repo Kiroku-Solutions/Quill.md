@@ -328,21 +328,21 @@ After submitting valid credentials, the user is redirected to a
 		expect(loaded?.sourcePath).toBe('.quill.md/issues/0042-fix-login-redirect.md');
 
 		const issue = loaded?.issue;
-		expect(issue?.id).toBe(42);
-		expect(issue?.title).toBe('Fix login redirect');
-		expect(issue?.author).toBe('jane');
-		expect(issue?.creationDate).toBe('2026-10-20');
-		expect(issue?.updatedDate).toBe('2026-10-21');
-		expect(issue?.issueType).toBe('bug');
-		expect(issue?.status).toBe('in_progress');
-		expect(issue?.assignee).toBe('jane');
-		expect(issue?.labels).toEqual(['security', 'frontend']);
-		expect(issue?.relations).toEqual([
-			{ type: 'blocks', id: 45 },
-			{ type: 'relates_to', id: 7 }
+		expect(issue?.id).toBe('42');
+		expect(issue?.fields.title).toBe('Fix login redirect');
+		expect(issue?.fields.author).toBe('jane');
+		expect(issue?.fields.creationDate).toBe('2026-10-20');
+		expect(issue?.fields.updatedDate).toBe('2026-10-21');
+		expect(issue?.fields.issueType).toBe('bug');
+		expect(issue?.fields.status).toBe('in_progress');
+		expect(issue?.fields.assignee).toBe('jane');
+		expect(issue?.fields.labels).toEqual(['security', 'frontend']);
+		expect(issue?.fields.relations).toEqual([
+			{ type: 'blocks', id: '45' },
+			{ type: 'relates_to', id: '7' }
 		]);
-		expect(issue?.startDate).toBe('2026-10-20');
-		expect(issue?.duration).toBe(3);
+		expect(issue?.fields.startDate).toBe('2026-10-20');
+		expect(issue?.fields.duration).toBe(3);
 
 		// Template-defined custom fields survive the round-trip.
 		expect(issue?.customFields['severity']).toBe('high');
@@ -368,7 +368,7 @@ After submitting valid credentials, the user is redirected to a
 
 	it('handles multiple issues in a single directory', async () => {
 		const fs = new MemoryFsAdapter();
-		const mkIssue = (id: number, title: string) => `---
+		const mkIssue = (id: string, title: string) => `---
 id: ${id}
 title: "${title}"
 author: "jose"
@@ -385,12 +385,12 @@ content for ${title}
 <!-- [SECTION_END: Description] -->
 `;
 
-		await fs.writeTextFile('.quill.md/issues/0001-first.md', mkIssue(1, 'first'));
-		await fs.writeTextFile('.quill.md/issues/0002-second.md', mkIssue(2, 'second'));
-		await fs.writeTextFile('.quill.md/issues/0003-third.md', mkIssue(3, 'third'));
+		await fs.writeTextFile('.quill.md/issues/0001-first.md', mkIssue('1', 'first'));
+		await fs.writeTextFile('.quill.md/issues/0002-second.md', mkIssue('2', 'second'));
+		await fs.writeTextFile('.quill.md/issues/0003-third.md', mkIssue('3', 'third'));
 
 		const issues = await loadIssues(fs);
-		expect(issues.map((i) => i.issue.id)).toEqual([1, 2, 3]);
+		expect(issues.map((i) => i.issue.id)).toEqual(['1', '2', '3']);
 	});
 });
 

@@ -30,11 +30,11 @@ export const ISSUE_TRASH_DIRECTORY = '.quill.md/.trash';
  * Exposed so callers can show the path in the UI before moving the file.
  */
 export function trashedIssuePath(
-	issue: Pick<Issue, 'id' | 'title'>,
+	issue: Pick<Issue, 'id'> & { fields: Pick<Issue['fields'], 'title'> },
 	now: number = Date.now()
 ): string {
 	const idSegment = String(issue.id);
-	const slugSegment = slugify(issue.title);
+	const slugSegment = slugify(issue.fields.title);
 	return `${ISSUE_TRASH_DIRECTORY}/${now}-${idSegment}-${slugSegment}.md`;
 }
 
@@ -51,12 +51,16 @@ export function trashedIssuePath(
  */
 export async function moveIssueToTrash(
 	adapter: WritableDirectoryAdapter,
-	issue: Pick<Issue, 'id' | 'title'>,
+	issue: Pick<Issue, 'id'> & { fields: Pick<Issue['fields'], 'title'> },
 	sourcePath: string,
 	now: number = Date.now()
 ): Promise<string> {
 	const { parent } = splitPath(sourcePath);
-	if (parent === '.quill.md/issues') {
+	if (
+		parent === '.quill.md/issues' ||
+		parent === '.quill.md/issues/open' ||
+		parent === '.quill.md/issues/closed'
+	) {
 		const trashPath = trashedIssuePath(issue, now);
 		await adapter.moveFile(sourcePath, trashPath);
 		return trashPath;

@@ -41,23 +41,25 @@ const config: Config = {
 };
 
 /** Build an `Issue` with the given id and relations. All other fields are stub. */
-function makeIssue(id: number, relations: readonly Relation[] = []): Issue {
+function makeIssue(id: string, relations: readonly Relation[] = []): Issue {
 	return {
 		id,
-		title: `Issue ${id}`,
-		author: 'tester',
-		creationDate: '2026-01-01',
-		updatedDate: '2026-01-01',
-		issueType: 'task',
-		status: 'open',
-		assignee: null,
-		labels: [],
-		relations: relations.map((r) => ({ ...r })),
-		startDate: null,
-		endDate: null,
-		duration: null,
-		sprintId: null,
-		estimate: null,
+		fields: {
+			title: `Issue ${id}`,
+			author: 'tester',
+			creationDate: '2026-01-01',
+			updatedDate: '2026-01-01',
+			issueType: 'task',
+			status: 'open',
+			assignee: null,
+			labels: [],
+			relations: relations.map((r) => ({ ...r })),
+			startDate: null,
+			endDate: null,
+			duration: null,
+			sprintId: null,
+			estimate: null
+		},
 		integrityHash: null,
 		customFields: {},
 		sections: [],
@@ -73,8 +75,8 @@ const baseContext = {
 
 describe('validateIssue — cycle detection (audit A12)', () => {
 	it('flags a 2-node cycle A → B → A as a single cycle entry per node', () => {
-		const a = makeIssue(1, [{ type: 'blocks', id: 2 }]);
-		const b = makeIssue(2, [{ type: 'blocks', id: 1 }]);
+		const a = makeIssue('1', [{ type: 'blocks', id: '2' }]);
+		const b = makeIssue('2', [{ type: 'blocks', id: '1' }]);
 		const result = validateIssue(a, { ...baseContext, allIssues: [a, b] });
 
 		// Exactly one error, attributed to the `relations` field.
@@ -87,9 +89,9 @@ describe('validateIssue — cycle detection (audit A12)', () => {
 	});
 
 	it('flags a 3-node cycle A → B → C → A', () => {
-		const a = makeIssue(1, [{ type: 'blocks', id: 2 }]);
-		const b = makeIssue(2, [{ type: 'blocks', id: 3 }]);
-		const c = makeIssue(3, [{ type: 'blocks', id: 1 }]);
+		const a = makeIssue('1', [{ type: 'blocks', id: '2' }]);
+		const b = makeIssue('2', [{ type: 'blocks', id: '3' }]);
+		const c = makeIssue('3', [{ type: 'blocks', id: '1' }]);
 		const result = validateIssue(a, { ...baseContext, allIssues: [a, b, c] });
 
 		expect(result.errors.some((e) => e.field === 'relations' && /cycle/i.test(e.message))).toBe(
@@ -100,12 +102,12 @@ describe('validateIssue — cycle detection (audit A12)', () => {
 	it('deduplicates repeated nodes inside a cycle (A → B → C → B → A)', () => {
 		// Without the `uniqueCycle` fix, the inner `B` would be recorded twice
 		// in the errors Map for the A → B → C → B → A walk.
-		const a = makeIssue(1, [{ type: 'blocks', id: 2 }]);
-		const b = makeIssue(2, [
-			{ type: 'blocks', id: 3 },
-			{ type: 'blocks', id: 1 } // also from B back to A, completing the cycle twice
+		const a = makeIssue('1', [{ type: 'blocks', id: '2' }]);
+		const b = makeIssue('2', [
+			{ type: 'blocks', id: '3' },
+			{ type: 'blocks', id: '1' } // also from B back to A, completing the cycle twice
 		]);
-		const c = makeIssue(3, [{ type: 'blocks', id: 2 }]); // C → B
+		const c = makeIssue('3', [{ type: 'blocks', id: '2' }]); // C → B
 		const result = validateIssue(a, { ...baseContext, allIssues: [a, b, c] });
 
 		const cycleErrors = result.errors.filter((e) => e.field === 'relations');
@@ -114,9 +116,9 @@ describe('validateIssue — cycle detection (audit A12)', () => {
 	});
 
 	it('does not flag a directed acyclic graph', () => {
-		const a = makeIssue(1, [{ type: 'blocks', id: 2 }]);
-		const b = makeIssue(2, [{ type: 'blocks', id: 3 }]);
-		const c = makeIssue(3);
+		const a = makeIssue('1', [{ type: 'blocks', id: '2' }]);
+		const b = makeIssue('2', [{ type: 'blocks', id: '3' }]);
+		const c = makeIssue('3');
 		const result = validateIssue(a, { ...baseContext, allIssues: [a, b, c] });
 		expect(
 			result.errors.filter((e) => e.field === 'relations' && /cycle/i.test(e.message))
@@ -126,8 +128,8 @@ describe('validateIssue — cycle detection (audit A12)', () => {
 	it('ignores `relates_to` edges for cycle detection (per ERS §3.1 FR-9)', () => {
 		// A relates_to B, B relates_to A — soft links must NOT be considered
 		// a cycle even though they form a closed loop in the full graph.
-		const a = makeIssue(1, [{ type: 'relates_to', id: 2 }]);
-		const b = makeIssue(2, [{ type: 'relates_to', id: 1 }]);
+		const a = makeIssue('1', [{ type: 'relates_to', id: '2' }]);
+		const b = makeIssue('2', [{ type: 'relates_to', id: '1' }]);
 		const result = validateIssue(a, { ...baseContext, allIssues: [a, b] });
 		expect(
 			result.errors.filter((e) => e.field === 'relations' && /cycle/i.test(e.message))
@@ -135,7 +137,7 @@ describe('validateIssue — cycle detection (audit A12)', () => {
 	});
 
 	it('ignores dangling edges (target does not exist)', () => {
-		const a = makeIssue(1, [{ type: 'blocks', id: 999 }]);
+		const a = makeIssue('1', [{ type: 'blocks', id: '999' }]);
 		// 999 is not in allIssues — the relation is flagged as dangling, but the
 		// cycle detector must not crash on the missing target.
 		const result = validateIssue(a, { ...baseContext, allIssues: [a] });
@@ -151,7 +153,7 @@ describe('validateIssue — cycle detection (audit A12)', () => {
 
 describe('validateIssue — relation rules', () => {
 	it('rejects self-relations as a relation error, not a cycle error', () => {
-		const a = makeIssue(1, [{ type: 'blocks', id: 1 }]);
+		const a = makeIssue('1', [{ type: 'blocks', id: '1' }]);
 		const result = validateIssue(a, { ...baseContext, allIssues: [a] });
 		expect(
 			result.errors.some((e) => e.field === 'relations[0].id' && /itself/i.test(e.message))
@@ -162,8 +164,8 @@ describe('validateIssue — relation rules', () => {
 		// Cast through `unknown` because the strict `RelationType` union would
 		// otherwise reject this at compile time — the validator must still
 		// cope with malformed input arriving from the YAML loader.
-		const a = makeIssue(1, [{ type: 'unknown_type' as unknown as Relation['type'], id: 2 }]);
-		const b = makeIssue(2);
+		const a = makeIssue('1', [{ type: 'unknown_type' as unknown as Relation['type'], id: '2' }]);
+		const b = makeIssue('2');
 		const result = validateIssue(a, { ...baseContext, allIssues: [a, b] });
 		expect(
 			result.errors.some(
@@ -173,7 +175,7 @@ describe('validateIssue — relation rules', () => {
 	});
 
 	it('rejects relation targets that do not exist', () => {
-		const a = makeIssue(1, [{ type: 'blocks', id: 999 }]);
+		const a = makeIssue('1', [{ type: 'blocks', id: '999' }]);
 		const result = validateIssue(a, { ...baseContext, allIssues: [a] });
 		expect(result.errors.some((e) => /does not exist/i.test(e.message))).toBe(true);
 	});
@@ -181,13 +183,14 @@ describe('validateIssue — relation rules', () => {
 
 describe('validateIssue — basic field rules', () => {
 	it('rejects non-positive ids', () => {
-		const issue = makeIssue(0);
+		const issue = makeIssue('0');
 		const result = validateIssue(issue, baseContext);
 		expect(result.errors.some((e) => e.field === 'id' && /positive/i.test(e.message))).toBe(true);
 	});
 
 	it('rejects empty titles', () => {
-		const issue = { ...makeIssue(1), title: '   ' };
+		const base = makeIssue('1');
+		const issue: Issue = { ...base, fields: { ...base.fields, title: '   ' } };
 		const result = validateIssue(issue, baseContext);
 		expect(result.errors.some((e) => e.field === 'title' && /required/i.test(e.message))).toBe(
 			true
@@ -195,7 +198,8 @@ describe('validateIssue — basic field rules', () => {
 	});
 
 	it('rejects unknown status against the config', () => {
-		const issue = { ...makeIssue(1), status: 'mystery' };
+		const base = makeIssue('1');
+		const issue: Issue = { ...base, fields: { ...base.fields, status: 'mystery' } };
 		const result = validateIssue(issue, baseContext);
 		expect(
 			result.errors.some((e) => e.field === 'status' && /Unknown status/i.test(e.message))
@@ -203,7 +207,7 @@ describe('validateIssue — basic field rules', () => {
 	});
 
 	it('returns ok=true for a well-formed issue', () => {
-		const issue = makeIssue(1);
+		const issue = makeIssue('1');
 		const result = validateIssue(issue, baseContext);
 		expect(result.ok).toBe(true);
 		expect(result.errors).toEqual([]);

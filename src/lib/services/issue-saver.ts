@@ -21,7 +21,7 @@
  *    result will have `integrityWarning: false` by construction.
  */
 import type { WritableDirectoryAdapter } from '../adapters/directory-adapter.ts';
-import type { Issue, LoadedIssue } from '../types/index.ts';
+import type { Config, Issue, LoadedIssue } from '../types/index.ts';
 import { buildIssueFilename, nextIssueId, parseIssueFile, serializeIssue } from './index.ts';
 
 export const ISSUES_DIR = '.quill.md/issues';
@@ -45,27 +45,26 @@ export interface CreateIssueInput {
  * Compose the default issue record from the inputs plus today's date.
  * Pure — no I/O, no date side effects beyond a default.
  */
-export function buildDefaultIssue(
-	input: CreateIssueInput,
-	existing: ReadonlyArray<{ id: number }>
-): Issue {
+export function buildDefaultIssue(input: CreateIssueInput): Issue {
 	const today = input.today ?? new Date().toISOString().slice(0, 10);
 	return {
-		id: nextIssueId(existing),
-		title: input.title,
-		author: input.author,
-		creationDate: today,
-		updatedDate: today,
-		issueType: input.issueType,
-		status: input.status ?? 'open',
-		assignee: null,
-		labels: [],
-		relations: [],
-		startDate: null,
-		endDate: null,
-		duration: null,
-		sprintId: null,
-		estimate: null,
+		id: nextIssueId(),
+		fields: {
+			title: input.title,
+			author: input.author,
+			creationDate: today,
+			updatedDate: today,
+			issueType: input.issueType,
+			status: input.status ?? 'open',
+			assignee: null,
+			labels: [],
+			relations: [],
+			startDate: null,
+			endDate: null,
+			duration: null,
+			sprintId: null,
+			estimate: null
+		},
 		integrityHash: null,
 		// `FrontmatterValue` is a recursive union; custom fields from a UI
 		// may arrive as `unknown` (the patch path is widened). The
@@ -78,8 +77,20 @@ export function buildDefaultIssue(
 }
 
 /** Path under which a given issue's markdown file lives. */
-export function issuePath(id: number, title: string): string {
-	return `${ISSUES_DIR}/${buildIssueFilename(id, title)}`;
+export function issuePath(issue: Issue, config: Config | null): string {
+	let category = 'open';
+	if (config) {
+		const st = config?.statuses?.find((s) => s.id === issue.fields.status);
+		if (st && (st.category === 'done' || st.category === 'cancelled')) {
+			category = 'closed';
+		}
+	} else {
+		// Fallback if config not loaded
+		const s = issue.fields.status;
+		if (s === 'done' || s === 'closed' || s === 'cancelled' || s === 'rejected')
+			category = 'closed';
+	}
+	return `${ISSUES_DIR}/${category}/${buildIssueFilename(issue.id, issue.fields.title)}`;
 }
 
 /**
@@ -93,11 +104,16 @@ export function issuePath(id: number, title: string): string {
 export async function saveIssue(
 	adapter: WritableDirectoryAdapter,
 	issue: Issue,
-	sourcePath: string
+	sourcePath: string | null,
+	config: Config | null
 ): Promise<LoadedIssue> {
 	const text = await serializeIssue(issue);
-	await adapter.writeTextFile(sourcePath, text);
-	return parseIssueFile(text, sourcePath);
+	const newPath = issuePath(issue, config);
+	await adapter.writeTextFile(newPath, text);
+	if (sourcePath && sourcePath !== newPath) {
+		await adapter.removeFile(sourcePath).catch(() => {});
+	}
+	return parseIssueFile(text, newPath);
 }
 
 /**
@@ -112,8 +128,8 @@ export async function saveIssue(
 export async function createIssue(
 	adapter: WritableDirectoryAdapter,
 	input: CreateIssueInput,
-	existingIssues: ReadonlyArray<{ id: number }>
+	config: Config | null
 ): Promise<LoadedIssue> {
-	const issue = buildDefaultIssue(input, existingIssues);
-	return saveIssue(adapter, issue, issuePath(issue.id, issue.title));
+	const issue = buildDefaultIssue(input);
+	return saveIssue(adapter, issue, null, config);
 }

@@ -22,7 +22,7 @@
 </script>
 
 <div
-	class="flex flex-col bg-surface border border-border rounded-xl shadow-sm transition-all duration-[var(--motion-fast)] ease-in-out {compact
+	class="flex flex-col rounded-xl border border-border bg-surface shadow-sm transition-all duration-[var(--motion-fast)] ease-in-out {compact
 		? 'p-4'
 		: 'p-8'} {extraClass}"
 >

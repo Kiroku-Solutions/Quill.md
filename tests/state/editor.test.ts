@@ -61,9 +61,41 @@ const VALID_TASK = JSON.stringify({
 	sections: []
 });
 
-function makeIssue(overrides: Partial<Issue> = {}): Issue {
-	return {
-		id: 1,
+/**
+ * Accepts both `{ fields: { title: 'X' } }` (new nested shape) and
+ * `{ title: 'X' }` (legacy flat shape) for back-compat. Legacy system
+ * keys at the top level are routed to `issue.fields.<key>`. Test-only
+ * helper — production code uses the strict nested shape.
+ */
+function makeIssue(overrides: Record<string, unknown> = {}): Issue {
+	const LEGACY_FIELDS = [
+		'title',
+		'author',
+		'creationDate',
+		'updatedDate',
+		'issueType',
+		'status',
+		'assignee',
+		'labels',
+		'relations',
+		'startDate',
+		'endDate',
+		'duration',
+		'sprintId',
+		'estimate'
+	] as const;
+	const legacy: Record<string, unknown> = {};
+	for (const k of LEGACY_FIELDS) {
+		if (k in overrides) {
+			legacy[k] = overrides[k];
+			delete overrides[k];
+		}
+	}
+	const overrideFields =
+		typeof overrides['fields'] === 'object' && overrides['fields'] !== null
+			? (overrides['fields'] as Record<string, unknown>)
+			: {};
+	const fields = {
 		title: 'First issue',
 		author: 'jane',
 		creationDate: '2026-01-15',
@@ -78,11 +110,26 @@ function makeIssue(overrides: Partial<Issue> = {}): Issue {
 		duration: null,
 		sprintId: null,
 		estimate: null,
+		...legacy,
+		...overrideFields
+	} as Issue['fields'];
+	const overrideSections = Array.isArray(overrides['sections'])
+		? (overrides['sections'] as Issue['sections'])
+		: null;
+	const overrideCustomFields = overrides['customFields'];
+	delete overrides['sections'];
+	delete overrides['customFields'];
+	return {
+		id: '1',
+		...overrides,
+		fields,
 		integrityHash: null,
-		customFields: {},
-		sections: [{ name: 'Description', markdown: 'Initial description.' }],
-		integrityWarning: false,
-		...overrides
+		customFields:
+			overrideCustomFields && typeof overrideCustomFields === 'object'
+				? (overrideCustomFields as Record<string, unknown> as Issue['customFields'])
+				: {},
+		sections: overrideSections ?? [{ name: 'Description', markdown: 'Initial description.' }],
+		integrityWarning: false
 	};
 }
 
@@ -134,31 +181,31 @@ afterEach(() => {
 describe('createEditorStore — open', () => {
 	it('clones the issue and the clone is independent of issues.byId', async () => {
 		const stores = await makeStores(async (fs) => {
-			await seedIssueFile(fs, makeIssue({ id: 1, title: 'Original' }));
+			await seedIssueFile(fs, makeIssue({ id: '1', title: 'Original' }));
 		});
 
-		stores.editor.open(1);
-		expect(stores.editor.activeId).toBe(1);
-		expect(stores.editor.draft?.issue.title).toBe('Original');
+		stores.editor.open('1');
+		expect(stores.editor.activeId).toBe('1');
+		expect(stores.editor.draft?.issue.fields.title).toBe('Original');
 		expect(stores.editor.isDirty).toBe(false);
 
 		// Mutate the draft — the source must be unchanged.
 		const draft = stores.editor.draft as LoadedIssue;
-		draft.issue.title = 'Mutated';
+		draft.issue.fields.title = 'Mutated';
 		stores.editor.patchField('title', 'Mutated');
 		expect(stores.editor.isDirty).toBe(true);
 
-		expect(stores.issues.byId.get(1)?.issue.title).toBe('Original');
+		expect(stores.issues.byId.get('1')?.issue.fields.title).toBe('Original');
 		// The draft has the mutation.
-		expect(stores.editor.draft?.issue.title).toBe('Mutated');
+		expect(stores.editor.draft?.issue.fields.title).toBe('Mutated');
 	});
 
 	it('close() on an unknown id is a no-op that resets the store', async () => {
 		const stores = await makeStores(async (fs) => {
-			await seedIssueFile(fs, makeIssue({ id: 1 }));
+			await seedIssueFile(fs, makeIssue({ id: '1' }));
 		});
-		stores.editor.open(1);
-		stores.editor.open(99); // unknown — should reset
+		stores.editor.open('1');
+		stores.editor.open('99'); // unknown — should reset
 		expect(stores.editor.activeId).toBeNull();
 		expect(stores.editor.draft).toBeNull();
 		expect(stores.editor.isDirty).toBe(false);
@@ -171,19 +218,19 @@ describe('createEditorStore — open', () => {
 describe('createEditorStore — patchField', () => {
 	it('updates a system key and sets isDirty', async () => {
 		const stores = await makeStores(async (fs) => {
-			await seedIssueFile(fs, makeIssue({ id: 1, title: 'A' }));
+			await seedIssueFile(fs, makeIssue({ id: '1', title: 'A' }));
 		});
-		stores.editor.open(1);
+		stores.editor.open('1');
 		stores.editor.patchField('title', 'B');
-		expect(stores.editor.draft?.issue.title).toBe('B');
+		expect(stores.editor.draft?.issue.fields.title).toBe('B');
 		expect(stores.editor.isDirty).toBe(true);
 	});
 
 	it('updates a custom key and sets isDirty', async () => {
 		const stores = await makeStores(async (fs) => {
-			await seedIssueFile(fs, makeIssue({ id: 1, customFields: { severity: 'low' } }));
+			await seedIssueFile(fs, makeIssue({ id: '1', customFields: { severity: 'low' } }));
 		});
-		stores.editor.open(1);
+		stores.editor.open('1');
 		stores.editor.patchField('severity', 'high');
 		expect(stores.editor.draft?.issue.customFields['severity']).toBe('high');
 		expect(stores.editor.isDirty).toBe(true);
@@ -191,16 +238,16 @@ describe('createEditorStore — patchField', () => {
 
 	it('removes a custom key when set to undefined', async () => {
 		const stores = await makeStores(async (fs) => {
-			await seedIssueFile(fs, makeIssue({ id: 1, customFields: { severity: 'low' } }));
+			await seedIssueFile(fs, makeIssue({ id: '1', customFields: { severity: 'low' } }));
 		});
-		stores.editor.open(1);
+		stores.editor.open('1');
 		stores.editor.patchField('severity', undefined);
 		expect('severity' in (stores.editor.draft?.issue.customFields ?? {})).toBe(false);
 	});
 
 	it('is a no-op when there is no active draft', async () => {
 		const stores = await makeStores(async (fs) => {
-			await seedIssueFile(fs, makeIssue({ id: 1 }));
+			await seedIssueFile(fs, makeIssue({ id: '1' }));
 		});
 		// No open() call.
 		stores.editor.patchField('title', 'B');
@@ -217,10 +264,10 @@ describe('createEditorStore — patchSection', () => {
 		const stores = await makeStores(async (fs) => {
 			await seedIssueFile(
 				fs,
-				makeIssue({ id: 1, sections: [{ name: 'Description', markdown: 'old' }] })
+				makeIssue({ id: '1', sections: [{ name: 'Description', markdown: 'old' }] })
 			);
 		});
-		stores.editor.open(1);
+		stores.editor.open('1');
 		stores.editor.patchSection('Description', 'new');
 		expect(stores.editor.draft?.issue.sections[0]?.markdown).toBe('new');
 		expect(stores.editor.isDirty).toBe(true);
@@ -228,9 +275,9 @@ describe('createEditorStore — patchSection', () => {
 
 	it('appends a new section when the name is unknown', async () => {
 		const stores = await makeStores(async (fs) => {
-			await seedIssueFile(fs, makeIssue({ id: 1, sections: [] }));
+			await seedIssueFile(fs, makeIssue({ id: '1', sections: [] }));
 		});
-		stores.editor.open(1);
+		stores.editor.open('1');
 		stores.editor.patchSection('Acceptance', 'criteria');
 		expect(stores.editor.draft?.issue.sections).toEqual([
 			{ name: 'Acceptance', markdown: 'criteria' }
@@ -244,27 +291,33 @@ describe('createEditorStore — patchSection', () => {
 describe('createEditorStore — save', () => {
 	it('persists the draft to disk; a fresh store reads the new state', async () => {
 		const stores = await makeStores(async (fs) => {
-			await seedIssueFile(fs, makeIssue({ id: 1, title: 'A' }));
+			await seedIssueFile(fs, makeIssue({ id: '1', title: 'A' }));
 		});
-		stores.editor.open(1);
+		stores.editor.open('1');
 		stores.editor.patchField('title', 'B');
 		expect(stores.editor.isDirty).toBe(true);
 
 		await stores.editor.save();
 
 		expect(stores.editor.isDirty).toBe(false);
-		expect(stores.issues.dirty.has(1)).toBe(false);
-		// On disk: the new title.
-		const onDisk = stores.fs.snapshot().files['.quill.md/issues/0001-issue.md'];
-		expect(onDisk).toContain('title: B');
+		expect(stores.issues.dirty.has('1')).toBe(false);
+		// On disk: the new title — scan all issue files for the updated content
+		// (the saver may rename the file to match the new slug).
+		const snap = stores.fs.snapshot().files;
+		const issueFiles = Object.entries(snap).filter(([p]) => p.startsWith('.quill.md/issues/'));
+		expect(issueFiles.length).toBeGreaterThan(0);
+		const hasNewTitle = issueFiles.some(
+			([, content]) => typeof content === 'string' && content.includes('title: B')
+		);
+		expect(hasNewTitle).toBe(true);
 		// After save the draft is re-cloned from the (re-parsed) issues
 		// store, so it should reflect the new state too.
-		expect(stores.editor.draft?.issue.title).toBe('B');
+		expect(stores.editor.draft?.issue.fields.title).toBe('B');
 	});
 
 	it('is a no-op when there is no active id', async () => {
 		const stores = await makeStores(async (fs) => {
-			await seedIssueFile(fs, makeIssue({ id: 1 }));
+			await seedIssueFile(fs, makeIssue({ id: '1' }));
 		});
 		// No open() — should resolve undefined without throwing.
 		await expect(stores.editor.save()).resolves.toBeUndefined();
@@ -277,28 +330,28 @@ describe('createEditorStore — save', () => {
 describe('createEditorStore — discard', () => {
 	it('re-clones from issues.byId and clears isDirty', async () => {
 		const stores = await makeStores(async (fs) => {
-			await seedIssueFile(fs, makeIssue({ id: 1, title: 'A' }));
+			await seedIssueFile(fs, makeIssue({ id: '1', title: 'A' }));
 		});
-		stores.editor.open(1);
+		stores.editor.open('1');
 		stores.editor.patchField('title', 'B');
-		expect(stores.editor.draft?.issue.title).toBe('B');
+		expect(stores.editor.draft?.issue.fields.title).toBe('B');
 		expect(stores.editor.isDirty).toBe(true);
 
 		stores.editor.discard();
 
-		expect(stores.editor.draft?.issue.title).toBe('A');
+		expect(stores.editor.draft?.issue.fields.title).toBe('A');
 		expect(stores.editor.isDirty).toBe(false);
 	});
 
 	it('does NOT affect the source issues.byId record', async () => {
 		const stores = await makeStores(async (fs) => {
-			await seedIssueFile(fs, makeIssue({ id: 1, title: 'A' }));
+			await seedIssueFile(fs, makeIssue({ id: '1', title: 'A' }));
 		});
-		stores.editor.open(1);
+		stores.editor.open('1');
 		stores.editor.patchField('title', 'B');
 		stores.editor.discard();
 		// Source untouched (we never saved).
-		expect(stores.issues.byId.get(1)?.issue.title).toBe('A');
+		expect(stores.issues.byId.get('1')?.issue.fields.title).toBe('A');
 	});
 });
 
@@ -309,9 +362,9 @@ describe('createEditorStore — errors', () => {
 	it('returns the validation errors for the active issue', async () => {
 		const stores = await makeStores(async (fs) => {
 			// issueType 'bug' with the obligatory 'severity' field missing.
-			await seedIssueFile(fs, makeIssue({ id: 1, issueType: 'bug', title: 'No severity' }));
+			await seedIssueFile(fs, makeIssue({ id: '1', issueType: 'bug', title: 'No severity' }));
 		});
-		stores.editor.open(1);
+		stores.editor.open('1');
 		// The `errors` getter must reach through to `issues.validate(activeId)`.
 		// Since the issue has no `severity` custom field, the validator
 		// surfaces a "severity is required" error.
@@ -323,7 +376,7 @@ describe('createEditorStore — errors', () => {
 
 	it('is an empty array when there is no active id', async () => {
 		const stores = await makeStores(async (fs) => {
-			await seedIssueFile(fs, makeIssue({ id: 1 }));
+			await seedIssueFile(fs, makeIssue({ id: '1' }));
 		});
 		expect(stores.editor.errors).toEqual([]);
 	});
@@ -342,29 +395,29 @@ describe('createEditorStore — integrityWarning', () => {
 			// getter is a passthrough, so it should reflect the same.
 			const { canonicalForm } = await import('$lib/services/serializer');
 			const { computeIntegrityHash } = await import('$lib/services/integrity');
-			const issue = makeIssue({ id: 1, title: 'Tampered' });
+			const issue = makeIssue({ id: '1', title: 'Tampered' });
 			const canonical = canonicalForm(issue);
 			const realHash = await computeIntegrityHash(canonical);
 			const text = await serializeIssue(issue);
 			const tampered = text.replace(realHash, 'sha256:' + '0'.repeat(64));
 			await fs.writeTextFile('.quill.md/issues/0001-issue.md', tampered);
 		});
-		stores.editor.open(1);
+		stores.editor.open('1');
 		expect(stores.editor.draft?.issue.integrityWarning).toBe(true);
 		expect(stores.editor.integrityWarning).toBe(true);
 	});
 
 	it('is false for a freshly serialised issue (no corruption)', async () => {
 		const stores = await makeStores(async (fs) => {
-			await seedIssueFile(fs, makeIssue({ id: 1 }));
+			await seedIssueFile(fs, makeIssue({ id: '1' }));
 		});
-		stores.editor.open(1);
+		stores.editor.open('1');
 		expect(stores.editor.integrityWarning).toBe(false);
 	});
 
 	it('is false when no draft is active', async () => {
 		const stores = await makeStores(async (fs) => {
-			await seedIssueFile(fs, makeIssue({ id: 1 }));
+			await seedIssueFile(fs, makeIssue({ id: '1' }));
 		});
 		expect(stores.editor.integrityWarning).toBe(false);
 	});
@@ -376,9 +429,9 @@ describe('createEditorStore — integrityWarning', () => {
 describe('createEditorStore — close', () => {
 	it('resets activeId, draft, and isDirty', async () => {
 		const stores = await makeStores(async (fs) => {
-			await seedIssueFile(fs, makeIssue({ id: 1 }));
+			await seedIssueFile(fs, makeIssue({ id: '1' }));
 		});
-		stores.editor.open(1);
+		stores.editor.open('1');
 		stores.editor.patchField('title', 'B');
 		stores.editor.close();
 		expect(stores.editor.activeId).toBeNull();

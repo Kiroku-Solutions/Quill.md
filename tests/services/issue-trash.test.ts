@@ -25,10 +25,13 @@ import {
 } from '$lib/services/issue-trash';
 import type { Issue } from '$lib/types';
 
-const ISSUE_PATH = '.quill.md/issues/0007-fix-login.md';
+const ISSUE_PATH = '.quill.md/issues/open/0007-fix-login.md';
 
-function makeIssue(id = 7, title = 'Fix login'): Pick<Issue, 'id' | 'title'> {
-	return { id, title };
+function makeIssue(
+	id = '7',
+	title = 'Fix login'
+): Pick<Issue, 'id'> & { fields: Pick<Issue['fields'], 'title'> } {
+	return { id, fields: { title } };
 }
 
 describe('trashedIssuePath (pure helper)', () => {
@@ -38,8 +41,8 @@ describe('trashedIssuePath (pure helper)', () => {
 	});
 
 	it('honours an explicit `now` parameter for deterministic output', () => {
-		const a = trashedIssuePath(makeIssue(42, 'Sprint retro'), 1_700_000_000_000);
-		const b = trashedIssuePath(makeIssue(42, 'Sprint retro'), 1_800_000_000_000);
+		const a = trashedIssuePath(makeIssue('42', 'Sprint retro'), 1_700_000_000_000);
+		const b = trashedIssuePath(makeIssue('42', 'Sprint retro'), 1_800_000_000_000);
 		expect(a).toBe('.quill.md/.trash/1700000000000-42-sprint-retro.md');
 		expect(b).toBe('.quill.md/.trash/1800000000000-42-sprint-retro.md');
 		expect(a).not.toBe(b);
@@ -70,8 +73,8 @@ describe('moveIssueToTrash — issue source path', () => {
 	it('removes the file from the source location after the move', async () => {
 		await moveIssueToTrash(fs, makeIssue(), ISSUE_PATH, 1_700_000_000_000);
 		// The source path no longer exists; the only file under
-		// `.quill.md/issues/` is gone.
-		const issuesEntries = await fs.listDirectory('.quill.md/issues');
+		// `.quill.md/issues/open/` is gone.
+		const issuesEntries = await fs.listDirectory('.quill.md/issues/open');
 		expect(issuesEntries).toEqual([]);
 	});
 });

@@ -11,7 +11,7 @@ export type RelationType = 'parent' | 'child' | 'blocks' | 'depends_on' | 'relat
 
 export interface Relation {
 	type: RelationType;
-	id: number;
+	id: string;
 }
 
 /** All relation types in declaration order. Used by the validator. */
@@ -46,23 +46,25 @@ export interface IssueSection {
  * informational; the issue can still be edited and saved.
  */
 export interface Issue {
-	id: number;
-	title: string;
-	author: string;
-	creationDate: string;
-	updatedDate: string;
-	issueType: string;
-	status: string;
-	assignee: string | null;
-	labels: string[];
-	relations: Relation[];
-	startDate: string | null;
-	endDate: string | null;
-	duration: number | null;
-	sprintId: string | null;
-	estimate: number | null;
-	integrityHash: string | null;
+	id: string;
+	fields: {
+		title: string;
+		author: string;
+		creationDate: string;
+		updatedDate: string;
+		issueType: string;
+		status: string;
+		assignee: string | null;
+		labels: string[];
+		relations: Relation[];
+		startDate: string | null;
+		endDate: string | null;
+		duration: number | null;
+		sprintId: string | null;
+		estimate: number | null;
+	};
 	customFields: Record<string, FrontmatterValue>;
+	integrityHash: string | null;
 	sections: IssueSection[];
 	integrityWarning: boolean;
 }

@@ -34,19 +34,50 @@ pnpm build
 pnpm preview
 ```
 
-## Running the MCP Server
+## AI Integration (MCP Server)
 
-Connect your AI tools by pointing them to the built MCP server:
+quill.md comes with a standalone Model Context Protocol (MCP) server that allows AI assistants (like Claude Desktop, Cursor, or custom agents) to read, create, and manage your agile workspace directly.
+
+Because the issues are stored as markdown files in the `.quill.md/` folder, your AI can keep your project documentation, epics, and tasks continuously updated without needing a web interface.
+
+### Building the MCP Server
 
 ```sh
-# Build the MCP server
 cd quill-mcp-server
 npm install
 npm run build
-
-# Start the server (pass the path to your repository root)
-node dist/index.js "C:\path\to\your\repo"
 ```
+
+### Usage in Other Projects
+
+You can use the quill MCP server to manage agile workflows in **any** repository. Simply provide the absolute path to your target project's root directory when starting the server. If the target project doesn't have a `.quill.md/` folder, the AI can initialize it using the `quill_init_preset` tool.
+
+### Claude Desktop Configuration
+
+Add the following to your Claude Desktop `claude_desktop_config.json` (adjusting the paths):
+
+```json
+{
+	"mcpServers": {
+		"quill": {
+			"command": "node",
+			"args": ["/path/to/quill.md/quill-mcp-server/dist/index.js", "/path/to/your/target/project"]
+		}
+	}
+}
+```
+
+### Cursor Configuration
+
+In Cursor's MCP settings, add a new server:
+
+- **Type**: `command`
+- **Name**: `quill`
+- **Command**: `node /path/to/quill.md/quill-mcp-server/dist/index.js "/path/to/your/target/project"`
+
+### Agent Skills
+
+For the best results with agentic workflows, provide your AI agent with the instructions found in `.agents/skills/quill-skill/SKILL.md`. This skill enforces strict Agile rules (like BDD Acceptance Criteria, Fibonacci estimations, and UUID string relations) to ensure the AI generates high-quality, actionable tickets.
 
 ## Community
 

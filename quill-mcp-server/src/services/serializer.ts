@@ -1,7 +1,7 @@
 import yaml from 'js-yaml';
 
 export interface Issue {
-	id: number;
+	id: string;
 	title: string;
 	author: string;
 	creationDate: string;
@@ -10,7 +10,7 @@ export interface Issue {
 	status: string;
 	assignee: string | null;
 	labels: string[];
-	relations: Array<{ type: string; id: number }>;
+	relations: Array<{ type: string; id: string }>;
 	startDate: string | null;
 	endDate: string | null;
 	duration: number | null;
@@ -44,37 +44,42 @@ export async function serializeIssue(issue: Issue): Promise<string> {
 	if (issue.sprintId !== null) frontmatter.sprint_id = issue.sprintId;
 	if (issue.estimate !== null) frontmatter.estimate = issue.estimate;
 
-	if (Object.keys(issue.customFields).length > 0) {
-		frontmatter.custom_fields = issue.customFields;
+	// Add custom fields at the top level
+	for (const key of Object.keys(issue.customFields)) {
+		frontmatter[key] = issue.customFields[key];
 	}
 
-	// Generate the YAML without integrity_hash first
-	const yamlStrWithoutHash = yaml.dump(frontmatter, { lineWidth: -1 });
+	const yamlStrWithoutHash = yaml.dump(frontmatter, {
+		lineWidth: -1,
+		noRefs: true,
+		sortKeys: false,
+		quotingType: '"'
+	});
 
-	let mdStrWithoutHash = `---\n${yamlStrWithoutHash}---\n`;
-
+	let bodyStrs = [];
 	for (let i = 0; i < issue.sections.length; i++) {
 		const sec = issue.sections[i];
-		mdStrWithoutHash += `\n<!-- [SECTION_START: ${sec.name}] -->\n\n${sec.markdown}\n\n<!-- [SECTION_END: ${sec.name}] -->\n`;
+		const body = sec.markdown.endsWith('\n') ? sec.markdown : `${sec.markdown}\n`;
+		bodyStrs.push(
+			`## ${sec.name}\n<!-- [SECTION_START: ${sec.name}] -->\n${body}<!-- [SECTION_END: ${sec.name}] -->\n`
+		);
 	}
+	const bodyStr = bodyStrs.join('\n');
+
+	let mdStrWithoutHash = `---\n${yamlStrWithoutHash}---\n\n${bodyStr}`;
 
 	// Compute integrity hash using SHA-256 hex digest of the string
 	const hash = crypto.createHash('sha256').update(mdStrWithoutHash, 'utf8').digest('hex');
 	frontmatter.integrity_hash = `sha256:${hash}`;
 
 	// Now dump it with the hash included
-	const finalYamlStr = yaml.dump(frontmatter, { lineWidth: -1 });
-	let finalMdStr = `---\n${finalYamlStr}---\n`;
-
-	for (let i = 0; i < issue.sections.length; i++) {
-		const sec = issue.sections[i];
-		finalMdStr += `\n<!-- [SECTION_START: ${sec.name}] -->\n\n${sec.markdown}\n\n<!-- [SECTION_END: ${sec.name}] -->\n`;
-	}
-
-	return finalMdStr;
+	const finalYamlStr = yaml
+		.dump(frontmatter, { lineWidth: -1, noRefs: true, sortKeys: false, quotingType: '"' })
+		.replace(/^integrity_hash: (.*)$/m, 'integrity_hash: "$1"');
+	return `---\n${finalYamlStr}---\n\n${bodyStr}`;
 }
 
-export function buildIssueFilename(id: number, title: string): string {
+export function buildIssueFilename(id: string, title: string): string {
 	const safeTitle = title
 		.toLowerCase()
 		.replace(/[^a-z0-9]+/g, '-')

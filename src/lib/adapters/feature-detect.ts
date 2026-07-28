@@ -15,7 +15,11 @@ import {
 	FsaPermissionError,
 	AdapterNotFoundError,
 	RemoteFetchError,
-	RemoteAuthError
+	RemoteAuthError,
+	RemoteConflictError,
+	RemoteBranchMissingError,
+	RemoteCommitRejectedError,
+	RemoteUnsupportedHostError
 } from './errors.ts';
 
 /** Names of `window` members that gate File System Access support. */
@@ -97,4 +101,29 @@ export function isNotFoundError(err: unknown): err is AdapterNotFoundError {
 /** Narrows an unknown value to either remote-mode error class. */
 export function isRemoteError(err: unknown): err is RemoteFetchError | RemoteAuthError {
 	return err instanceof RemoteFetchError || err instanceof RemoteAuthError;
+}
+
+/** Narrows an unknown value to any remote error class. */
+export function isAnyRemoteError(
+	err: unknown
+): err is
+	| RemoteFetchError
+	| RemoteAuthError
+	| RemoteConflictError
+	| RemoteBranchMissingError
+	| RemoteCommitRejectedError
+	| RemoteUnsupportedHostError {
+	return (
+		err instanceof RemoteFetchError ||
+		err instanceof RemoteAuthError ||
+		err instanceof RemoteConflictError ||
+		err instanceof RemoteBranchMissingError ||
+		err instanceof RemoteCommitRejectedError ||
+		err instanceof RemoteUnsupportedHostError
+	);
+}
+
+/** Narrows an unknown value to `RemoteConflictError`. */
+export function isRemoteConflictError(err: unknown): err is RemoteConflictError {
+	return err instanceof RemoteConflictError;
 }

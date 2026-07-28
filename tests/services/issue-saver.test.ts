@@ -36,35 +36,29 @@ import {
 import type { Issue } from '$lib/types';
 
 describe('buildDefaultIssue', () => {
-	const noExisting: ReadonlyArray<{ id: number }> = [];
-
 	it('defaults `status` to "open" when input.status is omitted', () => {
-		const issue = buildDefaultIssue(
-			{ title: 'Hello', issueType: 'task', author: 'jane' },
-			noExisting
-		);
-		expect(issue.status).toBe('open');
+		const issue = buildDefaultIssue({ title: 'Hello', issueType: 'task', author: 'jane' });
+		expect(issue.fields.status).toBe('open');
 	});
 
 	it('respects an explicit input.status', () => {
-		const issue = buildDefaultIssue(
-			{ title: 'Hello', issueType: 'task', author: 'jane', status: 'in_progress' },
-			noExisting
-		);
-		expect(issue.status).toBe('in_progress');
+		const issue = buildDefaultIssue({
+			title: 'Hello',
+			issueType: 'task',
+			author: 'jane',
+			status: 'in_progress'
+		});
+		expect(issue.fields.status).toBe('in_progress');
 	});
 
 	it('copies customFields into a fresh object (no shared mutation)', () => {
 		const seed = { severity: 'high', priority: 'p1' };
-		const issue = buildDefaultIssue(
-			{
-				title: 'Hello',
-				issueType: 'task',
-				author: 'jane',
-				customFields: seed
-			},
-			noExisting
-		);
+		const issue = buildDefaultIssue({
+			title: 'Hello',
+			issueType: 'task',
+			author: 'jane',
+			customFields: seed
+		});
 		expect(issue.customFields).toEqual({ severity: 'high', priority: 'p1' });
 		// Not the same reference — the saver must clone so a later
 		// mutation of the caller's seed doesn't leak into the Issue.
@@ -73,27 +67,31 @@ describe('buildDefaultIssue', () => {
 
 	it('defaults creationDate / updatedDate to today UTC', () => {
 		const today = '2026-06-24';
-		const issue = buildDefaultIssue(
-			{ title: 'Hello', issueType: 'task', author: 'jane', today },
-			noExisting
-		);
-		expect(issue.creationDate).toBe('2026-06-24');
-		expect(issue.updatedDate).toBe('2026-06-24');
+		const issue = buildDefaultIssue({ title: 'Hello', issueType: 'task', author: 'jane', today });
+		expect(issue.fields.creationDate).toBe('2026-06-24');
+		expect(issue.fields.updatedDate).toBe('2026-06-24');
 	});
 
-	it('uses nextIssueId(existing) when assigning the id', () => {
-		const existing = [{ id: 3 }, { id: 7 }];
-		const issue = buildDefaultIssue(
-			{ title: 'Hello', issueType: 'task', author: 'jane', today: '2026-06-24' },
-			existing
-		);
-		expect(issue.id).toBe(8);
+	it('assigns a UUID string to the id', () => {
+		const issue = buildDefaultIssue({
+			title: 'Hello',
+			issueType: 'task',
+			author: 'jane',
+			today: '2026-06-24'
+		});
+		expect(typeof issue.id).toBe('string');
 	});
 });
 
 describe('issuePath', () => {
 	it('composes the canonical <id>-<slug>.md under ISSUES_DIR', () => {
-		expect(issuePath(42, 'Fix login redirect!')).toBe(`${ISSUES_DIR}/0042-fix-login-redirect.md`);
+		const issue = buildDefaultIssue({
+			title: 'Fix login redirect!',
+			issueType: 'task',
+			author: 'jane'
+		});
+		issue.id = '1'; // Force ID to 1 for test
+		expect(issuePath(issue, null)).toBe('.quill.md/issues/open/1-fix-login-redirect.md');
 	});
 
 	it('exposes ISSUES_DIR as ".quill.md/issues"', () => {
@@ -111,16 +109,16 @@ describe('createIssue — write + reparse round-trip', () => {
 		const li = await createIssue(
 			fs,
 			{ title: 'New thing', issueType: 'task', author: 'jane', today: '2026-06-24' },
-			[]
+			null
 		);
 
-		expect(li.issue.id).toBe(1);
-		expect(li.issue.title).toBe('New thing');
-		expect(li.sourcePath).toBe('.quill.md/issues/0001-new-thing.md');
+		expect(typeof li.issue.id).toBe('string');
+		expect(li.issue.fields.title).toBe('New thing');
+		expect(li.sourcePath).toMatch(/\.quill\.md\/issues\/open\/[a-f0-9\-]+-new-thing\.md/);
 
 		// The file must exist on disk after the call.
 		const onDisk = await fs.readTextFile(li.sourcePath);
-		expect(onDisk).toContain('id: 1');
+		expect(onDisk).toContain(`id: ${li.issue.id}`);
 		expect(onDisk).toContain('title: New thing');
 
 		// The returned LoadedIssue is the post-write ground truth: its
@@ -137,9 +135,9 @@ describe('createIssue — write + reparse round-trip', () => {
 		const li = await createIssue(
 			fs,
 			{ title: 'T', issueType: 'mystery-type', author: 'jane', today: '2026-06-24' },
-			[]
+			null
 		);
-		expect(li.issue.issueType).toBe('mystery-type');
+		expect(li.issue.fields.issueType).toBe('mystery-type');
 		expect(li.issue.integrityWarning).toBe(false);
 	});
 });
@@ -152,21 +150,23 @@ describe('saveIssue — overwrite + last-write-wins', () => {
 
 	function baseIssue(): Issue {
 		return {
-			id: 1,
-			title: 'Hello',
-			author: 'jane',
-			creationDate: '2026-01-01',
-			updatedDate: '2026-01-01',
-			issueType: 'task',
-			status: 'open',
-			assignee: null,
-			labels: [],
-			relations: [],
-			startDate: null,
-			endDate: null,
-			duration: null,
-			sprintId: null,
-			estimate: null,
+			id: '1',
+			fields: {
+				title: 'Hello',
+				author: 'jane',
+				creationDate: '2026-01-01',
+				updatedDate: '2026-01-01',
+				issueType: 'task',
+				status: 'open',
+				assignee: null,
+				labels: [],
+				relations: [],
+				startDate: null,
+				endDate: null,
+				duration: null,
+				sprintId: null,
+				estimate: null
+			},
 			integrityHash: null,
 			customFields: {},
 			sections: [],
@@ -175,17 +175,20 @@ describe('saveIssue — overwrite + last-write-wins', () => {
 	}
 
 	it('overwrites an existing file in place (same sourcePath)', async () => {
-		const path = '.quill.md/issues/0001-hello.md';
-		const li1 = await saveIssue(fs, baseIssue(), path);
-		expect(li1.issue.title).toBe('Hello');
+		const path = '.quill.md/issues/open/1-hello.md';
+		const li1 = await saveIssue(fs, baseIssue(), path, null);
+		expect(li1.issue.fields.title).toBe('Hello');
 
-		const updated: Issue = { ...baseIssue(), title: 'Hello, world!', status: 'in_progress' };
-		const li2 = await saveIssue(fs, updated, path);
+		const updated: Issue = {
+			...baseIssue(),
+			fields: { ...baseIssue().fields, title: 'Hello, world!', status: 'in_progress' }
+		};
+		const li2 = await saveIssue(fs, updated, path, null);
 
-		expect(li2.issue.title).toBe('Hello, world!');
-		expect(li2.issue.status).toBe('in_progress');
+		expect(li2.issue.fields.title).toBe('Hello, world!');
+		expect(li2.issue.fields.status).toBe('in_progress');
 		// Only one file remains under the issues dir.
-		const entries = await fs.listDirectory(ISSUES_DIR);
+		const entries = await fs.listDirectory(`${ISSUES_DIR}/open`);
 		expect(entries.filter((e) => e.kind === 'file')).toHaveLength(1);
 	});
 
@@ -194,12 +197,27 @@ describe('saveIssue — overwrite + last-write-wins', () => {
 		// paths (per its docs); the service layer is expected to
 		// serialise. Here we await each save in turn to exercise the
 		// "last write wins" semantics deterministically.
-		const path = '.quill.md/issues/0001-hello.md';
-		await saveIssue(fs, { ...baseIssue(), title: 'First' }, path);
-		await saveIssue(fs, { ...baseIssue(), title: 'Second' }, path);
-		await saveIssue(fs, { ...baseIssue(), title: 'Third' }, path);
+		const path = '.quill.md/issues/open/1-hello.md';
+		await saveIssue(
+			fs,
+			{ ...baseIssue(), fields: { ...baseIssue().fields, title: 'First' } },
+			path,
+			null
+		);
+		await saveIssue(
+			fs,
+			{ ...baseIssue(), fields: { ...baseIssue().fields, title: 'Second' } },
+			path,
+			null
+		);
+		const lastLi = await saveIssue(
+			fs,
+			{ ...baseIssue(), fields: { ...baseIssue().fields, title: 'Third' } },
+			path,
+			null
+		);
 
-		const final = await fs.readTextFile(path);
+		const final = await fs.readTextFile(lastLi.sourcePath);
 		expect(final).toContain('title: Third');
 	});
 });

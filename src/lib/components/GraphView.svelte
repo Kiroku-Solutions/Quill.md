@@ -14,12 +14,12 @@
 		const allIssues = Array.from(issues.byId.values());
 		const matchedIssues = allIssues.filter((li) => {
 			const f = filter.filter;
-			if (f.status && li.issue.status !== f.status) return false;
-			if (f.type && li.issue.issueType !== f.type) return false;
+			if (f.status && li.issue.fields.status !== f.status) return false;
+			if (f.type && li.issue.fields.issueType !== f.type) return false;
 			if (f.q) {
 				const needle = f.q.toLowerCase();
 				if (
-					!li.issue.title.toLowerCase().includes(needle) &&
+					!li.issue.fields.title.toLowerCase().includes(needle) &&
 					!li.issue.sections.some((s) => s.markdown.toLowerCase().includes(needle))
 				) {
 					return false;
@@ -34,15 +34,13 @@
 
 		if (hasActiveFilter) {
 			for (const li of matchedIssues) {
-				for (const rel of li.issue.relations) {
-					const target = issues.byId.get(Number(rel.id));
+				for (const rel of li.issue.fields.relations) {
+					const target = issues.byId.get(rel.id);
 					if (target) filteredSet.add(target);
 				}
 			}
 			for (const li of allIssues) {
-				if (
-					li.issue.relations.some((r) => matchedIssues.some((m) => m.issue.id === Number(r.id)))
-				) {
+				if (li.issue.fields.relations.some((r) => matchedIssues.some((m) => m.issue.id === r.id))) {
 					filteredSet.add(li);
 				}
 			}
@@ -55,27 +53,31 @@
 
 		let groupNodes: import('$lib/types').LoadedIssue[] = [];
 		if (groupBy === 'epic') {
-			groupNodes = Array.from(issues.byId.values()).filter((li) => li.issue.issueType === 'epic');
+			groupNodes = Array.from(issues.byId.values()).filter(
+				(li) => li.issue.fields.issueType === 'epic'
+			);
 		} else if (groupBy === 'sprint') {
-			groupNodes = Array.from(issues.byId.values()).filter((li) => li.issue.issueType === 'sprint');
+			groupNodes = Array.from(issues.byId.values()).filter(
+				(li) => li.issue.fields.issueType === 'sprint'
+			);
 		}
 
 		for (const li of filteredIssues) {
 			const issue = li.issue;
-			const tmpl = templates.byType.get(issue.issueType);
+			const tmpl = templates.byType.get(issue.fields.issueType);
 
 			let color: string | undefined = tmpl?.color || '#888888';
 			let groupId: string | undefined = undefined;
 
 			if (groupBy !== 'none') {
-				if (issue.issueType === groupBy) {
+				if (issue.fields.issueType === groupBy) {
 					groupId = String(issue.id);
 					color = undefined; // Auto-color by group
 				} else {
 					const relatedGroup = groupNodes.find(
 						(g) =>
-							issue.relations.some((r) => r.id === g.issue.id) ||
-							g.issue.relations.some((r) => r.id === issue.id)
+							issue.fields.relations.some((r) => r.id === g.issue.id) ||
+							g.issue.fields.relations.some((r) => r.id === issue.id)
 					);
 					if (relatedGroup) {
 						groupId = String(relatedGroup.issue.id);
@@ -89,12 +91,12 @@
 
 			nodes.push({
 				id: String(issue.id),
-				name: issue.title,
+				name: issue.fields.title,
 				color,
 				groupId
 			});
 
-			for (const rel of issue.relations) {
+			for (const rel of issue.fields.relations) {
 				const targetId = String(rel.id);
 				if (validNodeIds.has(targetId)) {
 					links.push({ source: String(issue.id), target: targetId, name: rel.type });
@@ -176,7 +178,7 @@
 					.backgroundColor('#00000000')
 					.onNodeClick((node: any) => {
 						if (!node.id.startsWith('debug-')) {
-							editor.open(Number(node.id));
+							editor.open(node.id);
 						}
 					});
 			} else {
@@ -194,7 +196,7 @@
 					.linkDirectionalArrowRelPos(1)
 					.onNodeClick((node: any) => {
 						if (!node.id.startsWith('debug-')) {
-							editor.open(Number(node.id));
+							editor.open(node.id);
 						}
 					});
 			}
@@ -243,21 +245,21 @@
 	});
 </script>
 
-<div class="relative w-full h-full bg-surface overflow-hidden">
+<div class="relative h-full w-full overflow-hidden bg-surface">
 	<div bind:this={container} class="absolute inset-0"></div>
 
 	<!-- 2D/3D Toggle -->
 	<div
-		class="absolute bottom-6 right-6 flex items-center gap-2 bg-background/80 backdrop-blur border border-border p-2 rounded-lg shadow-sm z-10"
+		class="absolute right-6 bottom-6 z-10 flex items-center gap-2 rounded-lg border border-border bg-background/80 p-2 shadow-sm backdrop-blur"
 	>
 		<span
-			class="text-[11px] font-bold uppercase tracking-widest {is3D
+			class="text-[11px] font-bold tracking-widest uppercase {is3D
 				? 'text-muted-foreground'
 				: 'text-primary'}">2D</span
 		>
 		<button
 			type="button"
-			class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+			class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none"
 			onclick={() => (is3D = !is3D)}
 			aria-pressed={is3D}
 		>
@@ -280,7 +282,7 @@
 			></span>
 		</button>
 		<span
-			class="text-[11px] font-bold uppercase tracking-widest {is3D
+			class="text-[11px] font-bold tracking-widest uppercase {is3D
 				? 'text-primary'
 				: 'text-muted-foreground'}">3D</span
 		>

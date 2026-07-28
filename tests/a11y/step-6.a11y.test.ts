@@ -44,7 +44,7 @@ import type { HandleRecord } from '../../src/lib/adapters/handle-store';
 // service (see `vi.mock('$lib/services/wizard', …)`).
 
 let activeStub: StoreGraph | null = null;
-const openCalls: { id: number }[] = [];
+const openCalls: { id: string }[] = [];
 
 vi.mock('$lib/state', () => ({
 	getStores: () => {
@@ -57,7 +57,7 @@ vi.mock('$lib/state', () => ({
 		activeStub = stores;
 		return stores;
 	},
-	brandIssueId: (id: number) => id as never
+	brandIssueId: (id: string) => id as never
 }));
 
 vi.mock('$lib/adapters', () => ({
@@ -104,23 +104,25 @@ const CONFIG: Config = {
 	remote: { cors_proxy: '' }
 };
 
-function makeIssue(id: number, status: string, title: string, type = 'task'): Issue {
+function makeIssue(id: string, status: string, title: string, type = 'task'): Issue {
 	return {
 		id,
-		title,
-		author: 'jane',
-		creationDate: '2026-06-25',
-		updatedDate: '2026-06-25',
-		issueType: type,
-		sprintId: null,
-		estimate: null,
-		status,
-		assignee: null,
-		labels: [],
-		relations: [],
-		startDate: '2026-06-25',
-		endDate: '2026-06-26',
-		duration: 1,
+		fields: {
+			title,
+			author: 'jane',
+			creationDate: '2026-06-25',
+			updatedDate: '2026-06-25',
+			issueType: type,
+			sprintId: null,
+			estimate: null,
+			status,
+			assignee: null,
+			labels: [],
+			relations: [],
+			startDate: '2026-06-25',
+			endDate: '2026-06-26',
+			duration: 1
+		},
 		integrityHash: null,
 		customFields: {},
 		sections: [{ name: 'Description', markdown: `Body for ${title}` }],
@@ -128,7 +130,7 @@ function makeIssue(id: number, status: string, title: string, type = 'task'): Is
 	};
 }
 
-function makeLoaded(id: number, status: string, title: string): LoadedIssue {
+function makeLoaded(id: string, status: string, title: string): LoadedIssue {
 	return {
 		issue: makeIssue(id, status, title),
 		sourcePath: `.quill.md/issues/${String(id).padStart(4, '0')}-${title.toLowerCase()}.md`
@@ -177,13 +179,13 @@ function buildStub(opts: {
 	integrityCount?: number;
 	recentHandles?: HandleRecord[];
 	issues?: LoadedIssue[];
-	activeEditorId?: number | null;
+	activeEditorId?: string | null;
 	settingsOpen?: boolean;
 	mobileNavOpen?: boolean;
 }): StoreGraph {
 	const loaded = opts.issues ?? [];
 	const integrityWarnings = Array.from({ length: opts.integrityCount ?? 0 }, (_, i) => ({
-		issue: { id: i + 1, integrityWarning: true } as never
+		issue: { id: String(i + 1), integrityWarning: true } as never
 	}));
 	const activeEditorId = opts.activeEditorId ?? null;
 	const activeDraft =
@@ -204,6 +206,9 @@ function buildStub(opts: {
 			hasRemoteCredentials: opts.mode === 'remote',
 			remoteUrl: null,
 			proxyWarning: null,
+			editBranch: null,
+			providerId: null,
+			parentSha: null,
 			lastFetchedAt: opts.mode === 'remote' ? Date.now() - 5 * 60 * 1000 : null,
 			localAdapter:
 				opts.mode === 'local'
@@ -216,6 +221,20 @@ function buildStub(opts: {
 						} as never)
 					: null,
 			remoteAdapter: null,
+			commitQueue: {
+				depth: 0,
+				lastFlushAt: null,
+				lastError: null,
+				flushing: false,
+				active: false,
+				start: () => undefined,
+				setSession: () => undefined,
+				stop: () => undefined,
+				enqueue: () => undefined,
+				flushNow: () => Promise.resolve(),
+				clear: () => undefined,
+				pendingSnapshot: () => []
+			},
 			bootstrap: () => Promise.resolve(),
 			openLocalFolder: () => Promise.resolve(),
 			switchFolder: () => Promise.resolve(null),
@@ -270,7 +289,7 @@ function buildStub(opts: {
 			isDirty: activeEditorId !== null,
 			integrityWarning: false,
 			errors: [],
-			open: (id: number) => {
+			open: (id: string) => {
 				openCalls.push({ id });
 			},
 			close: () => {},
@@ -429,9 +448,9 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 		activeStub = buildStub({
 			mode: 'local',
 			issues: [
-				makeLoaded(1, 'open', 'First issue'),
-				makeLoaded(2, 'in_progress', 'Second issue'),
-				makeLoaded(3, 'done', 'Third issue')
+				makeLoaded('1', 'open', 'First issue'),
+				makeLoaded('2', 'in_progress', 'Second issue'),
+				makeLoaded('3', 'done', 'Third issue')
 			]
 		});
 		render(AppShell, { mode: 'local' });
@@ -448,9 +467,9 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 		activeStub = buildStub({
 			mode: 'local',
 			issues: [
-				makeLoaded(1, 'open', 'First issue'),
-				makeLoaded(2, 'in_progress', 'Second issue'),
-				makeLoaded(3, 'open', 'Third issue')
+				makeLoaded('1', 'open', 'First issue'),
+				makeLoaded('2', 'in_progress', 'Second issue'),
+				makeLoaded('3', 'open', 'Third issue')
 			]
 		});
 		render(AppShell, { mode: 'local' });
@@ -468,7 +487,10 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 	it('local gantt view — no serious or critical axe violations', async () => {
 		activeStub = buildStub({
 			mode: 'local',
-			issues: [makeLoaded(1, 'open', 'First issue'), makeLoaded(2, 'in_progress', 'Second issue')]
+			issues: [
+				makeLoaded('1', 'open', 'First issue'),
+				makeLoaded('2', 'in_progress', 'Second issue')
+			]
 		});
 		render(AppShell, { mode: 'local' });
 		if (activeStub) (activeStub.view as { view: string }).view = 'gantt';
@@ -490,7 +512,10 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 		// tooltip.
 		activeStub = buildStub({
 			mode: 'local',
-			issues: [makeLoaded(1, 'open', 'First issue'), makeLoaded(2, 'in_progress', 'Second issue')]
+			issues: [
+				makeLoaded('1', 'open', 'First issue'),
+				makeLoaded('2', 'in_progress', 'Second issue')
+			]
 		});
 		render(AppShell, { mode: 'local' });
 		if (activeStub) (activeStub.view as { view: string }).view = 'gantt';
@@ -514,11 +539,11 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 	});
 
 	it('editor panel — no serious or critical axe violations', async () => {
-		const li = makeLoaded(1, 'open', 'A real issue');
+		const li = makeLoaded('1', 'open', 'A real issue');
 		activeStub = buildStub({
 			mode: 'local',
 			issues: [li],
-			activeEditorId: 1
+			activeEditorId: '1'
 		});
 		render(AppShell, { mode: 'local' });
 		render(LocalPage);
@@ -560,7 +585,7 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 	it('remote list view — no serious or critical axe violations', async () => {
 		activeStub = buildStub({
 			mode: 'remote',
-			issues: [makeLoaded(1, 'open', 'Read-only issue')]
+			issues: [makeLoaded('1', 'open', 'Read-only issue')]
 		});
 		render(AppShell, { mode: 'remote' });
 		render(RemotePage);
@@ -586,7 +611,7 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 			route?: 'home' | 'local' | 'remote' | 'wizard' | 'settings';
 			issues?: LoadedIssue[];
 			view?: 'list' | 'kanban' | 'gantt';
-			editorId?: number | null;
+			editorId?: string | null;
 			recentHandles?: HandleRecord[];
 			integrityCount?: number;
 		}> = [
@@ -599,25 +624,25 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 			{
 				label: 'local-list',
 				mode: 'local',
-				issues: [makeLoaded(1, 'open', 'A'), makeLoaded(2, 'in_progress', 'B')]
+				issues: [makeLoaded('1', 'open', 'A'), makeLoaded('2', 'in_progress', 'B')]
 			},
 			{
 				label: 'local-kanban',
 				mode: 'local',
-				issues: [makeLoaded(1, 'open', 'A'), makeLoaded(2, 'in_progress', 'B')],
+				issues: [makeLoaded('1', 'open', 'A'), makeLoaded('2', 'in_progress', 'B')],
 				view: 'kanban'
 			},
 			{
 				label: 'local-gantt',
 				mode: 'local',
-				issues: [makeLoaded(1, 'open', 'A'), makeLoaded(2, 'in_progress', 'B')],
+				issues: [makeLoaded('1', 'open', 'A'), makeLoaded('2', 'in_progress', 'B')],
 				view: 'gantt'
 			},
 			{
 				label: 'editor',
 				mode: 'local',
-				issues: [makeLoaded(1, 'open', 'A real issue')],
-				editorId: 1
+				issues: [makeLoaded('1', 'open', 'A real issue')],
+				editorId: '1'
 			},
 			{ label: 'wizard', mode: 'home', route: 'wizard' },
 			{
@@ -626,7 +651,7 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 				route: 'settings',
 				recentHandles: [makeHandle('recent-1', 'acme-projects')]
 			},
-			{ label: 'remote-list', mode: 'remote', issues: [makeLoaded(1, 'open', 'Read-only')] }
+			{ label: 'remote-list', mode: 'remote', issues: [makeLoaded('1', 'open', 'Read-only')] }
 		];
 
 		const summary: Array<{

@@ -12,7 +12,7 @@
 
 <button
 	type="button"
-	class="p-2 rounded-md text-muted-foreground hover:bg-foreground/5 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+	class="rounded-md p-2 text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
 	onclick={toggle}
 	aria-label={theme.theme === 'dark' ? t('theme.switchToLight') : t('theme.switchToDark')}
 >
@@ -23,7 +23,7 @@
 			fill="none"
 			stroke="currentColor"
 			stroke-width="2"
-			class="w-5 h-5"
+			class="h-5 w-5"
 		>
 			<circle cx="12" cy="12" r="5" />
 			<path
@@ -37,7 +37,7 @@
 			fill="none"
 			stroke="currentColor"
 			stroke-width="2"
-			class="w-5 h-5"
+			class="h-5 w-5"
 		>
 			<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
 		</svg>

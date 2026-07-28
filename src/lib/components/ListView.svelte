@@ -34,12 +34,12 @@
 		Array.from(issues.byId.values())
 			.filter((li) => {
 				const f = filter.filter;
-				if (f.status && li.issue.status !== f.status) return false;
-				if (f.type && li.issue.issueType !== f.type) return false;
+				if (f.status && li.issue.fields.status !== f.status) return false;
+				if (f.type && li.issue.fields.issueType !== f.type) return false;
 				if (f.q) {
 					const needle = f.q.toLowerCase();
 					if (
-						!li.issue.title.toLowerCase().includes(needle) &&
+						!li.issue.fields.title.toLowerCase().includes(needle) &&
 						!li.issue.sections.some((s) => s.markdown.toLowerCase().includes(needle))
 					) {
 						return false;
@@ -52,13 +52,13 @@
 				const dir = sortDir === 'asc' ? 1 : -1;
 				switch (sortKey) {
 					case 'id':
-						return (a.issue.id - b.issue.id) * dir;
+						return a.issue.id.localeCompare(b.issue.id) * dir;
 					case 'title':
-						return a.issue.title.localeCompare(b.issue.title) * dir;
+						return a.issue.fields.title.localeCompare(b.issue.fields.title) * dir;
 					case 'status':
-						return a.issue.status.localeCompare(b.issue.status) * dir;
+						return a.issue.fields.status.localeCompare(b.issue.fields.status) * dir;
 					case 'updated_date':
-						return a.issue.updatedDate.localeCompare(b.issue.updatedDate) * dir;
+						return a.issue.fields.updatedDate.localeCompare(b.issue.fields.updatedDate) * dir;
 				}
 			})
 	);
@@ -68,27 +68,27 @@
 	const groups = $derived.by(() => {
 		if (groupBy === 'sprint') {
 			const sprintIssues = Array.from(issues.byId.values()).filter(
-				(li) => li.issue.issueType === 'sprint'
+				(li) => li.issue.fields.issueType === 'sprint'
 			);
 			const definedGroups = sprintIssues.map((s) => ({
 				id: `sprint-${s.issue.id}`,
-				title: s.issue.title,
+				title: s.issue.fields.title,
 				match: (issue: import('$lib/types').Issue) =>
-					issue.relations.some((r) => r.id === s.issue.id) ||
-					s.issue.relations.some((r) => r.id === issue.id)
+					issue.fields.relations.some((r) => r.id === s.issue.id) ||
+					s.issue.fields.relations.some((r) => r.id === issue.id)
 			}));
 			return [...definedGroups, { id: 'unassigned', title: 'Sin Asignar', match: () => true }];
 		}
 		if (groupBy === 'epic') {
 			const epicIssues = Array.from(issues.byId.values()).filter(
-				(li) => li.issue.issueType === 'epic'
+				(li) => li.issue.fields.issueType === 'epic'
 			);
 			const definedGroups = epicIssues.map((e) => ({
 				id: `epic-${e.issue.id}`,
-				title: e.issue.title,
+				title: e.issue.fields.title,
 				match: (issue: import('$lib/types').Issue) =>
-					issue.relations.some((r) => r.id === e.issue.id) ||
-					e.issue.relations.some((r) => r.id === issue.id)
+					issue.fields.relations.some((r) => r.id === e.issue.id) ||
+					e.issue.fields.relations.some((r) => r.id === issue.id)
 			}));
 			return [...definedGroups, { id: 'unassigned', title: 'Sin Asignar', match: () => true }];
 		}
@@ -135,7 +135,7 @@
 		}
 	}
 
-	function open(id: number): void {
+	function open(id: string): void {
 		editor.open(id);
 	}
 
@@ -162,7 +162,7 @@
 		}
 	}
 
-	async function focusRow(id: number): Promise<void> {
+	async function focusRow(id: string): Promise<void> {
 		await tick();
 		const el = document.querySelector<HTMLElement>(`[data-row-id="${id}"]`);
 		el?.focus();
@@ -177,7 +177,7 @@
 
 <div class="px-6 py-4" data-testid="list-view">
 	<div
-		class="mb-4 flex items-center justify-between text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+		class="mb-4 flex items-center justify-between text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 	>
 		<span data-testid="list-view-count">
 			{t('list.countPill', { filtered: filteredCount, total: total })}
@@ -185,16 +185,16 @@
 		<span>{t('list.sortLabel', { key: sortKey, dir: sortDir })}</span>
 	</div>
 
-	<div class="overflow-x-auto border border-border rounded-xl bg-background shadow-sm">
+	<div class="overflow-x-auto rounded-xl border border-border bg-background shadow-sm">
 		<table class="w-full text-left text-sm whitespace-nowrap">
 			<thead
-				class="bg-surface border-b border-border text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+				class="border-b border-border bg-surface text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 			>
 				<tr>
 					<th aria-sort={ariaSortFor('id')} class="px-4 py-3 font-semibold">
 						<button
 							type="button"
-							class="flex items-center gap-1 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+							class="flex items-center gap-1 transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
 							onclick={() => toggleSort('id')}
 						>
 							{t('list.headers.id')}
@@ -205,7 +205,7 @@
 					<th aria-sort={ariaSortFor('title')}>
 						<button
 							type="button"
-							class="flex items-center gap-1 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+							class="flex items-center gap-1 transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
 							onclick={() => toggleSort('title')}
 						>
 							{t('list.headers.title')}
@@ -218,7 +218,7 @@
 					<th aria-sort={ariaSortFor('status')}>
 						<button
 							type="button"
-							class="flex items-center gap-1 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+							class="flex items-center gap-1 transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
 							onclick={() => toggleSort('status')}
 						>
 							{t('list.headers.status')}
@@ -232,7 +232,7 @@
 					<th aria-sort={ariaSortFor('updated_date')}>
 						<button
 							type="button"
-							class="flex items-center gap-1 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+							class="flex items-center gap-1 transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
 							onclick={() => toggleSort('updated_date')}
 						>
 							{t('list.headers.updated')}
@@ -248,23 +248,23 @@
 				{#if groupBy !== 'none' && (groupRows.length > 0 || group.id !== 'unassigned')}
 					<tbody class="bg-surface-dark border-b border-border">
 						<tr>
-							<td colspan="7" class="px-4 py-2 font-bold text-sm text-foreground">
+							<td colspan="7" class="px-4 py-2 text-sm font-bold text-foreground">
 								{group.title}
-								<span class="ml-2 text-xs text-muted-foreground font-normal opacity-70"
+								<span class="ml-2 text-xs font-normal text-muted-foreground opacity-70"
 									>({groupRows.length})</span
 								>
 							</td>
 						</tr>
 					</tbody>
 				{/if}
-				<tbody class="divide-y divide-hairline">
+				<tbody class="divide-hairline divide-y">
 					{#each groupRows as li (li.issue.id)}
 						<tr
-							class="hover:bg-surface transition-colors cursor-pointer text-foreground focus-visible:outline-none focus-visible:bg-surface focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+							class="cursor-pointer text-foreground transition-colors hover:bg-surface focus-visible:bg-surface focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset"
 							tabindex="0"
 							role="button"
 							data-row-id={li.issue.id}
-							aria-label={t('list.rowAria', { id: li.issue.id, title: li.issue.title })}
+							aria-label={t('list.rowAria', { id: li.issue.id, title: li.issue.fields.title })}
 							onclick={() => open(li.issue.id)}
 							onkeydown={(e) =>
 								onRowKeydown(
@@ -272,39 +272,39 @@
 									rows.findIndex((r) => r.issue.id === li.issue.id)
 								)}
 						>
-							<td class="font-mono text-xs text-muted-foreground px-4 py-3"
+							<td class="px-4 py-3 font-mono text-xs text-muted-foreground"
 								>{li.issue.id.toString().padStart(4, '0')}</td
 							>
-							<td class="font-medium px-4 py-3 min-w-[20rem] truncate">{li.issue.title}</td>
+							<td class="min-w-[20rem] truncate px-4 py-3 font-medium">{li.issue.fields.title}</td>
 							<td class="px-4 py-3"
 								><span
-									class="px-2 py-0.5 bg-foreground/5 rounded text-[10px] font-bold uppercase tracking-widest text-muted-foreground"
-									>{li.issue.issueType}</span
+									class="rounded bg-foreground/5 px-2 py-0.5 text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
+									>{li.issue.fields.issueType}</span
 								></td
 							>
 							<td class="px-4 py-3">
 								<span
-									class="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-widest"
+									class="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-widest"
 									style="background-color: var(--status-color, var(--color-cb-muted)); color: #fff"
 								>
-									{li.issue.status}
+									{li.issue.fields.status}
 								</span>
 							</td>
-							<td class="px-4 py-3">{li.issue.assignee ?? '—'}</td>
+							<td class="px-4 py-3">{li.issue.fields.assignee ?? '—'}</td>
 							<td class="px-4 py-3">
-								{#each li.issue.labels as l (l)}
+								{#each li.issue.fields.labels as l (l)}
 									<span
-										class="px-1.5 py-0.5 border border-border rounded text-[10px] font-bold uppercase tracking-widest text-muted-foreground mr-1"
+										class="mr-1 rounded border border-border px-1.5 py-0.5 text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
 										>{l}</span
 									>
 								{/each}
 							</td>
-							<td class="text-xs text-muted-foreground px-4 py-3">{li.issue.updatedDate}</td>
+							<td class="px-4 py-3 text-xs text-muted-foreground">{li.issue.fields.updatedDate}</td>
 						</tr>
 					{/each}
 					{#if groupRows.length === 0 && (groupBy === 'none' || group.id !== 'unassigned')}
 						<tr>
-							<td colspan="7" class="py-12 text-center text-muted-foreground font-medium italic"
+							<td colspan="7" class="py-12 text-center font-medium text-muted-foreground italic"
 								>{t('list.empty')}</td
 							>
 						</tr>

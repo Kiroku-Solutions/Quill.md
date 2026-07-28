@@ -18,7 +18,7 @@ import type { StoreGraph } from '../../src/lib/state/context';
 import type { Config, Issue, LoadedIssue } from '../../src/lib/types';
 
 let activeStub: StoreGraph | null = null;
-const openCalls: { id: number }[] = [];
+const openCalls: { id: string }[] = [];
 
 vi.mock('$lib/state', () => ({
 	getStores: () => {
@@ -46,23 +46,25 @@ const CONFIG: Config = {
 	remote: { cors_proxy: '' }
 };
 
-function makeIssue(id: number, status: string, title: string): Issue {
+function makeIssue(id: string, status: string, title: string): Issue {
 	return {
 		id,
-		title,
-		author: 'tester',
-		creationDate: '2026-01-01',
-		updatedDate: '2026-01-01',
-		issueType: 'task',
-		status,
-		assignee: null,
-		labels: [],
-		relations: [],
-		startDate: null,
-		endDate: null,
-		duration: null,
-		sprintId: null,
-		estimate: null,
+		fields: {
+			title,
+			author: 'tester',
+			creationDate: '2026-01-01',
+			updatedDate: '2026-01-01',
+			issueType: 'task',
+			status,
+			assignee: null,
+			labels: [],
+			relations: [],
+			startDate: null,
+			endDate: null,
+			duration: null,
+			sprintId: null,
+			estimate: null
+		},
 		integrityHash: null,
 		customFields: {},
 		sections: [],
@@ -73,7 +75,7 @@ function makeIssue(id: number, status: string, title: string): Issue {
 function buildStub(issues: readonly Issue[]): StoreGraph {
 	const loaded: LoadedIssue[] = issues.map((iss) => ({
 		issue: iss,
-		sourcePath: `.quill.md/issues/${String(iss.id).padStart(4, '0')}-${iss.title.toLowerCase()}.md`
+		sourcePath: `.quill.md/issues/${String(iss.id).padStart(4, '0')}-${iss.fields.title.toLowerCase()}.md`
 	}));
 	return {
 		mode: {
@@ -83,9 +85,26 @@ function buildStub(issues: readonly Issue[]): StoreGraph {
 			hasRemoteCredentials: false,
 			remoteUrl: null,
 			proxyWarning: null,
+			editBranch: null,
+			providerId: null,
+			parentSha: null,
 			lastFetchedAt: null,
 			localAdapter: null,
 			remoteAdapter: null,
+			commitQueue: {
+				depth: 0,
+				lastFlushAt: null,
+				lastError: null,
+				flushing: false,
+				active: false,
+				start: () => undefined,
+				setSession: () => undefined,
+				stop: () => undefined,
+				enqueue: () => undefined,
+				flushNow: () => Promise.resolve(),
+				clear: () => undefined,
+				pendingSnapshot: () => []
+			},
 			bootstrap: () => Promise.resolve(),
 			openLocalFolder: () => Promise.resolve(),
 			switchFolder: () => Promise.resolve(null),
@@ -138,7 +157,7 @@ function buildStub(issues: readonly Issue[]): StoreGraph {
 			isDirty: false,
 			integrityWarning: false,
 			errors: [],
-			open: (id: number) => {
+			open: (id: string) => {
 				openCalls.push({ id });
 			},
 			close: () => {},
@@ -189,9 +208,9 @@ describe('ListView — keyboard nav (NFR-4)', () => {
 
 	it('renders one row per issue with the filter pill count', async () => {
 		activeStub = buildStub([
-			makeIssue(1, 'open', 'First issue'),
-			makeIssue(2, 'open', 'Second issue'),
-			makeIssue(3, 'open', 'Third issue')
+			makeIssue('1', 'open', 'First issue'),
+			makeIssue('2', 'open', 'Second issue'),
+			makeIssue('3', 'open', 'Third issue')
 		]);
 		render(ListView);
 
@@ -200,9 +219,9 @@ describe('ListView — keyboard nav (NFR-4)', () => {
 
 	it('auto-focuses the first row on mount', async () => {
 		activeStub = buildStub([
-			makeIssue(1, 'open', 'First issue'),
-			makeIssue(2, 'open', 'Second issue'),
-			makeIssue(3, 'open', 'Third issue')
+			makeIssue('1', 'open', 'First issue'),
+			makeIssue('2', 'open', 'Second issue'),
+			makeIssue('3', 'open', 'Third issue')
 		]);
 		render(ListView);
 
@@ -213,9 +232,9 @@ describe('ListView — keyboard nav (NFR-4)', () => {
 
 	it('moves focus to the next row on ArrowDown', async () => {
 		activeStub = buildStub([
-			makeIssue(1, 'open', 'First issue'),
-			makeIssue(2, 'open', 'Second issue'),
-			makeIssue(3, 'open', 'Third issue')
+			makeIssue('1', 'open', 'First issue'),
+			makeIssue('2', 'open', 'Second issue'),
+			makeIssue('3', 'open', 'Third issue')
 		]);
 		render(ListView);
 
@@ -233,9 +252,9 @@ describe('ListView — keyboard nav (NFR-4)', () => {
 
 	it('moves focus to the previous row on ArrowUp', async () => {
 		activeStub = buildStub([
-			makeIssue(1, 'open', 'First issue'),
-			makeIssue(2, 'open', 'Second issue'),
-			makeIssue(3, 'open', 'Third issue')
+			makeIssue('1', 'open', 'First issue'),
+			makeIssue('2', 'open', 'Second issue'),
+			makeIssue('3', 'open', 'Third issue')
 		]);
 		render(ListView);
 
@@ -258,9 +277,9 @@ describe('ListView — keyboard nav (NFR-4)', () => {
 
 	it('opens the editor when Enter is pressed on a focused row', async () => {
 		activeStub = buildStub([
-			makeIssue(1, 'open', 'First issue'),
-			makeIssue(2, 'open', 'Second issue'),
-			makeIssue(3, 'open', 'Third issue')
+			makeIssue('1', 'open', 'First issue'),
+			makeIssue('2', 'open', 'Second issue'),
+			makeIssue('3', 'open', 'Third issue')
 		]);
 		render(ListView);
 
@@ -270,6 +289,6 @@ describe('ListView — keyboard nav (NFR-4)', () => {
 
 		await userEvent.keyboard('{Enter}');
 
-		expect(openCalls).toEqual([{ id: 1 }]);
+		expect(openCalls).toEqual([{ id: '1' }]);
 	});
 });

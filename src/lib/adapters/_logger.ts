@@ -146,7 +146,7 @@ function redactValue(value: unknown): unknown {
  */
 function looksLikePat(value: string): boolean {
 	// GitHub classic: 40 hex chars
-	if (/[a-f0-9]{40}/i.test(value)) return true;
+	if (/(?<![a-zA-Z0-9])[a-f0-9]{40}(?![a-zA-Z0-9])/i.test(value)) return true;
 	// GitHub fine-grained: ghp_, gho_, ghu_, ghs_, ghr_ + 36 alnum
 	if (/(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36,}/.test(value)) return true;
 	// GitLab: glpat- + 20 alnum

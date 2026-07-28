@@ -66,6 +66,14 @@ export { createUiStore } from './ui.svelte.ts';
 export { StateError } from './errors.ts';
 export type { StateErrorKind } from './errors.ts';
 
+// ─── Commit queue (remote edit mode) ──────────────────────────────────────
+export type { CommitQueueStore, QueuedWrite, QueueState } from './commit-queue.svelte.ts';
+export { createCommitQueueStore, KANBAN_DEBOUNCE_MS } from './commit-queue.svelte.ts';
+
+// ─── PAT sessionStorage (FR-5 silent restore) ─────────────────────────────
+export type { RemoteSessionMeta } from './pat-storage.ts';
+export { clearPat, readPat, readSessionMeta, writePat, writeSessionMeta } from './pat-storage.ts';
+
 // ─── Context (per-mount store wiring) ──────────────────────────────────────
 export { setStores, getStores } from './context.ts';
 export type { StoreGraph } from './context.ts';
