@@ -31,7 +31,8 @@ export const es: Translations = {
 			`${params.n} error${params.n === 1 ? '' : 'es'} de validación`,
 		integrityReview: (params: Params) =>
 			`${params.n} advertencia${params.n === 1 ? '' : 's'} de integridad`,
-		fullscreen: 'Pantalla completa'
+		fullscreen: 'Pantalla completa',
+		colorLabel: (params: Params) => `Color ${params.color}`
 	},
 
 	app: {
@@ -106,6 +107,7 @@ export const es: Translations = {
 		remotePatLabel: 'Personal Access Token (opcional para repos públicos)',
 		remotePatPlaceholder: 'ghp_…',
 		remotePatHelp: 'Guardado en memoria solo durante la sesión — nunca en disco, nunca en URLs.',
+		remotePatOptional: 'Repositorio público detectado. El PAT es opcional (modo lectura).',
 		fsaUnavailable:
 			'Tu navegador no soporta la File System Access API. Usa Chrome, Edge, Brave, Arc, Opera, o Vivaldi para el Modo de Edición Local.',
 
@@ -282,7 +284,8 @@ export const es: Translations = {
 			`Elemento ${params.id} recogido. Usa las flechas para mover, Espacio o Enter para soltar, Escape para cancelar.`,
 		dropped: (params: Params) => `Elemento ${params.id} soltado en columna ${params.col}`,
 		cancelled: (params: Params) => `Movimiento cancelado para el elemento ${params.id}.`,
-		activateHint: 'Presiona F2 para abrir el editor'
+		activateHint: 'Presiona F2 para abrir el editor',
+		sprintLabel: 'Sprint'
 	},
 
 	gantt: {
@@ -317,12 +320,21 @@ export const es: Translations = {
 		statusLabel: 'Estado',
 		typeLabel: 'Tipo',
 		typePlaceholder: 'bug, tarea…',
-		clearButton: 'Limpiar'
+		clearButton: 'Limpiar',
+		sprintPlaceholder: 'ej. Sprint-1',
+		viewLevel: 'Nivel de Vista (Agrupar Por)',
+		flat: 'Plano (Bajo Nivel)',
+		groupBySprint: 'Agrupar por Sprint',
+		groupByEpic: 'Agrupar por Epic'
 	},
 
 	theme: {
 		switchToLight: 'Cambiar a tema claro',
 		switchToDark: 'Cambiar a tema oscuro'
+	},
+
+	graph: {
+		toggle3d: 'Alternar modo 3D'
 	},
 
 	proxy: {
@@ -450,6 +462,13 @@ export const es: Translations = {
 		allowedTargetsHint: 'Si no marcas ninguna, se permitirá vincular con cualquier elemento.',
 		allowedRelationTypes: 'Tipos de Relación Permitidos',
 		allowedRelationTypesHint:
-			'Si no marcas ninguno, se permitirán todos los tipos (Padre, Hijo, Bloquea, etc.).'
+			'Si no marcas ninguno, se permitirán todos los tipos (Padre, Hijo, Bloquea, etc.).',
+		namePlaceholder: 'Ej. Requerimiento Técnico',
+		idPlaceholder: 'ej. requerimiento-tecnico',
+		removeField: 'Eliminar campo',
+		fieldPlaceholder: 'Ej. Prioridad',
+		optionsPlaceholder: 'Alta, Media, Baja',
+		sectionPlaceholder: 'Nombre de la sección',
+		removeSection: 'Eliminar sección'
 	}
 };

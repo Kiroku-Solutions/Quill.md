@@ -30,7 +30,12 @@ import {
 	putSnapshot,
 	type CachedSnapshot
 } from './read-cache.ts';
-import { AdapterNotFoundError, RemoteFetchError, RemoteUnsupportedHostError } from './errors.ts';
+import {
+	AdapterNotFoundError,
+	RemoteAuthError,
+	RemoteFetchError,
+	RemoteUnsupportedHostError
+} from './errors.ts';
 import type { DirectoryEntry, ReadOnlyDirectoryAdapter } from './directory-adapter.ts';
 import { normalizePath } from './directory-adapter.ts';
 
@@ -148,7 +153,20 @@ export async function fetchSubtree(options: FetchOptions): Promise<FetchResult> 
 		(parsed as { baseUrl: string }).baseUrl = options.customBaseUrl.replace(/\/+$/, '');
 	}
 
-	const user = await provider.verifyAuth(parsed, options.pat);
+	let user: { login: string; name: string | null; email: string | null };
+	if (!options.pat) {
+		if (!provider.isPublic) {
+			throw new RemoteAuthError('Provider does not support anonymous access');
+		}
+		const publicRepo = await provider.isPublic(parsed);
+		if (!publicRepo) {
+			throw new RemoteAuthError('Repository is private or not found (PAT required)');
+		}
+		user = { login: 'anonymous', name: 'Anonymous', email: 'noreply@quill.md' };
+	} else {
+		user = await provider.verifyAuth(parsed, options.pat);
+	}
+
 	const author = options.commitAuthor
 		? {
 				name: options.commitAuthor.name,

@@ -1,15 +1,27 @@
 <script lang="ts">
+	/* eslint-disable @typescript-eslint/no-explicit-any */
+	/* eslint-disable @typescript-eslint/no-unsafe-function-type */
+	import { t } from '$lib/ui/strings';
 	import { getStores } from '$lib/state';
 	import { onMount, untrack } from 'svelte';
+	import { SvelteSet, SvelteMap } from 'svelte/reactivity';
 	const { issues, editor, templates, filter, theme } = getStores();
 
 	let container: HTMLDivElement | undefined = $state();
+
 	let graph: any;
 	let is3D = $state(true);
 
 	function buildGraphData() {
-		let nodes: any[] = [];
-		let links: any[] = [];
+		let nodes: {
+			id: string;
+			name: string;
+			color?: string;
+			groupId?: string;
+			val?: number;
+			[key: string]: unknown;
+		}[] = [];
+		let links: { source: string; target: string; name: string; [key: string]: unknown }[] = [];
 
 		const allIssues = Array.from(issues.byId.values());
 		const matchedIssues = allIssues.filter((li) => {
@@ -28,7 +40,7 @@
 			return true;
 		});
 
-		const filteredSet = new Set(matchedIssues);
+		const filteredSet = new SvelteSet(matchedIssues);
 		const f = filter.filter;
 		const hasActiveFilter = !!(f.status || f.type || f.q);
 
@@ -105,7 +117,7 @@
 		}
 
 		// Calculate sizes based on connection degree
-		const degrees = new Map<string, number>();
+		const degrees = new SvelteMap<string, number>();
 		for (const link of links) {
 			degrees.set(link.source, (degrees.get(link.source) || 0) + 1);
 			degrees.set(link.target, (degrees.get(link.target) || 0) + 1);
@@ -142,6 +154,7 @@
 		if (!container) return;
 
 		const currentIs3D = is3D;
+
 		let currentGraph: any = null;
 		let mounted = true;
 
@@ -151,6 +164,7 @@
 				graph = null;
 			}
 			if (container) {
+				// eslint-disable-next-line svelte/no-dom-manipulating
 				container.innerHTML = '';
 			}
 		});
@@ -167,16 +181,16 @@
 				const ForceGraph3D = module.default;
 				if (!mounted) return;
 
-				currentGraph = (ForceGraph3D as any)()(container)
+				currentGraph = (ForceGraph3D as Function)()(container)
 					.nodeLabel('name')
-					.nodeColor((n: any) => n.color || undefined)
+					.nodeColor((n: Record<string, any>) => n.color || undefined)
 					.nodeAutoColorBy('groupId')
 					.nodeVal('val')
 					.linkColor(() => linkColorStr)
 					.linkDirectionalArrowLength(3.5)
 					.linkDirectionalArrowRelPos(1)
 					.backgroundColor('#00000000')
-					.onNodeClick((node: any) => {
+					.onNodeClick((node: Record<string, any>) => {
 						if (!node.id.startsWith('debug-')) {
 							editor.open(node.id);
 						}
@@ -186,15 +200,15 @@
 				const ForceGraph2D = module.default;
 				if (!mounted) return;
 
-				currentGraph = (ForceGraph2D as any)()(container)
+				currentGraph = (ForceGraph2D as Function)()(container)
 					.nodeLabel('name')
-					.nodeColor((n: any) => n.color || undefined)
+					.nodeColor((n: Record<string, any>) => n.color || undefined)
 					.nodeAutoColorBy('groupId')
 					.nodeVal('val')
 					.linkColor(() => linkColorStr)
 					.linkDirectionalArrowLength(3.5)
 					.linkDirectionalArrowRelPos(1)
-					.onNodeClick((node: any) => {
+					.onNodeClick((node: Record<string, any>) => {
 						if (!node.id.startsWith('debug-')) {
 							editor.open(node.id);
 						}
@@ -263,7 +277,7 @@
 			onclick={() => (is3D = !is3D)}
 			aria-pressed={is3D}
 		>
-			<span class="sr-only">Toggle 3D mode</span>
+			<span class="sr-only">{t('graph.toggle3d')}</span>
 			<span
 				aria-hidden="true"
 				class="pointer-events-none absolute h-full w-full rounded-md bg-transparent"

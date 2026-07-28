@@ -25,7 +25,7 @@ export interface Issue {
 import crypto from 'node:crypto';
 
 export async function serializeIssue(issue: Issue): Promise<string> {
-	const frontmatter: any = {
+	const frontmatter: Record<string, unknown> = {
 		id: issue.id,
 		title: issue.title,
 		author: issue.author,
@@ -56,7 +56,7 @@ export async function serializeIssue(issue: Issue): Promise<string> {
 		quotingType: '"'
 	});
 
-	let bodyStrs = [];
+	const bodyStrs = [];
 	for (let i = 0; i < issue.sections.length; i++) {
 		const sec = issue.sections[i];
 		const body = sec.markdown.endsWith('\n') ? sec.markdown : `${sec.markdown}\n`;
@@ -66,7 +66,7 @@ export async function serializeIssue(issue: Issue): Promise<string> {
 	}
 	const bodyStr = bodyStrs.join('\n');
 
-	let mdStrWithoutHash = `---\n${yamlStrWithoutHash}---\n\n${bodyStr}`;
+	const mdStrWithoutHash = `---\n${yamlStrWithoutHash}---\n\n${bodyStr}`;
 
 	// Compute integrity hash using SHA-256 hex digest of the string
 	const hash = crypto.createHash('sha256').update(mdStrWithoutHash, 'utf8').digest('hex');

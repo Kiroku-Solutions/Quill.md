@@ -144,6 +144,10 @@ export interface ModeStore {
 	readonly commitQueue: CommitQueueStore;
 	/** Edit branch the remote mode is committing to (`quill-md` by default). */
 	readonly editBranch: string | null;
+	/** Whether the remote mode is read-only (no PAT provided). */
+	readonly isReadOnly: boolean;
+	/** The name of the last active folder, shown if permission is dropped on reload. */
+	readonly lastActiveFolder: string | null;
 	/** Provider id the remote session is using (`github` / `gitlab`). */
 	readonly providerId: string | null;
 	/**
@@ -284,6 +288,10 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 	// Current branch tip SHA the queue will build on. Surfaced for tests;
 	// the UI does not read it today.
 	let parentSha = $state<string | null>(null);
+	// Whether the current remote session is read-only.
+	let isReadOnly = $state<boolean>(false);
+	// Last active local folder name, used to prompt user for permission on reload.
+	let lastActiveFolder = $state<string | null>(null);
 	// Singleton commit queue — started in `openRemote`, re-armed in
 	// `refreshRemote`, stopped in `signOut`. The queue holds the PAT
 	// for the duration of the session (cleared on `signOut` / tab close).
@@ -361,6 +369,7 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 		const permission = await tryQueryPermission(record.handle);
 		if (permission !== 'granted') {
 			// Persist as recent but do NOT make it active.
+			lastActiveFolder = record.handle.name;
 			mode = 'home';
 			await readRecent();
 			return;
@@ -456,16 +465,6 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 	async function openRemote(creds: RemoteCredentials, pat: string): Promise<void> {
 		const { fetchResult, scope } = await consumePatAndFetch(creds, pat);
 		_patScope = scope;
-		// Bind the writable adapter that fronts the read-only snapshot.
-		// The writable adapter is what the issues store / editor / Kanban
-		// read and write through; its `readTextFile` / `listDirectory`
-		// delegate to the snapshot, and its mutations enqueue against the
-		// commit queue started below.
-		const writable = new RemoteWritableAdapter({
-			readOnly: fetchResult.adapter,
-			queue: commitQueue
-		});
-		remoteAdapter = writable;
 		editBranch = fetchResult.editBranch;
 		providerId = fetchResult.providerId;
 		parentSha = fetchResult.sha;
@@ -505,6 +504,18 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 			parentSha: fetchResult.sha
 		};
 		commitQueue.start(queueState);
+		// Disable write adapters if no PAT is present.
+		isReadOnly = !pat;
+		if (isReadOnly) {
+			// Type cast because we know it's read-only and mutations will fail/be blocked.
+			remoteAdapter = fetchResult.adapter as unknown as WritableDirectoryAdapter;
+		} else {
+			remoteAdapter = new RemoteWritableAdapter({
+				readOnly: fetchResult.adapter,
+				queue: commitQueue
+			});
+		}
+
 		// Remote Mode is write-capable (FR-5); clear any local session markers.
 		activeHandle = null;
 		localAdapter = null;
@@ -590,6 +601,8 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 		editBranch = null;
 		providerId = null;
 		parentSha = null;
+		isReadOnly = false;
+		lastActiveFolder = null;
 		clearPat();
 		await handles.clearActive();
 		await readRecent();
@@ -667,6 +680,12 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 		},
 		get editBranch() {
 			return editBranch;
+		},
+		get isReadOnly() {
+			return isReadOnly;
+		},
+		get lastActiveFolder() {
+			return lastActiveFolder;
 		},
 		get providerId() {
 			return providerId;

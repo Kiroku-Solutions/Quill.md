@@ -1,7 +1,6 @@
 <script lang="ts">
 	import * as Icons from '@lucide/svelte';
 	import { t } from '$lib/ui/strings';
-	import { Tooltip } from '$lib/ui';
 
 	let { value = $bindable('file-text') } = $props<{ value?: string }>();
 
@@ -46,14 +45,16 @@
 
 	function getLucideComponent(name: string) {
 		const pascalName = kebabToPascal(name);
-		return (Icons as Record<string, any>)[pascalName] || Icons.FileText;
+		return (
+			(Icons as unknown as Record<string, typeof Icons.FileText>)[pascalName] || Icons.FileText
+		);
 	}
 </script>
 
 <div class="flex flex-col gap-2">
 	<span class="text-sm font-medium">{t('templateEditor.icon')}</span>
 	<div class="flex flex-wrap justify-start gap-2 rounded-lg border border-border bg-surface/50 p-3">
-		{#each PRESET_ICONS as iconName}
+		{#each PRESET_ICONS as iconName (iconName)}
 			{@const IconComponent = getLucideComponent(iconName)}
 			{@const isSelected = value === iconName}
 			<button

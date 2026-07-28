@@ -90,7 +90,7 @@
 		<input
 			type="text"
 			class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder-muted-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
-			placeholder="e.g. Sprint-1"
+			placeholder={t('filter.sprintPlaceholder')}
 			value={sprintId}
 			oninput={(e) => update({ sprintId: e.currentTarget.value || undefined })}
 		/>
@@ -98,7 +98,7 @@
 
 	<label class="flex flex-col gap-1.5">
 		<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
-			>View Level (Group By)</span
+			>{t('filter.viewLevel')}</span
 		>
 		<div class="relative w-full">
 			<select
@@ -112,9 +112,9 @@
 								: (e.currentTarget.value as 'none' | 'sprint' | 'epic')
 					})}
 			>
-				<option value="none">Flat (Bajo Nivel)</option>
-				<option value="sprint">Group by Sprint</option>
-				<option value="epic">Group by Epic</option>
+				<option value="none">{t('filter.flat')}</option>
+				<option value="sprint">{t('filter.groupBySprint')}</option>
+				<option value="epic">{t('filter.groupByEpic')}</option>
 			</select>
 			<div
 				class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground"

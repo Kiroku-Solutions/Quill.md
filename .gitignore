@@ -46,3 +46,4 @@ audits
 .agents
 quill-skill-workspace
 # test-mock.ts
+quill-mcp-server/dist/

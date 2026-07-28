@@ -95,6 +95,8 @@ function buildStub(opts: {
 	};
 	return {
 		mode: {
+			isReadOnly: false,
+			lastActiveFolder: null,
 			mode: opts.hasLocalAdapter ? 'local' : 'home',
 			activeHandle: null,
 			recentHandles: opts.recentHandles ?? [],

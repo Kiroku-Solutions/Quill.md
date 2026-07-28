@@ -185,6 +185,8 @@ function buildStub(opts: StubOpts = {}): StoreGraph {
 	byId.set(loaded.issue.id, loaded);
 	return {
 		mode: {
+			isReadOnly: false,
+			lastActiveFolder: null,
 			mode: 'local',
 			activeHandle: null,
 			recentHandles: [],

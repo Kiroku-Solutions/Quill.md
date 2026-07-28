@@ -18,7 +18,7 @@ export async function listIssues() {
 			let files: string[] = [];
 			try {
 				files = await fs.readdir(dir);
-			} catch (e) {
+			} catch {
 				continue;
 			}
 			for (const file of files) {
@@ -35,7 +35,7 @@ export async function listIssues() {
 							status: frontmatter.status,
 							filename: file
 						});
-					} catch (e) {
+					} catch {
 						// ignore parsing error
 					}
 				}
@@ -44,9 +44,10 @@ export async function listIssues() {
 		return {
 			content: [{ type: 'text' as const, text: JSON.stringify(issues, null, 2) }]
 		};
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const msg = error instanceof Error ? error.message : String(error);
 		return {
-			content: [{ type: 'text' as const, text: `Error reading issues: ${error.message}` }],
+			content: [{ type: 'text' as const, text: `Error reading issues: ${msg}` }],
 			isError: true
 		};
 	}
@@ -61,7 +62,7 @@ export async function readIssue(issueId: string) {
 			let files: string[] = [];
 			try {
 				files = await fs.readdir(dir);
-			} catch (e) {
+			} catch {
 				continue;
 			}
 			const file = files.find((f) => f.startsWith(`${issueId}-`) && f.endsWith('.md'));
@@ -79,9 +80,10 @@ export async function readIssue(issueId: string) {
 		return {
 			content: [{ type: 'text' as const, text: foundContent }]
 		};
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const msg = error instanceof Error ? error.message : String(error);
 		return {
-			content: [{ type: 'text' as const, text: `Error reading issue: ${error.message}` }],
+			content: [{ type: 'text' as const, text: `Error reading issue: ${msg}` }],
 			isError: true
 		};
 	}
@@ -101,13 +103,14 @@ export async function createIssue(
 		const dir = process.argv[2] || process.cwd();
 		const templatePath = path.join(dir, '.quill.md', 'templates', `${issueType}.json`);
 
-		let template: any;
+		let template: Record<string, unknown>;
 		try {
 			const templateContent = await fs.readFile(templatePath, 'utf-8');
 			template = JSON.parse(templateContent);
 		} catch (e) {
 			throw new Error(
-				`Strict Validation Failed: Template for issue type '${issueType}' does not exist.`
+				`Strict Validation Failed: Template for issue type '${issueType}' does not exist.`,
+				{ cause: e }
 			);
 		}
 
@@ -187,11 +190,11 @@ export async function createIssue(
 		try {
 			const configContent = await fs.readFile(path.join(dir, '.quill.md', 'config.json'), 'utf-8');
 			const config = JSON.parse(configContent);
-			const st = config?.statuses?.find((s: any) => s.id === status);
+			const st = config?.statuses?.find((s: Record<string, unknown>) => s.id === status);
 			if (st && (st.category === 'done' || st.category === 'cancelled')) {
 				category = 'closed';
 			}
-		} catch (e) {
+		} catch {
 			if (
 				status === 'done' ||
 				status === 'closed' ||
@@ -214,9 +217,10 @@ export async function createIssue(
 				}
 			]
 		};
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const msg = error instanceof Error ? error.message : String(error);
 		return {
-			content: [{ type: 'text' as const, text: `Error creating issue: ${error.message}` }],
+			content: [{ type: 'text' as const, text: `Error creating issue: ${msg}` }],
 			isError: true
 		};
 	}
