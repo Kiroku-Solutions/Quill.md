@@ -183,7 +183,9 @@ describe('serializeIssue — section bodies', () => {
 		const text = await serializeIssue(makeIssue());
 		// Section blocks end with "...END: Description] -->\n"; the next
 		// section starts on a new line.
-		expect(text).toMatch(/\[SECTION_END: Description\] -->\n\n## Steps to reproduce\n<!-- \[SECTION_START/);
+		expect(text).toMatch(
+			/\[SECTION_END: Description\] -->\n\n## Steps to reproduce\n<!-- \[SECTION_START/
+		);
 	});
 });
 

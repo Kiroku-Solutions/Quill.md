@@ -49,13 +49,20 @@ export async function serializeIssue(issue: Issue): Promise<string> {
 		frontmatter[key] = issue.customFields[key];
 	}
 
-	const yamlStrWithoutHash = yaml.dump(frontmatter, { lineWidth: -1, noRefs: true, sortKeys: false, quotingType: '"' });
+	const yamlStrWithoutHash = yaml.dump(frontmatter, {
+		lineWidth: -1,
+		noRefs: true,
+		sortKeys: false,
+		quotingType: '"'
+	});
 
 	let bodyStrs = [];
 	for (let i = 0; i < issue.sections.length; i++) {
 		const sec = issue.sections[i];
 		const body = sec.markdown.endsWith('\n') ? sec.markdown : `${sec.markdown}\n`;
-		bodyStrs.push(`## ${sec.name}\n<!-- [SECTION_START: ${sec.name}] -->\n${body}<!-- [SECTION_END: ${sec.name}] -->\n`);
+		bodyStrs.push(
+			`## ${sec.name}\n<!-- [SECTION_START: ${sec.name}] -->\n${body}<!-- [SECTION_END: ${sec.name}] -->\n`
+		);
 	}
 	const bodyStr = bodyStrs.join('\n');
 
@@ -66,7 +73,9 @@ export async function serializeIssue(issue: Issue): Promise<string> {
 	frontmatter.integrity_hash = `sha256:${hash}`;
 
 	// Now dump it with the hash included
-	const finalYamlStr = yaml.dump(frontmatter, { lineWidth: -1, noRefs: true, sortKeys: false, quotingType: '"' }).replace(/^integrity_hash: (.*)$/m, 'integrity_hash: "$1"');
+	const finalYamlStr = yaml
+		.dump(frontmatter, { lineWidth: -1, noRefs: true, sortKeys: false, quotingType: '"' })
+		.replace(/^integrity_hash: (.*)$/m, 'integrity_hash: "$1"');
 	return `---\n${finalYamlStr}---\n\n${bodyStr}`;
 }
 

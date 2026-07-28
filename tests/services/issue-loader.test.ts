@@ -136,10 +136,7 @@ describe('loadIssues — happy path', () => {
 		// sorted ascending so the UI can index by id without a sort.
 		for (const id of ['3', '1', '2']) {
 			const text = await serializeIssue(makeIssue(id, `Issue ${id}`));
-			await fs.writeTextFile(
-				`.quill.md/issues/open/${id}-issue-${id}.md`,
-				text
-			);
+			await fs.writeTextFile(`.quill.md/issues/open/${id}-issue-${id}.md`, text);
 		}
 
 		const loaded = await loadIssues(fs);

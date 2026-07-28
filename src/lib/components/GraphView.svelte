@@ -40,11 +40,7 @@
 				}
 			}
 			for (const li of allIssues) {
-				if (
-					li.issue.fields.relations.some((r) =>
-						matchedIssues.some((m) => m.issue.id === r.id)
-					)
-				) {
+				if (li.issue.fields.relations.some((r) => matchedIssues.some((m) => m.issue.id === r.id))) {
 					filteredSet.add(li);
 				}
 			}

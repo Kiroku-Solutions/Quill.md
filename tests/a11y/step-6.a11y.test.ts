@@ -487,7 +487,10 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 	it('local gantt view — no serious or critical axe violations', async () => {
 		activeStub = buildStub({
 			mode: 'local',
-			issues: [makeLoaded('1', 'open', 'First issue'), makeLoaded('2', 'in_progress', 'Second issue')]
+			issues: [
+				makeLoaded('1', 'open', 'First issue'),
+				makeLoaded('2', 'in_progress', 'Second issue')
+			]
 		});
 		render(AppShell, { mode: 'local' });
 		if (activeStub) (activeStub.view as { view: string }).view = 'gantt';
@@ -509,7 +512,10 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 		// tooltip.
 		activeStub = buildStub({
 			mode: 'local',
-			issues: [makeLoaded('1', 'open', 'First issue'), makeLoaded('2', 'in_progress', 'Second issue')]
+			issues: [
+				makeLoaded('1', 'open', 'First issue'),
+				makeLoaded('2', 'in_progress', 'Second issue')
+			]
 		});
 		render(AppShell, { mode: 'local' });
 		if (activeStub) (activeStub.view as { view: string }).view = 'gantt';

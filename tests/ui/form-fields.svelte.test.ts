@@ -452,7 +452,7 @@ describe('FormFields — template-driven form rows', () => {
 			...TASK_TEMPLATE.fields,
 			{
 				id: 0,
-			key: 'description',
+				key: 'description',
 				type: 'longtext',
 				name: 'Description',
 				obligatory: false

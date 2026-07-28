@@ -304,12 +304,10 @@ describe('createEditorStore — save', () => {
 		// On disk: the new title — scan all issue files for the updated content
 		// (the saver may rename the file to match the new slug).
 		const snap = stores.fs.snapshot().files;
-		const issueFiles = Object.entries(snap).filter(([p]) =>
-			p.startsWith('.quill.md/issues/')
-		);
+		const issueFiles = Object.entries(snap).filter(([p]) => p.startsWith('.quill.md/issues/'));
 		expect(issueFiles.length).toBeGreaterThan(0);
-		const hasNewTitle = issueFiles.some(([, content]) =>
-			typeof content === 'string' && content.includes('title: B')
+		const hasNewTitle = issueFiles.some(
+			([, content]) => typeof content === 'string' && content.includes('title: B')
 		);
 		expect(hasNewTitle).toBe(true);
 		// After save the draft is re-cloned from the (re-parsed) issues

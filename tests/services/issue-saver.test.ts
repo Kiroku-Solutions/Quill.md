@@ -37,29 +37,28 @@ import type { Issue } from '$lib/types';
 
 describe('buildDefaultIssue', () => {
 	it('defaults `status` to "open" when input.status is omitted', () => {
-		const issue = buildDefaultIssue(
-			{ title: 'Hello', issueType: 'task', author: 'jane' }
-		);
+		const issue = buildDefaultIssue({ title: 'Hello', issueType: 'task', author: 'jane' });
 		expect(issue.fields.status).toBe('open');
 	});
 
 	it('respects an explicit input.status', () => {
-		const issue = buildDefaultIssue(
-			{ title: 'Hello', issueType: 'task', author: 'jane', status: 'in_progress' }
-		);
+		const issue = buildDefaultIssue({
+			title: 'Hello',
+			issueType: 'task',
+			author: 'jane',
+			status: 'in_progress'
+		});
 		expect(issue.fields.status).toBe('in_progress');
 	});
 
 	it('copies customFields into a fresh object (no shared mutation)', () => {
 		const seed = { severity: 'high', priority: 'p1' };
-		const issue = buildDefaultIssue(
-			{
-				title: 'Hello',
-				issueType: 'task',
-				author: 'jane',
-				customFields: seed
-			}
-		);
+		const issue = buildDefaultIssue({
+			title: 'Hello',
+			issueType: 'task',
+			author: 'jane',
+			customFields: seed
+		});
 		expect(issue.customFields).toEqual({ severity: 'high', priority: 'p1' });
 		// Not the same reference — the saver must clone so a later
 		// mutation of the caller's seed doesn't leak into the Issue.
@@ -68,28 +67,31 @@ describe('buildDefaultIssue', () => {
 
 	it('defaults creationDate / updatedDate to today UTC', () => {
 		const today = '2026-06-24';
-		const issue = buildDefaultIssue(
-			{ title: 'Hello', issueType: 'task', author: 'jane', today }
-		);
+		const issue = buildDefaultIssue({ title: 'Hello', issueType: 'task', author: 'jane', today });
 		expect(issue.fields.creationDate).toBe('2026-06-24');
 		expect(issue.fields.updatedDate).toBe('2026-06-24');
 	});
 
 	it('assigns a UUID string to the id', () => {
-		const issue = buildDefaultIssue(
-			{ title: 'Hello', issueType: 'task', author: 'jane', today: '2026-06-24' }
-		);
+		const issue = buildDefaultIssue({
+			title: 'Hello',
+			issueType: 'task',
+			author: 'jane',
+			today: '2026-06-24'
+		});
 		expect(typeof issue.id).toBe('string');
 	});
 });
 
 describe('issuePath', () => {
 	it('composes the canonical <id>-<slug>.md under ISSUES_DIR', () => {
-		const issue = buildDefaultIssue({ title: 'Fix login redirect!', issueType: 'task', author: 'jane' });
+		const issue = buildDefaultIssue({
+			title: 'Fix login redirect!',
+			issueType: 'task',
+			author: 'jane'
+		});
 		issue.id = '1'; // Force ID to 1 for test
-		expect(issuePath(issue, null)).toBe(
-			'.quill.md/issues/open/1-fix-login-redirect.md'
-		);
+		expect(issuePath(issue, null)).toBe('.quill.md/issues/open/1-fix-login-redirect.md');
 	});
 
 	it('exposes ISSUES_DIR as ".quill.md/issues"', () => {

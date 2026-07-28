@@ -45,9 +45,7 @@ export interface CreateIssueInput {
  * Compose the default issue record from the inputs plus today's date.
  * Pure — no I/O, no date side effects beyond a default.
  */
-export function buildDefaultIssue(
-	input: CreateIssueInput
-): Issue {
+export function buildDefaultIssue(input: CreateIssueInput): Issue {
 	const today = input.today ?? new Date().toISOString().slice(0, 10);
 	return {
 		id: nextIssueId(),
@@ -89,7 +87,8 @@ export function issuePath(issue: Issue, config: Config | null): string {
 	} else {
 		// Fallback if config not loaded
 		const s = issue.fields.status;
-		if (s === 'done' || s === 'closed' || s === 'cancelled' || s === 'rejected') category = 'closed';
+		if (s === 'done' || s === 'closed' || s === 'cancelled' || s === 'rejected')
+			category = 'closed';
 	}
 	return `${ISSUES_DIR}/${category}/${buildIssueFilename(issue.id, issue.fields.title)}`;
 }
