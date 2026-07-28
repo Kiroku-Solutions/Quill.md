@@ -21,24 +21,24 @@ export const BUILT_IN_TEMPLATES: readonly Template[] = [
 		color: '#f97316',
 		default_status: 'open',
 		fields: [
-			{ id: 1, key: 'owner', name: 'Owner', type: 'user', obligatory: true },
+			{ id: '1', key: 'owner', name: 'Owner', type: 'user', obligatory: true },
 			{
-				id: 2,
+				id: '2',
 				key: 'labels',
 				name: 'Labels',
 				type: 'multi-select',
 				obligatory: false,
 				options_source: 'config.labels'
 			},
-			{ id: 3, key: 'relations', name: 'Relations', type: 'relations', obligatory: false },
-			{ id: 4, key: 'start_date', name: 'Start date', type: 'date', obligatory: false },
-			{ id: 5, key: 'end_date', name: 'End date', type: 'date', obligatory: false }
+			{ id: '3', key: 'relations', name: 'Relations', type: 'relations', obligatory: false },
+			{ id: '4', key: 'start_date', name: 'Start date', type: 'date', obligatory: false },
+			{ id: '5', key: 'end_date', name: 'End date', type: 'date', obligatory: false }
 		],
 		sections: [
-			{ id: 1, key: 'summary', name: 'Summary', obligatory: true, default: '' },
-			{ id: 2, key: 'goals', name: 'Goals', obligatory: false, default: '' },
+			{ id: '1', key: 'summary', name: 'Summary', obligatory: true, default: '' },
+			{ id: '2', key: 'goals', name: 'Goals', obligatory: false, default: '' },
 			{
-				id: 3,
+				id: '3',
 				key: 'success_criteria',
 				name: 'Success criteria',
 				obligatory: true,
@@ -53,20 +53,20 @@ export const BUILT_IN_TEMPLATES: readonly Template[] = [
 		color: '#a855f7',
 		default_status: 'open',
 		fields: [
-			{ id: 1, key: 'assignee', name: 'Assignee', type: 'user', obligatory: false },
+			{ id: '1', key: 'assignee', name: 'Assignee', type: 'user', obligatory: false },
 			{
-				id: 2,
+				id: '2',
 				key: 'labels',
 				name: 'Labels',
 				type: 'multi-select',
 				obligatory: false,
 				options_source: 'config.labels'
 			},
-			{ id: 3, key: 'relations', name: 'Relations', type: 'relations', obligatory: false }
+			{ id: '3', key: 'relations', name: 'Relations', type: 'relations', obligatory: false }
 		],
 		sections: [
-			{ id: 1, key: 'description', name: 'Description', obligatory: true, default: '' },
-			{ id: 2, key: 'main_flow', name: 'Main Flow', obligatory: true, default: '' }
+			{ id: '1', key: 'description', name: 'Description', obligatory: true, default: '' },
+			{ id: '2', key: 'main_flow', name: 'Main Flow', obligatory: true, default: '' }
 		]
 	},
 	{
@@ -76,18 +76,18 @@ export const BUILT_IN_TEMPLATES: readonly Template[] = [
 		color: '#0ea5e9',
 		default_status: 'open',
 		fields: [
-			{ id: 1, key: 'user', name: 'As a', type: 'text', obligatory: true },
-			{ id: 2, key: 'action', name: 'I want', type: 'text', obligatory: true },
-			{ id: 3, key: 'objective', name: 'So that', type: 'text', obligatory: true },
+			{ id: '1', key: 'user', name: 'As a', type: 'text', obligatory: true },
+			{ id: '2', key: 'action', name: 'I want', type: 'text', obligatory: true },
+			{ id: '3', key: 'objective', name: 'So that', type: 'text', obligatory: true },
 			{
-				id: 4,
+				id: '4',
 				key: 'estimate',
 				name: 'Estimate (points/hours)',
 				type: 'number',
 				obligatory: false
 			},
 			{
-				id: 41,
+				id: '41',
 				key: 'sprint_id',
 				name: 'Sprint',
 				type: 'select',
@@ -95,30 +95,30 @@ export const BUILT_IN_TEMPLATES: readonly Template[] = [
 				options_source: 'issues.sprints'
 			},
 			{
-				id: 5,
+				id: '5',
 				key: 'priority',
 				name: 'Priority',
 				type: 'select',
 				obligatory: false,
 				options: ['high', 'medium', 'low']
 			},
-			{ id: 6, key: 'assignee', name: 'Assignee', type: 'user', obligatory: false },
+			{ id: '6', key: 'assignee', name: 'Assignee', type: 'user', obligatory: false },
 			{
-				id: 7,
+				id: '7',
 				key: 'labels',
 				name: 'Labels',
 				type: 'multi-select',
 				obligatory: false,
 				options_source: 'config.labels'
 			},
-			{ id: 8, key: 'relations', name: 'Relations', type: 'relations', obligatory: false },
-			{ id: 9, key: 'start_date', name: 'Start date', type: 'date', obligatory: false },
-			{ id: 10, key: 'end_date', name: 'End date', type: 'date', obligatory: false }
+			{ id: '8', key: 'relations', name: 'Relations', type: 'relations', obligatory: false },
+			{ id: '9', key: 'start_date', name: 'Start date', type: 'date', obligatory: false },
+			{ id: '10', key: 'end_date', name: 'End date', type: 'date', obligatory: false }
 		],
 		sections: [
-			{ id: 1, key: 'description', name: 'Description', obligatory: true, default: '' },
+			{ id: '1', key: 'description', name: 'Description', obligatory: true, default: '' },
 			{
-				id: 2,
+				id: '2',
 				key: 'acceptance_criteria',
 				name: 'Acceptance criteria',
 				obligatory: true,
@@ -134,36 +134,36 @@ export const BUILT_IN_TEMPLATES: readonly Template[] = [
 		default_status: 'open',
 		fields: [
 			{
-				id: 1,
+				id: '1',
 				key: 'estimate',
 				name: 'Estimate (hours)',
 				type: 'number',
 				obligatory: false
 			},
 			{
-				id: 11,
+				id: '11',
 				key: 'sprint_id',
 				name: 'Sprint',
 				type: 'select',
 				obligatory: false,
 				options_source: 'issues.sprints'
 			},
-			{ id: 2, key: 'assignee', name: 'Assignee', type: 'user', obligatory: false },
+			{ id: '2', key: 'assignee', name: 'Assignee', type: 'user', obligatory: false },
 			{
-				id: 3,
+				id: '3',
 				key: 'labels',
 				name: 'Labels',
 				type: 'multi-select',
 				obligatory: false,
 				options_source: 'config.labels'
 			},
-			{ id: 4, key: 'relations', name: 'Relations', type: 'relations', obligatory: false },
-			{ id: 5, key: 'start_date', name: 'Start date', type: 'date', obligatory: false },
-			{ id: 6, key: 'end_date', name: 'End date', type: 'date', obligatory: false }
+			{ id: '4', key: 'relations', name: 'Relations', type: 'relations', obligatory: false },
+			{ id: '5', key: 'start_date', name: 'Start date', type: 'date', obligatory: false },
+			{ id: '6', key: 'end_date', name: 'End date', type: 'date', obligatory: false }
 		],
 		sections: [
-			{ id: 1, key: 'description', name: 'Description', obligatory: true, default: '' },
-			{ id: 2, key: 'notes', name: 'Notes', obligatory: false, default: '' }
+			{ id: '1', key: 'description', name: 'Description', obligatory: true, default: '' },
+			{ id: '2', key: 'notes', name: 'Notes', obligatory: false, default: '' }
 		]
 	},
 	{
@@ -174,7 +174,7 @@ export const BUILT_IN_TEMPLATES: readonly Template[] = [
 		default_status: 'open',
 		fields: [
 			{
-				id: 1,
+				id: '1',
 				key: 'severity',
 				name: 'Severity',
 				type: 'select',
@@ -182,44 +182,44 @@ export const BUILT_IN_TEMPLATES: readonly Template[] = [
 				options: ['low', 'medium', 'high', 'critical']
 			},
 			{
-				id: 2,
+				id: '2',
 				key: 'priority',
 				name: 'Priority',
 				type: 'select',
 				obligatory: true,
 				options: ['p0', 'p1', 'p2', 'p3']
 			},
-			{ id: 21, key: 'estimate', name: 'Estimate (hours)', type: 'number', obligatory: false },
+			{ id: '21', key: 'estimate', name: 'Estimate (hours)', type: 'number', obligatory: false },
 			{
-				id: 22,
+				id: '22',
 				key: 'sprint_id',
 				name: 'Sprint',
 				type: 'select',
 				obligatory: false,
 				options_source: 'issues.sprints'
 			},
-			{ id: 3, key: 'assignee', name: 'Assignee', type: 'user', obligatory: false },
+			{ id: '3', key: 'assignee', name: 'Assignee', type: 'user', obligatory: false },
 			{
-				id: 4,
+				id: '4',
 				key: 'labels',
 				name: 'Labels',
 				type: 'multi-select',
 				obligatory: false,
 				options_source: 'config.labels'
 			},
-			{ id: 5, key: 'relations', name: 'Relations', type: 'relations', obligatory: false }
+			{ id: '5', key: 'relations', name: 'Relations', type: 'relations', obligatory: false }
 		],
 		sections: [
-			{ id: 1, key: 'description', name: 'Description', obligatory: true, default: '' },
+			{ id: '1', key: 'description', name: 'Description', obligatory: true, default: '' },
 			{
-				id: 2,
+				id: '2',
 				key: 'steps_to_reproduce',
 				name: 'Steps to reproduce',
 				obligatory: true,
 				default: ''
 			},
 			{
-				id: 3,
+				id: '3',
 				key: 'expected_actual',
 				name: 'Expected vs. actual',
 				obligatory: false,
@@ -234,12 +234,12 @@ export const BUILT_IN_TEMPLATES: readonly Template[] = [
 		color: '#eab308',
 		default_status: 'open',
 		fields: [
-			{ id: 1, key: 'sprint_number', name: 'Sprint Number', type: 'number', obligatory: true },
-			{ id: 2, key: 'start_date', name: 'Start date', type: 'date', obligatory: false },
-			{ id: 3, key: 'end_date', name: 'End date', type: 'date', obligatory: false },
-			{ id: 4, key: 'relations', name: 'Relations', type: 'relations', obligatory: false }
+			{ id: '1', key: 'sprint_number', name: 'Sprint Number', type: 'number', obligatory: true },
+			{ id: '2', key: 'start_date', name: 'Start date', type: 'date', obligatory: false },
+			{ id: '3', key: 'end_date', name: 'End date', type: 'date', obligatory: false },
+			{ id: '4', key: 'relations', name: 'Relations', type: 'relations', obligatory: false }
 		],
-		sections: [{ id: 1, key: 'goals', name: 'Sprint Goals', obligatory: false, default: '' }]
+		sections: [{ id: '1', key: 'goals', name: 'Sprint Goals', obligatory: false, default: '' }]
 	}
 ];
 

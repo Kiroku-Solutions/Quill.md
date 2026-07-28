@@ -113,13 +113,13 @@
 	// Stable Map for O(1) card lookup — only rebuilds when `rows` changes.
 	const rowById = $derived.by(() => {
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity
-		const map = new Map<number, LoadedIssue>();
+		const map = new Map<string, LoadedIssue>();
 		for (const li of rows) map.set(li.issue.id, li);
 		return map;
 	});
 
 	const epicsById = $derived.by(() => {
-		const map = new Map<number, LoadedIssue>();
+		const map = new Map<string, LoadedIssue>();
 		for (const li of issues.byId.values()) {
 			if (li.issue.fields.issueType === 'epic') {
 				map.set(li.issue.id, li);
@@ -169,7 +169,7 @@
 		});
 	});
 
-	function findLoaded(id: number): LoadedIssue | undefined {
+	function findLoaded(id: string): LoadedIssue | undefined {
 		return rowById.get(id);
 	}
 
@@ -177,7 +177,7 @@
 		return columns.findIndex((c) => c.id === status);
 	}
 
-	function open(id: number): void {
+	function open(id: string): void {
 		editor.open(id);
 	}
 
@@ -302,7 +302,7 @@
 		});
 	}
 
-	function focusCard(id: number): void {
+	function focusCard(id: string): void {
 		queueMicrotask(() => {
 			const el = document.querySelector<HTMLElement>(`[data-card-id="${id}"]`);
 			el?.focus();

@@ -23,26 +23,17 @@ export function slugify(title: string): string {
 	return slug || 'untitled';
 }
 
-/** Zero-pad an issue id to a minimum of 4 digits for lexicographic ordering. */
-export function padIssueId(id: number): string {
-	return Math.max(1, id).toString().padStart(4, '0');
-}
-
 /**
  * Compose the canonical issue filename from id + title.
- * Example: `buildIssueFilename(42, 'Fix login redirect!')` → `0042-fix-login-redirect.md`.
+ * Example: `buildIssueFilename('123e4567-e89b-12d3-a456-426614174000', 'Fix login redirect!')` → `123e4567-e89b-12d3-a456-426614174000-fix-login-redirect.md`.
  */
-export function buildIssueFilename(id: number, title: string): string {
-	return `${padIssueId(id)}-${slugify(title)}.md`;
+export function buildIssueFilename(id: string, title: string): string {
+	return `${id}-${slugify(title)}.md`;
 }
 
 /**
- * Return the next available issue id given the current set.
- * Starts at 1 when the set is empty. Does not reuse deleted ids.
+ * Return a newly generated UUID for a new issue.
  */
-export function nextIssueId(issues: ReadonlyArray<{ id: number }>): number {
-	if (issues.length === 0) return 1;
-	let max = 0;
-	for (const i of issues) if (i.id > max) max = i.id;
-	return max + 1;
+export function nextIssueId(): string {
+	return globalThis.crypto.randomUUID();
 }

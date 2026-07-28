@@ -110,31 +110,14 @@ declare const ISSUE_ID_BRAND: unique symbol;
  * anyway, but failing fast at construction is cheaper than failing at
  * the next save).
  */
-export type IssueId = number & { readonly [ISSUE_ID_BRAND]: true };
+export type IssueId = string & { readonly [ISSUE_ID_BRAND]: true };
 
-/**
- * Runtime registry of every {@link IssueId} ever produced. Capped with FIFO
- * eviction (insertion order) so a long-lived session cannot grow it without
- * bound — the `architecture-audit.md` finding on `IssueId = number` called
- * this out as the missing brand.
- *
- * Deliberately a plain `Set<number>` rather than a `SvelteSet`: the
- * registry is a brand-validation data structure, not reactive store state.
- * It must not enter the Svelte reactivity graph (consumers must not
- * subscribe to brand membership). The `svelte/prefer-svelte-reactivity`
- * lint rule does not apply here for the same reason.
- */
 // eslint-disable-next-line svelte/prefer-svelte-reactivity
-const ISSUE_ID_REGISTRY: Set<number> = new Set();
+const ISSUE_ID_REGISTRY: Set<string> = new Set();
 
-/**
- * Upper bound. A single workspace can hold thousands of issues; 1000
- * covers the high end of a power-user session and keeps the per-session
- * memory cost bounded.
- */
 const ISSUE_ID_REGISTRY_LIMIT = 1000;
 
-function registerIssueId(value: number): void {
+function registerIssueId(value: string): void {
 	if (ISSUE_ID_REGISTRY.has(value)) return;
 	if (ISSUE_ID_REGISTRY.size >= ISSUE_ID_REGISTRY_LIMIT) {
 		const oldest = ISSUE_ID_REGISTRY.values().next().value;
@@ -143,21 +126,16 @@ function registerIssueId(value: number): void {
 	ISSUE_ID_REGISTRY.add(value);
 }
 
-/**
- * Brand a positive integer as an {@link IssueId}. Throws on a non-positive
- * or non-integer input so a malformed id never reaches the validator.
- */
-export function brandIssueId(value: number): IssueId {
-	if (!Number.isInteger(value) || value < 1) {
+export function brandIssueId(value: string): IssueId {
+	if (!value || typeof value !== 'string') {
 		throw new RangeError(`Invalid IssueId: ${value}`);
 	}
 	registerIssueId(value);
 	return value as IssueId;
 }
 
-/** Type guard: returns `true` for values that were registered via {@link brandIssueId}. */
 export function isIssueId(value: unknown): value is IssueId {
-	return typeof value === 'number' && ISSUE_ID_REGISTRY.has(value);
+	return typeof value === 'string' && ISSUE_ID_REGISTRY.has(value);
 }
 
 export interface CreateIssueInput {
@@ -179,21 +157,15 @@ export interface IssuesStore {
 	 * Set of `IssueId` values with in-memory dirty state.
 	 *
 	 * Keys are plain `number` so call sites can pass a raw id (e.g. a value
-	 * read from a row's `data-id` attribute or from a `Map<number, …>`
+	 * read from a row's `data-id` attribute or from a `Map<string, …>`
 	 * upstream). The `IssueId` brand is still applied at value construction
 	 * time via {@link brandIssueId}; this map only carries the runtime
 	 * numbers.
 	 */
-	readonly dirty: ReadonlySet<number>;
-	/** Per-id in-flight save promise. Keys are plain `number` (see {@link dirty}). */
-	readonly pendingSaves: ReadonlyMap<number, Promise<void>>;
-	/** Per-id last validation error list. Keys are plain `number` (see {@link dirty}). */
-	readonly errors: ReadonlyMap<number, readonly ValidationError[]>;
-	/**
-	 * Map from `Issue.id` → `LoadedIssue`, rebuilt every access from `issues`.
-	 * Keys are plain `number` (see {@link dirty} for the rationale).
-	 */
-	readonly byId: ReadonlyMap<number, LoadedIssue>;
+	readonly dirty: ReadonlySet<string>;
+	readonly pendingSaves: ReadonlyMap<string, Promise<void>>;
+	readonly errors: ReadonlyMap<string, readonly ValidationError[]>;
+	readonly byId: ReadonlyMap<string, LoadedIssue>;
 	/** Map from `Status.id` → `LoadedIssue[]`. Keys come from `config.statuses`. */
 	readonly byStatus: ReadonlyMap<string, readonly LoadedIssue[]>;
 	readonly integrityWarnings: readonly LoadedIssue[];
@@ -207,15 +179,11 @@ export interface IssuesStore {
 	/** Import an external .md file as a new issue */
 	readonly importIssue: (markdownContent: string) => Promise<IssueId>;
 	/** Patch an issue in memory. Marks it dirty. Does not touch disk. */
-	readonly update: (id: number, patch: IssuePatch) => void;
-	/** Validate, serialize, and write the issue to disk. Serialised per-id. */
-	readonly save: (id: number) => Promise<void>;
-	/** Clear the dirty flag for an issue without writing. */
-	readonly discard: (id: number) => void;
-	/** Soft-delete: move the issue's file to `.quill.md/.trash/`. */
-	readonly remove: (id: number) => Promise<void>;
-	/** Validate the issue and return the error list (empty if valid). */
-	readonly validate: (id: number) => readonly ValidationError[];
+	readonly update: (id: string, patch: IssuePatch) => void;
+	readonly save: (id: string) => Promise<void>;
+	readonly discard: (id: string) => void;
+	readonly remove: (id: string) => Promise<void>;
+	readonly validate: (id: string) => readonly ValidationError[];
 }
 
 export interface IssuesStoreDeps {
@@ -251,11 +219,11 @@ export function createIssuesStore(
 	// `load()` / `remove()` / `update()` path. The counter pattern is
 	// the documented reactivity channel.
 	// eslint-disable-next-line svelte/prefer-svelte-reactivity
-	const dirty: Set<number> = new Set();
+	const dirty: Set<string> = new Set();
 	// eslint-disable-next-line svelte/prefer-svelte-reactivity
-	const pendingSaves: Map<number, Promise<void>> = new Map();
+	const pendingSaves: Map<string, Promise<void>> = new Map();
 	// eslint-disable-next-line svelte/prefer-svelte-reactivity
-	const errors: Map<number, readonly ValidationError[]> = new Map();
+	const errors: Map<string, readonly ValidationError[]> = new Map();
 	/**
 	 * Narrow the union `WritableDirectoryAdapter | ReadOnlyDirectoryAdapter`
 	 * to `WritableDirectoryAdapter` for the write service paths. The state
@@ -304,7 +272,7 @@ export function createIssuesStore(
 	// over-fire on every `set()` and `delete()` (see the rev-counter
 	// rationale on `dirty` above).
 	// eslint-disable-next-line svelte/prefer-svelte-reactivity
-	const snapshots: Map<number, Issue> = new Map();
+	const snapshots: Map<string, Issue> = new Map();
 
 	// Per-load AbortController — superseded on every new load().
 	let loadController: AbortController | null = null;
@@ -373,7 +341,7 @@ export function createIssuesStore(
 		}
 	}
 
-	function findLoaded(id: number): LoadedIssue | undefined {
+	function findLoaded(id: string): LoadedIssue | undefined {
 		for (const li of issues) if (li.issue.id === id) return li;
 		return undefined;
 	}
@@ -409,7 +377,7 @@ export function createIssuesStore(
 				customFields: input.customFields,
 				sections: input.sections
 			},
-			issues.map((li) => li.issue)
+			deps.config.config
 		);
 		issues = [...issues, loaded];
 		// Brand on the way out: the service layer's `createIssue` returns a
@@ -436,7 +404,7 @@ export function createIssuesStore(
 				customFields: loadedIssue.customFields,
 				sections: loadedIssue.sections
 			},
-			issues.map((li) => li.issue)
+			deps.config.config
 		);
 		issues = [...issues, created];
 		return brandIssueId(created.issue.id);
@@ -481,7 +449,7 @@ export function createIssuesStore(
 		if (integrityHash !== undefined) {
 			issue.integrityHash = integrityHash as Issue['integrityHash'];
 		}
-		if (id !== undefined && typeof id === 'number') {
+		if (id !== undefined && typeof id === 'string') {
 			issue.id = id;
 		}
 		if (fieldsPatch && typeof fieldsPatch === 'object' && !Array.isArray(fieldsPatch)) {
@@ -509,7 +477,7 @@ export function createIssuesStore(
 		}
 	}
 
-	function update(id: number, patch: IssuePatch): void {
+	function update(id: string, patch: IssuePatch): void {
 		const loaded = findLoaded(id);
 		if (!loaded) return;
 		// Capture the pre-patch snapshot the first time this id becomes
@@ -539,7 +507,7 @@ export function createIssuesStore(
 		return { templates: tpls, config: cfg, allIssues };
 	}
 
-	function doSave(id: number): Promise<void> {
+	function doSave(id: string): Promise<void> {
 		return (async () => {
 			do {
 				// Clear dirty BEFORE yielding to async I/O. If a keystroke happens
@@ -569,7 +537,8 @@ export function createIssuesStore(
 				const refreshed = await saveIssue(
 					requireWritable(adapter),
 					loaded.issue,
-					loaded.sourcePath
+					loaded.sourcePath,
+					deps.config.config
 				);
 
 				const idx = issues.findIndex((li) => li.issue.id === id);
@@ -580,7 +549,7 @@ export function createIssuesStore(
 		})();
 	}
 
-	function save(id: number): Promise<void> {
+	function save(id: string): Promise<void> {
 		const existing = pendingSaves.get(id);
 		if (existing) return existing;
 		const p = doSave(id).finally(() => {
@@ -594,7 +563,7 @@ export function createIssuesStore(
 		return p;
 	}
 
-	function discard(id: number): void {
+	function discard(id: string): void {
 		// Restore the in-memory issue to the last saved state if we have a
 		// snapshot; otherwise just clear the dirty flag. Per plan §B.6.3,
 		// `discard()` means "revert dirty state to last saved".
@@ -609,7 +578,7 @@ export function createIssuesStore(
 		if (dirty.delete(id)) bumpDirty();
 	}
 
-	async function remove(id: number): Promise<void> {
+	async function remove(id: string): Promise<void> {
 		const loaded = findLoaded(id);
 		if (!loaded) return;
 		const adapter = adapterProvider();
@@ -625,7 +594,7 @@ export function createIssuesStore(
 		snapshots.delete(id);
 	}
 
-	function validate(id: number): readonly ValidationError[] {
+	function validate(id: string): readonly ValidationError[] {
 		const loaded = findLoaded(id);
 		if (!loaded) return [];
 		const cfg = deps.config.config;
@@ -648,19 +617,14 @@ export function createIssuesStore(
 	// behaviour the test contract depends on (and which `$derived.by`
 	// does not provide in a pure-Node test context without a Svelte
 	// component to drive the reactive cycle).
-	function buildById(): ReadonlyMap<number, LoadedIssue> {
+	function buildById(): ReadonlyMap<string, LoadedIssue> {
 		void dirtyRev;
 		// Local accumulator for the id → LoadedIssue rebuild. The map
 		// is the function's return value, not stored state. SvelteMap
 		// would unnecessarily wrap it in a proxy for a value that is
 		// never mutated after construction.
-		// eslint-disable-next-line svelte/prefer-svelte-reactivity
-		const map = new Map<number, LoadedIssue>();
-		// `li.issue.id` is `IssueId` (branded) but its runtime value is a
-		// plain number; we use the number directly as the map key so the
-		// public `byId` is `ReadonlyMap<number, LoadedIssue>` and call
-		// sites can look up by raw id.
-		for (const li of issues) map.set(li.issue.id as number, li);
+		const map = new Map<string, LoadedIssue>();
+		for (const li of issues) map.set(li.issue.id as string, li);
 		return map;
 	}
 

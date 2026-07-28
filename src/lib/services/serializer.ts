@@ -10,7 +10,7 @@ import { computeIntegrityHash } from './integrity.ts';
  */
 function serializeSection(section: IssueSection): string {
 	const body = section.markdown.endsWith('\n') ? section.markdown : `${section.markdown}\n`;
-	return `<!-- [SECTION_START: ${section.name}] -->\n${body}<!-- [SECTION_END: ${section.name}] -->\n`;
+	return `## ${section.name}\n<!-- [SECTION_START: ${section.name}] -->\n${body}<!-- [SECTION_END: ${section.name}] -->\n`;
 }
 
 /**
@@ -57,7 +57,7 @@ function yamlValueFor(issue: Issue, yamlKey: string): unknown {
 	const f = issue.fields;
 	switch (yamlKey) {
 		case FIELD_TO_YAML.id:
-			return issue.id > 0 ? issue.id : undefined;
+			return issue.id || undefined;
 		case FIELD_TO_YAML.title:
 			return f.title ? f.title : undefined;
 		case FIELD_TO_YAML.author:

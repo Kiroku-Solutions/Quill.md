@@ -95,7 +95,7 @@ export interface EditorStore {
 	readonly errors: readonly ValidationError[];
 
 	/** Clone the given issue into the draft buffer. No-op if not found. */
-	readonly open: (id: number) => void;
+	readonly open: (id: string) => void;
 	/** Clear the editor — resets `activeId`, `draft`, `isDirty`. */
 	readonly close: () => void;
 	/**
@@ -145,12 +145,12 @@ export interface EditorStoreDeps {
 export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 	const { issues, commitQueue } = deps;
 
-	let activeId = $state<number | null>(null);
+	let activeId = $state<string | null>(null);
 	let draft = $state.raw<LoadedIssue | null>(null);
 	let isDirty = $state<boolean>(false);
 	let revision = $state<number>(0);
 
-	function open(id: number): void {
+	function open(id: string): void {
 		const source = issues.byId.get(id);
 		if (!source) {
 			// Unknown id — close rather than open a half-state. The caller

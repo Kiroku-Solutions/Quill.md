@@ -135,7 +135,7 @@
 		}
 	}
 
-	function open(id: number): void {
+	function open(id: string): void {
 		editor.open(id);
 	}
 
@@ -162,7 +162,7 @@
 		}
 	}
 
-	async function focusRow(id: number): Promise<void> {
+	async function focusRow(id: string): Promise<void> {
 		await tick();
 		const el = document.querySelector<HTMLElement>(`[data-row-id="${id}"]`);
 		el?.focus();

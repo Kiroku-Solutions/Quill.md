@@ -62,7 +62,7 @@
 		})
 	);
 
-	function openIssue(id: number): void {
+	function openIssue(id: string): void {
 		editor.open(id);
 	}
 </script>

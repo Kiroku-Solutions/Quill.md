@@ -106,9 +106,8 @@ function parseRelations(value: unknown): Relation[] {
 		const type = obj['type'];
 		const id = obj['id'];
 		if (typeof type !== 'string' || !VALID_RELATION_TYPES.has(type as RelationType)) continue;
-		const numId = typeof id === 'number' ? id : Number(id);
-		if (!Number.isFinite(numId)) continue;
-		out.push({ type: type as RelationType, id: numId });
+		if (id == null || id === '') continue;
+		out.push({ type: type as RelationType, id: String(id) });
 	}
 	return out;
 }
@@ -145,7 +144,7 @@ export async function parseIssueFile(text: string, sourcePath: string): Promise<
 	const integrityHash = typeof integrityHashRaw === 'string' ? integrityHashRaw : null;
 
 	const issue: Issue = {
-		id: typeof fm['id'] === 'number' ? fm['id'] : Number(fm['id'] ?? 0),
+		id: asString(fm['id']),
 		fields: {
 			title: asString(fm['title']),
 			author: asString(fm['author']),

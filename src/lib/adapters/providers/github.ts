@@ -501,6 +501,6 @@ function treeEntryFor(c: RemoteFileChange): {
 		path: c.path,
 		mode: '100644',
 		type: 'blob',
-		content: utf8ToBase64(c.content)
+		content: c.content
 	};
 }

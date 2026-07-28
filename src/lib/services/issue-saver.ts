@@ -21,7 +21,7 @@
  *    result will have `integrityWarning: false` by construction.
  */
 import type { WritableDirectoryAdapter } from '../adapters/directory-adapter.ts';
-import type { Issue, LoadedIssue } from '../types/index.ts';
+import type { Config, Issue, LoadedIssue } from '../types/index.ts';
 import { buildIssueFilename, nextIssueId, parseIssueFile, serializeIssue } from './index.ts';
 
 export const ISSUES_DIR = '.quill.md/issues';
@@ -46,12 +46,11 @@ export interface CreateIssueInput {
  * Pure — no I/O, no date side effects beyond a default.
  */
 export function buildDefaultIssue(
-	input: CreateIssueInput,
-	existing: ReadonlyArray<{ id: number }>
+	input: CreateIssueInput
 ): Issue {
 	const today = input.today ?? new Date().toISOString().slice(0, 10);
 	return {
-		id: nextIssueId(existing),
+		id: nextIssueId(),
 		fields: {
 			title: input.title,
 			author: input.author,
@@ -80,8 +79,19 @@ export function buildDefaultIssue(
 }
 
 /** Path under which a given issue's markdown file lives. */
-export function issuePath(id: number, title: string): string {
-	return `${ISSUES_DIR}/${buildIssueFilename(id, title)}`;
+export function issuePath(issue: Issue, config: Config | null): string {
+	let category = 'open';
+	if (config) {
+		const st = config.statuses.find((s) => s.id === issue.fields.status);
+		if (st && (st.category === 'done' || st.category === 'cancelled')) {
+			category = 'closed';
+		}
+	} else {
+		// Fallback if config not loaded
+		const s = issue.fields.status;
+		if (s === 'done' || s === 'closed' || s === 'cancelled' || s === 'rejected') category = 'closed';
+	}
+	return `${ISSUES_DIR}/${category}/${buildIssueFilename(issue.id, issue.fields.title)}`;
 }
 
 /**
@@ -95,11 +105,16 @@ export function issuePath(id: number, title: string): string {
 export async function saveIssue(
 	adapter: WritableDirectoryAdapter,
 	issue: Issue,
-	sourcePath: string
+	sourcePath: string | null,
+	config: Config | null
 ): Promise<LoadedIssue> {
 	const text = await serializeIssue(issue);
-	await adapter.writeTextFile(sourcePath, text);
-	return parseIssueFile(text, sourcePath);
+	const newPath = issuePath(issue, config);
+	await adapter.writeTextFile(newPath, text);
+	if (sourcePath && sourcePath !== newPath) {
+		await adapter.removeFile(sourcePath).catch(() => {});
+	}
+	return parseIssueFile(text, newPath);
 }
 
 /**
@@ -114,8 +129,8 @@ export async function saveIssue(
 export async function createIssue(
 	adapter: WritableDirectoryAdapter,
 	input: CreateIssueInput,
-	existingIssues: ReadonlyArray<{ id: number }>
+	config: Config | null
 ): Promise<LoadedIssue> {
-	const issue = buildDefaultIssue(input, existingIssues);
-	return saveIssue(adapter, issue, issuePath(issue.id, issue.fields.title));
+	const issue = buildDefaultIssue(input);
+	return saveIssue(adapter, issue, null, config);
 }

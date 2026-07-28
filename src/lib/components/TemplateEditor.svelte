@@ -31,7 +31,7 @@
 	let sections = $state<TemplateSection[]>(
 		initialTemplate?.sections
 			? JSON.parse(JSON.stringify(initialTemplate.sections))
-			: [{ id: 1, key: 'description', name: 'Description', obligatory: true, default: '' }]
+			: [{ id: '1', key: 'description', name: 'Description', obligatory: true, default: '' }]
 	);
 
 	// Keep ID in sync with Name until user touches it
@@ -66,23 +66,23 @@
 		color = '#ef4444'; // red
 		fields = [
 			{
-				id: 1,
+				id: '1',
 				key: 'prioridad',
 				name: t('templateEditor.example.f1'),
 				type: 'select',
 				obligatory: true,
 				options: ['High', 'Medium', 'Low']
 			},
-			{ id: 2, key: 'fecha', name: t('templateEditor.example.f2'), type: 'date', obligatory: true },
+			{ id: '2', key: 'fecha', name: t('templateEditor.example.f2'), type: 'date', obligatory: true },
 			{
-				id: 3,
+				id: '3',
 				key: 'reportador',
 				name: t('templateEditor.example.f3'),
 				type: 'user',
 				obligatory: false
 			},
 			{
-				id: 4,
+				id: '4',
 				key: 'sistemas',
 				name: t('templateEditor.example.f4'),
 				type: 'multi-select',
@@ -92,21 +92,21 @@
 		];
 		sections = [
 			{
-				id: 1,
+				id: '1',
 				key: 'descripcion',
 				name: t('templateEditor.example.s1'),
 				obligatory: true,
 				default: ''
 			},
 			{
-				id: 2,
+				id: '2',
 				key: 'pasos',
 				name: t('templateEditor.example.s2'),
 				obligatory: false,
 				default: '1.\n2.\n3.'
 			},
 			{
-				id: 3,
+				id: '3',
 				key: 'mitigacion',
 				name: t('templateEditor.example.s3'),
 				obligatory: false,

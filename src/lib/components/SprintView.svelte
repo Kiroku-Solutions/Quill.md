@@ -18,7 +18,7 @@
 	const sprints = $derived(allIssues.filter((i) => i.fields.issueType === 'sprint'));
 
 	// Currently selected Sprint ID
-	let selectedSprintId = $state<number | null>(null);
+	let selectedSprintId = $state<string | null>(null);
 
 	// Auto-select first Sprint if none selected
 	$effect(() => {
@@ -128,7 +128,7 @@
 		}
 	}
 
-	function openIssue(id: number): void {
+	function openIssue(id: string): void {
 		editor.open(id);
 	}
 </script>

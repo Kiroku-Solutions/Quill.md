@@ -42,12 +42,12 @@ function isEmptyValue(value: unknown): boolean {
  * ERS §3.1 FR-9. Returns one error per issue that participates in any
  * detected cycle.
  */
-function detectCycles(issues: readonly Issue[]): Map<number, number[]> {
-	const errors = new Map<number, number[]>();
-	const byId = new Map<number, Issue>();
+function detectCycles(issues: readonly Issue[]): Map<string, number[]> {
+	const errors = new Map<string, number[]>();
+	const byId = new Map<string, Issue>();
 	for (const issue of issues) byId.set(issue.id, issue);
 
-	const adjacency = new Map<number, number[]>();
+	const adjacency = new Map<string, number[]>();
 	for (const issue of issues) {
 		const edges: number[] = [];
 		for (const rel of issue.fields.relations) {
@@ -58,11 +58,11 @@ function detectCycles(issues: readonly Issue[]): Map<number, number[]> {
 		adjacency.set(issue.id, edges);
 	}
 
-	const visited = new Set<number>();
-	const onStack = new Set<number>();
+	const visited = new Set<string>();
+	const onStack = new Set<string>();
 	const stack: number[] = [];
 
-	function visit(id: number): void {
+	function visit(id: string): void {
 		if (onStack.has(id)) {
 			const start = stack.indexOf(id);
 			if (start >= 0) {

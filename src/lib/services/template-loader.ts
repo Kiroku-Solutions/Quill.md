@@ -32,8 +32,8 @@ function assertTemplate(value: unknown, filename: string): Template {
 		if (!f || typeof f !== 'object') {
 			throw new Error(`${filename}: fields[${i}] must be an object`);
 		}
-		if (typeof f['id'] !== 'number') {
-			throw new Error(`${filename}: fields[${i}].id must be a number`);
+		if (typeof f['id'] !== 'string') {
+			throw new Error(`${filename}: fields[${i}].id must be a string`);
 		}
 		if (!isString(f['key'])) {
 			throw new Error(`${filename}: fields[${i}].key must be a string`);
@@ -72,8 +72,8 @@ function assertTemplate(value: unknown, filename: string): Template {
 		if (!s || typeof s !== 'object') {
 			throw new Error(`${filename}: sections[${i}] must be an object`);
 		}
-		if (typeof s['id'] !== 'number') {
-			throw new Error(`${filename}: sections[${i}].id must be a number`);
+		if (typeof s['id'] !== 'string') {
+			throw new Error(`${filename}: sections[${i}].id must be a string`);
 		}
 		if (!isString(s['key'])) {
 			throw new Error(`${filename}: sections[${i}].key must be a string`);

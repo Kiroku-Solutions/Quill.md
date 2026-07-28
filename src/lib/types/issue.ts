@@ -11,7 +11,7 @@ export type RelationType = 'parent' | 'child' | 'blocks' | 'depends_on' | 'relat
 
 export interface Relation {
 	type: RelationType;
-	id: number;
+	id: string;
 }
 
 /** All relation types in declaration order. Used by the validator. */
@@ -46,7 +46,7 @@ export interface IssueSection {
  * informational; the issue can still be edited and saved.
  */
 export interface Issue {
-	id: number;
+	id: string;
 	fields: {
 		title: string;
 		author: string;

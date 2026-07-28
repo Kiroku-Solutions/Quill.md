@@ -87,7 +87,7 @@
 		return config.config ? config.config.statuses.map((s) => ({ id: s.id, name: s.name })) : [];
 	}
 
-	function relationTitle(id: number): string {
+	function relationTitle(id: string): string {
 		const li = issues.byId.get(id);
 		return li ? li.issue.fields.title : `#${id}`;
 	}
@@ -139,7 +139,7 @@
 		editor.patchField('relations', next);
 	}
 
-	function removeRelation(id: number): void {
+	function removeRelation(id: string): void {
 		if (!issue) return;
 		const next = issue.fields.relations.filter((r) => r.id !== id);
 		editor.patchField('relations', next);

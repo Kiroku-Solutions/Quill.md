@@ -123,7 +123,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'business_value',
 						name: 'Valor de negocio',
 						type: 'select',
@@ -131,7 +131,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'target_release',
 						name: 'Lanzamiento objetivo',
 						type: 'text',
@@ -140,21 +140,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'acceptance',
 						name: 'Acceptance criteria',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'out_of_scope',
 						name: 'Out of scope',
 						obligatory: false,
@@ -170,7 +170,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'story_points',
 						name: 'Puntos de historia',
 						type: 'select',
@@ -178,7 +178,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['1', '2', '3', '5', '8', '13', '21']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'priority',
 						name: 'Prioridad',
 						type: 'select',
@@ -186,21 +186,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'sprint',
 						name: 'Sprint',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -210,21 +210,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'user_story',
 						name: 'User story',
 						obligatory: true,
 						default: '**As a** ___\n**I want** ___\n**so that** ___.'
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'acceptance',
 						name: 'Acceptance criteria',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'notes',
 						name: 'Notes & assumptions',
 						obligatory: false,
@@ -240,14 +240,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'estimate_hours',
 						name: 'Estimación (horas)',
 						type: 'number',
 						obligatory: false
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'priority',
 						name: 'Prioridad',
 						type: 'select',
@@ -255,14 +255,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -272,14 +272,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'definition_of_done',
 						name: 'Definition of done for this task',
 						obligatory: true,
@@ -295,7 +295,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'severity',
 						name: 'Severidad',
 						type: 'select',
@@ -303,7 +303,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'priority',
 						name: 'Prioridad',
 						type: 'select',
@@ -311,21 +311,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'regression',
 						name: 'Regresión desde',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -335,21 +335,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'steps_to_reproduce',
 						name: 'Steps to reproduce',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'expected_actual',
 						name: 'Expected vs. actual',
 						obligatory: true,
@@ -466,7 +466,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'backlog',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'class_of_service',
 						name: 'Clase de servicio',
 						type: 'select',
@@ -474,14 +474,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['expedite', 'fixed-date', 'standard', 'intangible']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'requestor',
 						name: 'Solicitante',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -489,7 +489,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options_source: 'config.labels'
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'cycle_time_h',
 						name: 'Tiempo de ciclo (h, calculado)',
 						type: 'number',
@@ -498,21 +498,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'exit_criteria',
 						name: 'Exit criteria (DoD for this card)',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'blockers',
 						name: 'Blockers (if any)',
 						obligatory: false,
@@ -528,7 +528,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'backlog',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'class_of_service',
 						name: 'Clase de servicio',
 						type: 'select',
@@ -536,14 +536,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['expedite', 'fixed-date', 'standard', 'intangible']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -553,14 +553,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'definition_of_done',
 						name: 'Definition of done',
 						obligatory: true,
@@ -679,7 +679,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'ideal_weeks',
 						name: 'Semanas ideales',
 						type: 'select',
@@ -687,7 +687,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['0.5', '1', '2']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'risk',
 						name: 'Índice de riesgo',
 						type: 'select',
@@ -695,7 +695,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['0', '1', '2']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'volatility',
 						name: 'Volatilidad (probable a cambiar)',
 						type: 'select',
@@ -703,14 +703,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['low', 'medium', 'high']
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'assignee',
 						name: 'Propietario',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -720,21 +720,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'user_story',
 						name: 'User story',
 						obligatory: true,
 						default: '**As a** ___\n**I want** ___\n**so that** ___.'
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'acceptance_tests',
 						name: 'Acceptance tests (automated)',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'conversation',
 						name: 'Conversation log',
 						obligatory: false,
@@ -750,28 +750,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'estimate_hours',
 						name: 'Horas ideales',
 						type: 'number',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'assignee',
 						name: 'Voluntario',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'pair_with',
 						name: 'Emparejar con',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -781,14 +781,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'test_first',
 						name: 'Test-first note',
 						obligatory: true,
@@ -804,28 +804,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'timebox_hours',
 						name: 'Timebox (horas)',
 						type: 'number',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'goal',
 						name: 'Pregunta a responder',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'assignee',
 						name: 'Propietario del spike',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -835,21 +835,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'hypothesis',
 						name: 'Hypothesis',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'findings',
 						name: 'Findings (deliverable)',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'followups',
 						name: 'Follow-up stories',
 						obligatory: false,
@@ -865,14 +865,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'failing_test',
 						name: 'Ruta de prueba que falla',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'severity',
 						name: 'Severidad',
 						type: 'select',
@@ -880,14 +880,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -897,21 +897,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'repro',
 						name: 'Reproduction',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'expected_actual',
 						name: 'Expected vs. actual',
 						obligatory: true,
@@ -1047,14 +1047,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'identified',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'value_stream',
 						name: 'Flujo de valor',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'value_score',
 						name: 'Valor para el cliente',
 						type: 'select',
@@ -1062,21 +1062,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['trivial', 'minor', 'significant', 'major']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'lead_time_days',
 						name: 'Lead time (días)',
 						type: 'number',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'assignee',
 						name: 'Propietario',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -1086,14 +1086,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'value_to_customer',
 						name: 'Value to customer',
 						obligatory: true,
@@ -1109,7 +1109,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'identified',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'waste_type',
 						name: 'Tipo de desperdicio',
 						type: 'select',
@@ -1125,14 +1125,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						]
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'where_in_stream',
 						name: 'Etapa en flujo de valor',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -1142,21 +1142,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'root_cause',
 						name: 'Root cause (5-Whys)',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'countermeasure',
 						name: 'Countermeasure',
 						obligatory: true,
@@ -1172,28 +1172,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'identified',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'metric_name',
 						name: 'Métrica a mejorar',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'baseline',
 						name: 'Valor base',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'target',
 						name: 'Valor objetivo',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'assignee',
 						name: 'Patrocinador',
 						type: 'user',
@@ -1202,21 +1202,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'problem',
 						name: 'Problem statement',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'experiment',
 						name: 'Experiment (PDCA cycle)',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'result',
 						name: 'Result & new baseline',
 						obligatory: true,
@@ -1335,21 +1335,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'modelling',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'subject_area',
 						name: 'Área temática',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'chief_architect',
 						name: 'Arquitecto Jefe',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -1359,14 +1359,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'object_model',
 						name: 'Object model (UML colour class diagram)',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'glossary',
 						name: 'Domain glossary',
 						obligatory: true,
@@ -1382,21 +1382,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'listed',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'subject_area',
 						name: 'Área temática',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'owner',
 						name: 'Propietario del conjunto',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -1406,14 +1406,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'milestones',
 						name: 'Milestones (step 3 output)',
 						obligatory: true,
@@ -1429,49 +1429,49 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'listed',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'action',
 						name: 'Acción (verbo)',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'result',
 						name: 'Resultado',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'object',
 						name: 'Objeto',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'feature_set',
 						name: 'Conjunto de características',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'chief_programmer',
 						name: 'Programador Jefe',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 6,
+						id: '6',
 						key: 'class_owners',
 						name: 'Dueños de clase (usuarios separados por comas)',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 7,
+						id: '7',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -1481,14 +1481,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'design_package',
 						name: 'Design package (sequence diagrams)',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'inspection_log',
 						name: 'Code inspection log',
 						obligatory: true,
@@ -1599,7 +1599,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'next',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'crystal_color',
 						name: 'Color de Crystal',
 						type: 'select',
@@ -1613,7 +1613,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						]
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'criticality',
 						name: 'Confort / Clase-D',
 						type: 'select',
@@ -1621,14 +1621,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['C', 'D', 'E']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'assignee',
 						name: 'Propietario',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -1638,14 +1638,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'delivery_plan',
 						name: 'Delivery plan (next release window)',
 						obligatory: true,
@@ -1661,21 +1661,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'next',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'from_workshop',
 						name: 'Del taller',
 						type: 'date',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'owner',
 						name: 'Propietario',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -1685,14 +1685,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'action',
 						name: 'Action',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'success_metric',
 						name: "How we'll know it worked",
 						obligatory: true,
@@ -1809,7 +1809,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'exploratory',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'moscow',
 						name: 'Prioridad MoSCoW',
 						type: 'select',
@@ -1817,28 +1817,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['must', 'should', 'could', 'wont']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'timebox',
 						name: 'Timebox',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'business_need',
 						name: 'Necesidad de negocio',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'assignee',
 						name: 'Propietario',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -1848,21 +1848,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'acceptance',
 						name: 'Acceptance criteria',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'prototype_link',
 						name: 'Prototype / model link',
 						obligatory: false,
@@ -1878,21 +1878,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'exploratory',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'start_date',
 						name: 'Inicio',
 						type: 'date',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'end_date',
 						name: 'Fin (fijo)',
 						type: 'date',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'phase',
 						name: 'Fase de ciclo de vida',
 						type: 'select',
@@ -1900,7 +1900,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['feasibility', 'foundations', 'exploratory', 'engineering', 'deployment']
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'owner',
 						name: 'Líder de Timebox',
 						type: 'user',
@@ -1909,28 +1909,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'objective',
 						name: 'Objective',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'scope_in',
 						name: 'Scope (Must + Should + Could)',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'scope_out',
 						name: "Scope (Won't this time)",
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'review_notes',
 						name: 'Timebox review notes',
 						obligatory: false,
@@ -1946,14 +1946,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'foundations',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'workshop_date',
 						name: 'Fecha de taller',
 						type: 'date',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'facilitator',
 						name: 'Facilitador',
 						type: 'user',
@@ -1962,14 +1962,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'model',
 						name: 'Model (diagram)',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'decisions',
 						name: 'Decisions',
 						obligatory: true,
@@ -2092,7 +2092,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'story_points',
 						name: 'Puntos de historia',
 						type: 'select',
@@ -2100,7 +2100,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['1', '2', '3', '5', '8', '13', '21']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'priority',
 						name: 'Prioridad',
 						type: 'select',
@@ -2108,21 +2108,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'sprint',
 						name: 'Sprint',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -2132,21 +2132,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'user_story',
 						name: 'User story',
 						obligatory: true,
 						default: '**As a** ___\n**I want** ___\n**so that** ___.'
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'acceptance',
 						name: 'Acceptance criteria',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'notes',
 						name: 'Notes & assumptions',
 						obligatory: false,
@@ -2162,14 +2162,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'estimate_hours',
 						name: 'Estimación (horas)',
 						type: 'number',
 						obligatory: false
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'priority',
 						name: 'Prioridad',
 						type: 'select',
@@ -2177,14 +2177,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -2194,14 +2194,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'definition_of_done',
 						name: 'Definition of done for this task',
 						obligatory: true,
@@ -2217,7 +2217,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'bucket-3mo',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'bucket',
 						name: 'Cubo',
 						type: 'select',
@@ -2225,7 +2225,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['bucket-12mo', 'bucket-6mo', 'bucket-3mo', 'ready']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'value_score',
 						name: 'Puntaje de valor',
 						type: 'select',
@@ -2233,7 +2233,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'size',
 						name: 'Tamaño',
 						type: 'select',
@@ -2241,7 +2241,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['S', 'M', 'L', 'XL']
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -2251,14 +2251,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'exit_criteria',
 						name: 'Ready-queue exit criteria',
 						obligatory: true,
@@ -2387,7 +2387,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'raw_idea',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'appetite',
 						name: 'Apetito (semanas)',
 						type: 'select',
@@ -2395,14 +2395,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['small-batch', 'big-batch']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'shaper',
 						name: 'Moldeador (Shaper)',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'cycle_kind',
 						name: 'Tipo de ciclo',
 						type: 'select',
@@ -2410,7 +2410,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['r-and-d', 'production']
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -2420,42 +2420,42 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'problem',
 						name: 'Problem (one sentence)',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'appetite_why',
 						name: 'Appetite & why this size',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'solution',
 						name: 'Solution sketch / breadboard',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'fat_marker',
 						name: 'Fat-marker sketches',
 						obligatory: false,
 						default: ''
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'rabbit_holes',
 						name: 'Rabbit holes',
 						obligatory: false,
 						default: ''
 					},
 					{
-						id: 6,
+						id: '6',
 						key: 'no_gos',
 						name: 'No-gos',
 						obligatory: true,
@@ -2471,14 +2471,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'building',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'pitch',
 						name: 'Pitch',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'hill_position',
 						name: 'Posición en la colina',
 						type: 'select',
@@ -2486,7 +2486,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['uphill', 'downhill']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'scope',
 						name: 'Alcance',
 						type: 'select',
@@ -2494,14 +2494,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['on-scope', 'over-scope', 'trim']
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'owner',
 						name: 'Propietario',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -2511,7 +2511,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
@@ -2633,21 +2633,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'backlog',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'portfolio',
 						name: 'Portafolio',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'owner',
 						name: 'Dueño de Negocio',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -2657,14 +2657,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'outcomes',
 						name: 'Desired business outcomes',
 						obligatory: true,
@@ -2680,28 +2680,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'backlog',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'epic_owner',
 						name: 'Dueño de Épica',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'wsjf_score',
 						name: 'Puntuación WSJF',
 						type: 'number',
 						obligatory: false
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'art',
 						name: 'Tren de Liberación Ágil (ART)',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -2711,14 +2711,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'lean_business_case',
 						name: 'Lean business case',
 						obligatory: true,
@@ -2734,21 +2734,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'backlog',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'solution_train',
 						name: 'Tren de Solución',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'owner',
 						name: 'Dueño de Capacidad',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -2758,14 +2758,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'non_functional',
 						name: 'Non-functional requirements',
 						obligatory: true,
@@ -2781,35 +2781,35 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'backlog',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'art',
 						name: 'Tren de Liberación Ágil (ART)',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'wsjf',
 						name: 'Prioridad WSJF',
 						type: 'number',
 						obligatory: false
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'acceptance',
 						name: 'Criterios de Aceptación (FIT)',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'owner',
 						name: 'Gerente de Producto',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -2819,14 +2819,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'design',
 						name: 'Design',
 						obligatory: false,
@@ -2842,7 +2842,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'backlog',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'enabler_kind',
 						name: 'Tipo de Habilitador',
 						type: 'select',
@@ -2850,21 +2850,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['architectural', 'infrastructure', 'compliance', 'exploration']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'feature',
 						name: 'Característica Padre',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'owner',
 						name: 'Propietario',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -2874,14 +2874,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'design',
 						name: 'Technical design',
 						obligatory: true,
@@ -2987,7 +2987,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'business_value',
 						name: 'Valor de negocio',
 						type: 'select',
@@ -2995,7 +2995,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'target_release',
 						name: 'Lanzamiento objetivo',
 						type: 'text',
@@ -3004,21 +3004,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'acceptance',
 						name: 'Acceptance criteria',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'out_of_scope',
 						name: 'Out of scope',
 						obligatory: false,
@@ -3034,7 +3034,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'story_points',
 						name: 'Puntos de historia',
 						type: 'select',
@@ -3042,7 +3042,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['1', '2', '3', '5', '8', '13', '21']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'priority',
 						name: 'Prioridad',
 						type: 'select',
@@ -3050,21 +3050,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'sprint',
 						name: 'Sprint',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -3074,21 +3074,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'user_story',
 						name: 'User story',
 						obligatory: true,
 						default: '**As a** ___\n**I want** ___\n**so that** ___.'
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'acceptance',
 						name: 'Acceptance criteria',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'notes',
 						name: 'Notes & assumptions',
 						obligatory: false,
@@ -3104,14 +3104,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'estimate_hours',
 						name: 'Estimación (horas)',
 						type: 'number',
 						obligatory: false
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'priority',
 						name: 'Prioridad',
 						type: 'select',
@@ -3119,14 +3119,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -3136,14 +3136,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'definition_of_done',
 						name: 'Definition of done for this task',
 						obligatory: true,
@@ -3159,7 +3159,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'severity',
 						name: 'Severidad',
 						type: 'select',
@@ -3167,7 +3167,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'priority',
 						name: 'Prioridad',
 						type: 'select',
@@ -3175,21 +3175,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'regression',
 						name: 'Regresión desde',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -3199,21 +3199,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'steps_to_reproduce',
 						name: 'Steps to reproduce',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'expected_actual',
 						name: 'Expected vs. actual',
 						obligatory: true,
@@ -3229,28 +3229,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'refining',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'for_area',
 						name: 'Por área (LeSS Huge)',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'teams',
 						name: 'Equipos involucrados (separados por comas)',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'facilitator',
 						name: 'Facilitador',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -3260,14 +3260,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'topic',
 						name: 'Topic / PBI to refine',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'outcome',
 						name: 'Refinement outcome',
 						obligatory: true,
@@ -3368,7 +3368,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'business_value',
 						name: 'Valor de negocio',
 						type: 'select',
@@ -3376,7 +3376,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'target_release',
 						name: 'Lanzamiento objetivo',
 						type: 'text',
@@ -3385,21 +3385,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'acceptance',
 						name: 'Acceptance criteria',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'out_of_scope',
 						name: 'Out of scope',
 						obligatory: false,
@@ -3415,7 +3415,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'story_points',
 						name: 'Puntos de historia',
 						type: 'select',
@@ -3423,7 +3423,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['1', '2', '3', '5', '8', '13', '21']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'priority',
 						name: 'Prioridad',
 						type: 'select',
@@ -3431,21 +3431,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'sprint',
 						name: 'Sprint',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -3455,21 +3455,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'user_story',
 						name: 'User story',
 						obligatory: true,
 						default: '**As a** ___\n**I want** ___\n**so that** ___.'
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'acceptance',
 						name: 'Acceptance criteria',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'notes',
 						name: 'Notes & assumptions',
 						obligatory: false,
@@ -3485,14 +3485,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'estimate_hours',
 						name: 'Estimación (horas)',
 						type: 'number',
 						obligatory: false
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'priority',
 						name: 'Prioridad',
 						type: 'select',
@@ -3500,14 +3500,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -3517,14 +3517,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'definition_of_done',
 						name: 'Definition of done for this task',
 						obligatory: true,
@@ -3540,7 +3540,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'severity',
 						name: 'Severidad',
 						type: 'select',
@@ -3548,7 +3548,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'priority',
 						name: 'Prioridad',
 						type: 'select',
@@ -3556,21 +3556,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'regression',
 						name: 'Regresión desde',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -3580,21 +3580,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'steps_to_reproduce',
 						name: 'Steps to reproduce',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'expected_actual',
 						name: 'Expected vs. actual',
 						obligatory: true,
@@ -3610,21 +3610,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'integration',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'blocked_teams',
 						name: 'Equipos bloqueados (separados por comas)',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'owner',
 						name: 'Dueño NIT',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -3634,14 +3634,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'integration_plan',
 						name: 'Integration plan',
 						obligatory: true,
@@ -3752,7 +3752,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'business_value',
 						name: 'Valor de negocio',
 						type: 'select',
@@ -3760,7 +3760,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'target_release',
 						name: 'Lanzamiento objetivo',
 						type: 'text',
@@ -3769,21 +3769,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'acceptance',
 						name: 'Acceptance criteria',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'out_of_scope',
 						name: 'Out of scope',
 						obligatory: false,
@@ -3799,7 +3799,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'story_points',
 						name: 'Puntos de historia',
 						type: 'select',
@@ -3807,7 +3807,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['1', '2', '3', '5', '8', '13', '21']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'priority',
 						name: 'Prioridad',
 						type: 'select',
@@ -3815,21 +3815,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'sprint',
 						name: 'Sprint',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -3839,21 +3839,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'user_story',
 						name: 'User story',
 						obligatory: true,
 						default: '**As a** ___\n**I want** ___\n**so that** ___.'
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'acceptance',
 						name: 'Acceptance criteria',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'notes',
 						name: 'Notes & assumptions',
 						obligatory: false,
@@ -3869,14 +3869,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'estimate_hours',
 						name: 'Estimación (horas)',
 						type: 'number',
 						obligatory: false
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'priority',
 						name: 'Prioridad',
 						type: 'select',
@@ -3884,14 +3884,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -3901,14 +3901,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'definition_of_done',
 						name: 'Definition of done for this task',
 						obligatory: true,
@@ -3924,7 +3924,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'severity',
 						name: 'Severidad',
 						type: 'select',
@@ -3932,7 +3932,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['low', 'medium', 'high', 'critical']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'priority',
 						name: 'Prioridad',
 						type: 'select',
@@ -3940,21 +3940,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'regression',
 						name: 'Regresión desde',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -3964,21 +3964,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'steps_to_reproduce',
 						name: 'Steps to reproduce',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'expected_actual',
 						name: 'Expected vs. actual',
 						obligatory: true,
@@ -3994,14 +3994,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'impediment',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'team_reporter',
 						name: 'Equipo reportador',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'escalation',
 						name: 'Escalamiento',
 						type: 'select',
@@ -4009,14 +4009,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['team', 'sos', 'sosos']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'owner',
 						name: 'Propietario',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -4026,21 +4026,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'impact',
 						name: 'Impact',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'resolution',
 						name: 'Resolution',
 						obligatory: false,
@@ -4056,7 +4056,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'in_progress',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'forum',
 						name: 'Del foro',
 						type: 'select',
@@ -4064,14 +4064,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['sos', 'sosos', 'metascrum', 'executive-scram']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'due_date',
 						name: 'Vence',
 						type: 'date',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'owner',
 						name: 'Propietario',
 						type: 'user',
@@ -4080,14 +4080,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'action',
 						name: 'Action',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'context',
 						name: 'Context',
 						obligatory: false,
@@ -4203,35 +4203,35 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'backlog',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'squad',
 						name: 'Escuadrón',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'tribe',
 						name: 'Tribu',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'trio',
 						name: 'Líder del trío',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'mission',
 						name: 'Misión a largo plazo',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -4241,14 +4241,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'okrs',
 						name: 'Linked OKRs',
 						obligatory: false,
@@ -4264,21 +4264,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'backlog',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'chapter',
 						name: 'Capítulo',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'chapter_lead',
 						name: 'Líder de capítulo',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -4288,14 +4288,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'standard',
 						name: 'Standard / guideline',
 						obligatory: false,
@@ -4311,21 +4311,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'backlog',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'guild',
 						name: 'Gremio',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'coordinator',
 						name: 'Coordinador',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -4335,7 +4335,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
@@ -4351,28 +4351,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'bet_open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'tribe',
 						name: 'Tribu',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'quarter',
 						name: 'Trimestre',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'bet_table',
 						name: 'Miembros de la mesa de apuestas',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -4382,21 +4382,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'problem',
 						name: 'Problem',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'outcome',
 						name: 'Outcome',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'killed_reason',
 						name: 'Why killed (if applicable)',
 						obligatory: false,
@@ -4536,7 +4536,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'inception',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'process_goal',
 						name: 'Process goal',
 						type: 'select',
@@ -4551,7 +4551,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						]
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'lifecycle',
 						name: 'Lifecycle',
 						type: 'select',
@@ -4566,14 +4566,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						]
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'owner',
 						name: 'Propietario',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -4583,21 +4583,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'strategy',
 						name: 'Chosen strategy',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'tradeoffs',
 						name: 'Tradeoffs',
 						obligatory: true,
@@ -4613,28 +4613,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'construction',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'hypothesis',
 						name: 'Hypothesis',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'metric',
 						name: 'Metric to move',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'owner',
 						name: 'Experiment owner',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -4644,14 +4644,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'experiment',
 						name: 'Experiment (Build-Measure-Learn)',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'result',
 						name: 'Result & validated learning',
 						obligatory: true,
@@ -4667,7 +4667,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'construction',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'devops_goal',
 						name: 'DevOps goal',
 						type: 'select',
@@ -4682,14 +4682,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						]
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'owner',
 						name: 'Propietario',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -4699,14 +4699,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'slo',
 						name: 'SLO / SRE target',
 						obligatory: true,
@@ -4833,7 +4833,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'assess',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'team_type',
 						name: 'Team type',
 						type: 'select',
@@ -4841,21 +4841,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['stream-aligned', 'platform', 'enabling', 'complicated-subsystem']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'value_stream',
 						name: 'Flujo de valor',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'team_size',
 						name: 'Team size',
 						type: 'number',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -4865,21 +4865,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'purpose',
 						name: 'Team purpose',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'responsibilities',
 						name: 'Responsibilities',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'interaction_modes',
 						name: 'Interaction modes (X-as-a-Service / Collaboration / Facilitating)',
 						obligatory: true,
@@ -4895,21 +4895,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'design',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'from_team',
 						name: 'From team',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'to_team',
 						name: 'To team',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'mode',
 						name: 'Interaction mode',
 						type: 'select',
@@ -4917,7 +4917,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['interaction-collab', 'interaction-xaas', 'interaction-facil']
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -4927,14 +4927,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'team_api',
 						name: 'Team API (what we expose / consume)',
 						obligatory: true,
@@ -4950,35 +4950,35 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'assess',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'team',
 						name: 'Team',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'intrinsic',
 						name: 'Intrinsic (1-5)',
 						type: 'number',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'extraneous',
 						name: 'Extraneous (1-5)',
 						type: 'number',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'germane',
 						name: 'Germane (1-5)',
 						type: 'number',
 						obligatory: true
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -4988,14 +4988,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'evidence',
 						name: 'Evidence (handoffs, rework, on-call hours)',
 						obligatory: true,
@@ -5011,28 +5011,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'design',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'from_state',
 						name: 'From (current)',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'to_state',
 						name: 'To (target)',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'driver',
 						name: 'Driver (cognitive overload / value stream change / etc.)',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -5042,14 +5042,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'plan',
 						name: 'Migration plan',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'risks',
 						name: 'Risks',
 						obligatory: true,
@@ -5065,21 +5065,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'design',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'internal_users',
 						name: 'Internal users (which stream-aligned teams consume)',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'owner',
 						name: 'Platform owner',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -5089,14 +5089,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'scope',
 						name: 'Thinnest viable platform (scope)',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'slo',
 						name: 'Platform SLO (reliability / latency / adoption)',
 						obligatory: true,
@@ -5233,14 +5233,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'plan',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'service',
 						name: 'Service',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'change_kind',
 						name: 'Change kind',
 						type: 'select',
@@ -5248,7 +5248,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['feature', 'experiment', 'hotfix', 'config', 'rollback']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'risk',
 						name: 'Risk',
 						type: 'select',
@@ -5256,14 +5256,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['low', 'medium', 'high']
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'deploy_window',
 						name: 'Deploy window',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -5273,21 +5273,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'rollback_plan',
 						name: 'Rollback plan',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'monitoring',
 						name: 'Monitoring / SLO impact',
 						obligatory: true,
@@ -5303,7 +5303,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'production',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'severity',
 						name: 'Severity (SEV1 / SEV2 / SEV3)',
 						type: 'select',
@@ -5311,28 +5311,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['SEV1', 'SEV2', 'SEV3']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'detected_at',
 						name: 'Detected at',
 						type: 'date',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'mitigated_at',
 						name: 'Mitigated at',
 						type: 'date',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'mttr_min',
 						name: 'MTTR (min)',
 						type: 'number',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -5342,21 +5342,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'summary',
 						name: 'Summary',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'root_cause',
 						name: 'Root cause (5-Whys)',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'action_items',
 						name: 'Action items (post-incident review)',
 						obligatory: true,
@@ -5372,14 +5372,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'production',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'service',
 						name: 'Service',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'environment',
 						name: 'Environment',
 						type: 'select',
@@ -5387,14 +5387,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['dev', 'staging', 'prod', 'canary']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'build_id',
 						name: 'Build / commit',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'deployer',
 						name: 'Deployer',
 						type: 'user',
@@ -5403,7 +5403,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'deploy_log',
 						name: 'Deploy log',
 						obligatory: false,
@@ -5419,28 +5419,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'plan',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'service',
 						name: 'Service',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'indicator',
 						name: 'SLI (e.g. availability / latency p99)',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'target',
 						name: 'SLO target',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'window',
 						name: 'Window (28d / 90d)',
 						type: 'select',
@@ -5448,7 +5448,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['28d', '90d']
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'owner',
 						name: 'SRE owner',
 						type: 'user',
@@ -5457,14 +5457,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'burn_rate',
 						name: 'Error budget burn rate (per day)',
 						obligatory: false,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'runbook',
 						name: 'Runbook link',
 						obligatory: false,
@@ -5574,21 +5574,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'draft',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'quarter',
 						name: 'Trimestre',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'owner',
 						name: 'Propietario',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'level',
 						name: 'Level',
 						type: 'select',
@@ -5596,7 +5596,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['company-okr', 'tribe-okr', 'team-okr', 'individual-okr']
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'aspirational',
 						name: 'Aspirational?',
 						type: 'select',
@@ -5604,7 +5604,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['aspirational', 'committed']
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -5614,14 +5614,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Objective statement (one sentence, qualitative, ambitious)',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'why',
 						name: 'Why this objective matters',
 						obligatory: true,
@@ -5637,42 +5637,42 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'draft',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'objective',
 						name: 'Parent objective',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'baseline',
 						name: 'Valor base',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'target',
 						name: 'Valor objetivo',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'current',
 						name: 'Current value',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'unit',
 						name: 'Unit (e.g. %, $, count, p99)',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 6,
+						id: '6',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -5682,14 +5682,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'description',
 						name: 'Description',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'checkins',
 						name: 'Weekly check-ins',
 						obligatory: false,
@@ -5705,35 +5705,35 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'in_progress',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'key_result',
 						name: 'Key Result',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'date',
 						name: 'Date',
 						type: 'date',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'current_value',
 						name: 'Current value',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'confidence',
 						name: 'Confidence (0-1)',
 						type: 'number',
 						obligatory: true
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -5743,14 +5743,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'what_changed',
 						name: 'What changed',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'next_step',
 						name: 'Next step',
 						obligatory: true,
@@ -5876,28 +5876,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'hypothesis',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'persona',
 						name: 'Persona',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'falsifiable_if',
 						name: 'Falsifiable if...',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'owner',
 						name: 'Propietario',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -5907,14 +5907,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'we_believe',
 						name: 'We believe that...',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'because',
 						name: 'Because...',
 						obligatory: true,
@@ -5930,14 +5930,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'build',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'hypothesis',
 						name: 'Hypothesis',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'mvp_kind',
 						name: 'MVP kind',
 						type: 'select',
@@ -5945,28 +5945,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['mvp', 'smoke-test', 'concierge', 'wizard-of-oz']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'primary_metric',
 						name: 'Primary metric',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'min_sample_size',
 						name: 'Min sample size',
 						type: 'number',
 						obligatory: true
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'owner',
 						name: 'Propietario',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 6,
+						id: '6',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -5976,14 +5976,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'experiment',
 						name: 'Experiment design',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'results',
 						name: 'Results & learning',
 						obligatory: true,
@@ -5999,7 +5999,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'learn',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'decision',
 						name: 'Decision',
 						type: 'select',
@@ -6007,14 +6007,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['pivot-zoom-in', 'pivot-zoom-out', 'pivot-segment', 'pivot-need', 'persevere']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'evidence',
 						name: 'Evidence (links to experiments)',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'owner',
 						name: 'Decision owner',
 						type: 'user',
@@ -6023,14 +6023,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'narrative',
 						name: 'Decision narrative',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'next_hypothesis',
 						name: 'Next hypothesis',
 						obligatory: true,
@@ -6153,7 +6153,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'open',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'story_points',
 						name: 'Puntos de historia',
 						type: 'select',
@@ -6161,7 +6161,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['1', '2', '3', '5', '8', '13', '21']
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'priority',
 						name: 'Prioridad',
 						type: 'select',
@@ -6169,21 +6169,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['p0', 'p1', 'p2', 'p3']
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'sprint',
 						name: 'Sprint',
 						type: 'text',
 						obligatory: false
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'assignee',
 						name: 'Responsable',
 						type: 'user',
 						obligatory: false
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -6193,21 +6193,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'user_story',
 						name: 'User story',
 						obligatory: true,
 						default: '**As a** ___\n**I want** ___\n**so that** ___.'
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'acceptance',
 						name: 'Acceptance criteria',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'notes',
 						name: 'Notes & assumptions',
 						obligatory: false,
@@ -6223,21 +6223,21 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'water',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'ba_owner',
 						name: 'BA owner',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'sponsor',
 						name: 'Business sponsor',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'priority',
 						name: 'Priority (MoSCoW)',
 						type: 'select',
@@ -6245,7 +6245,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['must', 'should', 'could', 'wont']
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'upstream_gate',
 						name: 'Upstream gate',
 						type: 'select',
@@ -6253,7 +6253,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['ba-review', 'legal-review', 'security-review']
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'labels',
 						name: 'Etiquetas',
 						type: 'multi-select',
@@ -6263,28 +6263,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'business_need',
 						name: 'Business need',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'brd_link',
 						name: 'BRD / FRD link',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'acceptance',
 						name: 'Acceptance criteria',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'sign_off',
 						name: 'Sign-off log',
 						obligatory: false,
@@ -6300,28 +6300,28 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				default_status: 'integration',
 				fields: [
 					{
-						id: 1,
+						id: '1',
 						key: 'release_date',
 						name: 'Release date',
 						type: 'date',
 						obligatory: true
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'fall_owner',
 						name: 'Fall owner',
 						type: 'user',
 						obligatory: true
 					},
 					{
-						id: 3,
+						id: '3',
 						key: 'environments',
 						name: 'Environments (dev/staging/prod)',
 						type: 'text',
 						obligatory: true
 					},
 					{
-						id: 4,
+						id: '4',
 						key: 'rollout_kind',
 						name: 'Rollout kind',
 						type: 'select',
@@ -6329,7 +6329,7 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 						options: ['blue-green', 'canary', 'feature-flag', 'big-bang']
 					},
 					{
-						id: 5,
+						id: '5',
 						key: 'rollback_runbook',
 						name: 'Rollback runbook',
 						type: 'text',
@@ -6338,14 +6338,14 @@ export const FRAMEWORK_PRESETS_ES: FrameworkPreset[] = [
 				],
 				sections: [
 					{
-						id: 1,
+						id: '1',
 						key: 'contents',
 						name: 'Contents (linked user stories, requirements, integration tasks)',
 						obligatory: true,
 						default: ''
 					},
 					{
-						id: 2,
+						id: '2',
 						key: 'change_advisory',
 						name: 'Change advisory board notes',
 						obligatory: false,
