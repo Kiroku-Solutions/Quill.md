@@ -132,7 +132,7 @@ function makeIssue(overrides: Record<string, unknown> = {}): Issue {
 	delete overrides['sections'];
 	delete overrides['customFields'];
 	return {
-		id: 1,
+		id: '1',
 		...overrides,
 		fields,
 		integrityHash: null,
@@ -229,19 +229,23 @@ describe('createIssuesStore — load partial failure', () => {
 // 3. create assigns correct id and writes file to disk
 // -----------------------------------------------------------------------------
 describe('createIssuesStore — create', () => {
-	it('assigns sequential ids starting at 1 and writes the file to disk', async () => {
+	it('assigns UUID string ids and writes the file to disk', async () => {
 		const fs = new MemoryFsAdapter();
 		const { issues } = await makeStores(fs);
 		await issues.load();
 
 		const id1 = await issues.create({ title: 'Foo', issueType: 'task', author: 'jane' });
-		expect(id1).toBe(1);
+		expect(typeof id1).toBe('string');
+		expect(id1.length).toBeGreaterThan(0);
 		const id2 = await issues.create({ title: 'Bar', issueType: 'bug', author: 'jane' });
-		expect(id2).toBe(2);
+		expect(typeof id2).toBe('string');
+		expect(id2).not.toBe(id1); // unique IDs
 
 		const snap = fs.snapshot();
-		expect(snap.files['.quill.md/issues/0001-foo.md']).toBeDefined();
-		expect(snap.files['.quill.md/issues/0002-bar.md']).toBeDefined();
+		// Files are written using the slug derived from the title
+		const files = Object.keys(snap.files).filter((f) => f.startsWith('.quill.md/issues/'));
+		expect(files.some((f) => f.includes('foo'))).toBe(true);
+		expect(files.some((f) => f.includes('bar'))).toBe(true);
 		expect(issues.issues).toHaveLength(2);
 	});
 });
@@ -377,7 +381,7 @@ describe('createIssuesStore — validate', () => {
 		await seedIssueFile(
 			fs,
 			makeIssue({
-				id: 1,
+				id: '1',
 				issueType: 'bug',
 				title: 'Bug full',
 				customFields: { severity: 'high' },
@@ -448,7 +452,7 @@ describe('createIssuesStore — integrityWarnings', () => {
 		const { issues } = await makeStores(fs);
 		await issues.load();
 		expect(issues.integrityWarnings).toHaveLength(1);
-		expect(issues.integrityWarnings[0]?.issue.id).toBe(1);
+		expect(issues.integrityWarnings[0]?.issue.id).toBe('1');
 	});
 });
 
@@ -632,13 +636,13 @@ describe('createIssuesStore — concurrent save on different ids', () => {
 		const { issues } = await makeStores(fs);
 		await issues.load();
 
-		const order: number[] = [];
+		const order: string[] = [];
 		// Mark both dirty before awaiting saves so the writes actually run.
 		issues.update('1', { title: 'One edited' });
 		issues.update('2', { title: 'Two edited' });
 
 		const [r1, r2] = await Promise.all([issues.save('1'), issues.save('2')]);
-		order.push(1, 2);
+		order.push('1', '2');
 		expect(r1).toBeUndefined();
 		expect(r2).toBeUndefined();
 

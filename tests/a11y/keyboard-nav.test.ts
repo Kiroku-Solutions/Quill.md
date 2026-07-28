@@ -25,7 +25,7 @@ import type { StoreGraph } from '../../src/lib/state/context';
 import type { Config, Issue, LoadedIssue, Template } from '../../src/lib/types';
 
 let activeStub: StoreGraph | null = null;
-const openCalls: { id: number }[] = [];
+const openCalls: { id: string }[] = [];
 const setCalls: Array<{ q?: string; status?: string; type?: string }> = [];
 
 vi.mock('$lib/state', () => ({
@@ -37,7 +37,7 @@ vi.mock('$lib/state', () => ({
 		activeStub = s;
 		return s;
 	},
-	brandIssueId: (id: number) => id as never
+	brandIssueId: (id: string) => id as never
 }));
 
 vi.mock('$lib/adapters', () => ({
@@ -128,7 +128,7 @@ function buildStub(opts: {
 }): StoreGraph {
 	const loaded = opts.issues ?? [];
 	const aeid = opts.activeEditorId ?? null;
-	const updateLog: Array<{ id: number; patch: object }> = [];
+	const updateLog: Array<{ id: string; patch: object }> = [];
 	return {
 		mode: {
 			mode: opts.mode,

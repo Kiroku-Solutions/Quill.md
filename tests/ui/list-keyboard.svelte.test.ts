@@ -18,7 +18,7 @@ import type { StoreGraph } from '../../src/lib/state/context';
 import type { Config, Issue, LoadedIssue } from '../../src/lib/types';
 
 let activeStub: StoreGraph | null = null;
-const openCalls: { id: number }[] = [];
+const openCalls: { id: string }[] = [];
 
 vi.mock('$lib/state', () => ({
 	getStores: () => {

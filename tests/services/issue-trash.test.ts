@@ -28,7 +28,7 @@ import type { Issue } from '$lib/types';
 const ISSUE_PATH = '.quill.md/issues/0007-fix-login.md';
 
 function makeIssue(
-	id = 7,
+	id = '7',
 	title = 'Fix login'
 ): Pick<Issue, 'id'> & { fields: Pick<Issue['fields'], 'title'> } {
 	return { id, fields: { title } };

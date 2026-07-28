@@ -118,7 +118,7 @@ export function validateIssue(issue: Issue, ctx: ValidationContext): ValidationR
 		}
 		for (const section of template.sections) {
 			if (!section.obligatory) continue;
-			const found = issue.sections.find((s) => s.name === section.key);
+			const found = issue.sections.find((s) => s.name === section.name);
 			if (!found || found.markdown.trim() === '') {
 				pushError(errors, section.key, `${section.name} is required`);
 			}

@@ -36,20 +36,16 @@ import {
 import type { Issue } from '$lib/types';
 
 describe('buildDefaultIssue', () => {
-	const noExisting: ReadonlyArray<{ id: number }> = [];
-
 	it('defaults `status` to "open" when input.status is omitted', () => {
 		const issue = buildDefaultIssue(
-			{ title: 'Hello', issueType: 'task', author: 'jane' },
-			noExisting
+			{ title: 'Hello', issueType: 'task', author: 'jane' }
 		);
 		expect(issue.fields.status).toBe('open');
 	});
 
 	it('respects an explicit input.status', () => {
 		const issue = buildDefaultIssue(
-			{ title: 'Hello', issueType: 'task', author: 'jane', status: 'in_progress' },
-			noExisting
+			{ title: 'Hello', issueType: 'task', author: 'jane', status: 'in_progress' }
 		);
 		expect(issue.fields.status).toBe('in_progress');
 	});
@@ -62,8 +58,7 @@ describe('buildDefaultIssue', () => {
 				issueType: 'task',
 				author: 'jane',
 				customFields: seed
-			},
-			noExisting
+			}
 		);
 		expect(issue.customFields).toEqual({ severity: 'high', priority: 'p1' });
 		// Not the same reference — the saver must clone so a later
@@ -74,18 +69,15 @@ describe('buildDefaultIssue', () => {
 	it('defaults creationDate / updatedDate to today UTC', () => {
 		const today = '2026-06-24';
 		const issue = buildDefaultIssue(
-			{ title: 'Hello', issueType: 'task', author: 'jane', today },
-			noExisting
+			{ title: 'Hello', issueType: 'task', author: 'jane', today }
 		);
 		expect(issue.fields.creationDate).toBe('2026-06-24');
 		expect(issue.fields.updatedDate).toBe('2026-06-24');
 	});
 
-	it('uses nextIssueId(existing) when assigning the id', () => {
-		const existing = [{ id: 3 }, { id: 7 }];
+	it('assigns a UUID string to the id', () => {
 		const issue = buildDefaultIssue(
-			{ title: 'Hello', issueType: 'task', author: 'jane', today: '2026-06-24' },
-			existing
+			{ title: 'Hello', issueType: 'task', author: 'jane', today: '2026-06-24' }
 		);
 		expect(typeof issue.id).toBe('string');
 	});
@@ -93,7 +85,7 @@ describe('buildDefaultIssue', () => {
 
 describe('issuePath', () => {
 	it('composes the canonical <id>-<slug>.md under ISSUES_DIR', () => {
-		const issue = buildDefaultIssue({ title: 'Fix login redirect!', issueType: 'task', author: 'jane' }, []);
+		const issue = buildDefaultIssue({ title: 'Fix login redirect!', issueType: 'task', author: 'jane' });
 		issue.id = '1'; // Force ID to 1 for test
 		expect(issuePath(issue, null)).toBe(
 			'.quill.md/issues/open/1-fix-login-redirect.md'
@@ -115,7 +107,7 @@ describe('createIssue — write + reparse round-trip', () => {
 		const li = await createIssue(
 			fs,
 			{ title: 'New thing', issueType: 'task', author: 'jane', today: '2026-06-24' },
-			[]
+			null
 		);
 
 		expect(typeof li.issue.id).toBe('string');
@@ -141,7 +133,7 @@ describe('createIssue — write + reparse round-trip', () => {
 		const li = await createIssue(
 			fs,
 			{ title: 'T', issueType: 'mystery-type', author: 'jane', today: '2026-06-24' },
-			[]
+			null
 		);
 		expect(li.issue.fields.issueType).toBe('mystery-type');
 		expect(li.issue.integrityWarning).toBe(false);
@@ -182,14 +174,14 @@ describe('saveIssue — overwrite + last-write-wins', () => {
 
 	it('overwrites an existing file in place (same sourcePath)', async () => {
 		const path = '.quill.md/issues/open/1-hello.md';
-		const li1 = await saveIssue(fs, baseIssue(), path);
+		const li1 = await saveIssue(fs, baseIssue(), path, null);
 		expect(li1.issue.fields.title).toBe('Hello');
 
 		const updated: Issue = {
 			...baseIssue(),
 			fields: { ...baseIssue().fields, title: 'Hello, world!', status: 'in_progress' }
 		};
-		const li2 = await saveIssue(fs, updated, path);
+		const li2 = await saveIssue(fs, updated, path, null);
 
 		expect(li2.issue.fields.title).toBe('Hello, world!');
 		expect(li2.issue.fields.status).toBe('in_progress');
@@ -207,17 +199,20 @@ describe('saveIssue — overwrite + last-write-wins', () => {
 		await saveIssue(
 			fs,
 			{ ...baseIssue(), fields: { ...baseIssue().fields, title: 'First' } },
-			path
+			path,
+			null
 		);
 		await saveIssue(
 			fs,
 			{ ...baseIssue(), fields: { ...baseIssue().fields, title: 'Second' } },
-			path
+			path,
+			null
 		);
 		const lastLi = await saveIssue(
 			fs,
 			{ ...baseIssue(), fields: { ...baseIssue().fields, title: 'Third' } },
-			path
+			path,
+			null
 		);
 
 		const final = await fs.readTextFile(lastLi.sourcePath);

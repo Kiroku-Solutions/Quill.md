@@ -116,7 +116,7 @@ function seedIssue(overrides: Record<string, unknown>): Issue {
 	delete overrides['sections'];
 	delete overrides['customFields'];
 	return {
-		id: 1,
+		id: '1',
 		...overrides,
 		fields,
 		integrityHash: null,
@@ -173,7 +173,7 @@ describe('state layer integration — full CRUD journey', () => {
 
 		const seedText = await serializeIssue(
 			seedIssue({
-				id: 1,
+				id: '1',
 				title: 'Original seed',
 				issueType: 'task',
 				sections: [{ name: 'Description', markdown: 'Original body.' }]
@@ -214,9 +214,14 @@ describe('state layer integration — full CRUD journey', () => {
 			issueType: 'bug',
 			author: 'jane'
 		});
-		expect(newId).toBe(2); // next id after the seeded 1
+		// UUID migration: create() now returns a UUID string, not a sequential number
+		expect(newId).toEqual(expect.any(String));
+		expect(newId.length).toBeGreaterThan(0);
 		expect(issues.issues).toHaveLength(2);
-		expect(fs.snapshot().files['.quill.md/issues/0002-newly-created.md']).toBeDefined();
+		const newIssueFiles = Object.keys(fs.snapshot().files).filter(
+			(f) => f.startsWith('.quill.md/issues/') && f.includes('newly-created')
+		);
+		expect(newIssueFiles).toHaveLength(1);
 
 		// ── Open in the editor, patch, save ─────────────────────────────
 		const editor = createEditorStore({ issues, config, templates });
@@ -301,8 +306,8 @@ describe('state layer integration — full CRUD journey', () => {
 		expect(snap.files['.quill.md/issues/0002-doomed.md']).toBeUndefined();
 		const trashFiles = Object.keys(snap.files).filter((p) => p.startsWith('.quill.md/.trash/'));
 		expect(trashFiles).toHaveLength(1);
-		// ERS §6.5: `<timestamp>-<id>-<slug>.md` — id=2, slug=doomed.
-		expect(trashFiles[0]).toMatch(/\.quill\.md\/\.trash\/\d+-2-doomed\.md$/);
+		// ERS §6.5: `<timestamp>-<id>-<slug>.md` — id is now a UUID string, slug=doomed.
+		expect(trashFiles[0]).toMatch(/\.quill\.md\/\.trash\/\d+-.+-doomed\.md$/);
 	});
 
 	it('save round-trip via editor.save() preserves integrity hash (FR-15)', async () => {

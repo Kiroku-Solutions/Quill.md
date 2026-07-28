@@ -44,7 +44,7 @@ import type { HandleRecord } from '../../src/lib/adapters/handle-store';
 // service (see `vi.mock('$lib/services/wizard', …)`).
 
 let activeStub: StoreGraph | null = null;
-const openCalls: { id: number }[] = [];
+const openCalls: { id: string }[] = [];
 
 vi.mock('$lib/state', () => ({
 	getStores: () => {
@@ -57,7 +57,7 @@ vi.mock('$lib/state', () => ({
 		activeStub = stores;
 		return stores;
 	},
-	brandIssueId: (id: number) => id as never
+	brandIssueId: (id: string) => id as never
 }));
 
 vi.mock('$lib/adapters', () => ({
@@ -185,7 +185,7 @@ function buildStub(opts: {
 }): StoreGraph {
 	const loaded = opts.issues ?? [];
 	const integrityWarnings = Array.from({ length: opts.integrityCount ?? 0 }, (_, i) => ({
-		issue: { id: i + 1, integrityWarning: true } as never
+		issue: { id: String(i + 1), integrityWarning: true } as never
 	}));
 	const activeEditorId = opts.activeEditorId ?? null;
 	const activeDraft =
@@ -605,7 +605,7 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 			route?: 'home' | 'local' | 'remote' | 'wizard' | 'settings';
 			issues?: LoadedIssue[];
 			view?: 'list' | 'kanban' | 'gantt';
-			editorId?: number | null;
+			editorId?: string | null;
 			recentHandles?: HandleRecord[];
 			integrityCount?: number;
 		}> = [
@@ -636,7 +636,7 @@ describe('Step 6 — accessibility audit (NFR-4)', () => {
 				label: 'editor',
 				mode: 'local',
 				issues: [makeLoaded('1', 'open', 'A real issue')],
-				editorId: 1
+				editorId: '1'
 			},
 			{ label: 'wizard', mode: 'home', route: 'wizard' },
 			{

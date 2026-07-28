@@ -33,7 +33,8 @@ async function withValidHash(text: string): Promise<string> {
 describe('parseIssueFile — file shape', () => {
 	it('returns default-shaped Issue for an empty file', async () => {
 		const { issue, sourcePath } = await parseIssueFile('', 'memory://empty.md');
-		expect(issue.id).toBe('0');
+		// Empty frontmatter → id field is absent → asString returns ''
+		expect(issue.id).toBe('');
 		expect(issue.fields.title).toBe('');
 		expect(issue.fields.author).toBe('');
 		expect(issue.fields.creationDate).toBe('');
@@ -45,7 +46,7 @@ describe('parseIssueFile — file shape', () => {
 	});
 
 	it('parses frontmatter-only files with no body sections', async () => {
-		const text = '---\nid: '5'\ntitle: Foo\nstatus: open\n---\n';
+		const text = '---\nid: "5"\ntitle: Foo\nstatus: open\n---\n';
 		const { issue } = await parseIssueFile(text, 'memory://fm-only.md');
 		expect(issue.id).toBe('5');
 		expect(issue.fields.title).toBe('Foo');
@@ -126,11 +127,11 @@ describe('parseIssueFile — relations (FR-9)', () => {
 
 	it('parses all five valid relation types', async () => {
 		const text = withRelations(
-			'  - type: parent\n    id: '2'\n' +
-				'  - type: child\n    id: '3'\n' +
-				'  - type: blocks\n    id: '4'\n' +
-				'  - type: depends_on\n    id: '5'\n' +
-				'  - type: relates_to\n    id: '6'\n'
+			'  - type: parent\n    id: "2"\n' +
+				'  - type: child\n    id: "3"\n' +
+				'  - type: blocks\n    id: "4"\n' +
+				'  - type: depends_on\n    id: "5"\n' +
+				'  - type: relates_to\n    id: "6"\n'
 		);
 		const { issue } = await parseIssueFile(text, 'memory://relations.md');
 		expect(issue.fields.relations).toEqual([
@@ -144,18 +145,24 @@ describe('parseIssueFile — relations (FR-9)', () => {
 
 	it('drops relations with an unknown type', async () => {
 		const text = withRelations(
-			'  - type: parent\n    id: '2'\n' + '  - type: frobnitz\n    id: 99\n'
+			'  - type: parent\n    id: "2"\n' + '  - type: frobnitz\n    id: 99\n'
 		);
 		const { issue } = await parseIssueFile(text, 'memory://bad-type.md');
 		expect(issue.fields.relations).toEqual([{ type: 'parent', id: '2' }]);
 	});
 
-	it('drops relations with a non-numeric id', async () => {
+	it('accepts relations with any non-empty string id (UUID migration)', async () => {
+		// Since Issue IDs are now UUIDs (arbitrary strings), the parser accepts
+		// any non-empty string as a valid relation id — numeric strings and
+		// opaque strings alike. Only null/empty ids are dropped.
 		const text = withRelations(
-			'  - type: parent\n    id: "not-a-number"\n' + '  - type: child\n    id: '5'\n'
+			'  - type: parent\n    id: "not-a-number"\n' + '  - type: child\n    id: "5"\n'
 		);
-		const { issue } = await parseIssueFile(text, 'memory://bad-id.md');
-		expect(issue.fields.relations).toEqual([{ type: 'child', id: '5' }]);
+		const { issue } = await parseIssueFile(text, 'memory://any-string-id.md');
+		expect(issue.fields.relations).toEqual([
+			{ type: 'parent', id: 'not-a-number' },
+			{ type: 'child', id: '5' }
+		]);
 	});
 
 	it('returns [] when relations is not an array', async () => {

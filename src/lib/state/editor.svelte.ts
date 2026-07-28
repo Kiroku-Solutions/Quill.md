@@ -84,11 +84,11 @@ function cloneLoaded(src: LoadedIssue): LoadedIssue {
 export interface EditorStore {
 	/**
 	 * The id of the issue currently loaded in the editor's draft buffer.
-	 * `null` when no issue is open. Plain `number` so call sites (and the
-	 * comparison `expect(activeId).toBe(1)` test pattern) work without
+	 * `null` when no issue is open. Plain `string` so call sites (and the
+	 * comparison `expect(activeId).toBe('1')` test pattern) work without
 	 * having to brand first.
 	 */
-	readonly activeId: number | null;
+	readonly activeId: string | null;
 	readonly draft: LoadedIssue | null;
 	readonly isDirty: boolean;
 	readonly integrityWarning: boolean;

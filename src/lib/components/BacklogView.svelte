@@ -24,7 +24,7 @@
 	const stories = $derived(allIssues.filter((i) => i.fields.issueType === 'user-story'));
 
 	// Helper to find stories linked to an Epic
-	function getEpicStories(epicId: number) {
+	function getEpicStories(epicId: string) {
 		return stories.filter((story) => {
 			const linksToEpic = story.fields.relations.some((r) => r.id === epicId);
 			const epicLinksToStory = epics
@@ -35,7 +35,7 @@
 	}
 
 	// Helper to find stories linked to a Use Case
-	function getUseCaseStories(useCaseId: number) {
+	function getUseCaseStories(useCaseId: string) {
 		return stories.filter((story) => {
 			const linksToUseCase = story.fields.relations.some((r) => r.id === useCaseId);
 			const useCaseLinksToStory = useCases

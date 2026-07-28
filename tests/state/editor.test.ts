@@ -120,7 +120,7 @@ function makeIssue(overrides: Record<string, unknown> = {}): Issue {
 	delete overrides['sections'];
 	delete overrides['customFields'];
 	return {
-		id: 1,
+		id: '1',
 		...overrides,
 		fields,
 		integrityHash: null,
@@ -185,7 +185,7 @@ describe('createEditorStore — open', () => {
 		});
 
 		stores.editor.open('1');
-		expect(stores.editor.activeId).toBe(1);
+		expect(stores.editor.activeId).toBe('1');
 		expect(stores.editor.draft?.issue.fields.title).toBe('Original');
 		expect(stores.editor.isDirty).toBe(false);
 
@@ -301,9 +301,17 @@ describe('createEditorStore — save', () => {
 
 		expect(stores.editor.isDirty).toBe(false);
 		expect(stores.issues.dirty.has('1')).toBe(false);
-		// On disk: the new title.
-		const onDisk = stores.fs.snapshot().files['.quill.md/issues/0001-issue.md'];
-		expect(onDisk).toContain('title: B');
+		// On disk: the new title — scan all issue files for the updated content
+		// (the saver may rename the file to match the new slug).
+		const snap = stores.fs.snapshot().files;
+		const issueFiles = Object.entries(snap).filter(([p]) =>
+			p.startsWith('.quill.md/issues/')
+		);
+		expect(issueFiles.length).toBeGreaterThan(0);
+		const hasNewTitle = issueFiles.some(([, content]) =>
+			typeof content === 'string' && content.includes('title: B')
+		);
+		expect(hasNewTitle).toBe(true);
 		// After save the draft is re-cloned from the (re-parsed) issues
 		// store, so it should reflect the new state too.
 		expect(stores.editor.draft?.issue.fields.title).toBe('B');

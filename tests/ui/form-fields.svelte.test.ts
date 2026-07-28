@@ -144,7 +144,7 @@ const TASK_TEMPLATE: Template = {
 	default_status: 'open',
 	fields: [
 		{
-			id: '1',
+			id: 1,
 			key: 'summary',
 			type: 'text',
 			name: 'Summary',

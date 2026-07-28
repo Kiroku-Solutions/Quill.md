@@ -37,7 +37,7 @@ import type { Config, Issue, LoadedIssue } from '../../src/lib/types';
 // `setStores` closures that read/write the active stub.
 
 interface UpdateCall {
-	id: number;
+	id: string;
 	patch: Record<string, unknown>;
 }
 interface OpenCall {

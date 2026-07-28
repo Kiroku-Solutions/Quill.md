@@ -34,14 +34,14 @@
 		if (hasActiveFilter) {
 			for (const li of matchedIssues) {
 				for (const rel of li.issue.fields.relations) {
-					const target = issues.byId.get(Number(rel.id));
+					const target = issues.byId.get(rel.id);
 					if (target) filteredSet.add(target);
 				}
 			}
 			for (const li of allIssues) {
 				if (
 					li.issue.fields.relations.some((r) =>
-						matchedIssues.some((m) => m.issue.id === Number(r.id))
+						matchedIssues.some((m) => m.issue.id === r.id)
 					)
 				) {
 					filteredSet.add(li);
@@ -182,7 +182,7 @@
 				})
 				.onNodeClick((node: any) => {
 					if (!node.id.startsWith('debug-')) {
-						editor.open(Number(node.id));
+						editor.open(node.id);
 					}
 				})
 				.nodeCanvasObject((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
