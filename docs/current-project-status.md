@@ -1341,3 +1341,16 @@ Following the core production readiness, the application has been extended with 
 1. **Standalone MCP Server (`quill-mcp-server/`)**: Built a fully functional Model Context Protocol server using the Anthropic SDK. This enables AI tools (Claude Desktop, Cursor) to directly read, list, and create markdown issues inside a local `.quill.md` folder. It uses standard `stdio` transport, Zod schema validation, and mimics Quill's internal JSON/YAML serialization.
 2. **Wizard Cleanup Protocol**: Switching between methodologies via the Wizard now automatically purges orphaned template JSON files and legacy mock issues to maintain a clean UI and prevent category clashes in the Kanban view.
 3. **UML/Mermaid Integration**: Added native support for Mermaid.js diagrams. The markdown preview sanitizes and client-side renders any `mermaid` code block securely. Integrated with the MCP Server (`quill-skill`) so AI agents are instructed to convert images of flowcharts and UML diagrams directly into Markdown mermaid format for the local issues.
+
+---
+
+## Stage 1 — Core Service & Data Model Upgrades (July 2026)
+
+We have completed the first stage of the core expansion and codebase polish, upgrading key services and fixing model constraints:
+
+1. **UUID Migration & Non-Sequential IDs**: Refactored `Issue.id` and `Relation.id` from `number` to `string` (UUID brand) globally across the types, services, stores, UI views, and testing frameworks. Sequential numeric IDs have been replaced with `crypto.randomUUID()`.
+2. **Folder Separation**: Updated loader and saver pathways so issues are routed and stored in `.quill.md/issues/open/` or `.quill.md/issues/closed/` based on their status categories, while maintaining a robust fallback to load legacy issues from the root `.quill.md/issues/` directory.
+3. **Visual Markdown Headers**: Upgraded `serializeSection` to write `## Section Name` markdown headers alongside parser tags to allow visual previews on remote providers (like GitHub), paired with parsing compatibility adjustments to filter visual header lines out of section contents.
+4. **Logger & PAT redactor fix**: Optimized the defense-in-depth logging system (`src/lib/adapters/_logger.ts`) to avoid false-positive PAT redactions on general text containing PAT-like sub-segments.
+5. **MCP Server Alignment**: Updated the `quill-mcp-server` tool definitions to output UUID-based issue identifiers, computing integrity hashes correctly to match client-side validation rules.
+6. **Test Suite Stability**: Resolved multiple type mismatches and flakiness across the 24+ test files in the workspace, achieving a 100% green pass for client, server, and renderer testing projects.
