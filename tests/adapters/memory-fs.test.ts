@@ -338,8 +338,8 @@ After submitting valid credentials, the user is redirected to a
 		expect(issue?.fields.assignee).toBe('jane');
 		expect(issue?.fields.labels).toEqual(['security', 'frontend']);
 		expect(issue?.fields.relations).toEqual([
-			{ type: 'blocks', id: 45 },
-			{ type: 'relates_to', id: 7 }
+			{ type: 'blocks', id: '45' },
+			{ type: 'relates_to', id: '7' }
 		]);
 		expect(issue?.fields.startDate).toBe('2026-10-20');
 		expect(issue?.fields.duration).toBe(3);
@@ -385,9 +385,9 @@ content for ${title}
 <!-- [SECTION_END: Description] -->
 `;
 
-		await fs.writeTextFile('.quill.md/issues/0001-first.md', mkIssue(1, 'first'));
-		await fs.writeTextFile('.quill.md/issues/0002-second.md', mkIssue(2, 'second'));
-		await fs.writeTextFile('.quill.md/issues/0003-third.md', mkIssue(3, 'third'));
+		await fs.writeTextFile('.quill.md/issues/0001-first.md', mkIssue('1', 'first'));
+		await fs.writeTextFile('.quill.md/issues/0002-second.md', mkIssue('2', 'second'));
+		await fs.writeTextFile('.quill.md/issues/0003-third.md', mkIssue('3', 'third'));
 
 		const issues = await loadIssues(fs);
 		expect(issues.map((i) => i.issue.id)).toEqual(['1', '2', '3']);

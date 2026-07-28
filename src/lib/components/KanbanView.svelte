@@ -43,15 +43,15 @@
 
 	// WAI-ARIA DnD keyboard state. When non-null, the focused card
 	// is "lifted" and the next Space/Enter commits the move.
-	let pickedUpId = $state<number | null>(null);
+	let pickedUpId = $state<string | null>(null);
 	let announcement = $state<string>('');
 
 	// ── Native HTML5 DnD state ─────────────────────────────────────
 	// Only two scalars — no arrays, no Maps, no objects to spread.
 	// Updates during drag are O(1) and touch minimal reactive surface.
-	let draggedId = $state<number | null>(null);
+	let draggedId = $state<string | null>(null);
 	let dropTargetId = $state<string | null>(null);
-	let justDroppedId = $state<number | null>(null);
+	let justDroppedId = $state<string | null>(null);
 	let dragPos = $state<{ x: number; y: number } | null>(null);
 
 	// ── Derived data ───────────────────────────────────────────────
@@ -119,6 +119,7 @@
 	});
 
 	const epicsById = $derived.by(() => {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const map = new Map<string, LoadedIssue>();
 		for (const li of issues.byId.values()) {
 			if (li.issue.fields.issueType === 'epic') {
@@ -257,14 +258,14 @@
 	}
 
 	let dodModalOpen = $state(false);
-	let dodPendingIssueId = $state<number | null>(null);
+	let dodPendingIssueId = $state<string | null>(null);
 	let dodPendingColId = $state<string | null>(null);
 	let dodChecks = $state<boolean[]>([]);
 
 	const dodList = $derived(config.config?.definition_of_done ?? []);
 	const dodAllChecked = $derived(dodChecks.length > 0 && dodChecks.every((c) => c));
 
-	function checkDoDAndSave(id: number, newStatus: string): void {
+	function checkDoDAndSave(id: string, newStatus: string): void {
 		const statusObj = columns.find((c) => c.id === newStatus);
 		if (statusObj && statusObj.category === 'done' && dodList.length > 0) {
 			dodPendingIssueId = id;
@@ -289,7 +290,7 @@
 		dodPendingColId = null;
 	}
 
-	function storesUpdateAndSave(id: number, newStatus: string): void {
+	function storesUpdateAndSave(id: string, newStatus: string): void {
 		const li = findLoaded(id);
 		if (!li) return;
 		const oldStatus = li.issue.fields.status;
@@ -665,7 +666,7 @@
 				</p>
 			</div>
 			<div class="max-h-[60vh] space-y-4 overflow-y-auto p-6">
-				{#each dodList as dodItem, i}
+				{#each dodList as dodItem, i (i)}
 					<label class="group flex cursor-pointer items-start gap-3">
 						<div class="relative mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center">
 							<input

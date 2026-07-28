@@ -52,7 +52,7 @@
 				const dir = sortDir === 'asc' ? 1 : -1;
 				switch (sortKey) {
 					case 'id':
-						return (a.issue.id - b.issue.id) * dir;
+						return a.issue.id.localeCompare(b.issue.id) * dir;
 					case 'title':
 						return a.issue.fields.title.localeCompare(b.issue.fields.title) * dir;
 					case 'status':

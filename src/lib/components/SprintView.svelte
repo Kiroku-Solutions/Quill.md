@@ -94,7 +94,7 @@
 
 	const isWritable = $derived(mode.mode === 'local');
 
-	async function linkStory(storyId: number) {
+	async function linkStory(storyId: string) {
 		if (!selectedSprint || !isWritable) return;
 		const nextSprintRelations = [
 			...selectedSprint.fields.relations,
@@ -114,7 +114,7 @@
 		}
 	}
 
-	async function unlinkStory(storyId: number) {
+	async function unlinkStory(storyId: string) {
 		if (!selectedSprint || !isWritable) return;
 		const nextSprintRelations = selectedSprint.fields.relations.filter((r) => r.id !== storyId);
 		issues.update(selectedSprint.id, { fields: { relations: nextSprintRelations } });

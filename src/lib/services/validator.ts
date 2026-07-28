@@ -42,14 +42,14 @@ function isEmptyValue(value: unknown): boolean {
  * ERS §3.1 FR-9. Returns one error per issue that participates in any
  * detected cycle.
  */
-function detectCycles(issues: readonly Issue[]): Map<string, number[]> {
-	const errors = new Map<string, number[]>();
+function detectCycles(issues: readonly Issue[]): Map<string, string[]> {
+	const errors = new Map<string, string[]>();
 	const byId = new Map<string, Issue>();
 	for (const issue of issues) byId.set(issue.id, issue);
 
-	const adjacency = new Map<string, number[]>();
+	const adjacency = new Map<string, string[]>();
 	for (const issue of issues) {
-		const edges: number[] = [];
+		const edges: string[] = [];
 		for (const rel of issue.fields.relations) {
 			if (!STRICT_RELATION_TYPES.has(rel.type)) continue;
 			if (!byId.has(rel.id)) continue; // dangling edges are reported separately
@@ -60,7 +60,7 @@ function detectCycles(issues: readonly Issue[]): Map<string, number[]> {
 
 	const visited = new Set<string>();
 	const onStack = new Set<string>();
-	const stack: number[] = [];
+	const stack: string[] = [];
 
 	function visit(id: string): void {
 		if (onStack.has(id)) {
@@ -137,8 +137,13 @@ export function validateIssue(issue: Issue, ctx: ValidationContext): ValidationR
 	if (issue.fields.author.trim() === '') {
 		pushError(errors, 'author', 'Author is required');
 	}
-	if (issue.id <= 0) {
-		pushError(errors, 'id', 'Id must be a positive integer');
+	if (issue.id.trim() === '') {
+		pushError(errors, 'id', 'Id is required');
+	} else {
+		const idNum = Number(issue.id);
+		if (!isNaN(idNum) && idNum <= 0) {
+			pushError(errors, 'id', 'Id must be a positive integer');
+		}
 	}
 
 	if (!ctx.config.statuses.some((s) => s.id === issue.fields.status)) {

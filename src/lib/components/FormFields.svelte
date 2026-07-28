@@ -131,7 +131,7 @@
 		editor.patchField(systemKeyFor(field.key), list);
 	}
 
-	function changeRelationType(id: number, newType: string): void {
+	function changeRelationType(id: string, newType: string): void {
 		if (!issue) return;
 		const next = issue.fields.relations.map((r) =>
 			r.id === id ? { ...r, type: newType as any } : r
@@ -150,7 +150,7 @@
 
 	function addRelation(): void {
 		if (!issue || !newRelationId) return;
-		const id = Number(newRelationId);
+		const id = newRelationId;
 		if (issue.fields.relations.some((r) => r.id === id)) return;
 		const next = [...issue.fields.relations, { type: newRelationType as any, id }];
 		editor.patchField('relations', next);
@@ -501,8 +501,7 @@
 							</div>
 
 							{#if newRelationId}
-								{@const targetIssueType = issues.byId.get(Number(newRelationId))?.issue.fields
-									.issueType}
+								{@const targetIssueType = issues.byId.get(newRelationId)?.issue.fields.issueType}
 								{@const allowedRelTypesForNew =
 									targetIssueType &&
 									field.allowed_targets &&

@@ -61,12 +61,12 @@ const VALID_TASK_TEMPLATE: Template = {
 	color: '#0f0',
 	default_status: 'open',
 	fields: [
-		{ id: '1', key: 'priority', type: 'text', name: 'Priority', obligatory: false },
-		{ id: '2', key: 'story_points', type: 'number', name: 'Story Points', obligatory: false }
+		{ id: 1, key: 'priority', type: 'text', name: 'Priority', obligatory: false },
+		{ id: 2, key: 'story_points', type: 'number', name: 'Story Points', obligatory: false }
 	],
 	sections: [
-		{ id: '1', key: 'description', name: 'Description', obligatory: true },
-		{ id: '2', key: 'acceptance', name: 'Acceptance Criteria', obligatory: false }
+		{ id: 1, key: 'description', name: 'Description', obligatory: true },
+		{ id: 2, key: 'acceptance', name: 'Acceptance Criteria', obligatory: false }
 	]
 };
 
@@ -76,10 +76,10 @@ const VALID_BUG_TEMPLATE: Template = {
 	icon: 'bug',
 	color: '#f00',
 	default_status: 'open',
-	fields: [{ id: '1', key: 'severity', type: 'text', name: 'Severity', obligatory: true }],
+	fields: [{ id: 1, key: 'severity', type: 'text', name: 'Severity', obligatory: true }],
 	sections: [
-		{ id: '1', key: 'description', name: 'Description', obligatory: true },
-		{ id: '2', key: 'steps', name: 'Steps to reproduce', obligatory: false }
+		{ id: 1, key: 'description', name: 'Description', obligatory: true },
+		{ id: 2, key: 'steps', name: 'Steps to reproduce', obligatory: false }
 	]
 };
 
@@ -94,7 +94,7 @@ async function seedFixtures(
 	}
 	if (opts.includeIssues && opts.includeIssues > 0) {
 		for (let i = 1; i <= opts.includeIssues; i++) {
-			const md = await renderFixtureIssue(i, `Issue ${i}`);
+			const md = await renderFixtureIssue(String(i), `Issue ${i}`);
 			await fs.writeTextFile(`.quill.md/issues/${buildIssueFilename(String(i), `Issue ${i}`)}`, md);
 		}
 	}
@@ -168,7 +168,7 @@ describe('integration — create → save → re-read', () => {
 	it('persists a newly-created issue and surfaces it on reload', async () => {
 		// 1. Read the current issue set.
 		const before = await loadIssues(fs);
-		const nextId = nextIssueId(before.map((li) => li.issue));
+		const nextId = nextIssueId();
 
 		// 2. Compose a new issue from a template (task) + the loaded config.
 		const title = 'Add login screen';
@@ -230,7 +230,7 @@ describe('integration — create → save → re-read', () => {
 
 		const issues = await loadIssues(fs);
 		expect(issues).toHaveLength(3);
-		expect(issues.map((li) => li.issue.id)).toEqual([1, 2, 3]);
+		expect(issues.map((li) => li.issue.id)).toEqual(['1', '2', '3']);
 		expect(issues.map((li) => li.issue.fields.title)).toEqual(['Issue 1', 'Issue 2', 'Issue 3']);
 	});
 
@@ -288,7 +288,7 @@ describe('integration — delete (move-to-trash)', () => {
 		// The trashed content is still readable at its new path.
 		const trashContent = await fs.readTextFile(trashPath);
 		expect(trashContent.length).toBeGreaterThan(0);
-		expect(trashContent).toContain(`id: ${target.issue.id}`);
+		expect(trashContent).toContain(target.issue.id);
 	});
 
 	it('emptyTrash clears the trash directory without touching issues outside it', async () => {
@@ -301,7 +301,7 @@ describe('integration — delete (move-to-trash)', () => {
 		const kept = before[1]!;
 
 		await moveToTrash(fs, moved.sourcePath);
-		expect(await emptyTrash(fs)).toBe('1');
+		expect(await emptyTrash(fs)).toBe(1);
 
 		const after = await loadIssues(fs);
 		expect(after).toHaveLength(1);
@@ -398,7 +398,7 @@ describe('integration — round-trip via serialize → write → read → parse'
 		await seedFixtures(fs);
 
 		const original: Issue = {
-			id: 42,
+			id: '42',
 			fields: {
 				sprintId: null,
 				estimate: null,
@@ -411,8 +411,8 @@ describe('integration — round-trip via serialize → write → read → parse'
 				assignee: 'jane',
 				labels: ['security', 'frontend'],
 				relations: [
-					{ type: 'blocks', id: 45 },
-					{ type: 'relates_to', id: 7 }
+					{ type: 'blocks', id: '45' },
+					{ type: 'relates_to', id: '7' }
 				],
 				startDate: '2026-10-20',
 				endDate: '2026-10-25',
