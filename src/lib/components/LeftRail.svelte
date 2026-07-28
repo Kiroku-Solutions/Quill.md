@@ -55,7 +55,7 @@
 
 	function onViewChange(id: string): void {
 		if (id === 'list' || id === 'kanban' || id === 'gantt' || id === 'graph') {
-			stores.view.setView(id as any);
+			stores.view.setView(id as 'list' | 'kanban' | 'gantt' | 'graph' | 'backlog' | 'sprint');
 			closeMobileNav();
 		}
 	}

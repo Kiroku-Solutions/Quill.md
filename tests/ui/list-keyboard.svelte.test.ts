@@ -79,6 +79,8 @@ function buildStub(issues: readonly Issue[]): StoreGraph {
 	}));
 	return {
 		mode: {
+			isReadOnly: false,
+			lastActiveFolder: null,
 			mode: 'local',
 			activeHandle: null,
 			recentHandles: [],

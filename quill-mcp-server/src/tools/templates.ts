@@ -31,7 +31,7 @@ export async function createTemplate(templateJsonStr: string) {
 				} else if (t.color) {
 					usedColors.add(t.color.toLowerCase());
 				}
-			} catch (e) {
+			} catch {
 				// Ignore unparseable files
 			}
 		}
@@ -95,12 +95,15 @@ export async function createTemplate(templateJsonStr: string) {
 		];
 
 		for (const sysField of systemFields) {
-			if (!template.fields.some((f: any) => f.key === sysField.key)) {
+			if (!template.fields.some((f: Record<string, unknown>) => f.key === sysField.key)) {
 				template.fields.push(sysField);
 			}
 		}
 		// Re-sort to ensure negative ID fields appear at the top
-		template.fields.sort((a: any, b: any) => (a.id ?? 0) - (b.id ?? 0));
+		template.fields.sort(
+			(a: Record<string, unknown>, b: Record<string, unknown>) =>
+				(Number(a.id) || 0) - (Number(b.id) || 0)
+		);
 
 		const filename = `${template.id}.json`;
 
@@ -118,9 +121,10 @@ export async function createTemplate(templateJsonStr: string) {
 				}
 			]
 		};
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const msg = error instanceof Error ? error.message : String(error);
 		return {
-			content: [{ type: 'text' as const, text: `Error creating template: ${error.message}` }],
+			content: [{ type: 'text' as const, text: `Error creating template: ${msg}` }],
 			isError: true
 		};
 	}

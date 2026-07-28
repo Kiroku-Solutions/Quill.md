@@ -114,7 +114,7 @@ describe('createIssue — write + reparse round-trip', () => {
 
 		expect(typeof li.issue.id).toBe('string');
 		expect(li.issue.fields.title).toBe('New thing');
-		expect(li.sourcePath).toMatch(/\.quill\.md\/issues\/open\/[a-f0-9\-]+-new-thing\.md/);
+		expect(li.sourcePath).toMatch(/\.quill\.md\/issues\/open\/[a-f0-9-]+-new-thing\.md/);
 
 		// The file must exist on disk after the call.
 		const onDisk = await fs.readTextFile(li.sourcePath);

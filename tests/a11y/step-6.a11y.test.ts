@@ -197,6 +197,8 @@ function buildStub(opts: {
 			: null;
 	return {
 		mode: {
+			isReadOnly: false,
+			lastActiveFolder: null,
 			mode: opts.mode,
 			activeHandle:
 				opts.mode === 'local'

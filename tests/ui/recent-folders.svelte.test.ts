@@ -79,6 +79,8 @@ function makeHandle(id: string, name: string): HandleRecord {
 function buildStub(opts: { recentHandles: HandleRecord[] }): StoreGraph {
 	return {
 		mode: {
+			isReadOnly: false,
+			lastActiveFolder: null,
 			mode: 'home',
 			activeHandle: null,
 			recentHandles: opts.recentHandles,

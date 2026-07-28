@@ -8,3 +8,4 @@ export * from './template-loader.ts';
 export * from './issue-loader.ts';
 export * from './issue-saver.ts';
 export * from './issue-trash.ts';
+export * from './search.ts';

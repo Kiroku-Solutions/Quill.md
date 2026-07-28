@@ -281,7 +281,7 @@
 				{queueError.message}
 				{#if queueError.name === 'RemoteConflictError'}
 					<Button variant="secondary" size="sm" class="ml-2" onclick={refresh}
-						>Pull to refresh</Button
+						>{t('editToolbar.pullToRefresh')}</Button
 					>
 				{/if}
 			</Alert>

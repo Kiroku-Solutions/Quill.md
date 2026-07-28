@@ -48,6 +48,8 @@ const TARGETS = [join(ROOT, 'src', 'lib', 'components'), join(ROOT, 'src', 'rout
 
 const ALLOWED_ATTRIBUTES = new Set([
 	'class',
+	'for',
+	'mode',
 	'data-testid',
 	'data-record-id',
 	'data-card-id',

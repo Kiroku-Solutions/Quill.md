@@ -7,8 +7,6 @@
 	field is `readonly`; the writer is a follow-up.
 -->
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
 	import { getStores } from '$lib/state';
 	import { Button, Card, IconButton, Input, Tooltip } from '$lib/ui';
 	import { t } from '$lib/ui/strings';
@@ -251,7 +249,7 @@
 					</div>
 				</div>
 				<div class="mt-2 flex flex-col gap-2">
-					{#each stores.templates.templates as tmpl}
+					{#each stores.templates.templates as tmpl (tmpl.id)}
 						<Card compact class="flex items-center gap-3 px-3 py-2">
 							<span class="h-3 w-3 rounded-full" style="background-color: {tmpl.color}"></span>
 							<span class="text-sm font-medium">{tmpl.name}</span>

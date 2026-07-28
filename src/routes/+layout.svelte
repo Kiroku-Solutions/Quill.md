@@ -28,7 +28,6 @@
 	} from '$lib/state';
 	import { handleStore, LocalFsAdapter } from '$lib/adapters';
 	import type { WritableDirectoryAdapter } from '$lib/adapters/directory-adapter';
-	import { isFsaAvailable } from '$lib/adapters/feature-detect';
 
 	let { children } = $props();
 
@@ -118,7 +117,6 @@
 	// last folder handle from IndexedDB; `theme` reads localStorage.
 	// Both are no-ops on the server / in tests.
 	onMount(async () => {
-		if (!isFsaAvailable()) return;
 		// The no-flash theme class is set by the inline script in
 		// `app.html` before the first paint. The line below is a
 		// safety net for the rare case where the inline script
@@ -137,6 +135,10 @@
 			} else if (mode.remoteAdapter) {
 				await Promise.all([config.load(), templates.load()]);
 				await issues.load();
+
+				if (config.config === null && !$page.url.pathname.startsWith('/wizard')) {
+					await goto(resolve('/wizard'));
+				}
 			}
 		} catch (cause) {
 			console.error('[quill-md] bootstrap failed:', cause);

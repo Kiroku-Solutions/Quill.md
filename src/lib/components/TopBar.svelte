@@ -87,7 +87,6 @@
 	});
 
 	const indicatorText = $derived(folderName ?? repoLabel ?? null);
-	const productGoal = $derived(stores.config.config?.product_goal ?? null);
 
 	function toggleSettings(): void {
 		stores.ui.toggleSettings();
