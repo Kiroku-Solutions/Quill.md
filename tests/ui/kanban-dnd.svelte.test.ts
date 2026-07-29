@@ -119,6 +119,8 @@ function buildStub(issues: readonly Issue[], mode: 'local' | 'remote'): StoreGra
 	}
 	return {
 		mode: {
+			isReadOnly: false,
+			lastActiveFolder: null,
 			mode,
 			activeHandle: null,
 			recentHandles: [],

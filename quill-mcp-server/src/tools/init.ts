@@ -107,9 +107,10 @@ export async function initPreset(presetId: string) {
 				}
 			]
 		};
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const msg = error instanceof Error ? error.message : String(error);
 		return {
-			content: [{ type: 'text' as const, text: `Error initializing preset: ${error.message}` }],
+			content: [{ type: 'text' as const, text: `Error initializing preset: ${msg}` }],
 			isError: true
 		};
 	}

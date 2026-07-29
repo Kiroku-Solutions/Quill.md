@@ -30,7 +30,8 @@ export const en = {
 			`${params.n} validation ${params.n === 1 ? 'error' : 'errors'}`,
 		integrityReview: (params: Params) =>
 			`${params.n} integrity ${params.n === 1 ? 'warning' : 'warnings'}`,
-		fullscreen: 'Fullscreen'
+		fullscreen: 'Fullscreen',
+		colorLabel: (params: Params) => `Color ${params.color}`
 	},
 
 	app: {
@@ -106,6 +107,7 @@ export const en = {
 		remotePatPlaceholder: 'ghp_…',
 		remotePatHelp:
 			'Stored in memory only for the duration of the session — never on disk, never in URLs.',
+		remotePatOptional: 'Public repository detected. PAT is optional (read-only mode).',
 		fsaUnavailable:
 			'Your browser does not support the File System Access API. Use Chrome, Edge, Brave, Arc, Opera, or Vivaldi for Local Edit Mode.',
 
@@ -276,7 +278,8 @@ export const en = {
 			`Picked up item ${params.id}. Use arrow keys to move, Space or Enter to drop, Escape to cancel.`,
 		dropped: (params: Params) => `Dropped item ${params.id} in column ${params.col}`,
 		cancelled: (params: Params) => `Cancelled move of item ${params.id}.`,
-		activateHint: 'Press F2 to open the editor'
+		activateHint: 'Press F2 to open the editor',
+		sprintLabel: 'Sprint'
 	},
 
 	gantt: {
@@ -311,12 +314,21 @@ export const en = {
 		statusLabel: 'Status',
 		typeLabel: 'Type',
 		typePlaceholder: 'bug, task…',
-		clearButton: 'Clear'
+		clearButton: 'Clear',
+		sprintPlaceholder: 'e.g. Sprint-1',
+		viewLevel: 'View Level (Group By)',
+		flat: 'Flat',
+		groupBySprint: 'Group by Sprint',
+		groupByEpic: 'Group by Epic'
 	},
 
 	theme: {
 		switchToLight: 'Switch to light theme',
 		switchToDark: 'Switch to dark theme'
+	},
+
+	graph: {
+		toggle3d: 'Toggle 3D mode'
 	},
 
 	proxy: {
@@ -444,7 +456,14 @@ export const en = {
 		allowedTargetsHint: 'If none are checked, linking with any item will be allowed.',
 		allowedRelationTypes: 'Allowed Relation Types',
 		allowedRelationTypesHint:
-			'If none are checked, all types (Parent, Child, Blocks, etc.) will be allowed.'
+			'If none are checked, all types (Parent, Child, Blocks, etc.) will be allowed.',
+		namePlaceholder: 'e.g. Technical Requirement',
+		idPlaceholder: 'e.g. tech-requirement',
+		removeField: 'Remove field',
+		fieldPlaceholder: 'e.g. Priority',
+		optionsPlaceholder: 'High, Medium, Low',
+		sectionPlaceholder: 'Section name',
+		removeSection: 'Remove section'
 	}
 };
 

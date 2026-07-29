@@ -31,7 +31,7 @@
  * header shape (`Bearer` for fine-grained, `token` for classic).
  */
 
-import type { Octokit } from '@octokit/rest';
+import { Octokit } from '@octokit/rest';
 import { createOctokit, decodeBase64Content, mapGraphQLError, utf8ToBase64 } from './_octokit.ts';
 import {
 	RemoteBranchMissingError,
@@ -50,7 +50,6 @@ import type {
 	PutFileInput,
 	PutFileResult,
 	RemoteFile,
-	RemoteFileChange,
 	RepoProvider
 } from './types.ts';
 
@@ -446,61 +445,82 @@ export class GitHubProvider implements RepoProvider {
 		return { commitSha: data.commit.sha ?? '' };
 	}
 
+	async isPublic(parsed: ParsedRepo): Promise<boolean> {
+		// Create an unauthenticated client to check visibility
+		const octokit = createOctokit('', parsed.baseUrl);
+		try {
+			const { data } = await octokit.rest.repos.get({
+				owner: parsed.owner,
+				repo: parsed.repo
+			});
+			return data.private === false;
+		} catch {
+			return false;
+		}
+	}
+
 	async commitBatch(input: CommitBatchInput): Promise<CommitBatchResult> {
 		const octokit = this.#client(input.parsed, input.pat);
 		const { owner, repo } = input.parsed;
-		const date = new Date().toISOString();
+		const endpointUrl = `${input.parsed.baseUrl}/graphql`;
 
-		const { data: parent } = await octokit.rest.git.getCommit({
-			owner,
-			repo,
-			commit_sha: input.parentSha
-		});
-		const { data: tree } = await octokit.rest.git.createTree({
-			owner,
-			repo,
-			base_tree: parent.tree.sha,
-			tree: input.changes.map((c) => treeEntryFor(c))
-		});
-		const { data: commit } = await octokit.rest.git.createCommit({
-			owner,
-			repo,
-			message: input.message,
-			parents: [input.parentSha],
-			tree: tree.sha,
-			author: { name: input.author.name, email: input.author.email, date },
-			committer: { name: input.author.name, email: input.author.email, date }
-		});
-		await octokit.rest.git.updateRef({
-			owner,
-			repo,
-			ref: `heads/${input.branch}`,
-			sha: commit.sha,
-			force: false
-		});
+		const additions = [];
+		const deletions = [];
 
-		const perFileShas: Record<string, string> = {};
 		for (const c of input.changes) {
-			if (c.action === 'upsert') perFileShas[c.path] = '';
+			if (c.action === 'upsert') {
+				additions.push({
+					path: c.path,
+					contents: utf8ToBase64(c.content)
+				});
+			} else if (c.action === 'delete') {
+				deletions.push({
+					path: c.path
+				});
+			}
 		}
-		return { commitSha: commit.sha, perFileShas };
-	}
-}
 
-function treeEntryFor(c: RemoteFileChange): {
-	path: string;
-	mode: '100644';
-	type: 'blob';
-	content?: string;
-	sha?: null;
-} {
-	if (c.action === 'delete') {
-		return { path: c.path, mode: '100644', type: 'blob', sha: null };
+		const mutation = /* GraphQL */ `
+			mutation CreateCommitOnBranch($input: CreateCommitOnBranchInput!) {
+				createCommitOnBranch(input: $input) {
+					commit {
+						oid
+					}
+				}
+			}
+		`;
+
+		try {
+			const response = await octokit.graphql<{ createCommitOnBranch: { commit: { oid: string } } }>(
+				mutation,
+				{
+					input: {
+						branch: {
+							repositoryNameWithOwner: `${owner}/${repo}`,
+							branchName: input.branch
+						},
+						message: {
+							headline: input.message
+						},
+						expectedHeadOid: input.parentSha,
+						fileChanges: {
+							additions,
+							deletions
+						}
+					}
+				}
+			);
+
+			const commitSha = response.createCommitOnBranch.commit.oid;
+
+			const perFileShas: Record<string, string> = {};
+			for (const c of input.changes) {
+				if (c.action === 'upsert') perFileShas[c.path] = ''; // Shas will be re-fetched on next fetchSince
+			}
+
+			return { commitSha, perFileShas };
+		} catch (err) {
+			throw mapGraphQLError(err, endpointUrl);
+		}
 	}
-	return {
-		path: c.path,
-		mode: '100644',
-		type: 'blob',
-		content: c.content
-	};
 }

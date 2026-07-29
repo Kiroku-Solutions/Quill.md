@@ -623,6 +623,7 @@ export function createIssuesStore(
 		// is the function's return value, not stored state. SvelteMap
 		// would unnecessarily wrap it in a proxy for a value that is
 		// never mutated after construction.
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const map = new Map<string, LoadedIssue>();
 		for (const li of issues) map.set(li.issue.id as string, li);
 		return map;

@@ -3,14 +3,16 @@
 	import { Button, Card } from '$lib/ui';
 	import IconPicker from './IconPicker.svelte';
 	import ColorPicker from './ColorPicker.svelte';
-	import type { Template, TemplateField, TemplateSection, FieldType } from '$lib/types/index';
+	import type { Template, TemplateField, TemplateSection } from '$lib/types/index';
 	import { FIELD_TYPES, RELATION_TYPES } from '$lib/types/index';
 	import * as Icons from '@lucide/svelte';
-	import { slide, fade } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
 	import { getStores } from '$lib/state';
 
 	const stores = getStores();
 	const availableTemplates = $derived(stores.templates.templates);
+
+	import { untrack } from 'svelte';
 
 	let { initialTemplate, onsave, oncancel } = $props<{
 		initialTemplate?: Template;
@@ -19,23 +21,27 @@
 	}>();
 
 	// Local state
-	let name = $state(initialTemplate?.name || '');
-	let id = $state(initialTemplate?.id || '');
-	let icon = $state(initialTemplate?.icon || 'file-text');
-	let color = $state(initialTemplate?.color || '#0ea5e9');
-	let default_status = $state(initialTemplate?.default_status || 'open');
+	let name = $state(untrack(() => initialTemplate?.name || ''));
+	let id = $state(untrack(() => initialTemplate?.id || ''));
+	let icon = $state(untrack(() => initialTemplate?.icon || 'file-text'));
+	let color = $state(untrack(() => initialTemplate?.color || '#0ea5e9'));
+	let default_status = $state(untrack(() => initialTemplate?.default_status || 'open'));
 
 	let fields = $state<TemplateField[]>(
-		initialTemplate?.fields ? JSON.parse(JSON.stringify(initialTemplate.fields)) : []
+		untrack(() =>
+			initialTemplate?.fields ? JSON.parse(JSON.stringify(initialTemplate.fields)) : []
+		)
 	);
 	let sections = $state<TemplateSection[]>(
-		initialTemplate?.sections
-			? JSON.parse(JSON.stringify(initialTemplate.sections))
-			: [{ id: 1, key: 'description', name: 'Description', obligatory: true, default: '' }]
+		untrack(() =>
+			initialTemplate?.sections
+				? JSON.parse(JSON.stringify(initialTemplate.sections))
+				: [{ id: 1, key: 'description', name: 'Description', obligatory: true, default: '' }]
+		)
 	);
 
 	// Keep ID in sync with Name until user touches it
-	let idTouched = $state(!!initialTemplate);
+	let idTouched = $state(untrack(() => !!initialTemplate));
 
 	let showTypeHelp = $state(false);
 	let showBasicHelp = $state(false);
@@ -226,7 +232,8 @@
 	}
 
 	const PreviewIcon = $derived(
-		(Icons as Record<string, any>)[kebabToPascal(icon)] || Icons.FileText
+		(Icons as unknown as Record<string, typeof Icons.FileText>)[kebabToPascal(icon)] ||
+			Icons.FileText
 	);
 	const canSave = $derived(name.trim().length > 0 && id.trim().length > 0);
 </script>
@@ -322,7 +329,7 @@
 						value={name}
 						oninput={handleNameInput}
 						class="border-input focus-visible:ring-ring flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-						placeholder="Ej. Requerimiento Técnico"
+						placeholder={t('templateEditor.namePlaceholder')}
 					/>
 				</div>
 
@@ -334,7 +341,7 @@
 						value={id}
 						oninput={handleIdInput}
 						class="border-input focus-visible:ring-ring flex h-10 w-full rounded-md border bg-muted/50 px-3 py-2 font-mono text-sm text-muted-foreground ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-						placeholder="ej. requerimiento-tecnico"
+						placeholder={t('templateEditor.idPlaceholder')}
 					/>
 					<span class="text-xs text-muted-foreground">{t('templateEditor.idHint')}</span>
 				</div>
@@ -410,7 +417,7 @@
 							<button
 								class="hover:text-destructive absolute top-3 right-3 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
 								onclick={() => removeField(index)}
-								aria-label="Remove field"
+								aria-label={t('templateEditor.removeField')}
 								title={t('common.delete')}
 							>
 								<Icons.Trash2 size={18} />
@@ -426,7 +433,7 @@
 										type="text"
 										bind:value={field.name}
 										class="border-input focus-visible:ring-ring flex h-9 w-full rounded-md border bg-background px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
-										placeholder="Ej. Prioridad"
+										placeholder={t('templateEditor.fieldPlaceholder')}
 									/>
 								</div>
 								<div class="flex flex-col gap-1.5">
@@ -451,7 +458,7 @@
 										bind:value={field.type}
 										class="border-input focus-visible:ring-ring flex h-9 w-full rounded-md border bg-background px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
 									>
-										{#each FIELD_TYPES as ft}
+										{#each FIELD_TYPES as ft (ft)}
 											<option value={ft}>{t(`templateEditor.types.${ft}`)}</option>
 										{/each}
 									</select>
@@ -506,7 +513,7 @@
 										value={(field.options || []).join(', ')}
 										oninput={(e) => handleFieldOptionsChange(e, index)}
 										class="border-input focus-visible:ring-ring flex h-9 w-full rounded-md border bg-background px-3 py-1 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
-										placeholder="Alta, Media, Baja"
+										placeholder={t('templateEditor.optionsPlaceholder')}
 									/>
 									<span class="text-[10px] text-muted-foreground"
 										>{t('templateEditor.optionsHint')}</span
@@ -514,7 +521,7 @@
 
 									{#if field.options && field.options.length > 0}
 										<div class="mt-2 flex flex-wrap gap-1">
-											{#each field.options as opt}
+											{#each field.options as opt (opt)}
 												<span
 													class="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
 												>
@@ -579,7 +586,7 @@
 																>{t('templateEditor.allowedRelationTypes')}</span
 															>
 															<div class="mt-1 flex flex-wrap gap-2">
-																{#each RELATION_TYPES as rType}
+																{#each RELATION_TYPES as rType (rType)}
 																	{@const checked =
 																		field.allowed_targets?.[tmpl.id]?.includes(rType) ?? false}
 																	<label
@@ -664,7 +671,7 @@
 									type="text"
 									bind:value={section.name}
 									class="focus:ring-ring flex h-9 w-full rounded-md border-0 bg-transparent px-2 py-1 text-sm font-semibold hover:bg-muted/50 focus:bg-background focus:ring-1"
-									placeholder="Nombre de la sección"
+									placeholder={t('templateEditor.sectionPlaceholder')}
 								/>
 							</div>
 
@@ -680,7 +687,7 @@
 								<button
 									class="hover:text-destructive hover:bg-destructive/10 rounded-md p-2 text-muted-foreground transition-colors"
 									onclick={() => removeSection(index)}
-									aria-label="Remove section"
+									aria-label={t('templateEditor.removeSection')}
 									title={t('common.delete')}
 								>
 									<Icons.Trash2 size={16} />

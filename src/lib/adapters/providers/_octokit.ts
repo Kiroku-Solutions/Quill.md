@@ -90,18 +90,18 @@ export function createOctokit(rawPat: string, baseUrl?: string): Octokit {
 			return true;
 		}
 	};
-	const octokit = new ConfiguredOctokit({
-		auth: pat,
+	const config: Record<string, unknown> = {
 		userAgent: USER_AGENT,
 		baseUrl: baseUrl ?? DEFAULT_BASE_URL,
 		throttle,
 		retry: {
 			retries: 3,
-			// 409 / 412 are optimistic-concurrency signals (RemoteCommitRejectedError),
-			// not transient errors. 422 is a validation failure.
 			doNotRetry: [400, 401, 403, 404, 409, 410, 412, 422, 451]
 		}
-	});
+	};
+	if (pat) config.auth = pat;
+
+	const octokit = new ConfiguredOctokit(config);
 	octokit.hook.error('request', (error) => {
 		throw mapRequestError(error);
 	});

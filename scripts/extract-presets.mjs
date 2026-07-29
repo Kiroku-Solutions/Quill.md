@@ -10,7 +10,6 @@ const lines = content.split('\n');
 const frameworks = [];
 let currentFramework = null;
 let currentTemplate = null;
-let currentJson = [];
 let parsingMode = null; // 'config' | 'template' | null
 
 for (let i = 0; i < lines.length; i++) {
@@ -60,7 +59,7 @@ for (let i = 0; i < lines.length; i++) {
 
 	// Read JSON blocks
 	if (line.startsWith('```json')) {
-		currentJson = [];
+		let currentJson = [];
 		let j = i + 1;
 		while (j < lines.length && !lines[j].startsWith('```')) {
 			currentJson.push(lines[j]);

@@ -18,7 +18,6 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { MemoryFsAdapter } from '$lib/adapters/memory-fs';
 import { writeWizardSetup } from '$lib/services/wizard';
 import { FRAMEWORK_PRESETS } from '$lib/services/framework-presets';
-import { defaultConfig } from '$lib/services/built-in-templates';
 
 const mockTemplates = FRAMEWORK_PRESETS[0].templates;
 const mockConfig = FRAMEWORK_PRESETS[0].config;
@@ -98,7 +97,7 @@ describe('writeWizardSetup — overwrite flags', () => {
 
 	it('skips an existing template when overwriteTemplates is false (default)', async () => {
 		const original = mockTemplates[0];
-		const tampered = { ...original, custom: 'preserved' } as any;
+		const tampered = { ...original, custom: 'preserved' } as Record<string, unknown>;
 		await fs.writeTextFile(
 			`.quill.md/templates/${original.id}.json`,
 			JSON.stringify(tampered, null, '\t') + '\n'
@@ -113,7 +112,7 @@ describe('writeWizardSetup — overwrite flags', () => {
 
 	it('overwrites an existing template when overwriteTemplates is true', async () => {
 		const original = mockTemplates[0];
-		const tampered = { ...original, custom: 'will-be-replaced' } as any;
+		const tampered = { ...original, custom: 'will-be-replaced' } as Record<string, unknown>;
 		await fs.writeTextFile(
 			`.quill.md/templates/${original.id}.json`,
 			JSON.stringify(tampered, null, '\t') + '\n'

@@ -92,6 +92,8 @@ function buildStub(opts: { integrityCount: number; activeHandleName?: string }):
 
 	return {
 		mode: {
+			isReadOnly: false,
+			lastActiveFolder: null,
 			mode: 'home',
 			activeHandle:
 				opts.activeHandleName !== undefined

@@ -134,7 +134,7 @@
 	function changeRelationType(id: string, newType: string): void {
 		if (!issue) return;
 		const next = issue.fields.relations.map((r) =>
-			r.id === id ? { ...r, type: newType as any } : r
+			r.id === id ? { ...r, type: newType as Relation['type'] } : r
 		);
 		editor.patchField('relations', next);
 	}
@@ -152,7 +152,7 @@
 		if (!issue || !newRelationId) return;
 		const id = newRelationId;
 		if (issue.fields.relations.some((r) => r.id === id)) return;
-		const next = [...issue.fields.relations, { type: newRelationType as any, id }];
+		const next = [...issue.fields.relations, { type: newRelationType as Relation['type'], id }];
 		editor.patchField('relations', next);
 		newRelationId = '';
 		newRelationType = 'relates_to';
@@ -444,7 +444,7 @@
 										value={rel.type}
 										onchange={(e) => changeRelationType(rel.id, e.currentTarget.value)}
 									>
-										{#each allowedRelTypes as rType}
+										{#each allowedRelTypes as rType (rType)}
 											<option value={rType}>{t(`formFields.relationTypes.${rType}`)}</option>
 										{/each}
 									</select>
@@ -482,7 +482,7 @@
 									bind:value={newRelationId}
 								>
 									<option value="">{t('formFields.selectPlaceholder')}</option>
-									{#each relationOptions(field) as opt}
+									{#each relationOptions(field) as opt (opt.id)}
 										<option value={opt.id}>{opt.name}</option>
 									{/each}
 								</select>
@@ -514,7 +514,7 @@
 										class="w-full appearance-none rounded border border-border bg-background py-1.5 pr-8 pl-2 text-xs text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 										bind:value={newRelationType}
 									>
-										{#each allowedRelTypesForNew as rType}
+										{#each allowedRelTypesForNew as rType (rType)}
 											<option value={rType}>{t(`formFields.relationTypes.${rType}`)}</option>
 										{/each}
 									</select>

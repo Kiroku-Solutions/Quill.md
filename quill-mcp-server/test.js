@@ -1,4 +1,4 @@
-import { createIssue, listIssues, readIssue } from './dist/tools/issues.js';
+import { createIssue, listIssues } from './dist/tools/issues.js';
 
 async function test() {
 	process.argv[2] = '../'; // point to the root AgnosticIssuer folder which has .quill.md

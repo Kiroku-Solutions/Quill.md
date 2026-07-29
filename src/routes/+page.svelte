@@ -21,6 +21,7 @@
 	import { t } from '$lib/ui/strings';
 	import { isFsaAvailable } from '$lib/adapters/feature-detect';
 	import { LocalFsAdapter } from '$lib/adapters';
+	import { detectProvider } from '$lib/adapters/providers/detect';
 	import { getStores } from '$lib/state';
 	import HowItWorksStrip from '$lib/components/HowItWorksStrip.svelte';
 	import RecentFoldersList from '$lib/components/RecentFoldersList.svelte';
@@ -30,14 +31,40 @@
 
 	let pat = $state('');
 	let repoUrl = $state('');
-	let repoBranch = $state('main');
+	let repoBranch = $state('quill.md');
 	let openError = $state<string | null>(null);
 	let remoteError = $state<string | null>(null);
 	let localLoading = $state(false);
 	let remoteLoading = $state(false);
+	let isPublicRepo = $state<boolean | null>(null);
 
 	const fsaSupported = $derived(isFsaAvailable());
 	const recentCount = $derived(stores.mode.recentHandles.length);
+
+	$effect(() => {
+		const url = repoUrl.trim();
+		if (!url) {
+			isPublicRepo = null;
+			return;
+		}
+
+		const check = async () => {
+			try {
+				const parsedUrl = new URL(url);
+				const provider = detectProvider(parsedUrl);
+				if (provider?.isPublic) {
+					const parsed = provider.parseUrl(parsedUrl);
+					isPublicRepo = await provider.isPublic(parsed);
+				} else {
+					isPublicRepo = null;
+				}
+			} catch {
+				isPublicRepo = null;
+			}
+		};
+		const timer = setTimeout(check, 500);
+		return () => clearTimeout(timer);
+	});
 
 	async function openLocalFolder(): Promise<void> {
 		openError = null;
@@ -176,7 +203,13 @@
 					/>
 					<p class="flex items-start gap-1 text-xs opacity-60">
 						<Lock class="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
-						<span>{t('home.remotePatHelp')}</span>
+						<span>
+							{#if isPublicRepo === true}
+								{t('home.remotePatOptional')}
+							{:else}
+								{t('home.remotePatHelp')}
+							{/if}
+						</span>
 					</p>
 				</div>
 				{#if remoteError}

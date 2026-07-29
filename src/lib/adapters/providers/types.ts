@@ -175,4 +175,7 @@ export interface RepoProvider {
 
 	/** Batched multi-file commit. */
 	commitBatch(input: CommitBatchInput): Promise<CommitBatchResult>;
+
+	/** Optional: Check if a repository is public without a PAT. */
+	isPublic?(parsed: ParsedRepo): Promise<boolean>;
 }

@@ -32,7 +32,7 @@
 <div class="flex flex-col gap-2">
 	<span class="text-sm font-medium">{t('templateEditor.color')}</span>
 	<div class="flex flex-wrap gap-2 rounded-lg border border-border bg-surface/50 p-3">
-		{#each PRESET_COLORS as color}
+		{#each PRESET_COLORS as color (color)}
 			{@const isSelected = value === color}
 			<button
 				type="button"
@@ -42,7 +42,7 @@
 					: 'hover:scale-110'}"
 				style="background-color: {color}"
 				onclick={() => selectColor(color)}
-				aria-label="Color {color}"
+				aria-label={t('common.colorLabel', { color })}
 			>
 				{#if isSelected}
 					<span class="absolute inset-0 flex items-center justify-center text-white drop-shadow-md">
