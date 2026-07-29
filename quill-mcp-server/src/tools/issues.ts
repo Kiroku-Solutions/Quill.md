@@ -1,16 +1,23 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { existsSync } from 'node:fs';
 import yaml from 'js-yaml';
 import crypto from 'node:crypto';
 import { serializeIssue, buildIssueFilename, Issue } from '../services/serializer.js';
 
-function getIssuesDir() {
-	const dir = process.argv[2] || process.cwd();
-	return path.join(dir, '.quill.md', 'issues');
+function resolveProjectDir(projectDir?: string): string {
+	if (projectDir) return projectDir;
+	const argDir = process.argv[2];
+	if (argDir && existsSync(path.join(argDir, '.quill.md'))) return argDir;
+	return process.cwd();
 }
 
-export async function listIssues() {
-	const issuesDir = getIssuesDir();
+function getIssuesDir(projectDir?: string) {
+	return path.join(resolveProjectDir(projectDir), '.quill.md', 'issues');
+}
+
+export async function listIssues(projectDir?: string) {
+	const issuesDir = getIssuesDir(projectDir);
 	try {
 		const issues = [];
 		const dirs = [issuesDir, path.join(issuesDir, 'open'), path.join(issuesDir, 'closed')];
@@ -53,8 +60,8 @@ export async function listIssues() {
 	}
 }
 
-export async function readIssue(issueId: string) {
-	const issuesDir = getIssuesDir();
+export async function readIssue(issueId: string, projectDir?: string) {
+	const issuesDir = getIssuesDir(projectDir);
 	try {
 		const dirs = [issuesDir, path.join(issuesDir, 'open'), path.join(issuesDir, 'closed')];
 		let foundContent: string | null = null;
@@ -95,12 +102,13 @@ export async function createIssue(
 	status: string,
 	sections: Record<string, string>,
 	relations?: Array<{ type: string; id: string }>,
-	customFields?: Record<string, unknown>
+	customFields?: Record<string, unknown>,
+	projectDir?: string
 ) {
-	const issuesDir = getIssuesDir();
+	const issuesDir = getIssuesDir(projectDir);
 	try {
 		// --- STRICT VALIDATION ---
-		const dir = process.argv[2] || process.cwd();
+		const dir = resolveProjectDir(projectDir);
 		const templatePath = path.join(dir, '.quill.md', 'templates', `${issueType}.json`);
 
 		let template: Record<string, unknown>;
@@ -157,10 +165,45 @@ export async function createIssue(
 
 		const newId = crypto.randomUUID();
 
-		const issueSections = Object.entries(sections).map(([name, markdown]) => ({
-			name,
-			markdown
-		}));
+		const issueSections = Object.entries(sections).map(([key, markdown]) => {
+			let tplSecName = key;
+			if (template.sections && Array.isArray(template.sections)) {
+				const tplSec = template.sections.find((s: Record<string, unknown>) => s.key === key);
+				if (tplSec && typeof tplSec.name === 'string') {
+					tplSecName = tplSec.name;
+				}
+			}
+			return {
+				name: tplSecName,
+				markdown
+			};
+		});
+
+		if (customFields) {
+			const systemKeys = new Set([
+				'id',
+				'title',
+				'author',
+				'creation_date',
+				'updated_date',
+				'issue_type',
+				'status',
+				'assignee',
+				'labels',
+				'relations',
+				'start_date',
+				'end_date',
+				'duration',
+				'sprint_id',
+				'estimate',
+				'integrity_hash'
+			]);
+			for (const k of Object.keys(customFields)) {
+				if (systemKeys.has(k)) {
+					delete customFields[k];
+				}
+			}
+		}
 
 		const issue: Issue = {
 			id: newId,
