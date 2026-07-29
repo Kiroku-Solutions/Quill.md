@@ -1,11 +1,19 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-function getTemplatesDir() {
-    const dir = process.argv[2] || process.cwd();
-    return path.join(dir, '.quill.md', 'templates');
+import { existsSync } from 'node:fs';
+function resolveProjectDir(projectDir) {
+    if (projectDir)
+        return projectDir;
+    const argDir = process.argv[2];
+    if (argDir && existsSync(path.join(argDir, '.quill.md')))
+        return argDir;
+    return process.cwd();
 }
-export async function createTemplate(templateJsonStr) {
-    const templatesDir = getTemplatesDir();
+function getTemplatesDir(projectDir) {
+    return path.join(resolveProjectDir(projectDir), '.quill.md', 'templates');
+}
+export async function createTemplate(templateJsonStr, projectDir) {
+    const templatesDir = getTemplatesDir(projectDir);
     try {
         const template = JSON.parse(templateJsonStr);
         if (!template.id || !template.name) {
@@ -74,7 +82,14 @@ export async function createTemplate(templateJsonStr) {
                 obligatory: true,
                 options_source: 'config.statuses'
             },
-            { id: -3, key: 'assignee', name: 'Assignee', type: 'user', obligatory: false },
+            {
+                id: -3,
+                key: 'assignee',
+                name: 'Assignee',
+                type: 'select',
+                obligatory: false,
+                options_source: 'config.users'
+            },
             {
                 id: -2,
                 key: 'labels',
@@ -85,6 +100,17 @@ export async function createTemplate(templateJsonStr) {
             },
             { id: -1, key: 'relations', name: 'Relations', type: 'relations', obligatory: false }
         ];
+        const validTypes = new Set(['text', 'longtext', 'number', 'boolean', 'select', 'multi-select', 'date', 'datetime', 'relation', 'relations']);
+        if (template.fields) {
+            for (const f of template.fields) {
+                if (!validTypes.has(f.type)) {
+                    throw new Error(`Strict Validation Failed: Field '${f.key}' uses an invalid type '${f.type}'. Valid types are: ${Array.from(validTypes).join(', ')}`);
+                }
+                if ((f.type === 'select' || f.type === 'multi-select') && !Array.isArray(f.options) && typeof f.options_source !== 'string') {
+                    throw new Error(`Strict Validation Failed: Field '${f.key}' of type '${f.type}' must have 'options' array or 'options_source' string`);
+                }
+            }
+        }
         for (const sysField of systemFields) {
             if (!template.fields.some((f) => f.key === sysField.key)) {
                 template.fields.push(sysField);

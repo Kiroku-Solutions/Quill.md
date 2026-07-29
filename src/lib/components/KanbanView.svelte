@@ -164,7 +164,12 @@
 					}
 				}
 				if (f.type && li.issue.fields.issueType !== f.type) return false;
-				if (f.sprintId && li.issue.fields.sprintId !== f.sprintId) return false;
+				if (f.sprintId) {
+					const inSprint =
+						li.issue.fields.sprintId === f.sprintId ||
+						li.issue.fields.relations.some((r) => r.id === f.sprintId);
+					if (!inSprint) return false;
+				}
 				return true;
 			});
 		});

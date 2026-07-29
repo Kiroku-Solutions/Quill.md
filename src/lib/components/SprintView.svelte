@@ -36,7 +36,9 @@
 	const sprintStories = $derived.by(() => {
 		if (!selectedSprint) return [];
 		return allStories.filter((story) => {
-			const linksToSprint = story.fields.relations.some((r) => r.id === selectedSprint.id);
+			const linksToSprint =
+				story.fields.relations.some((r) => r.id === selectedSprint.id) ||
+				story.fields.sprintId === selectedSprint.id;
 			const sprintLinksToStory = selectedSprint.fields.relations.some((r) => r.id === story.id);
 			return linksToSprint || sprintLinksToStory;
 		});
@@ -57,7 +59,9 @@
 		allStories.filter((story) => {
 			if (!hasEpicParent(story)) return false;
 			return !sprints.some((sprint) => {
-				const linksToSprint = story.fields.relations.some((r) => r.id === sprint.id);
+				const linksToSprint =
+					story.fields.relations.some((r) => r.id === sprint.id) ||
+					story.fields.sprintId === sprint.id;
 				const sprintLinksToStory = sprint.fields.relations.some((r) => r.id === story.id);
 				return linksToSprint || sprintLinksToStory;
 			});
@@ -69,7 +73,9 @@
 		allStories.filter((story) => {
 			if (hasEpicParent(story)) return false;
 			return !sprints.some((sprint) => {
-				const linksToSprint = story.fields.relations.some((r) => r.id === sprint.id);
+				const linksToSprint =
+					story.fields.relations.some((r) => r.id === sprint.id) ||
+					story.fields.sprintId === sprint.id;
 				const sprintLinksToStory = sprint.fields.relations.some((r) => r.id === story.id);
 				return linksToSprint || sprintLinksToStory;
 			});
@@ -79,7 +85,9 @@
 	// Metrics for each Sprint (helper)
 	function getSprintMetrics(sprint: Issue) {
 		const related = allStories.filter((story) => {
-			const linksToSprint = story.fields.relations.some((r) => r.id === sprint.id);
+			const linksToSprint =
+				story.fields.relations.some((r) => r.id === sprint.id) ||
+				story.fields.sprintId === sprint.id;
 			const sprintLinksToStory = sprint.fields.relations.some((r) => r.id === story.id);
 			return linksToSprint || sprintLinksToStory;
 		});

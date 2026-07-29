@@ -1,14 +1,22 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { existsSync } from 'node:fs';
 import yaml from 'js-yaml';
 import crypto from 'node:crypto';
 import { serializeIssue, buildIssueFilename } from '../services/serializer.js';
-function getIssuesDir() {
-    const dir = process.argv[2] || process.cwd();
-    return path.join(dir, '.quill.md', 'issues');
+function resolveProjectDir(projectDir) {
+    if (projectDir)
+        return projectDir;
+    const argDir = process.argv[2];
+    if (argDir && existsSync(path.join(argDir, '.quill.md')))
+        return argDir;
+    return process.cwd();
 }
-export async function listIssues() {
-    const issuesDir = getIssuesDir();
+function getIssuesDir(projectDir) {
+    return path.join(resolveProjectDir(projectDir), '.quill.md', 'issues');
+}
+export async function listIssues(projectDir) {
+    const issuesDir = getIssuesDir(projectDir);
     try {
         const issues = [];
         const dirs = [issuesDir, path.join(issuesDir, 'open'), path.join(issuesDir, 'closed')];
@@ -54,8 +62,8 @@ export async function listIssues() {
         };
     }
 }
-export async function readIssue(issueId) {
-    const issuesDir = getIssuesDir();
+export async function readIssue(issueId, projectDir) {
+    const issuesDir = getIssuesDir(projectDir);
     try {
         const dirs = [issuesDir, path.join(issuesDir, 'open'), path.join(issuesDir, 'closed')];
         let foundContent = null;
@@ -91,11 +99,11 @@ export async function readIssue(issueId) {
         };
     }
 }
-export async function createIssue(title, issueType, status, sections, relations, customFields) {
-    const issuesDir = getIssuesDir();
+export async function createIssue(title, issueType, status, sections, relations, customFields, projectDir) {
+    const issuesDir = getIssuesDir(projectDir);
     try {
         // --- STRICT VALIDATION ---
-        const dir = process.argv[2] || process.cwd();
+        const dir = resolveProjectDir(projectDir);
         const templatePath = path.join(dir, '.quill.md', 'templates', `${issueType}.json`);
         let template;
         try {
@@ -150,9 +158,22 @@ export async function createIssue(title, issueType, status, sections, relations,
         });
         if (customFields) {
             const systemKeys = new Set([
-                'id', 'title', 'author', 'creation_date', 'updated_date',
-                'issue_type', 'status', 'assignee', 'labels', 'relations',
-                'start_date', 'end_date', 'duration', 'sprint_id', 'estimate', 'integrity_hash'
+                'id',
+                'title',
+                'author',
+                'creation_date',
+                'updated_date',
+                'issue_type',
+                'status',
+                'assignee',
+                'labels',
+                'relations',
+                'start_date',
+                'end_date',
+                'duration',
+                'sprint_id',
+                'estimate',
+                'integrity_hash'
             ]);
             for (const k of Object.keys(customFields)) {
                 if (systemKeys.has(k)) {
