@@ -157,10 +157,45 @@ export async function createIssue(
 
 		const newId = crypto.randomUUID();
 
-		const issueSections = Object.entries(sections).map(([name, markdown]) => ({
-			name,
-			markdown
-		}));
+		const issueSections = Object.entries(sections).map(([key, markdown]) => {
+			let tplSecName = key;
+			if (template.sections && Array.isArray(template.sections)) {
+				const tplSec = template.sections.find((s: Record<string, unknown>) => s.key === key);
+				if (tplSec && typeof tplSec.name === 'string') {
+					tplSecName = tplSec.name;
+				}
+			}
+			return {
+				name: tplSecName,
+				markdown
+			};
+		});
+
+		if (customFields) {
+			const systemKeys = new Set([
+				'id',
+				'title',
+				'author',
+				'creation_date',
+				'updated_date',
+				'issue_type',
+				'status',
+				'assignee',
+				'labels',
+				'relations',
+				'start_date',
+				'end_date',
+				'duration',
+				'sprint_id',
+				'estimate',
+				'integrity_hash'
+			]);
+			for (const k of Object.keys(customFields)) {
+				if (systemKeys.has(k)) {
+					delete customFields[k];
+				}
+			}
+		}
 
 		const issue: Issue = {
 			id: newId,
