@@ -19,4 +19,5 @@
 # fallback status (200, not 404, keeps the URL stable so the
 # client router gets the path it expects).
 
+/_app/immutable/*   /_app/immutable/:splat   404
 /*    /index.html   200
