@@ -77,7 +77,8 @@
 # Cross-Origin-Resource-Policy: same-origin — refuse to be
 # embedded as a subresource by cross-origin pages.
 
-/
+/*
+	Cache-Control: no-cache, no-store, must-revalidate
 	Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
 	X-Content-Type-Options: nosniff
 	Referrer-Policy: no-referrer
@@ -85,7 +86,7 @@
 	Cross-Origin-Opener-Policy: same-origin
 	Cross-Origin-Embedder-Policy: require-corp
 	Cross-Origin-Resource-Policy: same-origin
-	Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'nonce-__CSP_NONCE__'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://api.github.com https://gitlab.com https://*.githubusercontent.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';
+	Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'nonce-__CSP_NONCE__' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://api.github.com https://gitlab.com https://*.githubusercontent.com https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none';
 
 /_app/immutable/*
 	Cache-Control: public, max-age=31536000, immutable
