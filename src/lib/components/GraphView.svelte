@@ -56,9 +56,17 @@
 					const target = issues.byId.get(rel.id);
 					if (target) filteredSet.add(target);
 				}
+				if (li.issue.fields.sprintId) {
+					const target = issues.byId.get(li.issue.fields.sprintId);
+					if (target) filteredSet.add(target);
+				}
 			}
 			for (const li of allIssues) {
-				if (li.issue.fields.relations.some((r) => matchedIssues.some((m) => m.issue.id === r.id))) {
+				if (
+					li.issue.fields.relations.some((r) => matchedIssues.some((m) => m.issue.id === r.id)) ||
+					(li.issue.fields.sprintId &&
+						matchedIssues.some((m) => m.issue.id === li.issue.fields.sprintId))
+				) {
 					filteredSet.add(li);
 				}
 			}
@@ -118,6 +126,12 @@
 				const targetId = String(rel.id);
 				if (validNodeIds.has(targetId)) {
 					links.push({ source: String(issue.id), target: targetId, name: rel.type });
+				}
+			}
+			if (issue.fields.sprintId) {
+				const targetId = String(issue.fields.sprintId);
+				if (validNodeIds.has(targetId) && !issue.fields.relations.some((r) => r.id === targetId)) {
+					links.push({ source: String(issue.id), target: targetId, name: 'relates_to' });
 				}
 			}
 		}
