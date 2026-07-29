@@ -1,13 +1,13 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-function getQuillDir() {
-	const dir = process.argv[2] || process.cwd();
+function getQuillDir(projectDir?: string) {
+	const dir = projectDir || process.argv[2] || process.cwd();
 	return path.join(dir, '.quill.md');
 }
 
-export async function initPreset(presetId: string) {
-	const quillDir = getQuillDir();
+export async function initPreset(presetId: string, projectDir?: string) {
+	const quillDir = getQuillDir(projectDir);
 	const templatesDir = path.join(quillDir, 'templates');
 	const issuesDir = path.join(quillDir, 'issues');
 

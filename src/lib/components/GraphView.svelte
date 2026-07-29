@@ -28,6 +28,12 @@
 			const f = filter.filter;
 			if (f.status && li.issue.fields.status !== f.status) return false;
 			if (f.type && li.issue.fields.issueType !== f.type) return false;
+			if (f.sprintId) {
+				const inSprint =
+					li.issue.fields.sprintId === f.sprintId ||
+					li.issue.fields.relations.some((r) => r.id === f.sprintId);
+				if (!inSprint) return false;
+			}
 			if (f.q) {
 				const needle = f.q.toLowerCase();
 				if (
