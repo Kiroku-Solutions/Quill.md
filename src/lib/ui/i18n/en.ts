@@ -111,8 +111,10 @@ export const en = {
 		accessModeLabel: 'Access Mode',
 		modeReadOnly: 'Read-Only',
 		modeEdit: 'Edit (requires token)',
-		restoreSessionTitle: (params: Params) => `Restore Last Session: Re-grant permission to ${params.folder}`,
-		restoreSessionBody: 'Your browser dropped permissions for the local folder on reload. Click here to re-grant access.',
+		restoreSessionTitle: (params: Params) =>
+			`Restore Last Session: Re-grant permission to ${params.folder}`,
+		restoreSessionBody:
+			'Your browser dropped permissions for the local folder on reload. Click here to re-grant access.',
 		fsaUnavailable:
 			'Your browser does not support the File System Access API. Use Chrome, Edge, Brave, Arc, Opera, or Vivaldi for Local Edit Mode.',
 

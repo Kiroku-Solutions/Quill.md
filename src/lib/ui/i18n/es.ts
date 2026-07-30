@@ -112,7 +112,8 @@ export const es: Translations = {
 		modeReadOnly: 'Solo Lectura',
 		modeEdit: 'Editar (requiere token)',
 		restoreSessionTitle: (params: Params) => `Restaurar Sesión: Dar permiso a ${params.folder}`,
-		restoreSessionBody: 'El navegador perdió los permisos locales al recargar. Haz clic aquí para reconectar.',
+		restoreSessionBody:
+			'El navegador perdió los permisos locales al recargar. Haz clic aquí para reconectar.',
 		fsaUnavailable:
 			'Tu navegador no soporta la File System Access API. Usa Chrome, Edge, Brave, Arc, Opera, o Vivaldi para el Modo de Edición Local.',
 

@@ -134,7 +134,7 @@
 
 <div class="mx-auto flex w-full max-w-5xl flex-col gap-12 px-6 py-20">
 	{#if lastFolder}
-		{@const record = stores.mode.recentHandles.find(r => r.name === lastFolder)}
+		{@const record = stores.mode.recentHandles.find((r) => r.name === lastFolder)}
 		{#if record}
 			<section class="mx-auto w-full max-w-2xl">
 				<!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -146,13 +146,17 @@
 					}}
 					class="cursor-pointer"
 				>
-					<Card class="border-warning/50 bg-warning/10 transition-all hover:border-warning/80 hover:shadow-md">
+					<Card
+						class="border-warning/50 bg-warning/10 transition-all hover:border-warning/80 hover:shadow-md"
+					>
 						<div class="flex items-center gap-4 p-4">
 							<div class="rounded-full bg-warning/20 p-3 text-warning">
 								<FolderOpen class="h-6 w-6" />
 							</div>
 							<div class="flex flex-col">
-								<h3 class="font-semibold text-foreground">{t('home.restoreSessionTitle', { folder: lastFolder })}</h3>
+								<h3 class="font-semibold text-foreground">
+									{t('home.restoreSessionTitle', { folder: lastFolder })}
+								</h3>
 								<p class="text-sm text-muted-foreground">{t('home.restoreSessionBody')}</p>
 							</div>
 						</div>
@@ -247,7 +251,9 @@
 					/>
 					{#if isPublicRepo === true}
 						<label class="flex flex-col gap-1.5">
-							<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase">{t('home.accessModeLabel')}</span>
+							<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
+								>{t('home.accessModeLabel')}</span
+							>
 							<div class="relative w-full">
 								<select
 									bind:value={wantsToEdit}
@@ -256,8 +262,17 @@
 									<option value={false}>{t('home.modeReadOnly')}</option>
 									<option value={true}>{t('home.modeEdit')}</option>
 								</select>
-								<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground">
-									<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+								<div
+									class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground"
+								>
+									<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+										><path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M19 9l-7 7-7-7"
+										></path></svg
+									>
 								</div>
 							</div>
 						</label>
