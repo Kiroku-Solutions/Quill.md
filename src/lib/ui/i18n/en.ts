@@ -23,7 +23,9 @@ export const en = {
 		delete: 'Delete',
 		permanentDelete: 'permanently delete',
 		lock: 'Lock Document',
-		lockConfirm: 'Are you sure you want to lock this document? It will become permanently immutable.',
+		lockConfirm:
+			'Are you sure you want to lock this document? It will become permanently immutable.',
+		immutable: 'Immutable',
 		trashDirectory: '.quill.md/.trash/',
 		remoteSessionExpired: 'Remote session expired — sign in again to refresh.',
 		issueCount: (params: Params) => `${params.n} item${params.n === 1 ? '' : 's'}`,

@@ -26,10 +26,10 @@ export interface ParsedDocument {
  */
 export async function parseDocumentFile(text: string): Promise<ParsedDocument> {
 	const { data, content } = parseFrontmatter(text);
-	
+
 	const id = typeof data?.id === 'string' ? data.id : crypto.randomUUID();
 	const immutable = data?.immutable === true || data?.immutable === 'true';
-	
+
 	let integrityWarning = false;
 	const storedHash = data?.integrity_hash;
 	if (typeof storedHash === 'string') {
@@ -59,25 +59,30 @@ function quoteIntegrityHash(yamlText: string): string {
 }
 
 /**
- * Serializes a document WITH an integrity hash. 
+ * Serializes a document WITH an integrity hash.
  */
-export async function serializeDocument(id: string, immutable: boolean, content: string, extraData: Record<string, unknown> = {}): Promise<string> {
+export async function serializeDocument(
+	id: string,
+	immutable: boolean,
+	content: string,
+	extraData: Record<string, unknown> = {}
+): Promise<string> {
 	const data: Record<string, unknown> = {
 		id,
-        immutable,
-		...extraData,
+		immutable,
+		...extraData
 	};
 
 	// 1. Serialize canonical form (without hash)
 	const canonicalYaml = dump(data, DUMP_OPTIONS);
 	const canonicalText = `---\n${canonicalYaml}---\n\n${content}`;
-	
+
 	// 2. Compute hash
 	const hash = await computeIntegrityHash(canonicalText);
-	
+
 	// 3. Inject hash
 	data['integrity_hash'] = hash;
-	
+
 	const finalYaml = quoteIntegrityHash(dump(data, DUMP_OPTIONS));
 	return `---\n${finalYaml}---\n\n${content}`;
 }
