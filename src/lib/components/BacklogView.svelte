@@ -65,6 +65,28 @@
 	function openIssue(id: string): void {
 		editor.open(id);
 	}
+
+	let currentPage = $state(1);
+	const pageSize = 10;
+
+	import { untrack } from 'svelte';
+	$effect(() => {
+		// Reset page on tab change
+		void activeTab;
+		untrack(() => {
+			currentPage = 1;
+		});
+	});
+
+	const activeItems = $derived(activeTab === 'epic' ? epics : useCases);
+	const totalPages = $derived(Math.max(1, Math.ceil(activeItems.length / pageSize)));
+
+	const paginatedEpics = $derived(
+		epics.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+	);
+	const paginatedUseCases = $derived(
+		useCases.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+	);
 </script>
 
 <div class="flex flex-col gap-6 p-6">
@@ -95,7 +117,7 @@
 	<!-- Backlog Tree Content -->
 	<div class="flex flex-col gap-6">
 		{#if activeTab === 'epic'}
-			{#each epics as epic (epic.id)}
+			{#each paginatedEpics as epic (epic.id)}
 				{@const related = getEpicStories(epic.id)}
 				<Card class="transition-all duration-[var(--motion-base)] hover:border-primary/30">
 					<div class="flex flex-col gap-4">
@@ -176,7 +198,7 @@
 				</Card>
 			{/each}
 		{:else}
-			{#each useCases as uc (uc.id)}
+			{#each paginatedUseCases as uc (uc.id)}
 				{@const related = getUseCaseStories(uc.id)}
 				<Card class="transition-all duration-[var(--motion-base)] hover:border-primary/30">
 					<div class="flex flex-col gap-4">
@@ -322,6 +344,30 @@
 					</div>
 				</div>
 			</Card>
+		{/if}
+
+		{#if totalPages > 1}
+			<div class="mt-4 flex items-center justify-between text-sm">
+				<span class="text-muted-foreground">
+					Page {currentPage} of {totalPages}
+				</span>
+				<div class="flex items-center gap-2">
+					<button
+						class="rounded-md border border-border bg-background px-3 py-1 text-foreground transition-colors hover:bg-surface disabled:opacity-50 disabled:hover:bg-background"
+						disabled={currentPage <= 1}
+						onclick={() => currentPage--}
+					>
+						{t('common.previous', { default: 'Previous' })}
+					</button>
+					<button
+						class="rounded-md border border-border bg-background px-3 py-1 text-foreground transition-colors hover:bg-surface disabled:opacity-50 disabled:hover:bg-background"
+						disabled={currentPage >= totalPages}
+						onclick={() => currentPage++}
+					>
+						{t('common.next', { default: 'Next' })}
+					</button>
+				</div>
+			</div>
 		{/if}
 	</div>
 </div>

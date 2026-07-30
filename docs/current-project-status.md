@@ -1118,6 +1118,18 @@ Following a deep audit against `docs/agile-frameworks-research.md`, the followin
 3. **Test Suite Stability**: Resolved 13 test failures related to the semantic terminology switch from "Issue" to "Item", achieving a 100% green pass on all 1041 tests.
 4. **UI Refinements**: Removed distracting emojis from the TopBar, improved project name rendering, and fixed wizard routing logic so injecting methodologies to an open local folder doesn't redirect the user to the home page.
 
+## UX & Read-Only Mode Polish (July 2026)
+
+Addressed several user experience issues related to the remote mode and sorting:
+1. **Mermaid Rendering Support**: Investigated Mermaid rendering issues and confirmed the app correctly parses `language-mermaid` when using standard triple-backtick markdown blocks.
+2. **Natural Sorting**: Updated ListView and GanttView sorting algorithms to use `localeCompare(..., undefined, { numeric: true })`. This ensures alphanumeric values (like "Sprint 1", "Sprint 2", "Sprint 10") are sorted naturally rather than lexicographically, both in standard columns and grouping headers (Sprints, Epics).
+3. **Default Sort Order**: Modified the ListView default sort column from `updated_date` (Descending) to `title` (Ascending) for a cleaner initial display, especially for alphanumeric identifiers like "DOC-01".
+4. **Strict Read-Only Mode**: Fixed a bug where providing a PAT implicitly bypassed the "Solo Lectura" (Read-Only) user intent. Read-only mode is now strictly honored in the state (`isReadOnly`), regardless of PAT presence.
+5. **Read-Only UI Lockdown**: Enforced read-only mode across the UI by:
+   - Disabling all inputs, selects, and textareas in `FormFields` and `EditorPanel`.
+   - Hiding write-only actions ("+ Nuevo", "Importar .md") from the `EditToolbar` to remove ambiguity.
+   - Changing the global TopBar badge to explicitly display "SOLO LECTURA" (or "Read-only" in English).
+
 ### Step 9 / post-launch follow-ups (out of scope for v0)
 
 - **Real screen-reader smoke** on NVDA + VoiceOver + Orca

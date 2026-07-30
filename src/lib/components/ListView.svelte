@@ -22,7 +22,7 @@
 	import { getStores } from '$lib/state';
 	import { t } from '$lib/ui/strings';
 
-	const { issues, filter, editor } = getStores();
+	const { issues, filter, editor, config } = getStores();
 
 	type SortKey = 'id' | 'title' | 'updated_date' | 'status';
 	type SortDir = 'asc' | 'desc';
@@ -34,6 +34,15 @@
 		Array.from(issues.byId.values())
 			.filter((li) => {
 				const f = filter.filter;
+				if (f.statusCategory && f.statusCategory !== 'all') {
+					const cfg = config.config;
+					if (cfg) {
+						const statusDef = cfg.statuses.find((s) => s.id === li.issue.fields.status);
+						const isClosed = statusDef?.category === 'done' || statusDef?.category === 'cancelled';
+						if (f.statusCategory === 'open' && isClosed) return false;
+						if (f.statusCategory === 'closed' && !isClosed) return false;
+					}
+				}
 				if (f.status && li.issue.fields.status !== f.status) return false;
 				if (f.type && li.issue.fields.issueType !== f.type) return false;
 				if (f.sprintId) {
@@ -150,8 +159,41 @@
 		return result;
 	});
 
+	let currentPage = $state(1);
+	const pageSize = 50;
+
+	import { untrack } from 'svelte';
+	$effect(() => {
+		// Reset page to 1 when filter changes
+		void filter.filter;
+		untrack(() => {
+			currentPage = 1;
+		});
+	});
+
 	const total = $derived(issues.issues.length);
 	const filteredCount = $derived(rows.length);
+	const totalPages = $derived(Math.max(1, Math.ceil(filteredCount / pageSize)));
+
+	const paginatedRows = $derived(rows.slice((currentPage - 1) * pageSize, currentPage * pageSize));
+
+	const paginatedGroupedRows = $derived.by(() => {
+		const result: Record<string, typeof sortedRows> = {};
+		for (const g of groups) {
+			result[g.id] = [];
+		}
+		for (const li of paginatedRows) {
+			const group =
+				groupBy !== 'none'
+					? groups.find((g) => g.id !== 'unassigned' && g.match(li.issue)) ||
+						groups[groups.length - 1]
+					: groups[0];
+			if (group) {
+				result[group.id].push(li);
+			}
+		}
+		return result;
+	});
 
 	function toggleSort(k: SortKey): void {
 		if (sortKey === k) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
@@ -170,18 +212,18 @@
 		return sortDir === 'asc' ? 'ascending' : 'descending';
 	}
 
-	function onRowKeydown(e: KeyboardEvent, idx: number): void {
+	function onRowKeydown(e: KeyboardEvent, globalIdx: number): void {
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
-			const li = rows[idx];
+			const li = paginatedRows[globalIdx];
 			if (li) open(li.issue.id);
 			return;
 		}
 		if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
 			e.preventDefault();
 			const delta = e.key === 'ArrowDown' ? 1 : -1;
-			const nextIdx = Math.max(0, Math.min(rows.length - 1, idx + delta));
-			const next = rows[nextIdx];
+			const nextIdx = Math.max(0, Math.min(paginatedRows.length - 1, globalIdx + delta));
+			const next = paginatedRows[nextIdx];
 			if (next) {
 				void focusRow(next.issue.id);
 			}
@@ -195,8 +237,8 @@
 	}
 
 	onMount(() => {
-		if (rows.length > 0) {
-			void focusRow(rows[0].issue.id);
+		if (paginatedRows.length > 0) {
+			void focusRow(paginatedRows[0].issue.id);
 		}
 	});
 </script>
@@ -270,8 +312,8 @@
 				</tr>
 			</thead>
 			{#each groups as group (group.id)}
-				{@const groupRows = groupedRows[group.id] ?? []}
-				{#if groupBy !== 'none' && (groupRows.length > 0 || group.id !== 'unassigned')}
+				{@const groupRows = paginatedGroupedRows[group.id] ?? []}
+				{#if groupBy !== 'none' && (groupRows.length > 0 || (group.id !== 'unassigned' && (groupedRows[group.id]?.length ?? 0) > 0))}
 					<tbody class="bg-surface-dark border-b border-border">
 						<tr>
 							<td colspan="7" class="px-4 py-2 text-sm font-bold text-foreground">
@@ -295,7 +337,7 @@
 							onkeydown={(e) =>
 								onRowKeydown(
 									e,
-									rows.findIndex((r) => r.issue.id === li.issue.id)
+									paginatedRows.findIndex((r) => r.issue.id === li.issue.id)
 								)}
 						>
 							<td class="px-4 py-3 font-mono text-xs text-muted-foreground"
@@ -339,4 +381,28 @@
 			{/each}
 		</table>
 	</div>
+
+	{#if totalPages > 1}
+		<div class="mt-4 flex items-center justify-between text-sm">
+			<span class="text-muted-foreground">
+				Page {currentPage} of {totalPages}
+			</span>
+			<div class="flex items-center gap-2">
+				<button
+					class="rounded-md border border-border bg-background px-3 py-1 text-foreground transition-colors hover:bg-surface disabled:opacity-50 disabled:hover:bg-background"
+					disabled={currentPage <= 1}
+					onclick={() => currentPage--}
+				>
+					{t('common.previous', { default: 'Previous' })}
+				</button>
+				<button
+					class="rounded-md border border-border bg-background px-3 py-1 text-foreground transition-colors hover:bg-surface disabled:opacity-50 disabled:hover:bg-background"
+					disabled={currentPage >= totalPages}
+					onclick={() => currentPage++}
+				>
+					{t('common.next', { default: 'Next' })}
+				</button>
+			</div>
+		</div>
+	{/if}
 </div>

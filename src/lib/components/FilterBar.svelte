@@ -46,6 +46,36 @@
 
 	<label class="flex flex-col gap-1.5">
 		<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
+			>{t('filter.statusCategoryLabel', { default: 'Status Category' })}</span
+		>
+		<div class="relative w-full">
+			<select
+				class="w-full appearance-none rounded-md border border-border bg-background py-2 pr-10 pl-3 text-sm text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
+				value={filter.filter.statusCategory ?? 'open'}
+				onchange={(e) =>
+					update({
+						statusCategory: (e.currentTarget.value as 'open' | 'closed' | 'all') || undefined
+					})}
+			>
+				<option value="open">{t('filter.statusCategoryOpen', { default: 'Only Open' })}</option>
+				<option value="all">{t('common.all')}</option>
+				<option value="closed"
+					>{t('filter.statusCategoryClosed', { default: 'Only Closed' })}</option
+				>
+			</select>
+			<div
+				class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground"
+			>
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+					><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"
+					></path></svg
+				>
+			</div>
+		</div>
+	</label>
+
+	<label class="flex flex-col gap-1.5">
+		<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
 			>{t('filter.statusLabel')}</span
 		>
 		<div class="relative w-full">

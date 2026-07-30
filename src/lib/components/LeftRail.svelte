@@ -184,6 +184,38 @@
 			</button>
 		</div>
 
+		<h2 class="mt-4 text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
+			{t('leftrail.docsHeading', { default: 'Documentation' })}
+		</h2>
+		<div class="flex flex-col gap-1">
+			<button
+				type="button"
+				class="flex cursor-pointer items-center justify-start gap-2 rounded-md px-3 py-2 text-sm font-semibold transition-colors duration-[var(--motion-fast)] ease-out {stores
+					.view.view === 'wiki'
+					? 'bg-primary text-primary-foreground'
+					: 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
+				onclick={() => {
+					stores.view.setView('wiki');
+					closeMobileNav();
+				}}
+			>
+				<span>{t('leftrail.view.wiki', { default: 'Wiki' })}</span>
+			</button>
+			<button
+				type="button"
+				class="flex cursor-pointer items-center justify-start gap-2 rounded-md px-3 py-2 text-sm font-semibold transition-colors duration-[var(--motion-fast)] ease-out {stores
+					.view.view === 'adr'
+					? 'bg-primary text-primary-foreground'
+					: 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
+				onclick={() => {
+					stores.view.setView('adr');
+					closeMobileNav();
+				}}
+			>
+				<span>{t('leftrail.view.adr', { default: 'ADRs' })}</span>
+			</button>
+		</div>
+
 		{#if warningCount > 0 && firstWarningId !== null}
 			<button
 				type="button"
