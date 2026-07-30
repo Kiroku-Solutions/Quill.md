@@ -45,6 +45,7 @@ export const es: Translations = {
 	modeBadge: {
 		local: 'Local',
 		remote: 'Remoto',
+		remoteReadOnly: 'Solo Lectura',
 		setup: 'Configuración',
 		home: 'Inicio',
 		firstRunSetup: 'Configuración inicial'
