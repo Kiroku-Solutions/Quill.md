@@ -171,14 +171,22 @@
 		void readTrashCount();
 	}
 
-	const providerLabel = $derived(isRemote ? 'Remote (editable)' : 'Local');
+	const providerLabel = $derived(
+		isRemote ? (stores.mode.isReadOnly ? 'Remote (read-only)' : 'Remote (editable)') : 'Local'
+	);
 </script>
 
 <nav
 	class="sticky top-[var(--topbar-height)] z-10 flex flex-wrap items-center gap-3 border-b border-border bg-surface/80 px-6 py-3 backdrop-blur-xl transition-colors duration-[var(--motion-slow)]"
 	data-testid="edit-toolbar"
 >
-	<Button variant="primary" size="sm" onclick={openNewIssue} data-testid="toolbar-new-issue">
+	<Button
+		variant="primary"
+		size="sm"
+		onclick={openNewIssue}
+		data-testid="toolbar-new-issue"
+		disabled={stores.mode.isReadOnly}
+	>
 		{t('editToolbar.newIssue')}
 	</Button>
 	<Button
@@ -187,6 +195,7 @@
 		loading={importing}
 		onclick={handleImport}
 		data-testid="toolbar-import-issue"
+		disabled={stores.mode.isReadOnly}
 	>
 		{t('editToolbar.importIssue')}
 	</Button>
