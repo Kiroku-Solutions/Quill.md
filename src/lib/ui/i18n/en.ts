@@ -108,6 +108,8 @@ export const en = {
 		remotePatHelp:
 			'Stored in memory only for the duration of the session — never on disk, never in URLs.',
 		remotePatOptional: 'Public repository detected. PAT is optional (read-only mode).',
+		remotePatWarning:
+			'Without a token, loading is significantly slower due to API limits. Add a PAT for instant speeds.',
 		accessModeLabel: 'Access Mode',
 		modeReadOnly: 'Read-Only',
 		modeEdit: 'Edit (requires token)',
