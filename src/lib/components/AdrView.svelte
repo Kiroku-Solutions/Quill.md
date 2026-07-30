@@ -10,6 +10,7 @@
 	import Lock from '@lucide/svelte/icons/lock';
 	import { untrack } from 'svelte';
 	import { saveDocument, parseDocumentFile } from '$lib/services/document-saver';
+	import type { WritableDirectoryAdapter } from '$lib/adapters/directory-adapter';
 
 	const { mode } = getStores();
 	const adapter = $derived(mode.mode === 'remote' ? mode.remoteAdapter : mode.localAdapter);
@@ -19,7 +20,7 @@
 	let fileContent = $state<string>('');
 	let originalContent = $state<string>('');
 	let isDirty = $derived(fileContent !== originalContent);
-	
+
 	let documentId = $state<string>('');
 	let isImmutable = $state(false);
 	let integrityWarning = $state(false);
@@ -62,9 +63,16 @@
 		if (!adapter || !selectedFile || !canEdit) return;
 		try {
 			// Type casting to access writeTextFile
-			const w = adapter as unknown as { writeTextFile: (p: string, c: string) => Promise<void> };
+			const w = adapter as unknown as WritableDirectoryAdapter;
 			if (typeof w.writeTextFile === 'function') {
-				const doc = await saveDocument(w, '.quill.md/adr', selectedFile, documentId, isImmutable, fileContent);
+				const doc = await saveDocument(
+					w,
+					'.quill.md/adr',
+					selectedFile,
+					documentId,
+					isImmutable,
+					fileContent
+				);
 				fileContent = doc.content;
 				originalContent = doc.content;
 				documentId = doc.id;
@@ -79,11 +87,26 @@
 
 	async function lockDocument() {
 		if (!adapter || !selectedFile || !canEdit) return;
-		if (!confirm(t('common.lockConfirm', { default: 'Are you sure you want to lock this document? It will become permanently immutable.' }))) return;
+		if (
+			!confirm(
+				t('common.lockConfirm', {
+					default:
+						'Are you sure you want to lock this document? It will become permanently immutable.'
+				})
+			)
+		)
+			return;
 		try {
-			const w = adapter as unknown as { writeTextFile: (p: string, c: string) => Promise<void> };
+			const w = adapter as unknown as WritableDirectoryAdapter;
 			if (typeof w.writeTextFile === 'function') {
-				const doc = await saveDocument(w, '.quill.md/adr', selectedFile, documentId, true, fileContent);
+				const doc = await saveDocument(
+					w,
+					'.quill.md/adr',
+					selectedFile,
+					documentId,
+					true,
+					fileContent
+				);
 				fileContent = doc.content;
 				originalContent = doc.content;
 				documentId = doc.id;
@@ -105,10 +128,17 @@
 				return;
 			}
 			try {
-				const w = adapter as unknown as { writeTextFile: (p: string, c: string) => Promise<void> };
+				const w = adapter as unknown as WritableDirectoryAdapter;
 				if (typeof w.writeTextFile === 'function') {
 					const id = crypto.randomUUID();
-					await saveDocument(w, '.quill.md/adr', filename, id, false, `# ${name}\n\n## Status\nProposed\n\n## Context\n...\n\n## Decision\n...\n\n## Consequences\n...`);
+					await saveDocument(
+						w,
+						'.quill.md/adr',
+						filename,
+						id,
+						false,
+						`# ${name}\n\n## Status\nProposed\n\n## Context\n...\n\n## Decision\n...\n\n## Consequences\n...`
+					);
 					await loadFiles();
 					await selectFile(filename);
 					activeTab = 'write';
@@ -169,13 +199,14 @@
 		{#if selectedFile}
 			<div class="flex flex-col gap-4 rounded-xl border border-border bg-surface p-5">
 				<div class="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
-					<h2 class="font-display flex items-center gap-3 text-xl font-bold text-foreground">
+					<h2 class="flex items-center gap-3 font-display text-xl font-bold text-foreground">
 						{selectedFile}
 						{#if isImmutable}
 							<span
 								class="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary"
 							>
-								<Lock class="h-3 w-3" /> Immutable
+								<Lock class="size-3" />
+								{t('common.immutable', { default: 'Immutable' })}
 							</span>
 						{/if}
 					</h2>

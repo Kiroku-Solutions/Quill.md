@@ -111,9 +111,9 @@ server.tool(
 	{
 		title: z.string().describe('The title of the ADR (e.g. "0001-use-svelte-for-frontend")'),
 		status: z.string().describe('The status of the ADR (e.g. Proposed, Accepted, Superseded)'),
-        context: z.string().describe('The context or background of the decision'),
-        decision: z.string().describe('The decision that was made'),
-        consequences: z.string().describe('The consequences of the decision'),
+		context: z.string().describe('The context or background of the decision'),
+		decision: z.string().describe('The decision that was made'),
+		consequences: z.string().describe('The consequences of the decision'),
 		projectDir: z.string().optional().describe('Optional absolute path to the project directory.')
 	},
 	async ({ title, status, context, decision, consequences, projectDir }) => {

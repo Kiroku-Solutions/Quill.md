@@ -19,40 +19,43 @@ const DUMP_OPTIONS = {
 	forceQuotes: false
 };
 
-function serializeDocument(id: string, immutable: boolean, content: string, extraData: Record<string, unknown> = {}): string {
+function serializeDocument(
+	id: string,
+	immutable: boolean,
+	content: string,
+	extraData: Record<string, unknown> = {}
+): string {
 	const data: Record<string, unknown> = {
 		id,
-        immutable,
-		...extraData,
+		immutable,
+		...extraData
 	};
 
 	// 1. Serialize canonical form (without hash)
 	const canonicalYaml = yaml.dump(data, DUMP_OPTIONS);
 	const canonicalText = `---\n${canonicalYaml}---\n\n${content}`;
-	
+
 	// 2. Compute hash
 	const hash = crypto.createHash('sha256').update(canonicalText, 'utf8').digest('hex');
-	
+
 	// 3. Inject hash
 	data['integrity_hash'] = `sha256:${hash}`;
-	
-	const finalYaml = yaml.dump(data, DUMP_OPTIONS).replace(/^integrity_hash: (.*)$/m, 'integrity_hash: "$1"');
+
+	const finalYaml = yaml
+		.dump(data, DUMP_OPTIONS)
+		.replace(/^integrity_hash: (.*)$/m, 'integrity_hash: "$1"');
 	return `---\n${finalYaml}---\n\n${content}`;
 }
 
-export async function createWikiPage(
-	title: string,
-	content: string,
-	projectDir?: string
-) {
+export async function createWikiPage(title: string, content: string, projectDir?: string) {
 	const dir = resolveProjectDir(projectDir);
 	const targetDir = path.join(dir, '.quill.md', 'wiki');
 	try {
 		await fs.mkdir(targetDir, { recursive: true });
-        const id = crypto.randomUUID();
-        const filename = `${title.trim().replace(/[^a-zA-Z0-9_-]/g, '_')}.md`;
-        
-        const serialized = serializeDocument(id, false, content);
+		const id = crypto.randomUUID();
+		const filename = `${title.trim().replace(/[^a-zA-Z0-9_-]/g, '_')}.md`;
+
+		const serialized = serializeDocument(id, false, content);
 		await fs.writeFile(path.join(targetDir, filename), serialized);
 
 		return {
@@ -77,18 +80,18 @@ export async function createAdr(
 	status: string,
 	context: string,
 	decision: string,
-    consequences: string,
+	consequences: string,
 	projectDir?: string
 ) {
 	const dir = resolveProjectDir(projectDir);
 	const targetDir = path.join(dir, '.quill.md', 'adr');
 	try {
 		await fs.mkdir(targetDir, { recursive: true });
-        const id = crypto.randomUUID();
-        const filename = `${title.trim().replace(/[^a-zA-Z0-9_-]/g, '_')}.md`;
-        
-        const content = `# ${title}\n\n## Status\n${status}\n\n## Context\n${context}\n\n## Decision\n${decision}\n\n## Consequences\n${consequences}`;
-        const serialized = serializeDocument(id, false, content);
+		const id = crypto.randomUUID();
+		const filename = `${title.trim().replace(/[^a-zA-Z0-9_-]/g, '_')}.md`;
+
+		const content = `# ${title}\n\n## Status\n${status}\n\n## Context\n${context}\n\n## Decision\n${decision}\n\n## Consequences\n${consequences}`;
+		const serialized = serializeDocument(id, false, content);
 		await fs.writeFile(path.join(targetDir, filename), serialized);
 
 		return {
