@@ -24,7 +24,9 @@ export const es: Translations = {
 		delete: 'Eliminar',
 		permanentDelete: 'eliminar permanentemente',
 		lock: 'Bloquear Documento',
-		lockConfirm: '¿Estás seguro de que quieres bloquear este documento? Se volverá permanentemente inmutable.',
+		lockConfirm:
+			'¿Estás seguro de que quieres bloquear este documento? Se volverá permanentemente inmutable.',
+		immutable: 'Inmutable',
 		trashDirectory: '.quill.md/.trash/',
 		remoteSessionExpired: 'Sesión remota expirada — inicia sesión nuevamente para actualizar.',
 		issueCount: (params: Params) => `${params.n} elemento${params.n === 1 ? '' : 's'}`,
