@@ -58,13 +58,25 @@
 				const dir = sortDir === 'asc' ? 1 : -1;
 				switch (sortKey) {
 					case 'id':
-						return a.issue.id.localeCompare(b.issue.id) * dir;
+						return a.issue.id.localeCompare(b.issue.id, undefined, { numeric: true }) * dir;
 					case 'title':
-						return a.issue.fields.title.localeCompare(b.issue.fields.title) * dir;
+						return (
+							a.issue.fields.title.localeCompare(b.issue.fields.title, undefined, {
+								numeric: true
+							}) * dir
+						);
 					case 'status':
-						return a.issue.fields.status.localeCompare(b.issue.fields.status) * dir;
+						return (
+							a.issue.fields.status.localeCompare(b.issue.fields.status, undefined, {
+								numeric: true
+							}) * dir
+						);
 					case 'updated_date':
-						return a.issue.fields.updatedDate.localeCompare(b.issue.fields.updatedDate) * dir;
+						return (
+							a.issue.fields.updatedDate.localeCompare(b.issue.fields.updatedDate, undefined, {
+								numeric: true
+							}) * dir
+						);
 				}
 			})
 	);

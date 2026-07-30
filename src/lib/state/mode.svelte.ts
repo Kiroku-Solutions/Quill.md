@@ -88,6 +88,8 @@ export interface RemoteCredentials {
 	readonly authorName?: string;
 	/** Commit author email override (overrides `RemoteConfig.commit_author_email`). */
 	readonly authorEmail?: string;
+	/** Force read-only mode even if a PAT is present. */
+	readonly readOnly?: boolean;
 }
 
 /**
@@ -504,8 +506,8 @@ export function createModeStore(ctx: StateContext, deps: ModeStoreDeps = {}): Mo
 			parentSha: fetchResult.sha
 		};
 		commitQueue.start(queueState);
-		// Disable write adapters if no PAT is present.
-		isReadOnly = !pat;
+		// Disable write adapters if no PAT is present, or if explicitly requested read-only.
+		isReadOnly = !pat || creds.readOnly === true;
 		if (isReadOnly) {
 			// Type cast because we know it's read-only and mutations will fail/be blocked.
 			remoteAdapter = fetchResult.adapter as unknown as WritableDirectoryAdapter;

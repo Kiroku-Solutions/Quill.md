@@ -35,7 +35,9 @@ export async function loadIssues(adapter: ReadOnlyDirectoryAdapter): Promise<Loa
 	await loadDir(`${ISSUES_DIR}/closed`);
 	await loadDir(ISSUES_DIR); // Legacy root issues
 
-	loaded.sort((a, b) => String(a.issue.id).localeCompare(String(b.issue.id)));
+	loaded.sort((a, b) =>
+		String(a.issue.id).localeCompare(String(b.issue.id), undefined, { numeric: true })
+	);
 	return loaded;
 }
 
