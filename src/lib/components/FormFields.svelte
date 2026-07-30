@@ -17,7 +17,8 @@
 
 	type Option = { id: string; name: string; type?: string };
 
-	const { editor, issues, templates, config } = getStores();
+	const { editor, issues, templates, config, mode } = getStores();
+	const isReadOnly = $derived(mode.isReadOnly);
 
 	const template = $derived(
 		editor.draft ? (templates.byType.get(editor.draft.issue.fields.issueType) ?? null) : null
@@ -318,6 +319,7 @@
 								systemKeyFor(field.key),
 								(e.currentTarget as HTMLInputElement).value
 							)}
+						disabled={isReadOnly}
 					/>
 				{:else if field.type === 'number'}
 					<input
@@ -337,6 +339,7 @@
 								editor.patchField(sKey, Number.isFinite(n) ? n : raw);
 							}
 						}}
+						disabled={isReadOnly}
 					/>
 				{:else if field.type === 'select' || field.type === 'user'}
 					{@const opts = field.type === 'user' ? userOptions() : selectOptionsFor(field)}
@@ -352,6 +355,7 @@
 								: 'border-border focus:border-transparent'} py-2 pr-10 pl-3 text-sm focus:outline-none {ringClass} transition-shadow"
 							value={(value as string | undefined) ?? ''}
 							aria-invalid={err ? 'true' : undefined}
+							disabled={isReadOnly}
 							onchange={(e) => {
 								const v = (e.currentTarget as HTMLSelectElement).value;
 								if (systemKeyFor(field.key) === 'issueType') {
@@ -412,6 +416,7 @@
 									: 'border-border bg-transparent text-muted-foreground hover:border-muted'}"
 								aria-pressed={on}
 								onclick={() => toggleMulti(field, opt.id)}
+								disabled={isReadOnly}
 							>
 								{opt.name}
 							</button>
@@ -443,6 +448,7 @@
 										class="w-full appearance-none rounded border border-border bg-surface py-1.5 pr-6 pl-2 text-xs text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 										value={rel.type}
 										onchange={(e) => changeRelationType(rel.id, e.currentTarget.value)}
+										disabled={isReadOnly ? true : undefined}
 									>
 										{#each allowedRelTypes as rType (rType)}
 											<option value={rType}>{t(`formFields.relationTypes.${rType}`)}</option>
@@ -460,6 +466,7 @@
 									class="p-1 text-muted-foreground transition-colors hover:text-error"
 									aria-label={t('formFields.removeRelationAria')}
 									onclick={() => removeRelation(rel.id)}
+									disabled={isReadOnly}
 								>
 									<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										><path
@@ -480,6 +487,7 @@
 								<select
 									class="w-full appearance-none rounded border border-border bg-background py-1.5 pr-8 pl-2 text-xs text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 									bind:value={newRelationId}
+									disabled={isReadOnly ? true : undefined}
 								>
 									<option value="">{t('formFields.selectPlaceholder')}</option>
 									{#each relationOptions(field) as opt (opt.id)}
@@ -537,7 +545,7 @@
 								type="button"
 								class="shrink-0 rounded bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
 								title={t('formFields.addRelation')}
-								disabled={!newRelationId}
+								disabled={!newRelationId || isReadOnly}
 								onclick={addRelation}
 							>
 								+

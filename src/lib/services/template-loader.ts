@@ -120,7 +120,7 @@ export async function loadTemplates(adapter: ReadOnlyDirectoryAdapter): Promise<
 		}
 		out.push(assertTemplate(parsed, path));
 	}
-	out.sort((a, b) => a.id.localeCompare(b.id));
+	out.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
 	return out;
 }
 

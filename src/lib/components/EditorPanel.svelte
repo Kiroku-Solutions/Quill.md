@@ -81,7 +81,8 @@
 		{ id: 'preview' as TabId, label: t('editor.tabs.preview') }
 	]);
 
-	const canSave = $derived(editor.isDirty && editor.errors.length === 0);
+	const isReadOnly = $derived(mode.isReadOnly);
+	const canSave = $derived(!isReadOnly && editor.isDirty && editor.errors.length === 0);
 	const canDiscard = $derived(editor.isDirty);
 
 	function setTab(id: string): void {
@@ -137,6 +138,7 @@
 					value={active.issue.fields.title}
 					oninput={(e) => editor.patchField('title', (e.currentTarget as HTMLInputElement).value)}
 					class="flex-1"
+					disabled={isReadOnly}
 				/>
 			{:else}
 				<div class="flex-1 text-sm font-semibold">{active.issue.fields.title}</div>
@@ -209,6 +211,7 @@
 							rows={14}
 							class="font-mono text-sm"
 							data-testid="editor-section-textarea"
+							disabled={isReadOnly}
 						/>
 					{:else}
 						<p class="text-sm opacity-60">{t('editor.noSectionsEdit')}</p>
@@ -240,6 +243,7 @@
 						}
 					}}
 					data-testid="editor-panel-delete"
+					disabled={isReadOnly}
 				>
 					{t('common.delete') ?? 'Delete'}
 				</Button>

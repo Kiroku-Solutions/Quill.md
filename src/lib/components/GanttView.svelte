@@ -154,14 +154,16 @@
 				for (const g of groupsMatchList) {
 					const items = groups.get(g.title);
 					if (items) {
-						items.sort((a, b) => a.issue.id.localeCompare(b.issue.id));
+						items.sort((a, b) =>
+							a.issue.id.localeCompare(b.issue.id, undefined, { numeric: true })
+						);
 						items.forEach((issue, i) => out.push({ group: g.title, issue, rowInGroup: i }));
 						groups.delete(g.title);
 					}
 				}
 			}
 			for (const [group, items] of groups) {
-				items.sort((a, b) => a.issue.id.localeCompare(b.issue.id));
+				items.sort((a, b) => a.issue.id.localeCompare(b.issue.id, undefined, { numeric: true }));
 				items.forEach((issue, i) => out.push({ group, issue, rowInGroup: i }));
 			}
 			return { grouped: out, undated: notDated, minMs, maxMs };
