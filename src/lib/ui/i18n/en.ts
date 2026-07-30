@@ -22,6 +22,8 @@ export const en = {
 		required: 'required',
 		delete: 'Delete',
 		permanentDelete: 'permanently delete',
+		lock: 'Lock Document',
+		lockConfirm: 'Are you sure you want to lock this document? It will become permanently immutable.',
 		trashDirectory: '.quill.md/.trash/',
 		remoteSessionExpired: 'Remote session expired — sign in again to refresh.',
 		issueCount: (params: Params) => `${params.n} item${params.n === 1 ? '' : 's'}`,
@@ -64,13 +66,16 @@ export const en = {
 		trackersHeading: 'Categories',
 		planningHeading: 'Planning',
 		filtersHeading: 'Filters',
+		docsHeading: 'Documentation',
 		view: {
 			list: 'List',
 			kanban: 'Kanban',
 			gantt: 'Gantt',
 			graph: 'Graph',
 			backlog: 'Backlog',
-			sprint: 'Sprint Planner'
+			sprint: 'Sprint Planner',
+			wiki: 'Wiki',
+			adr: 'ADRs'
 		},
 		expandNav: 'Expand navigation',
 		collapseNav: 'Collapse navigation',
@@ -322,6 +327,9 @@ export const en = {
 		searchLabel: 'Search',
 		searchPlaceholder: 'title or section body…',
 		statusLabel: 'Status',
+		statusCategoryLabel: 'State',
+		statusCategoryOpen: 'Open',
+		statusCategoryClosed: 'Closed',
 		typeLabel: 'Type',
 		typePlaceholder: 'bug, task…',
 		clearButton: 'Clear',
@@ -379,6 +387,16 @@ export const en = {
 		points: 'Story Points',
 		progressLabel: 'Progress',
 		pointsUnit: 'pts'
+	},
+	wiki: {
+		new: 'New Wiki Page',
+		empty: 'No wiki pages found.',
+		selectPage: 'Select a page from the sidebar to start'
+	},
+	adr: {
+		new: 'New ADR',
+		empty: 'No ADRs found.',
+		selectPage: 'Select an ADR from the sidebar to view'
 	},
 	backlogView: {
 		tabEpic: 'By Epic',

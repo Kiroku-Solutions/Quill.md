@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { listIssues, readIssue, createIssue } from './tools/issues.js';
 import { createTemplate } from './tools/templates.js';
 import { initPreset } from './tools/init.js';
+import { createWikiPage, createAdr } from './tools/docs.js';
 const server = new McpServer({
     name: 'quill-mcp-server',
     version: '1.0.0'
@@ -48,6 +49,23 @@ server.tool('quill_create_template', 'Creates a new issue template in the Quill.
     projectDir: z.string().optional().describe('Optional absolute path to the project directory.')
 }, async ({ templateJson, projectDir }) => {
     return await createTemplate(templateJson, projectDir);
+});
+server.tool('quill_create_wiki_page', 'Creates a new Wiki page in the Quill.md repository (.quill.md/wiki). Use this for general documentation or specifications.', {
+    title: z.string().describe('The title of the Wiki page (used for the filename)'),
+    content: z.string().describe('The markdown content of the Wiki page'),
+    projectDir: z.string().optional().describe('Optional absolute path to the project directory.')
+}, async ({ title, content, projectDir }) => {
+    return await createWikiPage(title, content, projectDir);
+});
+server.tool('quill_create_adr', 'Creates a new Architecture Decision Record (ADR) in the Quill.md repository (.quill.md/adr).', {
+    title: z.string().describe('The title of the ADR (e.g. "0001-use-svelte-for-frontend")'),
+    status: z.string().describe('The status of the ADR (e.g. Proposed, Accepted, Superseded)'),
+    context: z.string().describe('The context or background of the decision'),
+    decision: z.string().describe('The decision that was made'),
+    consequences: z.string().describe('The consequences of the decision'),
+    projectDir: z.string().optional().describe('Optional absolute path to the project directory.')
+}, async ({ title, status, context, decision, consequences, projectDir }) => {
+    return await createAdr(title, status, context, decision, consequences, projectDir);
 });
 async function main() {
     const transport = new StdioServerTransport();
