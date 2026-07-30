@@ -23,9 +23,9 @@
 		theme: 'default'
 	});
 
-	type Props = { markdown: string };
+	type Props = { markdown: string; class?: string };
 
-	let { markdown }: Props = $props();
+	let { markdown, class: className = '' }: Props = $props();
 
 	let debounced = $state('');
 	let html = $state('');
@@ -236,7 +236,11 @@
 	const isLoading = $derived(markdown !== debounced || rendering);
 </script>
 
-<div bind:this={container} class="prose max-w-none" data-testid="markdown-preview">
+<div
+	bind:this={container}
+	class="prose max-w-none dark:prose-invert {className}"
+	data-testid="markdown-preview"
+>
 	{#if isLoading}
 		<div class="flex flex-col gap-2" data-testid="markdown-preview-loading">
 			<Skeleton width="w-3/4" height="h-6" />

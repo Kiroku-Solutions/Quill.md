@@ -57,6 +57,8 @@ const EMPTY_TREE_SHA = '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
 const SUBTREE = '.quill.md';
 const TEMPLATES_DIR = `${SUBTREE}/templates`;
 const ISSUES_DIR = `${SUBTREE}/issues`;
+const ADR_DIR = `${SUBTREE}/adr`;
+const WIKI_DIR = `${SUBTREE}/wiki`;
 const CONFIG_PATH = `${SUBTREE}/config.json`;
 
 /**
@@ -83,6 +85,8 @@ const FETCH_ALL_QUERY = /* GraphQL */ `
 		$configExpr: String!
 		$templatesExpr: String!
 		$issuesExpr: String!
+		$adrExpr: String!
+		$wikiExpr: String!
 	) {
 		repository(owner: $owner, name: $name) {
 			config: object(expression: $configExpr) {
@@ -140,6 +144,40 @@ const FETCH_ALL_QUERY = /* GraphQL */ `
 					}
 				}
 			}
+			adr: object(expression: $adrExpr) {
+				... on Tree {
+					oid
+					entries {
+						name
+						type
+						path
+						object {
+							... on Blob {
+								oid
+								isTruncated
+								text
+							}
+						}
+					}
+				}
+			}
+			wiki: object(expression: $wikiExpr) {
+				... on Tree {
+					oid
+					entries {
+						name
+						type
+						path
+						object {
+							... on Blob {
+								oid
+								isTruncated
+								text
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 `;
@@ -174,6 +212,8 @@ interface QuillMdFetchAllResponse {
 		readonly config: QuillMdBlobNode | null;
 		readonly templates: QuillMdSubtree | null;
 		readonly issues: QuillMdSubtree | null;
+		readonly adr: QuillMdSubtree | null;
+		readonly wiki: QuillMdSubtree | null;
 	} | null;
 }
 
@@ -323,7 +363,9 @@ export class GitHubProvider implements RepoProvider {
 				name: parsed.repo,
 				configExpr: expr('config.json'),
 				templatesExpr: expr('templates'),
-				issuesExpr: expr('issues')
+				issuesExpr: expr('issues'),
+				adrExpr: expr('adr'),
+				wikiExpr: expr('wiki')
 			});
 		} catch (err) {
 			throw mapGraphQLError(err, endpointUrl);
@@ -347,6 +389,26 @@ export class GitHubProvider implements RepoProvider {
 			for (const entry of repo.templates.entries) {
 				if (entry.type !== 'blob' || !entry.object) continue;
 				const path = `${TEMPLATES_DIR}/${entry.name}`;
+				const content = entry.object.isTruncated
+					? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
+					: (entry.object.text ?? '');
+				out.push({ path, content, sha: entry.object.oid });
+			}
+		}
+		if (repo.adr) {
+			for (const entry of repo.adr.entries) {
+				if (entry.type !== 'blob' || !entry.object) continue;
+				const path = `${ADR_DIR}/${entry.name}`;
+				const content = entry.object.isTruncated
+					? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
+					: (entry.object.text ?? '');
+				out.push({ path, content, sha: entry.object.oid });
+			}
+		}
+		if (repo.wiki) {
+			for (const entry of repo.wiki.entries) {
+				if (entry.type !== 'blob' || !entry.object) continue;
+				const path = `${WIKI_DIR}/${entry.name}`;
 				const content = entry.object.isTruncated
 					? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
 					: (entry.object.text ?? '');
@@ -395,7 +457,9 @@ export class GitHubProvider implements RepoProvider {
 			return (
 				entry.path === CONFIG_PATH ||
 				entry.path.startsWith(`${TEMPLATES_DIR}/`) ||
-				entry.path.startsWith(`${ISSUES_DIR}/`)
+				entry.path.startsWith(`${ISSUES_DIR}/`) ||
+				entry.path.startsWith(`${ADR_DIR}/`) ||
+				entry.path.startsWith(`${WIKI_DIR}/`)
 			);
 		});
 

@@ -271,9 +271,7 @@
 							disabled={!canEdit}
 						/>
 					{:else}
-						<div class="prose prose-sm max-w-none dark:prose-invert">
-							<MarkdownPreview markdown={fileContent} />
-						</div>
+						<MarkdownPreview markdown={fileContent} class="prose-sm" />
 					{/if}
 				</div>
 			</div>
