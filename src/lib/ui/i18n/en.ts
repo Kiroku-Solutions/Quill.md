@@ -44,6 +44,7 @@ export const en = {
 	modeBadge: {
 		local: 'Local',
 		remote: 'Remote',
+		remoteReadOnly: 'Read-only',
 		setup: 'Setup',
 		home: 'Home',
 		firstRunSetup: 'First-run setup'

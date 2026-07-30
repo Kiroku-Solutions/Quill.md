@@ -74,7 +74,10 @@
 			case 'local':
 				return { label: t('modeBadge.local'), variant: 'success' as const };
 			case 'remote':
-				return { label: t('modeBadge.remote'), variant: 'warning' as const };
+				return {
+					label: stores.mode.isReadOnly ? t('modeBadge.remoteReadOnly') : t('modeBadge.remote'),
+					variant: 'warning' as const
+				};
 			case 'wizard':
 				// The 6B Badge primitive does not ship an `info` variant;
 				// the closest semantic match is `primary` (active flow).
