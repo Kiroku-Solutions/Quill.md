@@ -100,13 +100,26 @@ export async function createTemplate(templateJsonStr, projectDir) {
             },
             { id: -1, key: 'relations', name: 'Relations', type: 'relations', obligatory: false }
         ];
-        const validTypes = new Set(['text', 'longtext', 'number', 'boolean', 'select', 'multi-select', 'date', 'datetime', 'relation', 'relations']);
+        const validTypes = new Set([
+            'text',
+            'longtext',
+            'number',
+            'boolean',
+            'select',
+            'multi-select',
+            'date',
+            'datetime',
+            'relation',
+            'relations'
+        ]);
         if (template.fields) {
             for (const f of template.fields) {
                 if (!validTypes.has(f.type)) {
                     throw new Error(`Strict Validation Failed: Field '${f.key}' uses an invalid type '${f.type}'. Valid types are: ${Array.from(validTypes).join(', ')}`);
                 }
-                if ((f.type === 'select' || f.type === 'multi-select') && !Array.isArray(f.options) && typeof f.options_source !== 'string') {
+                if ((f.type === 'select' || f.type === 'multi-select') &&
+                    !Array.isArray(f.options) &&
+                    typeof f.options_source !== 'string') {
                     throw new Error(`Strict Validation Failed: Field '${f.key}' of type '${f.type}' must have 'options' array or 'options_source' string`);
                 }
             }
