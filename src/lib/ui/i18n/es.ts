@@ -108,6 +108,8 @@ export const es: Translations = {
 		remotePatPlaceholder: 'ghp_…',
 		remotePatHelp: 'Guardado en memoria solo durante la sesión — nunca en disco, nunca en URLs.',
 		remotePatOptional: 'Repositorio público detectado. El PAT es opcional (modo solo lectura).',
+		remotePatWarning:
+			'Sin un Token, la carga es considerablemente más lenta debido a los límites de la API. Añade un PAT para velocidades instantáneas.',
 		accessModeLabel: 'Modo de Acceso',
 		modeReadOnly: 'Solo Lectura',
 		modeEdit: 'Editar (requiere token)',
