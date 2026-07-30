@@ -288,6 +288,13 @@ export class GitHubProvider implements RepoProvider {
 		pat: string
 	): Promise<readonly RemoteFile[]> {
 		const octokit = this.#client(parsed, pat);
+
+		// GraphQL does not support unauthenticated requests.
+		// If PAT is empty (read-only public access), fallback to REST.
+		if (!pat) {
+			return this.fetchAllRest(parsed, branch, pat);
+		}
+
 		const expr = (sub: string): string => `${branch.sha}:${SUBTREE}/${sub}`;
 		const endpointUrl = `${parsed.baseUrl}/graphql`;
 		let data: QuillMdFetchAllResponse;
@@ -337,6 +344,45 @@ export class GitHubProvider implements RepoProvider {
 				out.push({ path, content, sha: entry.object.oid });
 			}
 		}
+		return out;
+	}
+
+	private async fetchAllRest(
+		parsed: ParsedRepo,
+		branch: BranchTip,
+		pat: string
+	): Promise<RemoteFile[]> {
+		const octokit = this.#client(parsed, pat);
+		const { data } = await octokit.rest.git.getTree({
+			owner: parsed.owner,
+			repo: parsed.repo,
+			tree_sha: branch.sha,
+			recursive: 'true'
+		});
+
+		const entriesToFetch = data.tree.filter((entry) => {
+			if (entry.type !== 'blob' || !entry.path) return false;
+			return (
+				entry.path === CONFIG_PATH ||
+				entry.path.startsWith(`${TEMPLATES_DIR}/`) ||
+				entry.path.startsWith(`${ISSUES_DIR}/`)
+			);
+		});
+
+		const out: RemoteFile[] = [];
+		// Fetch in chunks of 5 to avoid triggering GitHub's secondary abuse limit immediately
+		const chunkSize = 5;
+		for (let i = 0; i < entriesToFetch.length; i += chunkSize) {
+			const chunk = entriesToFetch.slice(i, i + chunkSize);
+			const results = await Promise.all(
+				chunk.map(async (entry) => {
+					const content = await this.fetchBlob(parsed, branch.sha, entry.path!, pat, 'base64');
+					return { path: entry.path!, content, sha: entry.sha ?? '' };
+				})
+			);
+			out.push(...results);
+		}
+
 		return out;
 	}
 

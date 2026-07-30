@@ -38,6 +38,7 @@
 	let remoteLoading = $state(false);
 	let isPublicRepo = $state<boolean | null>(null);
 	let wantsToEdit = $state(false);
+	let isCheckingAccess = $state(false);
 
 	const fsaSupported = $derived(isFsaAvailable());
 	const recentCount = $derived(stores.mode.recentHandles.length);
@@ -47,9 +48,11 @@
 		const url = repoUrl.trim();
 		if (!url) {
 			isPublicRepo = null;
+			isCheckingAccess = false;
 			return;
 		}
 
+		isCheckingAccess = true;
 		const check = async () => {
 			try {
 				const parsedUrl = new URL(url);
@@ -58,14 +61,19 @@
 					const parsed = provider.parseUrl(parsedUrl);
 					isPublicRepo = await provider.isPublic(parsed);
 				} else {
-					isPublicRepo = null;
+					isPublicRepo = false;
 				}
 			} catch {
-				isPublicRepo = null;
+				isPublicRepo = false;
+			} finally {
+				isCheckingAccess = false;
 			}
 		};
 		const timer = setTimeout(check, 500);
-		return () => clearTimeout(timer);
+		return () => {
+			clearTimeout(timer);
+			isCheckingAccess = false;
+		};
 	});
 
 	async function openLocalFolder(): Promise<void> {
@@ -249,51 +257,77 @@
 						placeholder={t('home.remoteBranchPlaceholder')}
 						required
 					/>
-					{#if isPublicRepo === true}
-						<label class="flex flex-col gap-1.5">
-							<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
-								>{t('home.accessModeLabel')}</span
-							>
-							<div class="relative w-full">
-								<select
-									bind:value={wantsToEdit}
-									class="w-full appearance-none rounded-md border border-border bg-background py-2 pr-10 pl-3 text-sm text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
+
+					{#if isCheckingAccess}
+						<div class="mt-1 flex animate-pulse items-center gap-2 text-xs text-muted-foreground">
+							<span
+								class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-primary border-t-transparent"
+							></span>
+							{t('common.loading')}
+						</div>
+					{:else if repoUrl.trim()}
+						{#if isPublicRepo === true}
+							<label class="mt-2 flex flex-col gap-1.5">
+								<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
+									>{t('home.accessModeLabel')}</span
 								>
-									<option value={false}>{t('home.modeReadOnly')}</option>
-									<option value={true}>{t('home.modeEdit')}</option>
-								</select>
-								<div
-									class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground"
-								>
-									<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M19 9l-7 7-7-7"
-										></path></svg
+								<div class="relative w-full">
+									<select
+										bind:value={wantsToEdit}
+										class="w-full appearance-none rounded-md border border-border bg-background py-2 pr-10 pl-3 text-sm text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
 									>
+										<option value={false}>{t('home.modeReadOnly')}</option>
+										<option value={true}>{t('home.modeEdit')}</option>
+									</select>
+									<div
+										class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground"
+									>
+										<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+											><path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M19 9l-7 7-7-7"
+											></path></svg
+										>
+									</div>
 								</div>
+							</label>
+						{:else if isPublicRepo === false}
+							<div class="mt-1 flex items-center gap-1 text-xs font-medium text-error">
+								<Lock class="h-3 w-3" />
+								<span>{t('home.modeEdit')}</span>
 							</div>
-						</label>
+						{/if}
 					{/if}
-					<Input
-						bind:value={pat}
-						type="password"
-						placeholder={t('home.remotePatLabel')}
-						autocomplete="off"
-						required={isPublicRepo === false || wantsToEdit}
-					/>
-					<p class="flex items-start gap-1 text-xs opacity-60">
-						<Lock class="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
-						<span>
-							{#if isPublicRepo === true && !wantsToEdit}
-								{t('home.remotePatOptional')}
-							{:else}
-								{t('home.remotePatHelp')}
-							{/if}
-						</span>
-					</p>
+
+					<div class="mt-2">
+						<Input
+							bind:value={pat}
+							type="password"
+							placeholder={t('home.remotePatLabel')}
+							autocomplete="off"
+							required={isPublicRepo === false || wantsToEdit}
+						/>
+					</div>
+
+					<div class="flex flex-col gap-1.5 text-xs">
+						<p class="flex items-start gap-1 opacity-60">
+							<Lock class="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
+							<span>
+								{#if isPublicRepo === true && !wantsToEdit}
+									{t('home.remotePatOptional')}
+								{:else}
+									{t('home.remotePatHelp')}
+								{/if}
+							</span>
+						</p>
+						{#if isPublicRepo === true && !wantsToEdit && !pat.trim()}
+							<p class="font-medium text-warning opacity-90">
+								{t('home.remotePatWarning')}
+							</p>
+						{/if}
+					</div>
 				</div>
 				{#if remoteError}
 					<Alert variant="error">{remoteError}</Alert>
