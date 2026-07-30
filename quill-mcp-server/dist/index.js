@@ -10,18 +10,18 @@ const server = new McpServer({
 });
 server.tool('quill_init_preset', "Initializes a Quill.md project with a base preset (e.g. 'scrum'). Creates config.json and base templates.", {
     presetId: z.string().describe("The ID of the preset to initialize (e.g. 'scrum')"),
-    projectDir: z.string().optional().describe("Optional absolute path to the project directory.")
+    projectDir: z.string().optional().describe('Optional absolute path to the project directory.')
 }, async ({ presetId, projectDir }) => {
     return await initPreset(presetId, projectDir);
 });
 server.tool('quill_list_issues', 'Lists all issues in the local Quill.md repository.', {
-    projectDir: z.string().optional().describe("Optional absolute path to the project directory.")
+    projectDir: z.string().optional().describe('Optional absolute path to the project directory.')
 }, async ({ projectDir }) => {
     return await listIssues(projectDir);
 });
 server.tool('quill_read_issue', 'Reads the full content of a specific Quill.md issue.', {
     issueId: z.string().describe('The ID of the issue to read'),
-    projectDir: z.string().optional().describe("Optional absolute path to the project directory.")
+    projectDir: z.string().optional().describe('Optional absolute path to the project directory.')
 }, async ({ issueId, projectDir }) => {
     return await readIssue(issueId, projectDir);
 });
@@ -37,7 +37,7 @@ server.tool('quill_create_issue', 'Creates a new issue in the Quill.md repositor
         .optional()
         .describe('Array of relations to other issues'),
     customFields: z.record(z.any()).optional().describe('Optional dictionary for custom fields'),
-    projectDir: z.string().optional().describe("Optional absolute path to the project directory.")
+    projectDir: z.string().optional().describe('Optional absolute path to the project directory.')
 }, async ({ title_text, issueType, status, sections, relations, customFields, projectDir }) => {
     return await createIssue(title_text, issueType, status, sections, relations, customFields, projectDir);
 });
@@ -45,7 +45,7 @@ server.tool('quill_create_template', 'Creates a new issue template in the Quill.
     templateJson: z
         .string()
         .describe("The JSON string representing the template object (must include at least 'id' and 'name')"),
-    projectDir: z.string().optional().describe("Optional absolute path to the project directory.")
+    projectDir: z.string().optional().describe('Optional absolute path to the project directory.')
 }, async ({ templateJson, projectDir }) => {
     return await createTemplate(templateJson, projectDir);
 });

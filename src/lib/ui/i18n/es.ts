@@ -107,7 +107,12 @@ export const es: Translations = {
 		remotePatLabel: 'Personal Access Token (opcional para repos públicos)',
 		remotePatPlaceholder: 'ghp_…',
 		remotePatHelp: 'Guardado en memoria solo durante la sesión — nunca en disco, nunca en URLs.',
-		remotePatOptional: 'Repositorio público detectado. El PAT es opcional (modo lectura).',
+		remotePatOptional: 'Repositorio público detectado. El PAT es opcional (modo solo lectura).',
+		accessModeLabel: 'Modo de Acceso',
+		modeReadOnly: 'Solo Lectura',
+		modeEdit: 'Editar (requiere token)',
+		restoreSessionTitle: (params: Params) => `Restaurar Sesión: Dar permiso a ${params.folder}`,
+		restoreSessionBody: 'El navegador perdió los permisos locales al recargar. Haz clic aquí para reconectar.',
 		fsaUnavailable:
 			'Tu navegador no soporta la File System Access API. Usa Chrome, Edge, Brave, Arc, Opera, o Vivaldi para el Modo de Edición Local.',
 
