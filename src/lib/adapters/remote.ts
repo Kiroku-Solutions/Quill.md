@@ -119,8 +119,10 @@ export function brandSha(value: string): Sha {
 	return value as Sha;
 }
 
+const CACHE_VERSION = 2; // Bump this when the remote fetch schema or data requirements change
+
 export function makeCacheKey(url: string, branch: string, sha: string): CacheKey {
-	return `${url}|${branch}|${sha}` as CacheKey;
+	return `v${CACHE_VERSION}|${url}|${branch}|${sha}` as CacheKey;
 }
 
 export const SUBTREE = '.quill.md';
