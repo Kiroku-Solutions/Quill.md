@@ -77,7 +77,7 @@
 # Cross-Origin-Resource-Policy: same-origin — refuse to be
 # embedded as a subresource by cross-origin pages.
 
-/
+/*
 	Cache-Control: no-cache, no-store, must-revalidate
 	Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
 	X-Content-Type-Options: nosniff
