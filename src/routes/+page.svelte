@@ -20,7 +20,7 @@
 	import { Alert, Button, Card, Input } from '$lib/ui';
 	import { t } from '$lib/ui/strings';
 	import { isFsaAvailable } from '$lib/adapters/feature-detect';
-	import { LocalFsAdapter } from '$lib/adapters';
+	import { LocalFsAdapter, type HandleRecord } from '$lib/adapters';
 	import { detectProvider } from '$lib/adapters/providers/detect';
 	import { getStores } from '$lib/state';
 	import HowItWorksStrip from '$lib/components/HowItWorksStrip.svelte';
@@ -37,9 +37,11 @@
 	let localLoading = $state(false);
 	let remoteLoading = $state(false);
 	let isPublicRepo = $state<boolean | null>(null);
+	let wantsToEdit = $state(false);
 
 	const fsaSupported = $derived(isFsaAvailable());
 	const recentCount = $derived(stores.mode.recentHandles.length);
+	const lastFolder = $derived(stores.mode.lastActiveFolder);
 
 	$effect(() => {
 		const url = repoUrl.trim();
@@ -109,9 +111,61 @@
 			remoteLoading = false;
 		}
 	}
+
+	async function restoreFolder(record: HandleRecord): Promise<void> {
+		openError = null;
+		localLoading = true;
+		try {
+			await stores.mode.openLocalFolder(record.handle);
+			await Promise.all([stores.config.load(), stores.templates.load()]);
+			await stores.issues.load();
+			if (stores.config.config === null) {
+				await goto(resolve('/wizard'));
+			} else {
+				await goto(resolve('/local'));
+			}
+		} catch (cause) {
+			openError = (cause as Error).message;
+		} finally {
+			localLoading = false;
+		}
+	}
 </script>
 
 <div class="mx-auto flex w-full max-w-5xl flex-col gap-12 px-6 py-20">
+	{#if lastFolder}
+		{@const record = stores.mode.recentHandles.find((r) => r.name === lastFolder)}
+		{#if record}
+			<section class="mx-auto w-full max-w-2xl">
+				<!-- svelte-ignore a11y_click_events_have_key_events -->
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<div
+					onclick={(e) => {
+						e.stopPropagation();
+						restoreFolder(record);
+					}}
+					class="cursor-pointer"
+				>
+					<Card
+						class="border-warning/50 bg-warning/10 transition-all hover:border-warning/80 hover:shadow-md"
+					>
+						<div class="flex items-center gap-4 p-4">
+							<div class="rounded-full bg-warning/20 p-3 text-warning">
+								<FolderOpen class="h-6 w-6" />
+							</div>
+							<div class="flex flex-col">
+								<h3 class="font-semibold text-foreground">
+									{t('home.restoreSessionTitle', { folder: lastFolder })}
+								</h3>
+								<p class="text-sm text-muted-foreground">{t('home.restoreSessionBody')}</p>
+							</div>
+						</div>
+					</Card>
+				</div>
+			</section>
+		{/if}
+	{/if}
+
 	<section
 		aria-labelledby="home-hero-title"
 		class="mb-6 flex flex-col items-center justify-center gap-4 text-center"
@@ -195,16 +249,45 @@
 						placeholder={t('home.remoteBranchPlaceholder')}
 						required
 					/>
+					{#if isPublicRepo === true}
+						<label class="flex flex-col gap-1.5">
+							<span class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase"
+								>{t('home.accessModeLabel')}</span
+							>
+							<div class="relative w-full">
+								<select
+									bind:value={wantsToEdit}
+									class="w-full appearance-none rounded-md border border-border bg-background py-2 pr-10 pl-3 text-sm text-foreground transition-shadow focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
+								>
+									<option value={false}>{t('home.modeReadOnly')}</option>
+									<option value={true}>{t('home.modeEdit')}</option>
+								</select>
+								<div
+									class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground"
+								>
+									<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+										><path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M19 9l-7 7-7-7"
+										></path></svg
+									>
+								</div>
+							</div>
+						</label>
+					{/if}
 					<Input
 						bind:value={pat}
 						type="password"
 						placeholder={t('home.remotePatLabel')}
 						autocomplete="off"
+						required={isPublicRepo === false || wantsToEdit}
 					/>
 					<p class="flex items-start gap-1 text-xs opacity-60">
 						<Lock class="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
 						<span>
-							{#if isPublicRepo === true}
+							{#if isPublicRepo === true && !wantsToEdit}
 								{t('home.remotePatOptional')}
 							{:else}
 								{t('home.remotePatHelp')}
