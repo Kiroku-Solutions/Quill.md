@@ -62,12 +62,22 @@ export interface FilterState {
 	q?: string;
 	sprintId?: string;
 	groupBy?: 'none' | 'sprint' | 'epic';
+	statusCategory?: 'open' | 'closed' | 'all';
 	creationDate?: DateRange;
 	updatedDate?: DateRange;
 }
 
 /** Flat keys that live at the top level of the URL query. */
-const SCALAR_KEYS = ['status', 'assignee', 'label', 'type', 'q', 'sprintId', 'groupBy'] as const;
+const SCALAR_KEYS = [
+	'status',
+	'statusCategory',
+	'assignee',
+	'label',
+	'type',
+	'q',
+	'sprintId',
+	'groupBy'
+] as const;
 /** Date-range field names; encoded as `<field>_from` / `<field>_to`. */
 const DATE_FIELDS = ['created', 'updated'] as const;
 const ALL_KEYS = [...SCALAR_KEYS, ...DATE_FIELDS.flatMap((f) => [`${f}_from`, `${f}_to`])] as const;

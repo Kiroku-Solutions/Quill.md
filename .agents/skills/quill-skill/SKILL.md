@@ -23,6 +23,8 @@ You have access to:
 - `quill_create_issue`: Create Markdown-based agile issues.
 - `quill_list_issues`: View the current backlog.
 - `quill_read_issue`: Read the content and relations of an issue.
+- `quill_create_wiki_page`: Generate documentation or specifications in `.quill.md/wiki/`.
+- `quill_create_adr`: Generate Architecture Decision Records in `.quill.md/adr/`.
 
 ### 0. Project Directory (CRITICAL — ALWAYS DO THIS)
 Every Quill tool accepts an optional `projectDir` parameter. You **MUST** always pass
@@ -107,6 +109,9 @@ Whenever invoked for project planning, execute this exact Chain of Thought:
    - *CRITICAL*: The response contains the UUID string ID of the new issue (e.g. `"bfe0f1a7-c8cd-4902-9f64-54676ce9eaec"`). Capture it exactly and pass it as `{ type: "parent", id: "<UUID>" }` to the subsequent User Stories. Never use numbers.
 5. **Quality Assurance Phase**:
    - For the most critical (P0) stories, generate explicit Test Case issues and link them to the story using `{ type: "relates_to", id: <Story_ID> }`.
+6. **Documentation Phase (Wiki and ADRs)**:
+   - When the user asks to document system architecture or specifications, use `quill_create_wiki_page`.
+   - When the user asks to record architectural decisions, use `quill_create_adr`.
 
 ## Anti-Patterns (NEVER DO THESE)
 - ❌ Using human-readable strings for `issueType` or `status` (e.g. 'User Story', 'To Do'). Use IDs only (`user-story`, `open`).

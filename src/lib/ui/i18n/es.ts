@@ -23,6 +23,8 @@ export const es: Translations = {
 		required: 'requerido',
 		delete: 'Eliminar',
 		permanentDelete: 'eliminar permanentemente',
+		lock: 'Bloquear Documento',
+		lockConfirm: '¿Estás seguro de que quieres bloquear este documento? Se volverá permanentemente inmutable.',
 		trashDirectory: '.quill.md/.trash/',
 		remoteSessionExpired: 'Sesión remota expirada — inicia sesión nuevamente para actualizar.',
 		issueCount: (params: Params) => `${params.n} elemento${params.n === 1 ? '' : 's'}`,
@@ -65,13 +67,16 @@ export const es: Translations = {
 		trackersHeading: 'Categorías',
 		planningHeading: 'Planificación',
 		filtersHeading: 'Filtros',
+		docsHeading: 'Documentación',
 		view: {
 			list: 'Lista',
 			kanban: 'Kanban',
 			gantt: 'Gantt',
 			graph: 'Grafo',
 			backlog: 'Backlog',
-			sprint: 'Planificador Sprint'
+			sprint: 'Planificador Sprint',
+			wiki: 'Wiki',
+			adr: 'ADRs'
 		},
 		expandNav: 'Expandir navegación',
 		collapseNav: 'Contraer navegación',
@@ -327,6 +332,9 @@ export const es: Translations = {
 		searchLabel: 'Buscar',
 		searchPlaceholder: 'título o cuerpo de sección…',
 		statusLabel: 'Estado',
+		statusCategoryLabel: 'Etapa',
+		statusCategoryOpen: 'Abiertos',
+		statusCategoryClosed: 'Cerrados',
 		typeLabel: 'Tipo',
 		typePlaceholder: 'bug, tarea…',
 		clearButton: 'Limpiar',
@@ -384,6 +392,16 @@ export const es: Translations = {
 		points: 'Puntos de Historia',
 		progressLabel: 'Progreso',
 		pointsUnit: 'pts'
+	},
+	wiki: {
+		new: 'Nueva Página Wiki',
+		empty: 'No se encontraron páginas wiki.',
+		selectPage: 'Selecciona una página en la barra lateral para comenzar'
+	},
+	adr: {
+		new: 'Nuevo ADR',
+		empty: 'No se encontraron ADRs.',
+		selectPage: 'Selecciona un ADR en la barra lateral para ver'
 	},
 	backlogView: {
 		tabEpic: 'Por Epic',

@@ -92,7 +92,16 @@
 			return linksToSprint || sprintLinksToStory;
 		});
 		const count = related.length;
-		const points = related.reduce((acc, story) => acc + (Number(story.fields.estimate) || 0), 0);
+		const points = related.reduce(
+			(acc, story) =>
+				acc +
+				(Number(
+					story.fields.estimate ??
+						story.customFields.story_points ??
+						story.customFields.estimate_hours
+				) || 0),
+			0
+		);
 		const completed = related.filter(
 			(s) => s.fields.status === 'done' || s.fields.status === 'closed'
 		).length;
@@ -290,11 +299,13 @@
 											>
 										</div>
 										<div class="flex items-center gap-3">
-											{#if story.fields.estimate}
+											{#if story.fields.estimate ?? story.customFields.story_points ?? story.customFields.estimate_hours}
 												<span
 													class="rounded bg-muted px-2.5 py-0.5 text-xs font-bold text-foreground"
 												>
-													{story.fields.estimate}
+													{story.fields.estimate ??
+														story.customFields.story_points ??
+														story.customFields.estimate_hours}
 													{t('sprint.pointsUnit')}
 												</span>
 											{/if}
@@ -355,11 +366,13 @@
 													<span class="truncate text-sm text-foreground">{story.fields.title}</span>
 												</div>
 												<div class="flex items-center gap-3">
-													{#if story.fields.estimate}
+													{#if story.fields.estimate ?? story.customFields.story_points ?? story.customFields.estimate_hours}
 														<span
 															class="rounded bg-muted px-2.5 py-0.5 text-xs font-bold text-foreground"
 														>
-															{story.fields.estimate}
+															{story.fields.estimate ??
+																story.customFields.story_points ??
+																story.customFields.estimate_hours}
 															{t('sprint.pointsUnit')}
 														</span>
 													{/if}
@@ -403,11 +416,13 @@
 													<span class="truncate text-sm text-foreground">{story.fields.title}</span>
 												</div>
 												<div class="flex items-center gap-3">
-													{#if story.fields.estimate}
+													{#if story.fields.estimate ?? story.customFields.story_points ?? story.customFields.estimate_hours}
 														<span
 															class="rounded bg-muted px-2.5 py-0.5 text-xs font-bold text-foreground"
 														>
-															{story.fields.estimate}
+															{story.fields.estimate ??
+																story.customFields.story_points ??
+																story.customFields.estimate_hours}
 															{t('sprint.pointsUnit')}
 														</span>
 													{/if}
