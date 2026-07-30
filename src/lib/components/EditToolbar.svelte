@@ -180,25 +180,20 @@
 	class="sticky top-[var(--topbar-height)] z-10 flex flex-wrap items-center gap-3 border-b border-border bg-surface/80 px-6 py-3 backdrop-blur-xl transition-colors duration-[var(--motion-slow)]"
 	data-testid="edit-toolbar"
 >
-	<Button
-		variant="primary"
-		size="sm"
-		onclick={openNewIssue}
-		data-testid="toolbar-new-issue"
-		disabled={stores.mode.isReadOnly}
-	>
-		{t('editToolbar.newIssue')}
-	</Button>
-	<Button
-		variant="secondary"
-		size="sm"
-		loading={importing}
-		onclick={handleImport}
-		data-testid="toolbar-import-issue"
-		disabled={stores.mode.isReadOnly}
-	>
-		{t('editToolbar.importIssue')}
-	</Button>
+	{#if !stores.mode.isReadOnly}
+		<Button variant="primary" size="sm" onclick={openNewIssue} data-testid="toolbar-new-issue">
+			{t('editToolbar.newIssue')}
+		</Button>
+		<Button
+			variant="secondary"
+			size="sm"
+			loading={importing}
+			onclick={handleImport}
+			data-testid="toolbar-import-issue"
+		>
+			{t('editToolbar.importIssue')}
+		</Button>
+	{/if}
 
 	<Button
 		variant="ghost"

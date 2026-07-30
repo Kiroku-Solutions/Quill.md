@@ -27,8 +27,8 @@
 	type SortKey = 'id' | 'title' | 'updated_date' | 'status';
 	type SortDir = 'asc' | 'desc';
 
-	let sortKey = $state<SortKey>('updated_date');
-	let sortDir = $state<SortDir>('desc');
+	let sortKey = $state<SortKey>('title');
+	let sortDir = $state<SortDir>('asc');
 
 	const sortedRows = $derived(
 		Array.from(issues.byId.values())
@@ -88,26 +88,34 @@
 			const sprintIssues = Array.from(issues.byId.values()).filter(
 				(li) => li.issue.fields.issueType === 'sprint'
 			);
-			const definedGroups = sprintIssues.map((s) => ({
-				id: `sprint-${s.issue.id}`,
-				title: s.issue.fields.title,
-				match: (issue: import('$lib/types').Issue) =>
-					issue.fields.relations.some((r) => r.id === s.issue.id) ||
-					s.issue.fields.relations.some((r) => r.id === issue.id)
-			}));
+			const definedGroups = sprintIssues
+				.sort((a, b) =>
+					a.issue.fields.title.localeCompare(b.issue.fields.title, undefined, { numeric: true })
+				)
+				.map((s) => ({
+					id: `sprint-${s.issue.id}`,
+					title: s.issue.fields.title,
+					match: (issue: import('$lib/types').Issue) =>
+						issue.fields.relations.some((r) => r.id === s.issue.id) ||
+						s.issue.fields.relations.some((r) => r.id === issue.id)
+				}));
 			return [...definedGroups, { id: 'unassigned', title: 'Sin Asignar', match: () => true }];
 		}
 		if (groupBy === 'epic') {
 			const epicIssues = Array.from(issues.byId.values()).filter(
 				(li) => li.issue.fields.issueType === 'epic'
 			);
-			const definedGroups = epicIssues.map((e) => ({
-				id: `epic-${e.issue.id}`,
-				title: e.issue.fields.title,
-				match: (issue: import('$lib/types').Issue) =>
-					issue.fields.relations.some((r) => r.id === e.issue.id) ||
-					e.issue.fields.relations.some((r) => r.id === issue.id)
-			}));
+			const definedGroups = epicIssues
+				.sort((a, b) =>
+					a.issue.fields.title.localeCompare(b.issue.fields.title, undefined, { numeric: true })
+				)
+				.map((e) => ({
+					id: `epic-${e.issue.id}`,
+					title: e.issue.fields.title,
+					match: (issue: import('$lib/types').Issue) =>
+						issue.fields.relations.some((r) => r.id === e.issue.id) ||
+						e.issue.fields.relations.some((r) => r.id === issue.id)
+				}));
 			return [...definedGroups, { id: 'unassigned', title: 'Sin Asignar', match: () => true }];
 		}
 		return [{ id: 'all', title: 'Todos los Problemas', match: () => true }];
