@@ -122,6 +122,20 @@ const FETCH_ALL_QUERY = /* GraphQL */ `
 								isTruncated
 								text
 							}
+							... on Tree {
+								entries {
+									name
+									type
+									path
+									object {
+										... on Blob {
+											oid
+											isTruncated
+											text
+										}
+									}
+								}
+							}
 						}
 					}
 				}
@@ -140,7 +154,12 @@ interface QuillMdSubtreeEntry {
 	readonly name: string;
 	readonly type: 'blob' | 'tree' | 'commit';
 	readonly path: string;
-	readonly object: QuillMdBlobNode | null;
+	readonly object: {
+		readonly oid: string;
+		readonly isTruncated?: boolean;
+		readonly text?: string | null;
+		readonly entries?: ReadonlyArray<QuillMdSubtreeEntry>;
+	} | null;
 }
 
 interface QuillMdSubtree {
@@ -336,12 +355,23 @@ export class GitHubProvider implements RepoProvider {
 		}
 		if (repo.issues) {
 			for (const entry of repo.issues.entries) {
-				if (entry.type !== 'blob' || !entry.object) continue;
-				const path = `${ISSUES_DIR}/${entry.name}`;
-				const content = entry.object.isTruncated
-					? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
-					: (entry.object.text ?? '');
-				out.push({ path, content, sha: entry.object.oid });
+				if (!entry.object) continue;
+				if (entry.type === 'blob') {
+					const path = `${ISSUES_DIR}/${entry.name}`;
+					const content = entry.object.isTruncated
+						? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
+						: (entry.object.text ?? '');
+					out.push({ path, content, sha: entry.object.oid });
+				} else if (entry.type === 'tree' && entry.object.entries) {
+					for (const sub of entry.object.entries) {
+						if (sub.type !== 'blob' || !sub.object) continue;
+						const path = `${ISSUES_DIR}/${entry.name}/${sub.name}`;
+						const content = sub.object.isTruncated
+							? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
+							: (sub.object.text ?? '');
+						out.push({ path, content, sha: sub.object.oid });
+					}
+				}
 			}
 		}
 		return out;
