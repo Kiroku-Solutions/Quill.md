@@ -260,7 +260,9 @@ function buildStub(issues: readonly Issue[], mode: 'local' | 'remote'): StoreGra
 			editorOpen: false,
 			openEditor: () => {},
 			closeEditor: () => {},
-			toggleEditor: () => {}
+			toggleEditor: () => {},
+			sidebarCollapsed: false,
+			toggleSidebarCollapsed: () => {}
 		}
 	};
 }
