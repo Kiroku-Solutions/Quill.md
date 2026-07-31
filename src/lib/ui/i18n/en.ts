@@ -114,8 +114,7 @@ export const en = {
 		remoteBranchPlaceholder: 'main',
 		remotePatLabel: 'Personal Access Token (optional for public repos)',
 		remotePatPlaceholder: 'ghp_…',
-		remotePatHelp:
-			'Stored in memory only for the duration of the session — never on disk, never in URLs.',
+		remotePatHelp: 'Held in memory for this session only.',
 		remotePatOptional: 'Public repository detected. PAT is optional (read-only mode).',
 		remotePatWarning:
 			'Without a token, loading is significantly slower due to API limits. Add a PAT for instant speeds.',

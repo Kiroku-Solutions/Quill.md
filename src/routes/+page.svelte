@@ -143,6 +143,15 @@
 	}
 </script>
 
+<svelte:window
+	onkeydown={(e) => {
+		if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'o') {
+			e.preventDefault();
+			if (fsaSupported) openLocalFolder();
+		}
+	}}
+/>
+
 <div class="mx-auto flex w-full max-w-5xl flex-col gap-12 px-6 py-20">
 	{#if lastFolder}
 		{@const record = stores.mode.recentHandles.find((r) => r.name === lastFolder)}
@@ -193,7 +202,7 @@
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div onclick={openLocalFolder} class="group cursor-pointer">
 			<Card
-				class="h-full transition-all duration-[var(--motion-base)] ease-in-out hover:-translate-y-1 hover:border-primary/50 hover:shadow-md"
+				class="h-full transition-all duration-[var(--motion-base)] ease-in-out hover:border-primary/50 hover:shadow-soft"
 			>
 				<div class="flex h-full flex-col gap-3">
 					<div
@@ -229,7 +238,7 @@
 		</div>
 
 		<Card
-			class="transition-all duration-[var(--motion-base)] ease-in-out focus-within:-translate-y-1 focus-within:border-primary/50 focus-within:shadow-md hover:border-primary/50 hover:shadow-md"
+			class="transition-all duration-[var(--motion-base)] ease-in-out focus-within:border-primary/50 focus-within:shadow-soft hover:border-primary/50 hover:shadow-soft"
 		>
 			<form
 				class="group flex h-full flex-col gap-3"

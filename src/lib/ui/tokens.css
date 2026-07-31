@@ -1,4 +1,8 @@
 :root {
+	--topbar-height: 4rem;
+	--leftrail-width: 260px;
+	--leftrail-width-collapsed: 72px;
+
 	/* ☀️ Light Theme */
 	--background: #fdfbf7;
 	--foreground: #121b26;
