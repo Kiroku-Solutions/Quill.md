@@ -27,6 +27,7 @@ import type { TemplatesStore } from './templates.svelte.ts';
 import type { ThemeStore } from './theme.svelte.ts';
 import type { UiStore } from './ui.svelte.ts';
 import type { ViewStore } from './view.svelte.ts';
+import type { TodoStore } from './todo.svelte.ts';
 
 export interface StoreGraph {
 	readonly mode: ModeStore;
@@ -43,6 +44,7 @@ export interface StoreGraph {
 	 * flags (command palette, toaster, etc.).
 	 */
 	readonly ui: UiStore;
+	readonly todo: TodoStore;
 }
 
 const STORES_KEY = Symbol('quill-md.stores');

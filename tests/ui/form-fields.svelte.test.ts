@@ -184,6 +184,7 @@ function buildStub(opts: StubOpts = {}): StoreGraph {
 	const byId = new Map<string, LoadedIssue>();
 	byId.set(loaded.issue.id, loaded);
 	return {
+		todo: {} as unknown as StoreGraph['todo'],
 		mode: {
 			isReadOnly: false,
 			lastActiveFolder: null,

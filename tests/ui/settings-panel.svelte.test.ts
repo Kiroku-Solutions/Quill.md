@@ -94,6 +94,7 @@ function buildStub(opts: {
 		remote: { cors_proxy: opts.corsProxy ?? 'https://cors.isomorphic-git.org' }
 	};
 	return {
+		todo: {} as unknown as StoreGraph['todo'],
 		mode: {
 			isReadOnly: false,
 			lastActiveFolder: null,

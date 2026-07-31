@@ -78,6 +78,7 @@ function makeHandle(id: string, name: string): HandleRecord {
 
 function buildStub(opts: { recentHandles: HandleRecord[] }): StoreGraph {
 	return {
+		todo: {} as unknown as StoreGraph['todo'],
 		mode: {
 			isReadOnly: false,
 			lastActiveFolder: null,

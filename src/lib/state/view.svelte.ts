@@ -22,7 +22,8 @@
 
 import { assertBrowser } from './_context.ts';
 
-export type View = 'list' | 'kanban' | 'gantt' | 'backlog' | 'sprint' | 'graph' | 'wiki' | 'adr';
+export type View =
+	'list' | 'kanban' | 'gantt' | 'backlog' | 'sprint' | 'graph' | 'wiki' | 'adr' | 'todo';
 
 /** Allowed view values in declaration order. */
 const ALL_VIEWS: readonly View[] = [
@@ -33,7 +34,8 @@ const ALL_VIEWS: readonly View[] = [
 	'sprint',
 	'graph',
 	'wiki',
-	'adr'
+	'adr',
+	'todo'
 ];
 
 const STORAGE_KEY = 'quill.md.view';
