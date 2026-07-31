@@ -9,7 +9,7 @@
 
 @theme {
 	--animate-shake: shake 0.3s ease-in-out infinite;
-	--animate-pop: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+	--animate-pop: pop 0.4s var(--ease-out);
 
 	@keyframes shake {
 		0%,
