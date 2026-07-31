@@ -132,12 +132,12 @@ describe('renderMarkdown — XSS sanitization', () => {
 		expect(out.toLowerCase()).not.toContain('<script');
 	});
 
-	it('strips <form> and <input>', () => {
+	it('strips <form> but allows <input> (for task lists)', () => {
 		// Wrap in a <p> so the input is not 100% stripped (which would trip
 		// the "non-empty input → empty output" check on the renderer).
 		const out = renderMarkdown('Text before <form action="/x"><input name="y"></form> and after');
 		expect(out.toLowerCase()).not.toContain('<form');
-		expect(out.toLowerCase()).not.toContain('<input');
+		expect(out.toLowerCase()).toContain('<input');
 		expect(out).toContain('Text before');
 		expect(out).toContain('and after');
 	});

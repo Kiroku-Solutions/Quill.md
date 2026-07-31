@@ -59,6 +59,10 @@ export { createEditorStore } from './editor.svelte.ts';
 export type { UiStore } from './ui.svelte.ts';
 export { createUiStore } from './ui.svelte.ts';
 
+// ─── Todo ───────────────────────────────────────────────────────────────────
+export type { TodoStore } from './todo.svelte.ts';
+export { createTodoStore } from './todo.svelte.ts';
+
 // ─── Errors ────────────────────────────────────────────────────────────────
 // `StoreNotReadyError` and `ConcurrentSaveError` were removed in
 // t1-state-types-layout — see git history. `StateError` is the only error

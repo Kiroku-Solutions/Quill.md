@@ -118,6 +118,7 @@ function buildStub(issues: readonly Issue[], mode: 'local' | 'remote'): StoreGra
 		else byStatus.set(li.issue.fields.status, [li]);
 	}
 	return {
+		todo: {} as unknown as StoreGraph['todo'],
 		mode: {
 			isReadOnly: false,
 			lastActiveFolder: null,

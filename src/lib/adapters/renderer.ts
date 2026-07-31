@@ -125,7 +125,7 @@ export interface RendererOptions {
 /** Default DOMPurify configuration: blocks all script vectors. */
 const STRICT_DOM_PURIFY_CONFIG: DOMPurifyConfig = {
 	USE_PROFILES: { html: true },
-	FORBID_TAGS: ['style', 'script', 'iframe', 'object', 'embed', 'form', 'input', 'button'],
+	FORBID_TAGS: ['style', 'script', 'iframe', 'object', 'embed', 'form', 'button'],
 	FORBID_ATTR: ['style', 'onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],
 	ALLOW_DATA_ATTR: false,
 	KEEP_CONTENT: true,

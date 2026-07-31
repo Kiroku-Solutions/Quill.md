@@ -130,6 +130,7 @@ function buildStub(opts: {
 	const aeid = opts.activeEditorId ?? null;
 	const updateLog: Array<{ id: string; patch: object }> = [];
 	return {
+		todo: {} as unknown as StoreGraph['todo'],
 		mode: {
 			isReadOnly: false,
 			lastActiveFolder: null,

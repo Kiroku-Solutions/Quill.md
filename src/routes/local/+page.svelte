@@ -33,6 +33,7 @@
 	import GraphView from '$lib/components/GraphView.svelte';
 	import WikiView from '$lib/components/WikiView.svelte';
 	import AdrView from '$lib/components/AdrView.svelte';
+	import TodoView from '$lib/components/TodoView.svelte';
 	import EditorPanel from '$lib/components/EditorPanel.svelte';
 	import FilterUrlSync from '$lib/components/FilterUrlSync.svelte';
 	import EditToolbar from '$lib/components/EditToolbar.svelte';
@@ -69,6 +70,8 @@
 			<WikiView />
 		{:else if stores.view.view === 'adr'}
 			<AdrView />
+		{:else if stores.view.view === 'todo'}
+			<TodoView />
 		{/if}
 	</div>
 

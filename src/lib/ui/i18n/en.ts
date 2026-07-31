@@ -77,7 +77,8 @@ export const en = {
 			backlog: 'Backlog',
 			sprint: 'Sprint Planner',
 			wiki: 'Wiki',
-			adr: 'ADRs'
+			adr: 'ADRs',
+			todo: 'To-Do List'
 		},
 		expandNav: 'Expand navigation',
 		collapseNav: 'Collapse navigation',
@@ -494,6 +495,16 @@ export const en = {
 		optionsPlaceholder: 'High, Medium, Low',
 		sectionPlaceholder: 'Section name',
 		removeSection: 'Remove section'
+	},
+	todo: {
+		placeholder: '- [ ] Your next task...',
+		newPrompt: 'Enter new To-Do list name:',
+		renamePrompt: 'Enter new name:',
+		alreadyExists: 'A list with this name already exists.',
+		deleteConfirm: 'Are you sure you want to delete this list?',
+		newList: 'New List',
+		emptyLists: 'No To-Do lists found.',
+		selectPage: 'Select a list from the sidebar to start'
 	}
 };
 
