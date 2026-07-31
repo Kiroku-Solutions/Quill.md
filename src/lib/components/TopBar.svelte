@@ -111,8 +111,17 @@
 >
 	<div class="flex flex-1 items-center gap-3 overflow-hidden">
 		{#if mode === 'local' || mode === 'remote'}
-			<div class="mr-1 -ml-2 flex-shrink-0 md:hidden">
-				<IconButton label={t('topbar.toggleMobileNav')} onclick={() => stores.ui.toggleMobileNav()}>
+			<div class="mr-1 -ml-2 flex-shrink-0 {stores.ui.sidebarCollapsed ? '' : 'md:hidden'}">
+				<IconButton
+					label={t('topbar.toggleMobileNav')}
+					onclick={() => {
+						if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+							stores.ui.toggleSidebarCollapsed();
+						} else {
+							stores.ui.toggleMobileNav();
+						}
+					}}
+				>
 					<MenuIcon class="h-6 w-6" aria-hidden="true" />
 				</IconButton>
 			</div>
