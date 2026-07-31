@@ -24,6 +24,7 @@
 		createThemeStore,
 		createUiStore,
 		createViewStore,
+		createTodoStore,
 		setStores
 	} from '$lib/state';
 	import { handleStore, LocalFsAdapter } from '$lib/adapters';
@@ -90,8 +91,9 @@
 	const view = createViewStore();
 	const theme = createThemeStore();
 	const ui = createUiStore();
+	const todo = createTodoStore();
 
-	setStores({ mode, config, templates, issues, editor, filter, view, theme, ui });
+	setStores({ mode, config, templates, issues, editor, filter, view, theme, ui, todo });
 
 	// The wizard route has its own standalone layout; the chrome that
 	// wraps every other page reads the current pathname and forwards a

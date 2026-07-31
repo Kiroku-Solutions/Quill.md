@@ -78,7 +78,8 @@ export const es: Translations = {
 			backlog: 'Backlog',
 			sprint: 'Planificador Sprint',
 			wiki: 'Wiki',
-			adr: 'ADRs'
+			adr: 'ADRs',
+			todo: 'Lista To-Do'
 		},
 		expandNav: 'Expandir navegación',
 		collapseNav: 'Contraer navegación',
@@ -499,5 +500,15 @@ export const es: Translations = {
 		optionsPlaceholder: 'Alta, Media, Baja',
 		sectionPlaceholder: 'Nombre de la sección',
 		removeSection: 'Eliminar sección'
+	},
+	todo: {
+		placeholder: '- [ ] Tu próxima tarea...',
+		newPrompt: 'Ingresa el nombre de la nueva lista To-Do:',
+		renamePrompt: 'Ingresa el nuevo nombre:',
+		alreadyExists: 'Ya existe una lista con este nombre.',
+		deleteConfirm: '¿Estás seguro de que quieres eliminar esta lista?',
+		newList: 'Nueva Lista',
+		emptyLists: 'No se encontraron listas To-Do.',
+		selectPage: 'Selecciona una lista de la barra lateral para comenzar'
 	}
 };

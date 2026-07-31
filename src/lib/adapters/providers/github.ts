@@ -59,6 +59,7 @@ const TEMPLATES_DIR = `${SUBTREE}/templates`;
 const ISSUES_DIR = `${SUBTREE}/issues`;
 const ADR_DIR = `${SUBTREE}/adr`;
 const WIKI_DIR = `${SUBTREE}/wiki`;
+const TODOS_DIR = `${SUBTREE}/todos`;
 const CONFIG_PATH = `${SUBTREE}/config.json`;
 
 /**
@@ -87,6 +88,7 @@ const FETCH_ALL_QUERY = /* GraphQL */ `
 		$issuesExpr: String!
 		$adrExpr: String!
 		$wikiExpr: String!
+		$todosExpr: String!
 	) {
 		repository(owner: $owner, name: $name) {
 			config: object(expression: $configExpr) {
@@ -178,6 +180,23 @@ const FETCH_ALL_QUERY = /* GraphQL */ `
 					}
 				}
 			}
+			todos: object(expression: $todosExpr) {
+				... on Tree {
+					oid
+					entries {
+						name
+						type
+						path
+						object {
+							... on Blob {
+								oid
+								isTruncated
+								text
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 `;
@@ -214,6 +233,7 @@ interface QuillMdFetchAllResponse {
 		readonly issues: QuillMdSubtree | null;
 		readonly adr: QuillMdSubtree | null;
 		readonly wiki: QuillMdSubtree | null;
+		readonly todos: QuillMdSubtree | null;
 	} | null;
 }
 
@@ -365,7 +385,8 @@ export class GitHubProvider implements RepoProvider {
 				templatesExpr: expr('templates'),
 				issuesExpr: expr('issues'),
 				adrExpr: expr('adr'),
-				wikiExpr: expr('wiki')
+				wikiExpr: expr('wiki'),
+				todosExpr: expr('todos')
 			});
 		} catch (err) {
 			throw mapGraphQLError(err, endpointUrl);
@@ -409,6 +430,16 @@ export class GitHubProvider implements RepoProvider {
 			for (const entry of repo.wiki.entries) {
 				if (entry.type !== 'blob' || !entry.object) continue;
 				const path = `${WIKI_DIR}/${entry.name}`;
+				const content = entry.object.isTruncated
+					? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
+					: (entry.object.text ?? '');
+				out.push({ path, content, sha: entry.object.oid });
+			}
+		}
+		if (repo.todos) {
+			for (const entry of repo.todos.entries) {
+				if (entry.type !== 'blob' || !entry.object) continue;
+				const path = `${TODOS_DIR}/${entry.name}`;
 				const content = entry.object.isTruncated
 					? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
 					: (entry.object.text ?? '');
@@ -459,7 +490,8 @@ export class GitHubProvider implements RepoProvider {
 				entry.path.startsWith(`${TEMPLATES_DIR}/`) ||
 				entry.path.startsWith(`${ISSUES_DIR}/`) ||
 				entry.path.startsWith(`${ADR_DIR}/`) ||
-				entry.path.startsWith(`${WIKI_DIR}/`)
+				entry.path.startsWith(`${WIKI_DIR}/`) ||
+				entry.path.startsWith(`${TODOS_DIR}/`)
 			);
 		});
 

@@ -23,9 +23,13 @@
 		theme: 'default'
 	});
 
-	type Props = { markdown: string; class?: string };
+	type Props = {
+		markdown: string;
+		class?: string;
+		ontasktoggle?: (e: CustomEvent<{ index: number; checked: boolean }>) => void;
+	};
 
-	let { markdown, class: className = '' }: Props = $props();
+	let { markdown, class: className = '', ontasktoggle }: Props = $props();
 
 	let debounced = $state('');
 	let html = $state('');
@@ -224,6 +228,30 @@
 								console.error('Mermaid render failed', e);
 							}
 						}
+
+						// Enable task list checkboxes
+						const checkboxes =
+							container.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
+						checkboxes.forEach((cb, index) => {
+							cb.removeAttribute('disabled');
+							cb.addEventListener('change', () => {
+								if (ontasktoggle) {
+									ontasktoggle(
+										new CustomEvent('tasktoggle', {
+											detail: { index, checked: cb.checked },
+											bubbles: true
+										})
+									);
+								} else {
+									container?.dispatchEvent(
+										new CustomEvent('tasktoggle', {
+											detail: { index, checked: cb.checked },
+											bubbles: true
+										})
+									);
+								}
+							});
+						});
 					}
 				}
 			}
@@ -276,5 +304,23 @@
 		height: 100%;
 		max-width: 100%;
 		max-height: 100%;
+	}
+
+	/* Task lists (GFM checkboxes) */
+	:global(.prose li:has(> input[type='checkbox'])) {
+		list-style-type: none;
+		padding-left: 0;
+		display: flex;
+		align-items: flex-start;
+		gap: 0.5rem;
+		margin-top: 0.5em;
+		margin-bottom: 0.5em;
+	}
+	:global(.prose li > input[type='checkbox']) {
+		margin-top: 0.35em;
+		margin-bottom: 0;
+	}
+	:global(.prose ul:has(> li > input[type='checkbox'])) {
+		padding-left: 1em;
 	}
 </style>

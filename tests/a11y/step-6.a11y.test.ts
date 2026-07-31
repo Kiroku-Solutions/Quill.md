@@ -196,6 +196,7 @@ function buildStub(opts: {
 				})()
 			: null;
 	return {
+		todo: {} as unknown as StoreGraph['todo'],
 		mode: {
 			isReadOnly: false,
 			lastActiveFolder: null,

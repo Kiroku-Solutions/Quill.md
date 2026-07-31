@@ -14,8 +14,12 @@
 	// List of all issues
 	const allIssues = $derived(issues.issues.map((li) => li.issue));
 
-	// Find Sprints
-	const sprints = $derived(allIssues.filter((i) => i.fields.issueType === 'sprint'));
+	// Find Sprints and sort them numerically by title
+	const sprints = $derived(
+		allIssues
+			.filter((i) => i.fields.issueType === 'sprint')
+			.sort((a, b) => a.fields.title.localeCompare(b.fields.title, undefined, { numeric: true }))
+	);
 
 	// Currently selected Sprint ID
 	let selectedSprintId = $state<string | null>(null);

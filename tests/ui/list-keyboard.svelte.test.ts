@@ -78,6 +78,7 @@ function buildStub(issues: readonly Issue[]): StoreGraph {
 		sourcePath: `.quill.md/issues/${String(iss.id).padStart(4, '0')}-${iss.fields.title.toLowerCase()}.md`
 	}));
 	return {
+		todo: {} as unknown as StoreGraph['todo'],
 		mode: {
 			isReadOnly: false,
 			lastActiveFolder: null,

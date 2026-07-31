@@ -91,6 +91,7 @@ function buildStub(opts: { integrityCount: number; activeHandleName?: string }):
 	}));
 
 	return {
+		todo: {} as unknown as StoreGraph['todo'],
 		mode: {
 			isReadOnly: false,
 			lastActiveFolder: null,
