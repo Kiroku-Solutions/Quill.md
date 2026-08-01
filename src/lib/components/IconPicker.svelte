@@ -59,9 +59,9 @@
 			{@const isSelected = value === iconName}
 			<button
 				type="button"
-				class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md transition-all duration-200
+				class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md transition-all duration-[var(--motion-fast)] ease-[var(--ease-out)]
 					{isSelected
-					? 'scale-110 bg-primary text-primary-foreground shadow-md'
+					? 'scale-110 bg-primary text-primary-foreground'
 					: 'text-muted-foreground hover:scale-105 hover:bg-muted hover:text-foreground'}"
 				onclick={() => selectIcon(iconName)}
 				aria-label={iconName}

@@ -174,13 +174,17 @@
 	const providerLabel = $derived(
 		isRemote ? (stores.mode.isReadOnly ? 'Remote (read-only)' : 'Remote (editable)') : 'Local'
 	);
+
+	const isIssueView = $derived(
+		['list', 'kanban', 'graph', 'gantt', 'backlog', 'sprint'].includes(stores.view.view)
+	);
 </script>
 
 <nav
 	class="sticky top-0 z-10 flex flex-wrap items-center gap-3 border-b border-border bg-surface/80 px-6 py-3 backdrop-blur-xl transition-colors duration-[var(--motion-slow)]"
 	data-testid="edit-toolbar"
 >
-	{#if !stores.mode.isReadOnly}
+	{#if !stores.mode.isReadOnly && isIssueView}
 		<Button variant="primary" size="sm" onclick={openNewIssue} data-testid="toolbar-new-issue">
 			{t('editToolbar.newIssue')}
 		</Button>
@@ -244,7 +248,7 @@
 	{/if}
 
 	<div class="ml-auto flex items-center gap-2">
-		{#if !isRemote}
+		{#if !isRemote && isIssueView}
 			<Tooltip text={t('editToolbar.trashAria', { n: trashCount })} position="bottom">
 				<button
 					type="button"

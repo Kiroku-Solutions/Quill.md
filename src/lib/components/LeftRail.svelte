@@ -5,8 +5,8 @@
 	Behaviour:
 	  - Sticky below the TopBar, `--leftrail-width` wide. Subtle right
 	    border (`border-base-300`) on a `bg-base-200` surface.
-	  - Contains the view switcher (List / Kanban / Gantt — built on the
-	    `Tabs` 6B primitive, wired to `viewStore.view`).
+	  - Contains the view switcher (List / Kanban / Gantt / Graph) as a
+	    vertical list, wired to `viewStore.view`.
 	  - Embeds the existing `FilterBar` component inside a collapsible
 	    panel.
 	  - Shows the integrity warning count as a clickable badge.
@@ -16,7 +16,7 @@
 <script lang="ts">
 	import PanelLeftClose from '@lucide/svelte/icons/panel-left-close';
 	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
-	import { IconButton, Tabs } from '$lib/ui';
+	import { IconButton } from '$lib/ui';
 	import { t } from '$lib/ui/strings';
 	import FilterBar from './FilterBar.svelte';
 	import { getStores } from '$lib/state';
@@ -94,8 +94,22 @@
 		</IconButton>
 	</div>
 
-	<Tabs tabs={viewTabs} value={stores.view.view} onchange={onViewChange} class="w-full" />
-
+	<div class="flex flex-col gap-1">
+		{#each viewTabs as tab (tab.id)}
+			<button
+				type="button"
+				class="flex cursor-pointer items-center justify-start gap-2 rounded-md px-3 py-2 text-sm font-semibold transition-colors duration-[var(--motion-fast)] ease-out focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none {stores
+					.view.view === tab.id
+					? 'bg-primary text-primary-foreground'
+					: 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
+				onclick={() => {
+					onViewChange(tab.id);
+				}}
+			>
+				<span>{tab.label}</span>
+			</button>
+		{/each}
+	</div>
 	{#if stores.templates.templates.length > 0}
 		<h2 class="mt-4 text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
 			{t('leftrail.trackersHeading')}
