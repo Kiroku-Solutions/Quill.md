@@ -67,7 +67,7 @@
 <aside
 	data-testid="leftrail"
 	aria-label={t('leftrail.ariaLabel')}
-	class="fixed top-0 bottom-0 left-0 z-50 flex h-screen w-[var(--leftrail-width)] shrink-0 flex-col gap-4 overflow-y-auto overscroll-contain border-r border-border bg-surface p-4 transition-transform duration-[var(--motion-base)] ease-out md:sticky md:top-[var(--topbar-height)] md:z-20 md:h-[calc(100vh-var(--topbar-height))] {mobileOpen
+	class="fixed top-0 bottom-0 left-0 z-50 flex h-screen w-[var(--leftrail-width)] shrink-0 flex-col gap-4 overflow-x-hidden overflow-y-auto overscroll-contain border-r border-border bg-surface p-4 transition-transform duration-[var(--motion-base)] ease-out md:sticky md:top-[var(--topbar-height)] md:z-20 md:h-[calc(100vh-var(--topbar-height))] {mobileOpen
 		? 'translate-x-0 shadow-2xl'
 		: '-translate-x-full md:shadow-none'} {stores.ui.sidebarCollapsed
 		? 'md:hidden'

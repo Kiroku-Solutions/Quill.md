@@ -177,7 +177,7 @@
 </script>
 
 <nav
-	class="sticky top-[var(--topbar-height)] z-10 flex flex-wrap items-center gap-3 border-b border-border bg-surface/80 px-6 py-3 backdrop-blur-xl transition-colors duration-[var(--motion-slow)]"
+	class="sticky top-0 z-10 flex flex-wrap items-center gap-3 border-b border-border bg-surface/80 px-6 py-3 backdrop-blur-xl transition-colors duration-[var(--motion-slow)]"
 	data-testid="edit-toolbar"
 >
 	{#if !stores.mode.isReadOnly}

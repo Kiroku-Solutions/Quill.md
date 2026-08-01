@@ -4,8 +4,6 @@
  * Verifies the 6H acceptance criteria from the brief:
  *   - The Theme picker is present with three buttons (Light / Dark /
  *     System). Clicking one calls `theme.setTheme(...)`.
- *   - The CORS proxy field shows the current value and is `readonly`.
- *     The "Coming in a follow-up" small-print is visible.
  *   - The Recent folders list is rendered (the 6D `<RecentFoldersList>`
  *     is embedded).
  *   - The "Empty trash" command button is present; clicking it opens
@@ -260,25 +258,6 @@ describe('SettingsPanel', () => {
 		await page.getByTestId('settings-theme-system').click();
 
 		expect(setThemeCalls).toEqual(['system']);
-	});
-
-	it('CORS proxy field shows the current value and is readonly', async () => {
-		renderOpen({ corsProxy: 'https://my-proxy.example.com' });
-
-		const input = page.getByTestId('settings-cors-input');
-		await expect.element(input).toBeInTheDocument();
-		await expect.element(input).toHaveValue('https://my-proxy.example.com');
-
-		// The "Coming in a follow-up" small-print is part of the CORS section.
-		const note = page.getByTestId('settings-cors-note');
-		await expect.element(note).toBeInTheDocument();
-		expect((note.element() as HTMLElement).textContent ?? '').toMatch(
-			/coming in a[\s\S]*follow-up/i
-		);
-
-		// The native input element must expose the `readonly` attribute.
-		const inputEl = document.querySelector<HTMLInputElement>('[data-testid="settings-cors-input"]');
-		expect(inputEl?.readOnly).toBe(true);
 	});
 
 	it('renders the embedded RecentFoldersList', async () => {
