@@ -80,7 +80,7 @@
 <div
 	role="tablist"
 	aria-orientation="horizontal"
-	class="flex w-full items-center gap-6 border-b border-border {extraClass}"
+	class="flex w-full [scrollbar-width:none] items-center gap-4 overflow-x-auto border-b border-border [&::-webkit-scrollbar]:hidden {extraClass}"
 >
 	{#each tabs as tab, i (tab.id)}
 		{@const isActive = tab.id === value}

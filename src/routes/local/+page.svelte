@@ -53,7 +53,7 @@
 	<FilterUrlSync />
 	<EditToolbar />
 
-	<div class="flex-1 overflow-y-auto pb-12">
+	<div class="flex-1 overflow-y-auto {stores.view.view === 'graph' ? '' : 'pb-12'}">
 		{#if stores.view.view === 'list'}
 			<ListView />
 		{:else if stores.view.view === 'kanban'}
