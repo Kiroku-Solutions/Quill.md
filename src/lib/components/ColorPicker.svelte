@@ -36,7 +36,7 @@
 			{@const isSelected = value === color}
 			<button
 				type="button"
-				class="relative h-8 w-8 rounded-full shadow-sm transition-all duration-200
+				class="relative h-8 w-8 rounded-full transition-all duration-[var(--motion-fast)] ease-[var(--ease-out)]
 					{isSelected
 					? 'scale-110 ring-2 ring-primary ring-offset-2 ring-offset-background'
 					: 'hover:scale-110'}"

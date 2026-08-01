@@ -115,7 +115,7 @@
 	}
 
 	async function onSaveTemplate(t: Template): Promise<void> {
-		const adapter = stores.mode.localAdapter;
+		const adapter = stores.mode.localAdapter || stores.mode.remoteAdapter;
 		if (!adapter) return;
 		try {
 			await saveTemplate(adapter, t, true);
@@ -237,7 +237,7 @@
 								editorTemplate = undefined;
 								editorOpen = true;
 							}}
-							disabled={!localAdapter}
+							disabled={(!localAdapter && !stores.mode.remoteAdapter) || stores.mode.isReadOnly}
 						>
 							{t('settings.newTemplate')}
 						</Button>
@@ -247,11 +247,12 @@
 					{#each stores.templates.templates as tmpl (tmpl.id)}
 						<button
 							type="button"
-							class="flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-surface px-3 py-2 text-left shadow-sm transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+							class="flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-surface px-3 py-2 text-left shadow-sm transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
 							onclick={() => {
 								editorTemplate = tmpl;
 								editorOpen = true;
 							}}
+							disabled={stores.mode.isReadOnly}
 						>
 							<span class="h-3 w-3 shrink-0 rounded-full" style="background-color: {tmpl.color}"
 							></span>

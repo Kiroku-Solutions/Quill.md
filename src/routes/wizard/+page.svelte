@@ -31,7 +31,9 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { Alert, Button, Card, Radio, Tooltip } from '$lib/ui';
+	import { slide } from 'svelte/transition';
+	import Check from '@lucide/svelte/icons/check';
+	import { Alert, Button, Tooltip } from '$lib/ui';
 	import { t } from '$lib/ui/strings';
 	import { i18n } from '$lib/ui/i18n/store.svelte';
 	import { FRAMEWORK_PRESETS } from '$lib/services/framework-presets';
@@ -119,95 +121,165 @@
 </script>
 
 <div class="flex min-h-screen flex-col bg-background text-foreground">
-	<div class="flex-1 px-6 py-10">
-		<div class="mx-auto flex max-w-4xl flex-col gap-8">
+	<div class="flex-1 px-4 py-8 sm:px-6 sm:py-12">
+		<div class="mx-auto flex max-w-2xl flex-col gap-10">
 			<section>
-				<h1 class="text-2xl font-semibold">{t('wizard.headTitle')}</h1>
-				<p class="mt-2 opacity-80">{t('wizard.headBody')}</p>
+				<h1 class="font-display text-3xl font-semibold tracking-tight">{t('wizard.headTitle')}</h1>
+				<p class="mt-3 text-lg opacity-80">{t('wizard.headBody')}</p>
 			</section>
 
-			<section class="flex flex-col gap-3">
-				<h2 class="text-lg font-semibold">{t('wizard.step1Title')}</h2>
+			<section class="flex flex-col gap-4">
+				<h2 class="font-display text-xl font-semibold">{t('wizard.step1Title')}</h2>
 
-				<Card compact class="cursor-pointer">
-					<label class="flex cursor-pointer items-start gap-3">
-						<Radio
-							name="wizard-path"
-							value="builtin"
-							checked={path === 'builtin'}
-							label=""
-							ariaLabel={t('wizard.builtinAria')}
-							onchange={() => (path = 'builtin')}
-						/>
+				<label
+					class="group relative flex cursor-pointer flex-col rounded-xl border-2 bg-surface p-5 shadow-sm transition-all hover:shadow-md {path ===
+					'builtin'
+						? 'border-primary ring-4 ring-primary/10'
+						: 'border-border hover:border-primary/50'}"
+				>
+					<input
+						type="radio"
+						name="wizard-path"
+						value="builtin"
+						checked={path === 'builtin'}
+						class="sr-only"
+						aria-label={t('wizard.builtinAria')}
+						onchange={() => (path = 'builtin')}
+					/>
+					<div class="flex items-start justify-between gap-4">
 						<div class="flex-1">
-							<div class="font-medium">{t('wizard.builtinTitle')}</div>
-							<div class="text-sm opacity-70">{t('wizard.builtinBody')}</div>
+							<div
+								class="font-display text-lg font-semibold text-foreground transition-colors group-hover:text-primary"
+							>
+								{t('wizard.builtinTitle')}
+							</div>
+							<div class="mt-1 text-sm leading-relaxed opacity-75">{t('wizard.builtinBody')}</div>
 						</div>
-					</label>
-				</Card>
+						<div
+							class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors {path ===
+							'builtin'
+								? 'border-primary bg-primary text-primary-foreground'
+								: 'border-muted-foreground group-hover:border-primary'}"
+						>
+							{#if path === 'builtin'}
+								<Check class="h-3 w-3" strokeWidth="3" />
+							{/if}
+						</div>
+					</div>
+				</label>
 
-				<Card compact class="cursor-pointer">
-					<label class="flex cursor-pointer items-start gap-3">
-						<Radio
-							name="wizard-path"
-							value="custom"
-							checked={path === 'custom'}
-							label=""
-							ariaLabel={t('wizard.customAria')}
-							onchange={() => (path = 'custom')}
-						/>
+				<label
+					class="group relative flex cursor-pointer flex-col rounded-xl border-2 bg-surface p-5 shadow-sm transition-all hover:shadow-md {path ===
+					'custom'
+						? 'border-primary ring-4 ring-primary/10'
+						: 'border-border hover:border-primary/50'}"
+				>
+					<input
+						type="radio"
+						name="wizard-path"
+						value="custom"
+						checked={path === 'custom'}
+						class="sr-only"
+						aria-label={t('wizard.customAria')}
+						onchange={() => (path = 'custom')}
+					/>
+					<div class="flex items-start justify-between gap-4">
 						<div class="flex-1">
-							<div class="font-medium">{t('wizard.customTitle')}</div>
-							<div class="text-sm opacity-70">{t('wizard.customBody')}</div>
+							<div
+								class="font-display text-lg font-semibold text-foreground transition-colors group-hover:text-primary"
+							>
+								{t('wizard.customTitle')}
+							</div>
+							<div class="mt-1 text-sm leading-relaxed opacity-75">{t('wizard.customBody')}</div>
 						</div>
-					</label>
-				</Card>
+						<div
+							class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors {path ===
+							'custom'
+								? 'border-primary bg-primary text-primary-foreground'
+								: 'border-muted-foreground group-hover:border-primary'}"
+						>
+							{#if path === 'custom'}
+								<Check class="h-3 w-3" strokeWidth="3" />
+							{/if}
+						</div>
+					</div>
+				</label>
 			</section>
 
 			{#if path === 'builtin'}
-				<section class="flex flex-col gap-3" data-testid="wizard-template-picker">
-					<h2 class="text-lg font-semibold">{t('wizard.step2Title')}</h2>
-					<p class="text-sm opacity-70">{t('wizard.step2Body')}</p>
-					<div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-						{#each activePresets as preset (preset.id)}
-							<div data-testid="wizard-preset-{preset.id}">
-								<Card compact class="h-full">
-									<label class="flex h-full cursor-pointer items-start gap-3">
-										<Radio
+				<div transition:slide={{ duration: 300 }}>
+					<section class="flex flex-col gap-4" data-testid="wizard-template-picker">
+						<h2 class="font-display text-xl font-semibold">{t('wizard.step2Title')}</h2>
+						<p class="text-sm opacity-80">{t('wizard.step2Body')}</p>
+						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+							{#each activePresets as preset, index (preset.id)}
+								{@const isActive = selectedPresetId === preset.id}
+								<div data-testid="wizard-preset-{preset.id}">
+									<label
+										class="group relative flex h-full cursor-pointer flex-col rounded-xl border-2 bg-surface p-5 shadow-sm transition-all hover:shadow-md {isActive
+											? 'border-primary ring-4 ring-primary/10'
+											: 'border-border hover:border-primary/50'}"
+									>
+										<input
+											type="radio"
 											name="preset"
 											value={preset.id}
 											checked={selectedPresetId === preset.id}
-											label=""
-											ariaLabel={t('wizard.selectFrameworkAria', { name: preset.name })}
+											class="sr-only"
+											aria-label={t('wizard.selectFrameworkAria', { name: preset.name })}
 											onchange={() => (selectedPresetId = preset.id)}
 										/>
-										<div class="flex-1">
-											<div class="font-medium">
+
+										{#if index === 0}
+											<div class="absolute -top-3 right-4">
+												<span
+													class="rounded-full bg-primary px-3 py-1 text-[10px] font-bold tracking-widest text-primary-foreground uppercase shadow-sm"
+												>
+													{t('wizard.recommended')}
+												</span>
+											</div>
+										{/if}
+
+										<div class="flex items-start justify-between gap-3">
+											<div
+												class="font-display font-semibold text-foreground transition-colors group-hover:text-primary"
+											>
 												{preset.name}
 											</div>
 											<div
-												class="mt-1 line-clamp-3 text-xs leading-relaxed opacity-70"
-												title={preset.description}
+												class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors {isActive
+													? 'border-primary bg-primary text-primary-foreground'
+													: 'border-muted-foreground group-hover:border-primary'}"
 											>
-												{preset.description}
-											</div>
-											<div class="mt-3 text-xs font-semibold opacity-60">
-												{t('wizard.frameworkIncludes', {
-													templates: preset.templates.length,
-													statuses: preset.config.statuses.length
-												})}
+												{#if isActive}
+													<Check class="h-3 w-3" strokeWidth="3" />
+												{/if}
 											</div>
 										</div>
+										<div
+											class="mt-2 line-clamp-3 text-xs leading-relaxed opacity-75"
+											title={preset.description}
+										>
+											{preset.description}
+										</div>
+										<div
+											class="mt-auto pt-4 text-[11px] font-semibold tracking-widest text-primary/70 uppercase"
+										>
+											{t('wizard.frameworkIncludes', {
+												templates: preset.templates.length,
+												statuses: preset.config.statuses.length
+											})}
+										</div>
 									</label>
-								</Card>
-							</div>
-						{/each}
-					</div>
-				</section>
+								</div>
+							{/each}
+						</div>
+					</section>
+				</div>
 			{/if}
 
 			{#if path === 'custom'}
-				<div class="mt-4 border-t border-border/50 pt-8">
+				<div transition:slide={{ duration: 300 }} class="mt-4 border-t border-border/50 pt-8">
 					<TemplateEditor onsave={applyCustomTemplate} oncancel={() => (path = 'builtin')} />
 				</div>
 			{/if}
@@ -219,7 +291,10 @@
 			{/if}
 
 			{#if path === 'builtin'}
-				<div class="mt-4 flex flex-col gap-4">
+				<div
+					class="sticky bottom-0 -mx-4 mt-8 flex flex-col gap-4 border-t border-border bg-background/90 p-4 backdrop-blur-md sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none"
+					transition:slide={{ duration: 300 }}
+				>
 					<div class="flex items-center gap-3">
 						<Tooltip
 							text={canApply ? t('wizard.applyTooltip') : t('wizard.applyTooltipDisabled')}
@@ -231,11 +306,14 @@
 								loading={isApplying}
 								onclick={apply}
 								data-testid="wizard-apply"
+								class="w-full sm:w-auto"
 							>
 								{isApplying ? t('wizard.applying') : t('wizard.applyButton')}
 							</Button>
 						</Tooltip>
-						<Button variant="ghost" onclick={cancel}>{t('wizard.cancel')}</Button>
+						<Button variant="ghost" onclick={cancel} class="w-full sm:w-auto"
+							>{t('wizard.cancel')}</Button
+						>
 					</div>
 				</div>
 			{/if}

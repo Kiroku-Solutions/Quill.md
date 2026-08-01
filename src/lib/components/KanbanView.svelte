@@ -36,7 +36,9 @@
 	import { t } from '$lib/ui/strings';
 	import type { LoadedIssue } from '$lib/types';
 
-	const { issues, filter, config, editor } = getStores();
+	const { issues, filter, config, editor, mode } = getStores();
+
+	const isReadOnly = $derived(mode.isReadOnly);
 
 	let rows = $state<readonly LoadedIssue[]>([]);
 	let columns = $state<ReadonlyArray<{ id: string; color?: string; category?: string }>>([]);
@@ -193,6 +195,7 @@
 	// object spreads, no Map rebuilds.
 
 	function onDragStart(e: DragEvent, li: LoadedIssue): void {
+		if (isReadOnly) return;
 		if (!e.dataTransfer) return;
 
 		// Hide the native drag ghost so we can render our own animated one
@@ -218,6 +221,7 @@
 	}
 
 	function onDragOver(e: DragEvent, groupId: string, colId: string): void {
+		if (isReadOnly) return;
 		if (draggedId === null) return;
 		e.preventDefault();
 		if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
@@ -386,10 +390,10 @@
 
 		switch (e.key) {
 			case 'ArrowLeft':
-				targetColIdx = Math.max(0, colIdx - 1);
+				if (!isReadOnly) targetColIdx = Math.max(0, colIdx - 1);
 				break;
 			case 'ArrowRight':
-				targetColIdx = Math.min(columns.length - 1, colIdx + 1);
+				if (!isReadOnly) targetColIdx = Math.min(columns.length - 1, colIdx + 1);
 				break;
 			case 'ArrowUp':
 				targetWithin = Math.max(0, withinIdx - 1);
@@ -406,7 +410,7 @@
 				// requirement).
 				e.preventDefault();
 				e.stopPropagation();
-				handlePickupToggle(li);
+				if (!isReadOnly) handlePickupToggle(li);
 				return;
 			default:
 				return;
@@ -521,7 +525,7 @@
 					<li role="listitem">
 						<button
 							type="button"
-							draggable={true}
+							draggable={!isReadOnly}
 							class="flex w-full cursor-grab flex-col rounded-xl p-4 text-left transition-shadow duration-150 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset active:animate-shake active:cursor-grabbing
 								{isDragging
 								? 'opacity-0'
@@ -529,7 +533,8 @@
 									? 'animate-pop border border-primary bg-background shadow-md'
 									: isLifted
 										? 'scale-[1.02] border border-primary bg-background shadow-md ring-2 ring-primary ring-offset-2'
-										: 'border border-border bg-background shadow-sm hover:shadow-[var(--shadow-soft)]'}"
+										: 'border border-border bg-background shadow-sm hover:shadow-[var(--shadow-soft)]'}
+								{isReadOnly ? '!cursor-pointer active:!animate-none active:!cursor-pointer' : ''}"
 							data-testid="kanban-card"
 							data-card-id={li.issue.id}
 							data-lifted={isLifted ? 'true' : 'false'}

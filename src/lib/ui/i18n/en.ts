@@ -14,6 +14,7 @@ export const en = {
 		ok: 'OK',
 		apply: 'Apply',
 		back: 'Back',
+		previous: 'Previous',
 		next: 'Next',
 		loading: 'Loading…',
 		empty: 'Empty',
@@ -381,7 +382,8 @@ export const en = {
 		applyError: (params: Params) => `Failed to write the wizard setup: ${params.msg}`,
 		selectFrameworkAria: (params: Params) => `Select framework ${params.name}`,
 		frameworkIncludes: (params: Params) =>
-			`Includes ${params.templates} templates · ${params.statuses} statuses`
+			`Includes ${params.templates} templates · ${params.statuses} statuses`,
+		recommended: 'Recommended'
 	},
 	sprint: {
 		progress: 'Sprint Progress',
