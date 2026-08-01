@@ -266,7 +266,9 @@ function buildStub(opts: {
 			editorOpen: false,
 			openEditor: () => {},
 			closeEditor: () => {},
-			toggleEditor: () => {}
+			toggleEditor: () => {},
+			sidebarCollapsed: false,
+			toggleSidebarCollapsed: () => {}
 		}
 	};
 }

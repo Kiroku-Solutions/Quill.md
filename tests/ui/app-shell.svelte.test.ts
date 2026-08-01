@@ -214,7 +214,9 @@ function buildStub(opts: { integrityCount: number; activeHandleName?: string }):
 			editorOpen: false,
 			openEditor: () => {},
 			closeEditor: () => {},
-			toggleEditor: () => {}
+			toggleEditor: () => {},
+			sidebarCollapsed: false,
+			toggleSidebarCollapsed: () => {}
 		}
 	};
 }

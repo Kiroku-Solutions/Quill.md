@@ -15,6 +15,7 @@ export const es: Translations = {
 		ok: 'Aceptar',
 		apply: 'Aplicar',
 		back: 'Atrás',
+		previous: 'Anterior',
 		next: 'Siguiente',
 		loading: 'Cargando…',
 		empty: 'Vacío',
@@ -387,7 +388,8 @@ export const es: Translations = {
 		applyError: (params: Params) => `Error al escribir la configuración: ${params.msg}`,
 		selectFrameworkAria: (params: Params) => `Seleccionar framework ${params.name}`,
 		frameworkIncludes: (params: Params) =>
-			`Incluye ${params.templates} plantillas · ${params.statuses} estados`
+			`Incluye ${params.templates} plantillas · ${params.statuses} estados`,
+		recommended: 'Recomendado'
 	},
 	sprint: {
 		progress: 'Progreso del Sprint',
