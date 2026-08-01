@@ -198,7 +198,9 @@ function buildStub(issues: readonly Issue[]): StoreGraph {
 			editorOpen: false,
 			openEditor: () => {},
 			closeEditor: () => {},
-			toggleEditor: () => {}
+			toggleEditor: () => {},
+			sidebarCollapsed: false,
+			toggleSidebarCollapsed: () => {}
 		}
 	};
 }

@@ -34,27 +34,27 @@
 		variant === 'error'
 			? {
 					bg: 'bg-error/5',
-					border: 'border-error/20 border-l-error',
+					border: 'border-error/20',
 					icon: AlertCircle,
 					iconColor: 'text-error'
 				}
 			: variant === 'warning'
 				? {
 						bg: 'bg-warning/5',
-						border: 'border-warning/20 border-l-warning',
+						border: 'border-warning/20',
 						icon: AlertTriangle,
 						iconColor: 'text-warning'
 					}
 				: variant === 'success'
 					? {
 							bg: 'bg-success/5',
-							border: 'border-success/20 border-l-success',
+							border: 'border-success/20',
 							icon: CheckCircle,
 							iconColor: 'text-success'
 						}
 					: {
 							bg: 'bg-primary/5',
-							border: 'border-primary/20 border-l-primary',
+							border: 'border-primary/20',
 							icon: Info,
 							iconColor: 'text-primary'
 						}
@@ -64,7 +64,7 @@
 
 <div
 	role={variant === 'error' || variant === 'warning' ? 'alert' : 'status'}
-	class="flex items-start gap-3 rounded-xl border border-l-4 p-4 shadow-sm {config.bg} {config.border} {extraClass} transition-all duration-[var(--motion-base)]"
+	class="flex items-start gap-3 rounded-xl border p-4 shadow-sm {config.bg} {config.border} {extraClass} transition-all duration-[var(--motion-base)]"
 >
 	<div class="mt-0.5 shrink-0 {config.iconColor}">
 		<Icon class="h-5 w-5" aria-hidden="true" />

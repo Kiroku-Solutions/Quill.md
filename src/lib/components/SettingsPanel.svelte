@@ -8,7 +8,7 @@
 -->
 <script lang="ts">
 	import { getStores } from '$lib/state';
-	import { Button, Card, IconButton, Input, Tooltip } from '$lib/ui';
+	import { Button, Card, IconButton, Tooltip } from '$lib/ui';
 	import { t } from '$lib/ui/strings';
 	import Sun from '@lucide/svelte/icons/sun';
 	import Moon from '@lucide/svelte/icons/moon';
@@ -41,7 +41,6 @@
 		{ id: 'es', label: t('settings.languageEs') }
 	];
 
-	const corsProxy = $derived(stores.config.config?.remote.cors_proxy ?? '');
 	const localAdapter = $derived(stores.mode.localAdapter);
 	const canClearCache = $derived(stores.mode.mode === 'remote');
 
@@ -50,6 +49,7 @@
 	let clearCacheBusy = $state(false);
 	let clearCacheStatus = $state<{ kind: 'success' | 'error'; message: string } | null>(null);
 	let editorOpen = $state(false);
+	let editorTemplate = $state<Template | undefined>(undefined);
 
 	async function readTrashCount(): Promise<void> {
 		const adapter = stores.mode.localAdapter;
@@ -80,7 +80,14 @@
 			}
 		};
 		window.addEventListener('keydown', onKey);
-		return () => window.removeEventListener('keydown', onKey);
+
+		const originalOverflow = document.body.style.overflow;
+		document.body.style.overflow = 'hidden';
+
+		return () => {
+			window.removeEventListener('keydown', onKey);
+			document.body.style.overflow = originalOverflow;
+		};
 	});
 
 	function onEmptied(): void {
@@ -108,7 +115,7 @@
 	}
 
 	async function onSaveTemplate(t: Template): Promise<void> {
-		const adapter = stores.mode.localAdapter;
+		const adapter = stores.mode.localAdapter || stores.mode.remoteAdapter;
 		if (!adapter) return;
 		try {
 			await saveTemplate(adapter, t, true);
@@ -205,21 +212,6 @@
 				</div>
 			</section>
 
-			<section class="mt-6 flex flex-col gap-2" data-testid="settings-cors">
-				<h3 class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
-					{t('settings.corsHeading')}
-				</h3>
-				<Input
-					value={corsProxy}
-					readonly
-					placeholder={t('settings.corsPlaceholder')}
-					data-testid="settings-cors-input"
-				/>
-				<p class="text-xs opacity-60" data-testid="settings-cors-note">
-					{t('settings.corsNote')}
-				</p>
-			</section>
-
 			<section class="mt-6 flex flex-col gap-2" data-testid="settings-recent">
 				<h3 class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
 					{t('settings.recentHeading')}
@@ -241,8 +233,11 @@
 							variant="secondary"
 							size="sm"
 							class="h-6 px-2 text-xs"
-							onclick={() => (editorOpen = true)}
-							disabled={!localAdapter}
+							onclick={() => {
+								editorTemplate = undefined;
+								editorOpen = true;
+							}}
+							disabled={(!localAdapter && !stores.mode.remoteAdapter) || stores.mode.isReadOnly}
 						>
 							{t('settings.newTemplate')}
 						</Button>
@@ -250,10 +245,19 @@
 				</div>
 				<div class="mt-2 flex flex-col gap-2">
 					{#each stores.templates.templates as tmpl (tmpl.id)}
-						<Card compact class="flex items-center gap-3 px-3 py-2">
-							<span class="h-3 w-3 rounded-full" style="background-color: {tmpl.color}"></span>
+						<button
+							type="button"
+							class="flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-surface px-3 py-2 text-left shadow-sm transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+							onclick={() => {
+								editorTemplate = tmpl;
+								editorOpen = true;
+							}}
+							disabled={stores.mode.isReadOnly}
+						>
+							<span class="h-3 w-3 shrink-0 rounded-full" style="background-color: {tmpl.color}"
+							></span>
 							<span class="text-sm font-medium">{tmpl.name}</span>
-						</Card>
+						</button>
 					{/each}
 				</div>
 			</section>
@@ -333,7 +337,11 @@
 
 		<!-- Editor Body -->
 		<div class="flex-1 overflow-y-auto p-4 sm:p-8">
-			<TemplateEditor onsave={onSaveTemplate} oncancel={() => (editorOpen = false)} />
+			<TemplateEditor
+				initialTemplate={editorTemplate}
+				onsave={onSaveTemplate}
+				oncancel={() => (editorOpen = false)}
+			/>
 		</div>
 	</div>
 {/if}

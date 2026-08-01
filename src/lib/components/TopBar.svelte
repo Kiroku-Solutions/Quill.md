@@ -107,61 +107,78 @@
 <header
 	data-testid="topbar"
 	aria-label={t('topbar.ariaLabel')}
-	class="sticky top-0 z-30 flex h-[var(--topbar-height)] w-full items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur-md transition-colors duration-[var(--motion-slow)] md:px-6"
+	class="sticky top-0 z-30 flex h-[var(--topbar-height)] w-full items-center justify-between gap-3 border-b border-border bg-background/90 px-4 shadow-sm backdrop-blur-md transition-colors duration-[var(--motion-slow)] md:px-6"
 >
-	{#if mode === 'local' || mode === 'remote'}
-		<div class="mr-1 -ml-2 flex-shrink-0 md:hidden">
-			<IconButton label={t('topbar.toggleMobileNav')} onclick={() => stores.ui.toggleMobileNav()}>
-				<MenuIcon class="h-6 w-6" aria-hidden="true" />
-			</IconButton>
-		</div>
-	{/if}
+	<div class="flex flex-1 items-center gap-3 overflow-hidden">
+		{#if mode === 'local' || mode === 'remote'}
+			<div class="mr-1 -ml-2 flex-shrink-0 {stores.ui.sidebarCollapsed ? '' : 'md:hidden'}">
+				<IconButton
+					label={t('topbar.toggleMobileNav')}
+					onclick={() => {
+						if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+							stores.ui.toggleSidebarCollapsed();
+						} else {
+							stores.ui.toggleMobileNav();
+						}
+					}}
+				>
+					<MenuIcon class="h-6 w-6" aria-hidden="true" />
+				</IconButton>
+			</div>
+		{/if}
 
-	<a
-		href={resolve('/')}
-		class="flex items-center gap-3 rounded font-display font-bold tracking-tight hover:opacity-80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
-		aria-label={t('app.homeAria')}
-	>
-		<img src={Bird} alt={t('app.logoAlt')} class="h-7 w-7" />
-		<div class="flex items-baseline gap-2">
-			<span class="text-xl text-foreground">{t('app.name')}</span>
-			<span class="font-sans text-xs font-medium text-muted-foreground">{t('app.version')}</span>
-		</div>
-	</a>
-
-	<Badge variant={badge.variant} size="sm">{badge.label}</Badge>
-
-	{#if indicatorText && indicatorText !== 'null'}
-		<div class="mx-4 hidden min-w-0 flex-1 items-center justify-center md:flex">
-			<span
-				class="truncate text-base font-semibold text-foreground"
-				title={indicatorText}
-				data-testid="topbar-project-name"
-			>
-				{indicatorText}
-			</span>
-		</div>
-	{:else}
-		<div class="flex-1"></div>
-	{/if}
-
-	<ThemeToggle />
-
-	<Tooltip text={t('topbar.settingsTooltip')} position="bottom">
-		<IconButton
-			label={t('topbar.openSettings')}
-			onclick={toggleSettings}
-			data-testid="topbar-settings"
+		<a
+			href={resolve('/')}
+			class="flex shrink-0 items-center gap-3 rounded font-display font-bold tracking-tight hover:opacity-80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
+			aria-label={t('app.homeAria')}
 		>
-			<Settings class="h-5 w-5" aria-hidden="true" />
-		</IconButton>
-	</Tooltip>
+			<img src={Bird} alt={t('app.logoAlt')} class="h-7 w-7" />
+			<div class="hidden items-baseline gap-2 sm:flex">
+				<span class="text-xl text-foreground">{t('app.name')}</span>
+				<span
+					class="rounded-full bg-muted/30 px-2 py-0.5 font-sans text-[10px] font-medium text-muted-foreground"
+					>{t('app.version')}</span
+				>
+			</div>
+		</a>
 
-	{#if mode === 'wizard'}
-		<Button variant="ghost" size="sm" onclick={handleCancel} data-testid="topbar-wizard-cancel">
-			{t('common.cancel')}
-		</Button>
-	{/if}
+		{#if indicatorText && indicatorText !== 'null'}
+			<div class="flex min-w-0 items-center gap-3">
+				<span class="hidden text-muted-foreground/40 sm:inline">/</span>
+				<span
+					class="truncate text-sm font-medium text-foreground"
+					title={indicatorText}
+					data-testid="topbar-project-name"
+				>
+					{indicatorText}
+				</span>
+			</div>
+		{/if}
+	</div>
+
+	<div class="flex shrink-0 items-center gap-2">
+		<Badge variant={badge.variant} size="sm">{badge.label}</Badge>
+
+		<div class="mx-2 hidden h-4 w-px bg-border sm:block"></div>
+
+		<ThemeToggle />
+
+		<Tooltip text={t('topbar.settingsTooltip')} position="bottom">
+			<IconButton
+				label={t('topbar.openSettings')}
+				onclick={toggleSettings}
+				data-testid="topbar-settings"
+			>
+				<Settings class="h-5 w-5" aria-hidden="true" />
+			</IconButton>
+		</Tooltip>
+
+		{#if mode === 'wizard'}
+			<Button variant="ghost" size="sm" onclick={handleCancel} data-testid="topbar-wizard-cancel">
+				{t('common.cancel')}
+			</Button>
+		{/if}
+	</div>
 </header>
 
 {#if stores.mode.proxyWarning}

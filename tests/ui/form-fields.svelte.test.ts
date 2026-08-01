@@ -318,7 +318,9 @@ function buildStub(opts: StubOpts = {}): StoreGraph {
 			editorOpen: false,
 			openEditor: () => {},
 			closeEditor: () => {},
-			toggleEditor: () => {}
+			toggleEditor: () => {},
+			sidebarCollapsed: false,
+			toggleSidebarCollapsed: () => {}
 		}
 	};
 }

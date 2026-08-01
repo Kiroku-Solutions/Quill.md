@@ -196,7 +196,9 @@ function buildStub(opts: { recentHandles: HandleRecord[] }): StoreGraph {
 			editorOpen: false,
 			openEditor: () => {},
 			closeEditor: () => {},
-			toggleEditor: () => {}
+			toggleEditor: () => {},
+			sidebarCollapsed: false,
+			toggleSidebarCollapsed: () => {}
 		}
 	};
 }
