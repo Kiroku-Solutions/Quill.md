@@ -111,7 +111,7 @@ describe('MemoryFsAdapter — writeTextFile (atomic invariant)', () => {
 	it('auto-creates intermediate directories on write', async () => {
 		await fs.writeTextFile('deep/nested/path/file.txt', 'x');
 		const entries = await fs.listDirectory('deep/nested/path');
-		expect(entries).toEqual([{ name: 'file.txt', kind: 'file' }]);
+		expect(entries).toEqual([{ name: 'file.txt', kind: 'file', path: 'file.txt' }]);
 	});
 
 	it('does not leave temp files behind after a successful write', async () => {
@@ -133,7 +133,7 @@ describe('MemoryFsAdapter — writeTextFile (atomic invariant)', () => {
 	it('registers the file as a child of its parent directory', async () => {
 		await fs.writeTextFile('dir/inner.txt', 'x');
 		const entries = await fs.listDirectory('dir');
-		expect(entries).toContainEqual({ name: 'inner.txt', kind: 'file' });
+		expect(entries).toContainEqual({ name: 'inner.txt', kind: 'file', path: 'inner.txt' });
 	});
 
 	it('overwriting an existing file replaces its content (not appends)', async () => {

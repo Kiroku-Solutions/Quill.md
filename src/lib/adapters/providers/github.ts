@@ -80,6 +80,46 @@ const CONFIG_PATH = `${SUBTREE}/config.json`;
  * (tracked in `docs/octokit-migration.md` §7).
  */
 const FETCH_ALL_QUERY = /* GraphQL */ `
+	fragment BlobNode on Blob {
+		oid
+		isTruncated
+		text
+	}
+
+	fragment TreeLevel1 on Tree {
+		oid
+		entries {
+			name
+			type
+			path
+			object {
+				...BlobNode
+				... on Tree {
+					oid
+					entries {
+						name
+						type
+						path
+						object {
+							...BlobNode
+							... on Tree {
+								oid
+								entries {
+									name
+									type
+									path
+									object {
+										...BlobNode
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	query QuillMdFetchAll(
 		$owner: String!
 		$name: String!
@@ -92,110 +132,22 @@ const FETCH_ALL_QUERY = /* GraphQL */ `
 	) {
 		repository(owner: $owner, name: $name) {
 			config: object(expression: $configExpr) {
-				... on Blob {
-					oid
-					isTruncated
-					text
-				}
+				...BlobNode
 			}
 			templates: object(expression: $templatesExpr) {
-				... on Tree {
-					oid
-					entries {
-						name
-						type
-						path
-						object {
-							... on Blob {
-								oid
-								isTruncated
-								text
-							}
-						}
-					}
-				}
+				...TreeLevel1
 			}
 			issues: object(expression: $issuesExpr) {
-				... on Tree {
-					oid
-					entries {
-						name
-						type
-						path
-						object {
-							... on Blob {
-								oid
-								isTruncated
-								text
-							}
-							... on Tree {
-								entries {
-									name
-									type
-									path
-									object {
-										... on Blob {
-											oid
-											isTruncated
-											text
-										}
-									}
-								}
-							}
-						}
-					}
-				}
+				...TreeLevel1
 			}
 			adr: object(expression: $adrExpr) {
-				... on Tree {
-					oid
-					entries {
-						name
-						type
-						path
-						object {
-							... on Blob {
-								oid
-								isTruncated
-								text
-							}
-						}
-					}
-				}
+				...TreeLevel1
 			}
 			wiki: object(expression: $wikiExpr) {
-				... on Tree {
-					oid
-					entries {
-						name
-						type
-						path
-						object {
-							... on Blob {
-								oid
-								isTruncated
-								text
-							}
-						}
-					}
-				}
+				...TreeLevel1
 			}
 			todos: object(expression: $todosExpr) {
-				... on Tree {
-					oid
-					entries {
-						name
-						type
-						path
-						object {
-							... on Blob {
-								oid
-								isTruncated
-								text
-							}
-						}
-					}
-				}
+				...TreeLevel1
 			}
 		}
 	}
@@ -406,66 +358,91 @@ export class GitHubProvider implements RepoProvider {
 				: (blob.text ?? '');
 			out.push({ path: CONFIG_PATH, content, sha: blob.oid });
 		}
-		if (repo.templates) {
-			for (const entry of repo.templates.entries) {
-				if (entry.type !== 'blob' || !entry.object) continue;
-				const path = `${TEMPLATES_DIR}/${entry.name}`;
+
+		await this.processTree(parsed, branch.sha, pat, TEMPLATES_DIR, repo.templates, out);
+		await this.processTree(parsed, branch.sha, pat, ISSUES_DIR, repo.issues, out);
+		await this.processTree(parsed, branch.sha, pat, ADR_DIR, repo.adr, out);
+		await this.processTree(parsed, branch.sha, pat, WIKI_DIR, repo.wiki, out);
+		await this.processTree(parsed, branch.sha, pat, TODOS_DIR, repo.todos, out);
+
+		return out;
+	}
+	private async processTree(
+		parsed: ParsedRepo,
+		branchSha: string,
+		pat: string,
+		basePath: string,
+		tree: QuillMdSubtree | undefined | null,
+		out: RemoteFile[]
+	): Promise<void> {
+		if (!tree || !tree.entries) return;
+
+		for (const entry of tree.entries) {
+			if (!entry.object) continue;
+			const currentPath = `${basePath}/${entry.name}`;
+
+			if (entry.type === 'blob') {
 				const content = entry.object.isTruncated
-					? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
+					? await this.fetchBlob(parsed, branchSha, currentPath, pat, 'raw')
 					: (entry.object.text ?? '');
-				out.push({ path, content, sha: entry.object.oid });
-			}
-		}
-		if (repo.adr) {
-			for (const entry of repo.adr.entries) {
-				if (entry.type !== 'blob' || !entry.object) continue;
-				const path = `${ADR_DIR}/${entry.name}`;
-				const content = entry.object.isTruncated
-					? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
-					: (entry.object.text ?? '');
-				out.push({ path, content, sha: entry.object.oid });
-			}
-		}
-		if (repo.wiki) {
-			for (const entry of repo.wiki.entries) {
-				if (entry.type !== 'blob' || !entry.object) continue;
-				const path = `${WIKI_DIR}/${entry.name}`;
-				const content = entry.object.isTruncated
-					? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
-					: (entry.object.text ?? '');
-				out.push({ path, content, sha: entry.object.oid });
-			}
-		}
-		if (repo.todos) {
-			for (const entry of repo.todos.entries) {
-				if (entry.type !== 'blob' || !entry.object) continue;
-				const path = `${TODOS_DIR}/${entry.name}`;
-				const content = entry.object.isTruncated
-					? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
-					: (entry.object.text ?? '');
-				out.push({ path, content, sha: entry.object.oid });
-			}
-		}
-		if (repo.issues) {
-			for (const entry of repo.issues.entries) {
-				if (!entry.object) continue;
-				if (entry.type === 'blob') {
-					const path = `${ISSUES_DIR}/${entry.name}`;
-					const content = entry.object.isTruncated
-						? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
-						: (entry.object.text ?? '');
-					out.push({ path, content, sha: entry.object.oid });
-				} else if (entry.type === 'tree' && entry.object.entries) {
-					for (const sub of entry.object.entries) {
-						if (sub.type !== 'blob' || !sub.object) continue;
-						const path = `${ISSUES_DIR}/${entry.name}/${sub.name}`;
-						const content = sub.object.isTruncated
-							? await this.fetchBlob(parsed, branch.sha, path, pat, 'raw')
-							: (sub.object.text ?? '');
-						out.push({ path, content, sha: sub.object.oid });
+				out.push({ path: currentPath, content, sha: entry.object.oid });
+			} else if (entry.type === 'tree') {
+				if (entry.object.entries) {
+					// We have the deeper tree from GraphQL
+					await this.processTree(
+						parsed,
+						branchSha,
+						pat,
+						currentPath,
+						entry.object as QuillMdSubtree,
+						out
+					);
+				} else {
+					// Max depth reached in GraphQL, fallback to REST
+					const restEntries = await this.fetchDeepTreeRest(
+						parsed,
+						entry.object.oid,
+						branchSha,
+						currentPath,
+						pat
+					);
+					for (const restEntry of restEntries) {
+						out.push(restEntry);
 					}
 				}
 			}
+		}
+	}
+
+	private async fetchDeepTreeRest(
+		parsed: ParsedRepo,
+		treeSha: string,
+		branchSha: string,
+		basePath: string,
+		pat: string
+	): Promise<RemoteFile[]> {
+		const octokit = this.#client(parsed, pat);
+		const { data } = await octokit.rest.git.getTree({
+			owner: parsed.owner,
+			repo: parsed.repo,
+			tree_sha: treeSha,
+			recursive: 'true'
+		});
+
+		const blobs = data.tree.filter((e) => e.type === 'blob' && e.path);
+		const out: RemoteFile[] = [];
+		const chunkSize = 5;
+
+		for (let i = 0; i < blobs.length; i += chunkSize) {
+			const chunk = blobs.slice(i, i + chunkSize);
+			const results = await Promise.all(
+				chunk.map(async (entry) => {
+					const fullPath = `${basePath}/${entry.path}`;
+					const content = await this.fetchBlob(parsed, branchSha, fullPath, pat, 'base64');
+					return { path: fullPath, content, sha: entry.sha ?? '' };
+				})
+			);
+			out.push(...results);
 		}
 		return out;
 	}

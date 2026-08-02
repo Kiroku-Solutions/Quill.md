@@ -249,7 +249,7 @@ export class LocalFsAdapter implements DirectoryAdapter {
 		}
 	}
 
-	async listDirectory(path: string): Promise<DirectoryEntry[]> {
+	async listDirectory(path: string, options?: { recursive?: boolean }): Promise<DirectoryEntry[]> {
 		requireNonEmpty(path);
 		const normalized = normalizePath(path);
 
@@ -257,12 +257,22 @@ export class LocalFsAdapter implements DirectoryAdapter {
 		if (!dirHandle) return [];
 
 		const entries: DirectoryEntry[] = [];
-		for await (const [name, handle] of dirHandle.entries()) {
-			entries.push({
-				name,
-				kind: handle.kind === 'file' ? 'file' : 'directory'
-			});
+
+		async function walk(handle: FileSystemDirectoryHandle, currentPath: string) {
+			for await (const [name, childHandle] of handle.entries()) {
+				const childPath = currentPath ? `${currentPath}/${name}` : name;
+				entries.push({
+					name,
+					kind: childHandle.kind === 'file' ? 'file' : 'directory',
+					path: childPath
+				});
+				if (options?.recursive && childHandle.kind === 'directory') {
+					await walk(childHandle as FileSystemDirectoryHandle, childPath);
+				}
+			}
 		}
+
+		await walk(dirHandle, '');
 		return entries;
 	}
 
