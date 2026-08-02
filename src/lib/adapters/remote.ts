@@ -224,6 +224,11 @@ async function ensureEditBranch(
 ): Promise<BranchTip> {
 	const existing = await provider.getBranch(parsed, branch, pat);
 	if (existing) return existing;
+	if (!pat) {
+		throw new RemoteAuthError(
+			`Branch '${branch}' not found. A Personal Access Token (PAT) is required to initialize Quill.md.`
+		);
+	}
 	// Treat branch absence as orphan-style: the wizard already asked the user
 	// for permission; we create an orphan branch so the user's history is
 	// independent of `main`. If creation fails for any reason, surface the

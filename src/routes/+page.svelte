@@ -115,6 +115,12 @@
 			);
 			await Promise.all([stores.config.load(), stores.templates.load()]);
 			await stores.issues.load();
+			if (stores.mode.isReadOnly && stores.config.config === null) {
+				await stores.mode.signOut();
+				throw new Error(
+					'Quill.md is not initialized on this repository. A PAT is required to initialize it.'
+				);
+			}
 			await goto(resolve('/remote'));
 		} catch (cause) {
 			remoteError = (cause as Error).message;
