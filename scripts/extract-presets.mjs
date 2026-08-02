@@ -76,7 +76,9 @@ for (let i = 0; i < lines.length; i++) {
 			}
 		} catch (e) {
 			console.error(
-				`Failed to parse JSON for ${currentFramework.name} in mode ${parsingMode}:`,
+				'Failed to parse JSON for %s in mode %s: %s',
+				currentFramework.name,
+				parsingMode,
 				e.message
 			);
 		}

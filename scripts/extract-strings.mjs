@@ -10,10 +10,10 @@ const arrayContent = content.substring(arrayStart);
 // Remove semicolon at the end if any
 const cleaned = arrayContent.replace(/;\s*$/, '');
 
-global.FRAMEWORK_PRESETS = eval('(' + cleaned + ')');
+const FRAMEWORK_PRESETS = JSON.parse(cleaned);
 
 const uniqueStrings = new Set();
-for (const preset of global.FRAMEWORK_PRESETS) {
+for (const preset of FRAMEWORK_PRESETS) {
 	uniqueStrings.add(preset.name);
 	if (preset.description) uniqueStrings.add(preset.description);
 
