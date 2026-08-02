@@ -53,7 +53,7 @@ import type { CommitQueueStore, QueuedWrite } from '../state/commit-queue.svelte
  */
 export interface ShaLookup {
 	readTextFile(path: string): Promise<string>;
-	listDirectory(path: string): Promise<DirectoryEntry[]>;
+	listDirectory(path: string, options?: { recursive?: boolean }): Promise<DirectoryEntry[]>;
 	headSha(): Promise<string>;
 	exists(rel: string): Promise<boolean>;
 	/**
@@ -117,9 +117,9 @@ export class RemoteWritableAdapter implements WritableDirectoryAdapter {
 		return this.readOnly.readTextFile(normalized);
 	}
 
-	async listDirectory(path: string): Promise<DirectoryEntry[]> {
+	async listDirectory(path: string, options?: { recursive?: boolean }): Promise<DirectoryEntry[]> {
 		const normalized = normalizePath(path);
-		const fromBase = await this.readOnly.listDirectory(normalized);
+		const fromBase = await this.readOnly.listDirectory(normalized, options);
 		// Build the merge: start from the read-only listing, then apply
 		// overlay entries whose path lives under `normalized`.
 		const merged = new Map<string, DirectoryEntry>();
