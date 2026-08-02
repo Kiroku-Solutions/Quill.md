@@ -45,7 +45,9 @@ function resolveKey(root: unknown, key: string): unknown {
 	for (const part of parts) {
 		if (cursor === null || cursor === undefined) return undefined;
 		if (typeof cursor !== 'object') return undefined;
-		cursor = (cursor as Record<string, unknown>)[part];
+		const desc = Object.getOwnPropertyDescriptor(cursor as Record<string, unknown>, part);
+		if (!desc) return undefined;
+		cursor = desc.value;
 	}
 	return cursor;
 }
