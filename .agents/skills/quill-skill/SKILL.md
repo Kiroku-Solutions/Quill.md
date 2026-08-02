@@ -110,8 +110,8 @@ Whenever invoked for project planning, execute this exact Chain of Thought:
 5. **Quality Assurance Phase**:
    - For the most critical (P0) stories, generate explicit Test Case issues and link them to the story using `{ type: "relates_to", id: <Story_ID> }`.
 6. **Documentation Phase (Wiki and ADRs)**:
-   - When the user asks to document system architecture or specifications, use `quill_create_wiki_page`.
-   - When the user asks to record architectural decisions, use `quill_create_adr`.
+   - When the user asks to document system architecture or specifications, use `quill_create_wiki_page`. You can organize these pages into deep subfolders by using slashes in the title (e.g. `architecture/backend/database`).
+   - When the user asks to record architectural decisions, use `quill_create_adr`. You can organize ADRs into subfolders (e.g. `2026/08/database-choice`).
 
 ## Anti-Patterns (NEVER DO THESE)
 - ❌ Using human-readable strings for `issueType` or `status` (e.g. 'User Story', 'To Do'). Use IDs only (`user-story`, `open`).

@@ -418,6 +418,91 @@ describe('GitHubProvider.fetchAll (GraphQL)', () => {
 		]);
 	});
 
+	it('falls back to fetchDeepTreeRest when GraphQL depth limit is reached', async () => {
+		const fetchSpy = vi.spyOn(globalThis, 'fetch');
+		fetchSpy.mockImplementation((input) => {
+			const rawUrl = typeof input === 'string' ? input : (input as URL).toString();
+			const url = decodeURIComponent(rawUrl);
+			if (url.endsWith('/graphql')) {
+				return Promise.resolve(
+					graphqlResponse({
+						data: {
+							repository: {
+								config: null,
+								templates: null,
+								issues: {
+									oid: 'issuessha',
+									entries: [
+										{
+											name: 'deepfolder',
+											type: 'tree',
+											path: 'deepfolder',
+											object: { oid: 'treesha' /* no entries array means depth limit reached */ }
+										}
+									]
+								}
+							}
+						}
+					})
+				);
+			}
+			if (url.includes('/git/trees/treesha')) {
+				return Promise.resolve(
+					new Response(
+						JSON.stringify({
+							tree: [
+								{ path: 'file1.md', type: 'blob', sha: 'blob1sha' },
+								{ path: 'sub/file2.md', type: 'blob', sha: 'blob2sha' }
+							]
+						}),
+						{ status: 200, headers: { 'Content-Type': 'application/json' } }
+					)
+				);
+			}
+			if (url.includes('/contents/.quill.md/issues/deepfolder/file1.md')) {
+				return Promise.resolve(
+					new Response(
+						JSON.stringify({
+							type: 'file',
+							content: btoa('deep file 1')
+						}),
+						{ status: 200, headers: { 'Content-Type': 'application/json' } }
+					)
+				);
+			}
+			if (url.includes('/contents/.quill.md/issues/deepfolder/sub/file2.md')) {
+				return Promise.resolve(
+					new Response(
+						JSON.stringify({
+							type: 'file',
+							content: btoa('deep file 2')
+						}),
+						{ status: 200, headers: { 'Content-Type': 'application/json' } }
+					)
+				);
+			}
+			return Promise.resolve(new Response('{}', { status: 200 }));
+		});
+
+		const files = await provider.fetchAll(
+			provider.parseUrl(new URL('https://github.com/acme/widgets')),
+			sampleBranch,
+			'graphql-depth-pat'
+		);
+
+		const calls = fetchSpy.mock.calls.map((c) =>
+			typeof c[0] === 'string' ? (c[0] as string) : (c[0] as URL).toString()
+		);
+
+		const getTreeCall = calls.find((u) => u.includes('/git/trees/treesha?recursive=true'));
+		expect(getTreeCall).toBeDefined();
+
+		expect(files).toEqual([
+			{ path: '.quill.md/issues/deepfolder/file1.md', content: 'deep file 1', sha: 'blob1sha' },
+			{ path: '.quill.md/issues/deepfolder/sub/file2.md', content: 'deep file 2', sha: 'blob2sha' }
+		]);
+	});
+
 	it('returns [] when .quill.md/ does not exist on the branch', async () => {
 		vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
 			graphqlResponse({
