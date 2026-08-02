@@ -250,19 +250,33 @@ function buildReadOnlyAdapter(files: readonly RemoteFile[], tip: BranchTip): Rea
 		return Promise.resolve(entry.content);
 	}
 
-	function listDirectory(path: string): Promise<DirectoryEntry[]> {
+	function listDirectory(
+		path: string,
+		options?: { recursive?: boolean }
+	): Promise<DirectoryEntry[]> {
 		const normalized = normalizePath(path);
-		const entries = new Map<string, { kind: 'file' | 'directory'; name: string }>();
+		const entries = new Map<string, DirectoryEntry>();
 		for (const f of files) {
 			const filePath = f.path;
 			if (normalized !== '.' && !filePath.startsWith(`${normalized}/`)) continue;
 			const remainder = normalized === '.' ? filePath : filePath.slice(normalized.length + 1);
-			const slash = remainder.indexOf('/');
-			if (slash === -1) {
-				entries.set(remainder, { kind: 'file', name: remainder });
+
+			if (options?.recursive) {
+				const parts = remainder.split('/');
+				let currentDir = '';
+				for (let i = 0; i < parts.length - 1; i++) {
+					currentDir = currentDir ? `${currentDir}/${parts[i]}` : parts[i];
+					entries.set(`${currentDir}/`, { kind: 'directory', name: parts[i], path: currentDir });
+				}
+				entries.set(remainder, { kind: 'file', name: parts[parts.length - 1], path: remainder });
 			} else {
-				const dirName = remainder.slice(0, slash);
-				entries.set(`${dirName}/`, { kind: 'directory', name: dirName });
+				const slash = remainder.indexOf('/');
+				if (slash === -1) {
+					entries.set(remainder, { kind: 'file', name: remainder, path: remainder });
+				} else {
+					const dirName = remainder.slice(0, slash);
+					entries.set(`${dirName}/`, { kind: 'directory', name: dirName, path: dirName });
+				}
 			}
 		}
 		return Promise.resolve([...entries.values()]);
