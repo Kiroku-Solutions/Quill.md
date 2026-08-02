@@ -139,7 +139,9 @@
 				await issues.load();
 
 				if (config.config === null && !$page.url.pathname.startsWith('/wizard')) {
-					await goto(resolve('/wizard'));
+					if (!mode.isReadOnly) {
+						await goto(resolve('/wizard'));
+					}
 				}
 			}
 		} catch (cause) {
