@@ -60,6 +60,7 @@
 export interface DirectoryEntry {
 	name: string;
 	kind: 'file' | 'directory';
+	path?: string;
 }
 
 /**
@@ -69,7 +70,7 @@ export interface DirectoryEntry {
  */
 export interface ReadOnlyDirectoryAdapter {
 	readTextFile(path: string): Promise<string>;
-	listDirectory(path: string): Promise<DirectoryEntry[]>;
+	listDirectory(path: string, options?: { recursive?: boolean }): Promise<DirectoryEntry[]>;
 }
 
 /**

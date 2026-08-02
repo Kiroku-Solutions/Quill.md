@@ -53,10 +53,13 @@ export async function createWikiPage(title: string, content: string, projectDir?
 	try {
 		await fs.mkdir(targetDir, { recursive: true });
 		const id = crypto.randomUUID();
-		const filename = `${title.trim().replace(/[^a-zA-Z0-9_-]/g, '_')}.md`;
+		const filename = `${title.trim().replace(new RegExp('[^a-zA-Z0-9_/-]', 'g'), '_')}.md`;
+
+		const fullPath = path.join(targetDir, filename);
+		await fs.mkdir(path.dirname(fullPath), { recursive: true });
 
 		const serialized = serializeDocument(id, false, content);
-		await fs.writeFile(path.join(targetDir, filename), serialized);
+		await fs.writeFile(fullPath, serialized);
 
 		return {
 			content: [
@@ -88,11 +91,14 @@ export async function createAdr(
 	try {
 		await fs.mkdir(targetDir, { recursive: true });
 		const id = crypto.randomUUID();
-		const filename = `${title.trim().replace(/[^a-zA-Z0-9_-]/g, '_')}.md`;
+		const filename = `${title.trim().replace(new RegExp('[^a-zA-Z0-9_/-]', 'g'), '_')}.md`;
 
-		const content = `# ${title}\n\n## Status\n${status}\n\n## Context\n${context}\n\n## Decision\n${decision}\n\n## Consequences\n${consequences}`;
-		const serialized = serializeDocument(id, false, content);
-		await fs.writeFile(path.join(targetDir, filename), serialized);
+		const fullPath = path.join(targetDir, filename);
+		await fs.mkdir(path.dirname(fullPath), { recursive: true });
+
+		const contentString = `# ${title}\n\n## Status\n${status}\n\n## Context\n${context}\n\n## Decision\n${decision}\n\n## Consequences\n${consequences}`;
+		const serialized = serializeDocument(id, false, contentString);
+		await fs.writeFile(fullPath, serialized);
 
 		return {
 			content: [

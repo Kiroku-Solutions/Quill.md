@@ -3,6 +3,7 @@
 	import { t } from '$lib/ui/strings';
 	import { Button, Textarea } from '$lib/ui';
 	import MarkdownPreview from './MarkdownPreview.svelte';
+	import FileTree from './FileTree.svelte';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Edit2 from '@lucide/svelte/icons/edit-2';
 	import Check from '@lucide/svelte/icons/check';
@@ -34,8 +35,10 @@
 	async function loadFiles() {
 		if (!adapter) return;
 		try {
-			const entries = await adapter.listDirectory('.quill.md/wiki');
-			files = entries.filter((e) => e.kind === 'file' && e.name.endsWith('.md')).map((e) => e.name);
+			const entries = await adapter.listDirectory('.quill.md/wiki', { recursive: true });
+			files = entries
+				.filter((e) => e.kind === 'file' && e.name.endsWith('.md'))
+				.map((e) => e.path || e.name);
 		} catch {
 			files = [];
 		}
@@ -120,9 +123,12 @@
 	}
 
 	async function createNewFile() {
-		const name = prompt('Enter new wiki page name (without .md):');
+		const name = prompt(
+			'Enter new wiki page name (without .md). You can use slashes for subfolders (e.g. features/auth):'
+		);
 		if (name && name.trim()) {
-			const filename = `${name.trim().replace(/[^a-zA-Z0-9_-]/g, '_')}.md`;
+			// Replace any characters except alphanumeric, dashes, underscores and slashes
+			const filename = `${name.trim().replace(new RegExp('[^a-zA-Z0-9_/-]', 'g'), '_')}.md`;
 			if (files.includes(filename)) {
 				alert('File already exists.');
 				return;
@@ -131,13 +137,15 @@
 				const w = adapter as unknown as WritableDirectoryAdapter;
 				if (typeof w.writeTextFile === 'function') {
 					const id = crypto.randomUUID();
+					// Document Saver might expect the directory to be passed as dir, and filename as just filename.
+					// Let's pass the relative path in the filename param and `.quill.md/wiki` in the dir param.
 					await saveDocument(
 						w,
 						'.quill.md/wiki',
 						filename,
 						id,
 						false,
-						`# ${name}\n\nStart writing here...`
+						`# ${name.split('/').pop()}\n\nStart writing here...`
 					);
 					await loadFiles();
 					await selectFile(filename);
@@ -174,18 +182,7 @@
 			{/if}
 		</div>
 		<div class="flex flex-col gap-1">
-			{#each files as file (file)}
-				<button
-					class="hover:bg-surface-dark flex items-center gap-2 rounded-md p-2 text-sm transition-colors {selectedFile ===
-					file
-						? 'bg-primary/10 font-bold text-primary'
-						: 'text-foreground'}"
-					onclick={() => selectFile(file)}
-				>
-					<FileText class="h-4 w-4 shrink-0" />
-					<span class="truncate">{file}</span>
-				</button>
-			{/each}
+			<FileTree paths={files} selected={selectedFile} onselect={selectFile} />
 			{#if files.length === 0}
 				<p class="p-2 text-xs text-muted-foreground italic">
 					{t('wiki.empty', { default: 'No wiki pages found.' })}

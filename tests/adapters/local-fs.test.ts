@@ -435,15 +435,15 @@ describe('LocalFsAdapter — listDirectory', () => {
 		await seedFile('b.txt', '2');
 		const adapter = await lfa();
 		const entries = await adapter.listDirectory('.');
-		expect(entries).toContainEqual({ name: 'a.txt', kind: 'file' });
-		expect(entries).toContainEqual({ name: 'b.txt', kind: 'file' });
+		expect(entries).toContainEqual({ name: 'a.txt', kind: 'file', path: 'a.txt' });
+		expect(entries).toContainEqual({ name: 'b.txt', kind: 'file', path: 'b.txt' });
 	});
 
 	it('returns entries with kind: "directory"', async () => {
 		await seedFile('dir/inner.txt', 'x');
 		const adapter = await lfa();
 		const entries = await adapter.listDirectory('.');
-		expect(entries).toContainEqual({ name: 'dir', kind: 'directory' });
+		expect(entries).toContainEqual({ name: 'dir', kind: 'directory', path: 'dir' });
 	});
 
 	it('returns empty array for a non-existent directory (per DirectoryAdapter contract)', async () => {

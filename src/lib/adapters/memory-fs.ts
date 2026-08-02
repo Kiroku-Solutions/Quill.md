@@ -141,7 +141,7 @@ export class MemoryFsAdapter implements DirectoryAdapter {
 		}
 	}
 
-	async listDirectory(path: string): Promise<DirectoryEntry[]> {
+	async listDirectory(path: string, options?: { recursive?: boolean }): Promise<DirectoryEntry[]> {
 		const normalized = requireNonEmpty(path);
 
 		// Auto-create behaviour matches what the FSA-backed adapter does
@@ -152,15 +152,31 @@ export class MemoryFsAdapter implements DirectoryAdapter {
 			return [];
 		}
 
-		const childNames = this.directories.get(normalized);
-		if (!childNames) return [];
-
 		const entries: DirectoryEntry[] = [];
-		for (const name of childNames) {
-			const childPath = normalized === ROOT ? name : `${normalized}/${name}`;
-			const kind: DirectoryEntry['kind'] = this.files.has(childPath) ? 'file' : 'directory';
-			entries.push({ name, kind });
-		}
+		const visited = new Set<string>();
+
+		const walk = (dirPath: string, relativePath: string) => {
+			if (visited.has(dirPath)) return;
+			visited.add(dirPath);
+
+			const childNames = this.directories.get(dirPath);
+			if (!childNames) return;
+
+			for (const name of childNames) {
+				const fullPath = dirPath === ROOT ? name : `${dirPath}/${name}`;
+				const currentRelative = relativePath ? `${relativePath}/${name}` : name;
+				const isFile = this.files.has(fullPath);
+				const kind: DirectoryEntry['kind'] = isFile ? 'file' : 'directory';
+
+				entries.push({ name, kind, path: currentRelative });
+
+				if (options?.recursive && kind === 'directory') {
+					walk(fullPath, currentRelative);
+				}
+			}
+		};
+
+		walk(normalized, '');
 		return entries;
 	}
 
