@@ -25,7 +25,7 @@
 	import IconButton from '$lib/ui/IconButton.svelte';
 	import Input from '$lib/ui/Input.svelte';
 	import Tabs from '$lib/ui/Tabs.svelte';
-	import Textarea from '$lib/ui/Textarea.svelte';
+	import CodeMirrorEditor from '$lib/ui/CodeMirrorEditor.svelte';
 	import Tooltip from '$lib/ui/Tooltip.svelte';
 	import X from '@lucide/svelte/icons/x';
 	import FormFields from './FormFields.svelte';
@@ -201,17 +201,11 @@
 
 				{#if activeTab === 'write'}
 					{#if activeSection}
-						<Textarea
+						<CodeMirrorEditor
 							value={activeSection.markdown}
-							oninput={(e) =>
-								editor.patchSection(
-									activeSection.name,
-									(e.currentTarget as HTMLTextAreaElement).value
-								)}
-							rows={14}
-							class="font-mono text-sm"
-							data-testid="editor-section-textarea"
-							disabled={isReadOnly}
+							onchange={(newValue) => editor.patchSection(activeSection.name, newValue)}
+							class="h-full min-h-[400px]"
+							readonly={isReadOnly}
 						/>
 					{:else}
 						<p class="text-sm opacity-60">{t('editor.noSectionsEdit')}</p>

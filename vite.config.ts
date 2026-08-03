@@ -58,6 +58,9 @@ export default defineConfig({
 		// documented fix per the Vitest 4 migration guide.
 		include: [
 			'async-lock',
+			'codemirror',
+			'@codemirror/state',
+			'@codemirror/view',
 			'@lucide/svelte/icons/settings',
 			'@lucide/svelte/icons/panel-left-open',
 			'@lucide/svelte/icons/panel-left-close',
