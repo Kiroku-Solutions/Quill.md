@@ -299,7 +299,7 @@ optimizeDeps: {
 
 ---
 
-## 6. Stage 1 — CRDT Data Layer (Yjs)
+## 6. Stage 1 — CRDT Data Layer (Yjs) ✅ [COMPLETED]
 
 **Goal**: Introduce Yjs as the in-memory collaborative data model for
 an open issue. No network transport yet — this stage wires Yjs to the

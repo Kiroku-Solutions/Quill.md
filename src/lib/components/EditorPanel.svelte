@@ -201,12 +201,16 @@
 
 				{#if activeTab === 'write'}
 					{#if activeSection}
-						<CodeMirrorEditor
-							value={activeSection.markdown}
-							onchange={(newValue) => editor.patchSection(activeSection.name, newValue)}
-							class="h-full min-h-[400px]"
-							readonly={isReadOnly}
-						/>
+						{#key editor.activeId + '-' + activeSection.name}
+							<CodeMirrorEditor
+								value={activeSection.markdown}
+								ytext={editor.getSectionYText(activeSection.name)}
+								awareness={editor.awareness ?? undefined}
+								onchange={(newValue) => editor.patchSection(activeSection.name, newValue)}
+								class="h-full min-h-[400px]"
+								readonly={isReadOnly}
+							/>
+						{/key}
 					{:else}
 						<p class="text-sm opacity-60">{t('editor.noSectionsEdit')}</p>
 					{/if}

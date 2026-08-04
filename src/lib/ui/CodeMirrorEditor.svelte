@@ -4,40 +4,54 @@
 	import { EditorView, basicSetup } from 'codemirror';
 	import { markdown } from '@codemirror/lang-markdown';
 	import { quillTheme } from './codemirror-theme';
+	import { yCollab } from 'y-codemirror.next';
+	import type * as Y from 'yjs';
+	import type { Awareness } from 'y-protocols/awareness';
 
 	type Props = {
 		value: string;
 		onchange?: (value: string) => void;
 		readonly?: boolean;
 		class?: string;
+		ytext?: Y.Text;
+		awareness?: Awareness;
 	};
 
-	let { value, onchange, readonly = false, class: cls = '' }: Props = $props();
+	let { value, onchange, readonly = false, class: cls = '', ytext, awareness }: Props = $props();
 
 	let container: HTMLDivElement;
 	let view: EditorView;
 	const editableCompartment = new Compartment();
 
 	onMount(() => {
+		const extensions = [
+			basicSetup,
+			markdown(),
+			editableCompartment.of(EditorView.editable.of(!readonly)),
+			quillTheme,
+			EditorView.lineWrapping
+		];
+
+		if (ytext && awareness) {
+			extensions.push(yCollab(ytext, awareness));
+		} else {
+			extensions.push(
+				EditorView.updateListener.of((update) => {
+					if (update.docChanged && onchange) {
+						// Avoid cyclic update
+						const newValue = update.state.doc.toString();
+						if (newValue !== value) {
+							onchange(newValue);
+						}
+					}
+				})
+			);
+		}
+
 		view = new EditorView({
 			state: EditorState.create({
-				doc: value,
-				extensions: [
-					basicSetup,
-					markdown(),
-					editableCompartment.of(EditorView.editable.of(!readonly)),
-					EditorView.updateListener.of((update) => {
-						if (update.docChanged && onchange) {
-							// Avoid cyclic update
-							const newValue = update.state.doc.toString();
-							if (newValue !== value) {
-								onchange(newValue);
-							}
-						}
-					}),
-					quillTheme,
-					EditorView.lineWrapping
-				]
+				doc: ytext ? ytext.toString() : value,
+				extensions
 			}),
 			parent: container
 		});
@@ -46,7 +60,7 @@
 	});
 
 	$effect(() => {
-		if (view && value !== view.state.doc.toString()) {
+		if (view && !ytext && value !== view.state.doc.toString()) {
 			view.dispatch({
 				changes: { from: 0, to: view.state.doc.length, insert: value }
 			});

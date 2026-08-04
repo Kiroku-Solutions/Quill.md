@@ -61,6 +61,9 @@ import type { ConfigStore } from './config.svelte.ts';
 import type { TemplatesStore } from './templates.svelte.ts';
 import type { IssuesStore } from './issues.svelte.ts';
 import type { CommitQueueStore } from './commit-queue.svelte.ts';
+import * as Y from 'yjs';
+import { Awareness } from 'y-protocols/awareness';
+import { createIssueYDoc, serializeYDoc } from '../collab/index.ts';
 
 /**
  * System frontmatter keys live on `Issue.fields`; everything else is a
@@ -90,6 +93,8 @@ export interface EditorStore {
 	 */
 	readonly activeId: string | null;
 	readonly draft: LoadedIssue | null;
+	readonly ydoc: Y.Doc | null;
+	readonly awareness: Awareness | null;
 	readonly isDirty: boolean;
 	readonly integrityWarning: boolean;
 	readonly errors: readonly ValidationError[];
@@ -114,6 +119,8 @@ export interface EditorStore {
 	readonly save: () => Promise<void>;
 	/** Re-clone the source issue into the draft, clearing the dirty flag. */
 	readonly discard: () => void;
+	/** Helper to retrieve the Y.Text instance for a section by name. */
+	readonly getSectionYText: (name: string) => Y.Text | undefined;
 }
 
 export interface EditorStoreDeps {
@@ -147,6 +154,8 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 
 	let activeId = $state<string | null>(null);
 	let draft = $state.raw<LoadedIssue | null>(null);
+	let ydoc = $state.raw<Y.Doc | null>(null);
+	let awareness = $state.raw<Awareness | null>(null);
 	let isDirty = $state<boolean>(false);
 	let revision = $state<number>(0);
 
@@ -160,6 +169,18 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		}
 		activeId = id;
 		draft = cloneLoaded(source);
+
+		if (ydoc) ydoc.destroy();
+		if (awareness) awareness.destroy();
+
+		ydoc = createIssueYDoc(draft.issue);
+		awareness = new Awareness(ydoc);
+
+		ydoc.on('update', () => {
+			isDirty = true;
+			revision++;
+		});
+
 		isDirty = false;
 		revision++;
 	}
@@ -167,6 +188,14 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 	function close(): void {
 		activeId = null;
 		draft = null;
+		if (ydoc) {
+			ydoc.destroy();
+			ydoc = null;
+		}
+		if (awareness) {
+			awareness.destroy();
+			awareness = null;
+		}
 		isDirty = false;
 		revision++;
 	}
@@ -181,11 +210,14 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 			// verb and the parser/serializer reject it.
 			if (value === undefined) return;
 			Object.assign(draft.issue.fields, { [key]: value });
+			if (ydoc) ydoc.getMap('meta').set(key, value);
 		} else {
 			if (value === undefined) {
 				delete draft.issue.customFields[key];
+				if (ydoc) ydoc.getMap('customFields').delete(key);
 			} else {
 				draft.issue.customFields[key] = value as FrontmatterValue;
+				if (ydoc) ydoc.getMap('customFields').set(key, value);
 			}
 		}
 		isDirty = true;
@@ -194,6 +226,19 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 
 	function patchSection(name: string, markdown: string): void {
 		if (!draft) return;
+
+		if (ydoc) {
+			const sectionsMap = ydoc.getMap('sections');
+			let ytext = sectionsMap.get(name) as Y.Text | undefined;
+			if (!ytext) {
+				ytext = new Y.Text(markdown);
+				sectionsMap.set(name, ytext);
+			} else {
+				ytext.delete(0, ytext.length);
+				ytext.insert(0, markdown);
+			}
+		}
+
 		const sections: IssueSection[] = draft.issue.sections;
 		const existing = sections.find((s) => s.name === name);
 		if (existing) {
@@ -213,7 +258,10 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		// validate → serialize → write → reparse. Issues store's
 		// `update(id, patch)` is the right verb — it captures a snapshot
 		// for `discard()` and flips the dirty flag.
-		issues.update(activeId, cloneIssueFields(draft.issue));
+
+		const issueToSave = ydoc ? serializeYDoc(ydoc) : draft.issue;
+
+		issues.update(activeId, cloneIssueFields(issueToSave));
 		await issues.save(activeId);
 		// Remote Edit Mode (FR-16): bypass the commit queue's debounce
 		// so this per-save click produces one commit on the edit branch
@@ -232,7 +280,17 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		// file (with a fresh integrity hash). Re-clone into the draft
 		// so the editor's view is consistent with disk.
 		const refreshed = issues.byId.get(activeId);
-		if (refreshed) draft = cloneLoaded(refreshed);
+		if (refreshed) {
+			draft = cloneLoaded(refreshed);
+			if (ydoc) ydoc.destroy();
+			if (awareness) awareness.destroy();
+			ydoc = createIssueYDoc(draft.issue);
+			awareness = new Awareness(ydoc);
+			ydoc.on('update', () => {
+				isDirty = true;
+				revision++;
+			});
+		}
 		isDirty = false;
 		revision++;
 	}
@@ -243,13 +301,33 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 			return;
 		}
 		const source = issues.byId.get(activeId);
+
+		if (ydoc) {
+			ydoc.destroy();
+			ydoc = null;
+		}
+		if (awareness) {
+			awareness.destroy();
+			awareness = null;
+		}
+
 		if (source) {
 			draft = cloneLoaded(source);
+			ydoc = createIssueYDoc(draft.issue);
+			awareness = new Awareness(ydoc);
+			ydoc.on('update', () => {
+				isDirty = true;
+				revision++;
+			});
 		} else {
 			draft = null;
 		}
 		isDirty = false;
 		revision++;
+	}
+
+	function getSectionYText(name: string): Y.Text | undefined {
+		return ydoc?.getMap('sections').get(name) as Y.Text | undefined;
 	}
 
 	return {
@@ -259,6 +337,14 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		get draft() {
 			void revision;
 			return draft;
+		},
+		get ydoc() {
+			void revision;
+			return ydoc;
+		},
+		get awareness() {
+			void revision;
+			return awareness;
 		},
 		get isDirty() {
 			return isDirty;
@@ -284,7 +370,8 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		patchField,
 		patchSection,
 		save,
-		discard
+		discard,
+		getSectionYText
 	};
 }
 

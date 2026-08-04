@@ -229,7 +229,10 @@ function buildStub(issues: readonly Issue[], mode: 'local' | 'remote'): StoreGra
 			patchField: () => {},
 			patchSection: () => {},
 			save: () => Promise.resolve(),
-			discard: () => {}
+			discard: () => {},
+			ydoc: null,
+			awareness: null,
+			getSectionYText: () => undefined
 		},
 		filter: {
 			filter: { q: undefined, status: undefined, type: undefined },
