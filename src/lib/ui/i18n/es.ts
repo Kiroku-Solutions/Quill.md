@@ -220,8 +220,10 @@ export const es: Translations = {
 		sectionsAria: 'Secciones',
 		noSectionsEdit: 'No hay secciones para editar.',
 		noSectionsPreview: 'No hay secciones para previsualizar.',
-		deleteTooltip: 'Mover a papelera',
+		deleteTooltip: 'Mover a la papelera',
 		unsaved: 'Cambios sin guardar',
+		remoteUnsavedEditsWarning:
+			'Otro usuario tiene cambios sin guardar en este elemento. Sus cambios se incluirán cuando cualquiera de los dos guarde.',
 		footerClose: 'Cerrar'
 	},
 

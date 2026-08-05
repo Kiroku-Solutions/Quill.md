@@ -174,6 +174,7 @@ function buildStub(opts: { integrityCount: number; activeHandleName?: string }):
 		},
 		editor: {
 			connectionState: 'disconnected',
+			remoteUnsavedEdits: false,
 			collabPresence: null,
 			activeId: null,
 			draft: null,

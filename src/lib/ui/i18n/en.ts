@@ -218,6 +218,8 @@ export const en = {
 		noSectionsPreview: 'No sections to preview.',
 		deleteTooltip: 'Move to trash',
 		unsaved: 'Unsaved changes',
+		remoteUnsavedEditsWarning:
+			'Another user has unsaved edits on this issue. Their changes will be included when either of you saves.',
 		footerClose: 'Close'
 	},
 

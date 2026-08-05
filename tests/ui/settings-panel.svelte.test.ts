@@ -178,6 +178,7 @@ function buildStub(opts: {
 		},
 		editor: {
 			connectionState: 'disconnected',
+			remoteUnsavedEdits: false,
 			collabPresence: null,
 			activeId: null,
 			draft: null,

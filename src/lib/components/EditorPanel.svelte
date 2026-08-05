@@ -163,6 +163,14 @@
 			</div>
 		{/if}
 
+		{#if editor.remoteUnsavedEdits}
+			<div class="px-2 pt-2" data-testid="editor-panel-remote-unsaved-edits">
+				<Alert variant="info">
+					{t('editor.remoteUnsavedEditsWarning')}
+				</Alert>
+			</div>
+		{/if}
+
 		{#if isRemoteError && queueError}
 			<div class="px-2 pt-2" data-testid="editor-panel-remote-conflict">
 				<Alert variant="error">

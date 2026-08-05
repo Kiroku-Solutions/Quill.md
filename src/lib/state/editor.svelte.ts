@@ -71,6 +71,7 @@ import {
 	createCollabPresenceStore,
 	type CollabPresenceStore
 } from '../collab/index.ts';
+import { canonicalForm } from '../services/serializer.ts';
 
 /**
  * System frontmatter keys live on `Issue.fields`; everything else is a
@@ -104,6 +105,7 @@ export interface EditorStore {
 	readonly awareness: Awareness | null;
 	readonly collabPresence: CollabPresenceStore | null;
 	readonly connectionState: 'connecting' | 'connected' | 'disconnected';
+	readonly remoteUnsavedEdits: boolean;
 	readonly isDirty: boolean;
 	readonly integrityWarning: boolean;
 	readonly errors: readonly ValidationError[];
@@ -167,6 +169,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 	let awareness = $state.raw<Awareness | null>(null);
 	let collabPresence = $state.raw<CollabPresenceStore | null>(null);
 	let connectionState = $state<'connecting' | 'connected' | 'disconnected'>('disconnected');
+	let remoteUnsavedEdits = $state<boolean>(false);
 	let isDirty = $state<boolean>(false);
 	let revision = $state<number>(0);
 
@@ -182,6 +185,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		}
 		activeId = id;
 		draft = cloneLoaded(source);
+		remoteUnsavedEdits = false;
 
 		if (providerCleanup) {
 			providerCleanup();
@@ -245,6 +249,12 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		// content is already in the doc.
 		if (!isYDocSeeded(ydoc)) {
 			createIssueYDoc(draft.issue, ydoc);
+		} else {
+			const ydocCanonical = canonicalForm(serializeYDoc(ydoc));
+			const diskCanonical = canonicalForm(draft.issue);
+			if (ydocCanonical !== diskCanonical) {
+				remoteUnsavedEdits = true;
+			}
 		}
 
 		ydoc.on('update', () => {
@@ -275,6 +285,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 			awareness.destroy();
 			awareness = null;
 		}
+		remoteUnsavedEdits = false;
 		isDirty = false;
 		revision++;
 	}
@@ -402,6 +413,10 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		get connectionState() {
 			void revision;
 			return connectionState;
+		},
+		get remoteUnsavedEdits() {
+			void revision;
+			return remoteUnsavedEdits;
 		},
 		get isDirty() {
 			return isDirty;

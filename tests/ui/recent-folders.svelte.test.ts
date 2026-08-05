@@ -156,6 +156,7 @@ function buildStub(opts: { recentHandles: HandleRecord[] }): StoreGraph {
 		},
 		editor: {
 			connectionState: 'disconnected',
+			remoteUnsavedEdits: false,
 			collabPresence: null,
 			activeId: null,
 			draft: null,
