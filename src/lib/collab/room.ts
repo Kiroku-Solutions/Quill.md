@@ -1,4 +1,5 @@
 import { HocuspocusProvider } from '@hocuspocus/provider';
+import { IndexeddbPersistence } from 'y-indexeddb';
 import type * as Y from 'yjs';
 import type { CollabConfig } from './types';
 import { sha256Hex } from '$lib/services/integrity';
@@ -15,7 +16,7 @@ export async function createRoom(
 	ydoc: Y.Doc,
 	roomSeed: string,
 	config: CollabConfig
-): Promise<{ provider: HocuspocusProvider; cleanup: () => void }> {
+): Promise<{ provider: HocuspocusProvider; cleanup: (isDirty?: boolean) => void }> {
 	// Room name is an opaque SHA-256 hash of the seed (e.g. providerId/owner/repo/branch/issueId)
 	const roomName = await sha256Hex(roomSeed);
 
@@ -25,6 +26,8 @@ export async function createRoom(
 		document: ydoc,
 		token: config.token
 	});
+
+	const indexeddbProvider = new IndexeddbPersistence(`quill-md-collab-${roomName}`, ydoc);
 
 	provider.on('status', ({ status }: { status: string }) => {
 		console.log(`[collab] Status changed to: ${status}`);
@@ -50,6 +53,12 @@ export async function createRoom(
 	// whether the server already has content for this room.
 	console.log(`[collab] Connecting to ${config.serverUrl} for room ${roomName}...`);
 	const startTime = Date.now();
+
+	// Wait for local IndexedDB to load first, then wait for network sync.
+	// `whenSynced` is a built-in promise on IndexeddbPersistence.
+	await indexeddbProvider.whenSynced;
+	console.log(`[collab] IndexedDB synced in ${Date.now() - startTime}ms`);
+
 	await waitForSync(provider, 5000);
 	console.log(
 		`[collab] Sync check completed in ${Date.now() - startTime}ms. isSynced=${provider.isSynced}`
@@ -65,11 +74,16 @@ export async function createRoom(
 
 	return {
 		provider,
-		cleanup: () => {
+		cleanup: (isDirty: boolean = false) => {
 			if (provider.awareness) {
 				provider.awareness.destroy();
 			}
 			provider.destroy();
+
+			if (!isDirty) {
+				indexeddbProvider.clearData();
+			}
+			indexeddbProvider.destroy();
 		}
 	};
 }

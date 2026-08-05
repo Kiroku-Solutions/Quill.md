@@ -216,7 +216,7 @@
 
 				{#if activeTab === 'write'}
 					{#if activeSection}
-						{#key editor.activeId + '-' + activeSection.name}
+						{#key editor.activeId + '-' + activeSection.name + '-' + (editor.getSectionYText(activeSection.name) !== undefined)}
 							<CodeMirrorEditor
 								value={activeSection.markdown}
 								ytext={editor.getSectionYText(activeSection.name)}

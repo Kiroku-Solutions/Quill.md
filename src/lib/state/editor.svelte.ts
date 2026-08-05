@@ -173,7 +173,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 	let isDirty = $state<boolean>(false);
 	let revision = $state<number>(0);
 
-	let providerCleanup: (() => void) | null = null;
+	let providerCleanup: ((isDirty?: boolean) => void) | null = null;
 
 	async function open(id: string): Promise<void> {
 		const source = issues.byId.get(id);
@@ -188,7 +188,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		remoteUnsavedEdits = false;
 
 		if (providerCleanup) {
-			providerCleanup();
+			providerCleanup(isDirty);
 			providerCleanup = null;
 		}
 		if (collabPresence) collabPresence.destroy();
@@ -270,7 +270,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		activeId = null;
 		draft = null;
 		if (providerCleanup) {
-			providerCleanup();
+			providerCleanup(isDirty);
 			providerCleanup = null;
 		}
 		if (collabPresence) {
@@ -370,6 +370,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		// file (with a fresh integrity hash). Re-clone into the draft
 		// so the editor's view is consistent with disk.
 		const refreshed = issues.byId.get(activeId);
+		isDirty = false; // Ensure IndexedDB is cleared when we reopen
 		if (refreshed) {
 			await open(activeId);
 		} else {
@@ -382,6 +383,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 			close();
 			return;
 		}
+		isDirty = false; // Discard should clear IndexedDB
 		await open(activeId);
 	}
 

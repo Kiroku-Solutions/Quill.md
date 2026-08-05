@@ -22,8 +22,8 @@
 7. [Stage 2 — Server Relay Sync (Hocuspocus)](#7-stage-2--server-relay-sync-hocuspocus) ✅ [COMPLETED]
 8. [Stage 3 — Presence & Awareness UX](#8-stage-3--presence--awareness-ux) ✅ [COMPLETED]
 9. [Stage 4 — Git Reconciliation](#9-stage-4--git-reconciliation) ✅ [COMPLETED]
-10. [Stage 5 — Configuration & Settings](#10-stage-5--configuration--settings)
-11. [Stage 6 — Offline & Resilience](#11-stage-6--offline--resilience)
+10. [Stage 5 — Configuration & Settings](#10-stage-5--configuration--settings) ✅ [COMPLETED]
+11. [Stage 6 — Offline & Resilience](#11-stage-6--offline--resilience) ✅ [COMPLETED]
 12. [Stage 7 — Testing & Verification](#12-stage-7--testing--verification)
 13. [Dependency Inventory](#13-dependency-inventory)
 14. [Risk Register](#14-risk-register)
@@ -665,7 +665,7 @@ When a user opens an issue (`editor.open(id)`):
 
 ---
 
-## 10. Stage 5 — Configuration & Settings
+## 10. Stage 5 — Configuration & Settings ✅ [COMPLETED]
 
 **Goal**: Expose collaboration settings in the UI and in
 `.quill.md/config.json`.
@@ -723,7 +723,7 @@ order):
 
 ---
 
-## 11. Stage 6 — Offline & Resilience
+## 11. Stage 6 — Offline & Resilience ✅ [COMPLETED]
 
 **Goal**: Ensure collaboration degrades gracefully and the user's
 work is never lost.
