@@ -282,6 +282,14 @@ export const es: Translations = {
 			`Vaciar papelera${Number(params.n) > 0 ? ` (${params.n})` : ''}`,
 		emptyTrashLocalTooltip: 'Vaciar la carpeta local .quill.md/.trash/',
 		emptyTrashSignInTooltip: 'Abre una carpeta local para habilitar esto',
+		collabHeading: 'Colaboración en tiempo real',
+		collabEnableToggle: 'Habilitar colaboración en tiempo real',
+		collabServerUrl: 'URL del servidor Hocuspocus',
+		collabServerUrlPlaceholder: 'wss://collab.myteam.com',
+		collabDisplayName: 'Nombre a mostrar',
+		collabDisplayNamePlaceholder: 'Opcional (por defecto tu nombre)',
+		collabAdvisoryText:
+			'Cuando está habilitado, tu navegador se conecta al servidor Hocuspocus configurado vía WebSocket. El contenido del documento se transmite cifrado con TLS hacia tu servidor. Solo usuarios con un token válido pueden unirse a la sesión de colaboración.',
 		templatesHeading: 'Categorías (Plantillas)',
 		newTemplate: '+ Nueva'
 	},

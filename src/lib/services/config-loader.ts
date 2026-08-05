@@ -161,6 +161,28 @@ function assertConfig(value: unknown): Config {
 	// No required check on `remote.cors_proxy` anymore — see FR-5 migration.
 	void v['remote'];
 
+	// Stage 5: Collaboration config defaults
+	if (v['collaboration'] !== undefined) {
+		if (typeof v['collaboration'] !== 'object' || v['collaboration'] === null) {
+			throw new Error('config.json: "collaboration" must be an object');
+		}
+		const collab = v['collaboration'] as Record<string, unknown>;
+		if (collab['enabled'] !== undefined && typeof collab['enabled'] !== 'boolean') {
+			throw new Error('config.json: "collaboration.enabled" must be a boolean');
+		}
+		if (collab['server_url'] !== undefined && typeof collab['server_url'] !== 'string') {
+			throw new Error('config.json: "collaboration.server_url" must be a string');
+		}
+		if (collab['display_name'] !== undefined && typeof collab['display_name'] !== 'string') {
+			throw new Error('config.json: "collaboration.display_name" must be a string');
+		}
+	} else {
+		// Provide default object if completely missing, so UI can rely on it existing
+		v['collaboration'] = {
+			enabled: false
+		};
+	}
+
 	return value as Config;
 }
 
