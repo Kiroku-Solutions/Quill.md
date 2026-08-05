@@ -156,6 +156,7 @@ function buildStub(issues: readonly Issue[]): StoreGraph {
 		},
 		editor: {
 			connectionState: 'disconnected',
+			collabPresence: null,
 			activeId: null,
 			draft: null,
 			isDirty: false,

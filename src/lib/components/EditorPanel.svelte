@@ -30,6 +30,8 @@
 	import X from '@lucide/svelte/icons/x';
 	import FormFields from './FormFields.svelte';
 	import MarkdownPreview from './MarkdownPreview.svelte';
+	import PresenceBar from './PresenceBar.svelte';
+	import PresenceCursors from './PresenceCursors.svelte';
 
 	const { editor, mode, templates, issues } = getStores();
 
@@ -147,6 +149,11 @@
 				<X class="h-4 w-4" aria-hidden="true" />
 			</IconButton>
 		</div>
+
+		{#if editor.collabPresence && editor.collabPresence.peerCount > 0}
+			<PresenceBar presence={editor.collabPresence} />
+			<PresenceCursors />
+		{/if}
 
 		{#if editor.integrityWarning}
 			<div class="px-2 pt-2" data-testid="editor-panel-integrity-warning">

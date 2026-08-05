@@ -201,6 +201,11 @@ export const en = {
 		confirm: 'Empty trash'
 	},
 
+	collab: {
+		presenceAria: 'Connected users',
+		you: 'You'
+	},
+
 	editor: {
 		tabs: {
 			form: 'Form',

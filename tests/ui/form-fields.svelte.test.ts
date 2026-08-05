@@ -262,6 +262,7 @@ function buildStub(opts: StubOpts = {}): StoreGraph {
 		},
 		editor: {
 			connectionState: 'disconnected',
+			collabPresence: null,
 			activeId: loaded.issue.id,
 			draft: loaded,
 			isDirty: false,

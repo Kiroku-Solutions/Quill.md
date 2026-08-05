@@ -63,7 +63,14 @@ import type { IssuesStore } from './issues.svelte.ts';
 import type { CommitQueueStore } from './commit-queue.svelte.ts';
 import * as Y from 'yjs';
 import { Awareness } from 'y-protocols/awareness';
-import { createIssueYDoc, isYDocSeeded, serializeYDoc, createRoom } from '../collab/index.ts';
+import {
+	createIssueYDoc,
+	isYDocSeeded,
+	serializeYDoc,
+	createRoom,
+	createCollabPresenceStore,
+	type CollabPresenceStore
+} from '../collab/index.ts';
 
 /**
  * System frontmatter keys live on `Issue.fields`; everything else is a
@@ -95,6 +102,7 @@ export interface EditorStore {
 	readonly draft: LoadedIssue | null;
 	readonly ydoc: Y.Doc | null;
 	readonly awareness: Awareness | null;
+	readonly collabPresence: CollabPresenceStore | null;
 	readonly connectionState: 'connecting' | 'connected' | 'disconnected';
 	readonly isDirty: boolean;
 	readonly integrityWarning: boolean;
@@ -157,6 +165,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 	let draft = $state.raw<LoadedIssue | null>(null);
 	let ydoc = $state.raw<Y.Doc | null>(null);
 	let awareness = $state.raw<Awareness | null>(null);
+	let collabPresence = $state.raw<CollabPresenceStore | null>(null);
 	let connectionState = $state<'connecting' | 'connected' | 'disconnected'>('disconnected');
 	let isDirty = $state<boolean>(false);
 	let revision = $state<number>(0);
@@ -178,6 +187,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 			providerCleanup();
 			providerCleanup = null;
 		}
+		if (collabPresence) collabPresence.destroy();
 		if (ydoc) ydoc.destroy();
 		if (awareness) awareness.destroy();
 
@@ -185,6 +195,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		// (if another client already seeded it) or from the local issue.
 		ydoc = new Y.Doc();
 		awareness = new Awareness(ydoc);
+		collabPresence = createCollabPresenceStore(awareness);
 
 		// Stage 2: MOCK CONFIG FOR NOW
 		// En producción esto provendrá del UI de configuración (Stage 5)
@@ -207,6 +218,10 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 				}
 				if (provider.awareness) {
 					awareness = provider.awareness;
+					if (collabPresence) {
+						collabPresence.destroy();
+					}
+					collabPresence = createCollabPresenceStore(awareness);
 				}
 
 				provider.on('status', ({ status }: { status: string }) => {
@@ -247,6 +262,10 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		if (providerCleanup) {
 			providerCleanup();
 			providerCleanup = null;
+		}
+		if (collabPresence) {
+			collabPresence.destroy();
+			collabPresence = null;
 		}
 		if (ydoc) {
 			ydoc.destroy();
@@ -375,6 +394,10 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		get awareness() {
 			void revision;
 			return awareness;
+		},
+		get collabPresence() {
+			void revision;
+			return collabPresence;
 		},
 		get connectionState() {
 			void revision;

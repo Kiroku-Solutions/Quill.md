@@ -205,6 +205,11 @@ export const es: Translations = {
 		confirm: 'Vaciar papelera'
 	},
 
+	collab: {
+		presenceAria: 'Usuarios conectados',
+		you: 'Tú'
+	},
+
 	editor: {
 		tabs: {
 			form: 'Formulario',

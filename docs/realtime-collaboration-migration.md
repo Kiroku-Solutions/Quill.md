@@ -20,7 +20,7 @@
 5. [Stage 0 — Foundation: CodeMirror 6 Editor](#5-stage-0--foundation-codemirror-6-editor)
 6. [Stage 1 — CRDT Data Layer (Yjs)](#6-stage-1--crdt-data-layer-yjs)
 7. [Stage 2 — Server Relay Sync (Hocuspocus)](#7-stage-2--server-relay-sync-hocuspocus) ✅ [COMPLETED]
-8. [Stage 3 — Presence & Awareness UX](#8-stage-3--presence--awareness-ux)
+8. [Stage 3 — Presence & Awareness UX](#8-stage-3--presence--awareness-ux) ✅ [COMPLETED]
 9. [Stage 4 — Git Reconciliation](#9-stage-4--git-reconciliation)
 10. [Stage 5 — Configuration & Settings](#10-stage-5--configuration--settings)
 11. [Stage 6 — Offline & Resilience](#11-stage-6--offline--resilience)
@@ -561,7 +561,7 @@ cd server && docker compose up -d
 
 ---
 
-## 8. Stage 3 — Presence & Awareness UX
+## 8. Stage 3 — Presence & Awareness UX ✅ [COMPLETED]
 
 **Goal**: Show who is online, where their cursor is, and what they are
 selecting, using Yjs's Awareness protocol.

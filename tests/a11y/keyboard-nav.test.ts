@@ -228,6 +228,7 @@ function buildStub(opts: {
 		},
 		editor: {
 			connectionState: 'disconnected',
+			collabPresence: null,
 			activeId: aeid,
 			draft: aeid !== null ? (loaded.find((l) => l.issue.id === aeid) as never) : null,
 			isDirty: aeid !== null,
