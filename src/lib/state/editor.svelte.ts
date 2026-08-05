@@ -63,7 +63,7 @@ import type { IssuesStore } from './issues.svelte.ts';
 import type { CommitQueueStore } from './commit-queue.svelte.ts';
 import * as Y from 'yjs';
 import { Awareness } from 'y-protocols/awareness';
-import { createIssueYDoc, serializeYDoc } from '../collab/index.ts';
+import { createIssueYDoc, isYDocSeeded, serializeYDoc, createRoom } from '../collab/index.ts';
 
 /**
  * System frontmatter keys live on `Issue.fields`; everything else is a
@@ -95,12 +95,13 @@ export interface EditorStore {
 	readonly draft: LoadedIssue | null;
 	readonly ydoc: Y.Doc | null;
 	readonly awareness: Awareness | null;
+	readonly connectionState: 'connecting' | 'connected' | 'disconnected';
 	readonly isDirty: boolean;
 	readonly integrityWarning: boolean;
 	readonly errors: readonly ValidationError[];
 
 	/** Clone the given issue into the draft buffer. No-op if not found. */
-	readonly open: (id: string) => void;
+	readonly open: (id: string) => Promise<void>;
 	/** Clear the editor — resets `activeId`, `draft`, `isDirty`. */
 	readonly close: () => void;
 	/**
@@ -118,7 +119,7 @@ export interface EditorStore {
 	/** Persist the draft to disk. Delegates to `issues.save(activeId)`. */
 	readonly save: () => Promise<void>;
 	/** Re-clone the source issue into the draft, clearing the dirty flag. */
-	readonly discard: () => void;
+	readonly discard: () => Promise<void>;
 	/** Helper to retrieve the Y.Text instance for a section by name. */
 	readonly getSectionYText: (name: string) => Y.Text | undefined;
 }
@@ -156,10 +157,13 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 	let draft = $state.raw<LoadedIssue | null>(null);
 	let ydoc = $state.raw<Y.Doc | null>(null);
 	let awareness = $state.raw<Awareness | null>(null);
+	let connectionState = $state<'connecting' | 'connected' | 'disconnected'>('disconnected');
 	let isDirty = $state<boolean>(false);
 	let revision = $state<number>(0);
 
-	function open(id: string): void {
+	let providerCleanup: (() => void) | null = null;
+
+	async function open(id: string): Promise<void> {
 		const source = issues.byId.get(id);
 		if (!source) {
 			// Unknown id — close rather than open a half-state. The caller
@@ -170,11 +174,63 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		activeId = id;
 		draft = cloneLoaded(source);
 
+		if (providerCleanup) {
+			providerCleanup();
+			providerCleanup = null;
+		}
 		if (ydoc) ydoc.destroy();
 		if (awareness) awareness.destroy();
 
-		ydoc = createIssueYDoc(draft.issue);
+		// Create an EMPTY Y.Doc — content will come from either the server
+		// (if another client already seeded it) or from the local issue.
+		ydoc = new Y.Doc();
 		awareness = new Awareness(ydoc);
+
+		// Stage 2: MOCK CONFIG FOR NOW
+		// En producción esto provendrá del UI de configuración (Stage 5)
+		const collabConfig = {
+			enabled: import.meta.env.MODE !== 'test',
+			serverUrl: 'ws://127.0.0.1:1234',
+			displayName: 'Dev User'
+		};
+
+		if (collabConfig.enabled) {
+			const repoPath = source.sourcePath ?? 'local-repo';
+			const roomSeed = `quill/${id}/${repoPath}`;
+			try {
+				const { provider, cleanup } = await createRoom(ydoc, roomSeed, collabConfig);
+				// Guard: if close() or another open() ran while we awaited,
+				// the activeId will have changed — discard the provider.
+				if (activeId !== id) {
+					cleanup();
+					return;
+				}
+				if (provider.awareness) {
+					awareness = provider.awareness;
+				}
+
+				provider.on('status', ({ status }: { status: string }) => {
+					connectionState = status as 'connecting' | 'connected' | 'disconnected';
+					revision++;
+				});
+
+				providerCleanup = cleanup;
+			} catch {
+				// Connection failed — continue in single-player mode.
+				// Guard against stale open.
+				if (activeId !== id) return;
+			}
+		}
+
+		// Guard: if close() ran during the await, ydoc is null.
+		if (!ydoc) return;
+
+		// After sync: if the server had no prior content for this room,
+		// seed the Y.Doc with the local issue data. Otherwise the server's
+		// content is already in the doc.
+		if (!isYDocSeeded(ydoc)) {
+			createIssueYDoc(draft.issue, ydoc);
+		}
 
 		ydoc.on('update', () => {
 			isDirty = true;
@@ -188,6 +244,10 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 	function close(): void {
 		activeId = null;
 		draft = null;
+		if (providerCleanup) {
+			providerCleanup();
+			providerCleanup = null;
+		}
 		if (ydoc) {
 			ydoc.destroy();
 			ydoc = null;
@@ -281,52 +341,22 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		// so the editor's view is consistent with disk.
 		const refreshed = issues.byId.get(activeId);
 		if (refreshed) {
-			draft = cloneLoaded(refreshed);
-			if (ydoc) ydoc.destroy();
-			if (awareness) awareness.destroy();
-			ydoc = createIssueYDoc(draft.issue);
-			awareness = new Awareness(ydoc);
-			ydoc.on('update', () => {
-				isDirty = true;
-				revision++;
-			});
+			await open(activeId);
+		} else {
+			close();
 		}
-		isDirty = false;
-		revision++;
 	}
 
-	function discard(): void {
+	async function discard(): Promise<void> {
 		if (activeId === null) {
 			close();
 			return;
 		}
-		const source = issues.byId.get(activeId);
-
-		if (ydoc) {
-			ydoc.destroy();
-			ydoc = null;
-		}
-		if (awareness) {
-			awareness.destroy();
-			awareness = null;
-		}
-
-		if (source) {
-			draft = cloneLoaded(source);
-			ydoc = createIssueYDoc(draft.issue);
-			awareness = new Awareness(ydoc);
-			ydoc.on('update', () => {
-				isDirty = true;
-				revision++;
-			});
-		} else {
-			draft = null;
-		}
-		isDirty = false;
-		revision++;
+		await open(activeId);
 	}
 
 	function getSectionYText(name: string): Y.Text | undefined {
+		void revision; // Force reactivity when the Y.Doc updates via ydoc.on('update')
 		return ydoc?.getMap('sections').get(name) as Y.Text | undefined;
 	}
 
@@ -345,6 +375,10 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		get awareness() {
 			void revision;
 			return awareness;
+		},
+		get connectionState() {
+			void revision;
+			return connectionState;
 		},
 		get isDirty() {
 			return isDirty;

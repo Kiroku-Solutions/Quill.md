@@ -282,24 +282,25 @@ function buildStub(opts: {
 			importIssue: () => Promise.resolve(1 as never),
 			update: () => {},
 			save: () => Promise.resolve(),
-			discard: () => {},
+			discard: async () => {},
 			remove: () => Promise.resolve(),
 			validate: () => []
 		},
 		editor: {
+			connectionState: 'disconnected',
 			activeId: activeEditorId,
 			draft: activeDraft as never,
 			isDirty: activeEditorId !== null,
 			integrityWarning: false,
 			errors: [],
-			open: (id: string) => {
+			open: async (id: string) => {
 				openCalls.push({ id });
 			},
 			close: () => {},
 			patchField: () => {},
 			patchSection: () => {},
 			save: () => Promise.resolve(),
-			discard: () => {},
+			discard: async () => {},
 			ydoc: null,
 			awareness: null,
 			getSectionYText: () => undefined

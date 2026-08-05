@@ -256,11 +256,12 @@ function buildStub(opts: StubOpts = {}): StoreGraph {
 			importIssue: () => Promise.resolve(1 as never),
 			update: () => {},
 			save: () => Promise.resolve(),
-			discard: () => {},
+			discard: async () => {},
 			remove: () => Promise.resolve(),
 			validate: () => errors
 		},
 		editor: {
+			connectionState: 'disconnected',
 			activeId: loaded.issue.id,
 			draft: loaded,
 			isDirty: false,
@@ -268,7 +269,7 @@ function buildStub(opts: StubOpts = {}): StoreGraph {
 			get errors() {
 				return errors;
 			},
-			open: () => {},
+			open: async () => {},
 			close: () => {},
 			patchField: (key: string, value: unknown) => {
 				patchCalls.push({ key, value });
@@ -287,7 +288,7 @@ function buildStub(opts: StubOpts = {}): StoreGraph {
 			},
 			patchSection: () => {},
 			save: () => Promise.resolve(),
-			discard: () => {},
+			discard: async () => {},
 			ydoc: null,
 			awareness: null,
 			getSectionYText: () => undefined

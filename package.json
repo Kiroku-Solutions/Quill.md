@@ -66,6 +66,7 @@
 		"@codemirror/language-data": "^6.5.2",
 		"@codemirror/state": "^6.7.1",
 		"@codemirror/view": "^6.43.7",
+		"@hocuspocus/provider": "^4.4.0",
 		"@lezer/highlight": "^1.2.3",
 		"@lucide/svelte": "^1.21.0",
 		"@octokit/plugin-retry": "^8.1.0",

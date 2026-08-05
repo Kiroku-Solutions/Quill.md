@@ -23,30 +23,31 @@
 	let view: EditorView;
 	const editableCompartment = new Compartment();
 
+	const collabCompartment = new Compartment();
+	const fallbackListenerCompartment = new Compartment();
+
+	function getFallbackListener() {
+		return EditorView.updateListener.of((update) => {
+			if (update.docChanged && onchange) {
+				// Avoid cyclic update
+				const newValue = update.state.doc.toString();
+				if (newValue !== value) {
+					onchange(newValue);
+				}
+			}
+		});
+	}
+
 	onMount(() => {
 		const extensions = [
 			basicSetup,
 			markdown(),
 			editableCompartment.of(EditorView.editable.of(!readonly)),
 			quillTheme,
-			EditorView.lineWrapping
+			EditorView.lineWrapping,
+			collabCompartment.of(ytext && awareness ? yCollab(ytext, awareness) : []),
+			fallbackListenerCompartment.of(!ytext || !awareness ? getFallbackListener() : [])
 		];
-
-		if (ytext && awareness) {
-			extensions.push(yCollab(ytext, awareness));
-		} else {
-			extensions.push(
-				EditorView.updateListener.of((update) => {
-					if (update.docChanged && onchange) {
-						// Avoid cyclic update
-						const newValue = update.state.doc.toString();
-						if (newValue !== value) {
-							onchange(newValue);
-						}
-					}
-				})
-			);
-		}
 
 		view = new EditorView({
 			state: EditorState.create({
@@ -57,6 +58,17 @@
 		});
 
 		return () => view.destroy();
+	});
+
+	$effect(() => {
+		if (view) {
+			view.dispatch({
+				effects: [
+					collabCompartment.reconfigure(ytext && awareness ? yCollab(ytext, awareness) : []),
+					fallbackListenerCompartment.reconfigure(!ytext || !awareness ? getFallbackListener() : [])
+				]
+			});
+		}
 	});
 
 	$effect(() => {

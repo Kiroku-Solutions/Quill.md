@@ -150,24 +150,25 @@ function buildStub(issues: readonly Issue[]): StoreGraph {
 			importIssue: () => Promise.resolve(1 as never),
 			update: () => {},
 			save: () => Promise.resolve(),
-			discard: () => {},
+			discard: async () => {},
 			remove: () => Promise.resolve(),
 			validate: () => []
 		},
 		editor: {
+			connectionState: 'disconnected',
 			activeId: null,
 			draft: null,
 			isDirty: false,
 			integrityWarning: false,
 			errors: [],
-			open: (id: string) => {
+			open: async (id: string) => {
 				openCalls.push({ id });
 			},
 			close: () => {},
 			patchField: () => {},
 			patchSection: () => {},
 			save: () => Promise.resolve(),
-			discard: () => {},
+			discard: async () => {},
 			ydoc: null,
 			awareness: null,
 			getSectionYText: () => undefined

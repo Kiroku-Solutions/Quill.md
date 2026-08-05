@@ -3,9 +3,10 @@ import type { Issue } from '../types/issue.ts';
 
 /**
  * Seeds a Y.Doc from a parsed Issue object.
+ * If an existing Y.Doc is provided, it will be populated in-place.
  */
-export function createIssueYDoc(issue: Issue): Y.Doc {
-	const ydoc = new Y.Doc();
+export function createIssueYDoc(issue: Issue, existingDoc?: Y.Doc): Y.Doc {
+	const ydoc = existingDoc ?? new Y.Doc();
 
 	// 1. Meta (System fields)
 	const metaMap = ydoc.getMap('meta');
@@ -30,4 +31,13 @@ export function createIssueYDoc(issue: Issue): Y.Doc {
 	}
 
 	return ydoc;
+}
+
+/**
+ * Returns true if the Y.Doc has any content seeded into it
+ * (i.e. has a 'sections' map with at least one entry).
+ */
+export function isYDocSeeded(ydoc: Y.Doc): boolean {
+	const sectionsMap = ydoc.getMap('sections');
+	return sectionsMap.size > 0;
 }
