@@ -163,7 +163,7 @@ export const es: Translations = {
 			`La papelera contiene ${params.n} archivo${params.n === 1 ? '' : 's'}. Clic para vaciar.`,
 		pushNow: (params: Params) => `Publicar ahora (${params.n})`,
 		signOut: 'Cerrar sesión',
-		lastFetchedAria: (params: Params) => `Última sincronización ${params.label}`,
+		lastFetchedAria: (params: Params) => `Última actualización ${params.label}`,
 		lastFetched: (params: Params) => `Última sincronización: ${params.label}`,
 		notYetFetched: 'No sincronizado aún',
 		dismissErrorAria: 'Ocultar error',
@@ -174,7 +174,20 @@ export const es: Translations = {
 					? 'GitLab'
 					: ('Remoto' as 'Remote'),
 		editBranchLabel: (params: Params) => params.branch,
-		pullToRefresh: 'Re-sincronizar'
+		pullToRefresh: 'Refrescar remoto',
+		refreshError: 'Fallo al sincronizar',
+		defaultFilename: 'quill-export',
+		export: 'Exportar'
+	},
+
+	exportModal: {
+		title: 'Exportar Documento',
+		closeAria: 'Cerrar',
+		description: (params: Params) =>
+			`Estás a punto de exportar ${params.count} documento(s). Selecciona el formato de salida a continuación:`,
+		export: 'Exportar',
+		pdf: 'Documento PDF',
+		docx: 'Word (DOCX)'
 	},
 
 	refreshPatPrompt: {

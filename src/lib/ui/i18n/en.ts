@@ -157,10 +157,12 @@ export const en = {
 		importIssue: 'Import .md',
 		importIssueFailed: (params: Params) => `Failed to import: ${params.msg}`,
 		refresh: '↻ Refresh',
+		pullToRefresh: 'Refresh Remote',
+		refreshError: 'Remote sync failed',
+		trashAria: (params: Params) => `Trash (${params.n} items)`,
 		trashButton: (params: Params) => `Trash (${params.n})`,
-		trashEmptyLabel: 'Empty',
-		trashAria: (params: Params) =>
-			`Trash contains ${params.n} ${params.n === 1 ? 'file' : 'files'}. Click to empty.`,
+		trashEmptyLabel: 'Empty Trash',
+		defaultFilename: 'quill-export',
 		pushNow: (params: Params) => `Push now (${params.n})`,
 		signOut: 'Sign out',
 		lastFetchedAria: (params: Params) => `Last fetched ${params.label}`,
@@ -170,7 +172,17 @@ export const en = {
 		providerLabel: (params: Params) =>
 			params.provider === 'github' ? 'GitHub' : params.provider === 'gitlab' ? 'GitLab' : 'Remote',
 		editBranchLabel: (params: Params) => params.branch,
-		pullToRefresh: 'Pull to refresh'
+		export: 'Export'
+	},
+
+	exportModal: {
+		title: 'Export Document',
+		closeAria: 'Close',
+		description: (params: Params) =>
+			`You are about to export ${params.count} document(s). Select the output format below:`,
+		export: 'Export',
+		pdf: 'PDF Document',
+		docx: 'Word (DOCX)'
 	},
 
 	refreshPatPrompt: {

@@ -27,8 +27,10 @@
 	import LogOut from '@lucide/svelte/icons/log-out';
 	import UploadCloud from '@lucide/svelte/icons/upload-cloud';
 	import Trash from '@lucide/svelte/icons/trash-2';
+	import Download from '@lucide/svelte/icons/download';
 	import NewIssueModal from './NewIssueModal.svelte';
 	import EmptyTrashModal from './EmptyTrashModal.svelte';
+	import ExportModal from './ExportModal.svelte';
 	import { getStores } from '$lib/state';
 
 	const stores = getStores();
@@ -54,6 +56,18 @@
 	let trashCount = $state(0);
 	let patPromptOpen = $state(false);
 	let promptPat = $state('');
+	let exportOpen = $state(false);
+
+	const exportDocs = $derived.by(() => {
+		return stores.issues.issues.map((loadedIssue) => {
+			const issue = loadedIssue.issue;
+			const markdown = issue.sections.map((s) => `## ${s.name}\n${s.markdown}`).join('\n\n');
+			return {
+				title: issue.fields.title,
+				markdown
+			};
+		});
+	});
 
 	async function readTrashCount(): Promise<void> {
 		const adapter = stores.mode.localAdapter;
@@ -163,6 +177,9 @@
 	function openNewIssue(): void {
 		newIssueOpen = true;
 	}
+	function openExport(): void {
+		exportOpen = true;
+	}
 	function openEmptyTrash(): void {
 		emptyTrashOpen = true;
 	}
@@ -196,6 +213,10 @@
 			data-testid="toolbar-import-issue"
 		>
 			{t('editToolbar.importIssue')}
+		</Button>
+		<Button variant="secondary" size="sm" onclick={openExport} data-testid="toolbar-export">
+			<Download class="mr-1 h-4 w-4" aria-hidden="true" />
+			{t('editToolbar.export') || 'Export'}
 		</Button>
 	{/if}
 
@@ -298,6 +319,13 @@
 </nav>
 
 <NewIssueModal bind:open={newIssueOpen} onclose={() => (newIssueOpen = false)} />
+
+<ExportModal
+	bind:open={exportOpen}
+	documents={exportDocs}
+	defaultFilename={t('editToolbar.defaultFilename')}
+	onclose={() => (exportOpen = false)}
+/>
 
 {#if !isRemote}
 	<EmptyTrashModal

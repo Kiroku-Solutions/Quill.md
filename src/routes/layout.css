@@ -2,6 +2,8 @@
 @import '../lib/ui/tokens.css';
 @plugin '@tailwindcss/typography';
 
+/* Trigger CSS rebuild 1 */
+
 /* Tailwind 4 defaults to `prefers-color-scheme: dark`. We use the
  * `<html class="dark">` convention instead so the no-flash
  * inline script in `app.html` can coordinate. */
