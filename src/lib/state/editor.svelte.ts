@@ -254,7 +254,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		// After sync: if the server had no prior content for this room,
 		// seed the Y.Doc with the local issue data. Otherwise the server's
 		// content is already in the doc.
-		console.log(`[editor] After createRoom. isYDocSeeded=${isYDocSeeded(ydoc)}`, {
+		console.log('[editor] After createRoom. isYDocSeeded=', isYDocSeeded(ydoc), {
 			sectionsSize: ydoc.getMap('sections').size,
 			metaId: ydoc.getMap('meta').get('id')
 		});

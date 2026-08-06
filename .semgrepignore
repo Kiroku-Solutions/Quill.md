@@ -1,0 +1,12 @@
+# Ignore AI agent skills and proposals
+.agent/
+.agents/
+
+# Ignore workflows injected by external tools that we don't manage
+.github/workflows/kiroku-ai-sync.yml
+
+# Ignore coverage and auto-generated test outputs
+coverage/
+
+# Ignore documentation files since they might contain false positives in code blocks
+*.md

@@ -9,6 +9,8 @@ A markdown-based, local-first issue tracker that travels with your repository.
 ## Capabilities
 
 - **Local-First Architecture:** Reads and writes markdown files directly to your local file system via the File System Access API. Your issues live in `.quill.md/issues/` right next to your code.
+- **Remote Edit Mode:** Connect directly to GitHub or GitLab repositories via their REST APIs. Quill fetches and commits changes to a dedicated **orphan branch** (default: `quill-md`). This ensures your issues are version-controlled alongside your project but without polluting your main codebase's history!
+- **Real-Time Collaboration:** Work with your team simultaneously using our standalone WebSocket server (powered by Hocuspocus/Yjs), allowing multiplayer editing of issues and boards.
 - **Agile Methodologies on Demand:** Includes 20 built-in agile frameworks (Scrum, Kanban, SAFe, Spotify, etc.) natively translated to Spanish. The Setup Wizard instantly populates your workspace with the appropriate issue templates and workflows.
 - **Dynamic Board Views:** Switch between List, Kanban, Gantt, and Graph views to visualize your workspace.
 - **UML & Diagrams:** Built-in support for rendering Mermaid.js diagrams directly from Markdown blocks. Agentic workflows can seamlessly save UML/Mermaid images as renderable text blocks.
