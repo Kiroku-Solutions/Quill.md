@@ -1366,3 +1366,40 @@ We have completed the first stage of the core expansion and codebase polish, upg
 4. **Logger & PAT redactor fix**: Optimized the defense-in-depth logging system (`src/lib/adapters/_logger.ts`) to avoid false-positive PAT redactions on general text containing PAT-like sub-segments.
 5. **MCP Server Alignment**: Updated the `quill-mcp-server` tool definitions to output UUID-based issue identifiers, computing integrity hashes correctly to match client-side validation rules.
 6. **Test Suite Stability**: Resolved multiple type mismatches and flakiness across the 24+ test files in the workspace, achieving a 100% green pass for client, server, and renderer testing projects.
+
+---
+
+## Stage 2 & 3 — Remote Mode, UI Views, Wiki & ADR Integrations (Completed)
+
+Following the core architecture upgrades, we completed Stages 2 and 3 of the Quill.md Expansion & Polish plan, as well as the Wiki & ADR Subfolders migration:
+
+1. **Wiki & ADR Subfolders**: 
+   - Created a nested, collapsible tree view in the sidebar for Wiki (`.quill.md/wiki/`) and ADR (`.quill.md/adr/`) pages.
+   - Updated Remote Mode to use the GitHub REST Tree API (`recursive=1`) instead of shallow GraphQL queries to support infinite subfolder depth.
+2. **UI/UX Refinements**: 
+   - Added a dropdown in the FilterBar for Open/Closed category filtering.
+   - Removed the redundant Tree view in favor of the Graph view.
+   - Standardized Story Points display in Sprint Planner (reading from `estimate`, `story_points`, or `estimate_hours`).
+3. **Remote Adapter Optimization**: 
+   - Implemented GraphQL `createCommitOnBranch` for batch operations in the GitHub provider.
+   - Added read-only bypass for public repositories (no PAT required).
+4. **Session Recovery**: 
+   - Cached folder metadata to sessionStorage to allow 1-click workspace recovery after browser reloads.
+5. **Search Index**: 
+   - Implemented a client-side search indexing service that generates `search-index.json`.
+6. **Automation**: 
+   - Created `scripts/quill-close-bot.js` to automatically close issues based on commit messages, compatible with CI/CD pipelines.
+
+---
+
+## Real-Time Collaboration (Completed)
+
+We have successfully implemented Real-Time Collaboration, turning Quill.md into a multiplayer experience without sacrificing its Git-backed nature. This was achieved through the following stages:
+
+- **Foundation (CodeMirror 6 Editor)**: Replaced the raw `<Textarea>` with CodeMirror 6, enabling rich markdown editing, custom syntax highlighting, and theming.
+- **CRDT Data Layer (Yjs)**: Introduced Yjs as the in-memory collaborative data model.
+- **Server Relay Sync (Hocuspocus)**: Integrated a self-hosted Hocuspocus WebSocket server. Added BroadcastChannel for instant same-browser multi-tab sync. 
+- **Presence & Awareness UX**: Implemented the `PresenceBar` to show who is online, their cursor locations, and active selections.
+- **Git Reconciliation**: Bridged the Y.Doc state with Git storage. On save, the `Y.Doc` serializes into Markdown, updates the integrity hash, and writes through the existing directory adapter pipeline.
+- **Configuration & Settings**: Added collaboration settings in the UI and `.quill.md/config.json`.
+- **Offline & Resilience**: Implemented `y-indexeddb` for offline persistence so work is never lost.

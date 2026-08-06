@@ -12,9 +12,19 @@ We use Docker to isolate the execution environment. This ensures that anyone on 
 
 You have two options to run the analysis:
 
-### Option 1: Quick and Direct Execution (Recommended)
+### Option 1: Using Docker Compose (Recommended)
 
-You do not need to build the Dockerfile. Simply open your terminal in the **root of your project** and run:
+Since this project has a `docker-compose.yml` file in the root, you can run Semgrep without building or configuring anything manually. Semgrep is configured under the `tools` profile so it won't run automatically in the background.
+
+To view the results in the terminal (human-readable mode):
+
+```powershell
+docker compose run --rm semgrep
+```
+
+### Option 2: Quick and Direct Execution (Standalone Docker)
+
+If you don't want to use docker-compose, you do not need to build the Dockerfile. Simply open your terminal in the **root of your project** and run:
 
 **To view the results in the terminal (human-readable mode):**
 
@@ -28,7 +38,7 @@ docker run --rm -v "${PWD}:/src" semgrep/semgrep semgrep scan --config p/default
 docker run --rm -v "${PWD}:/src" semgrep/semgrep semgrep scan --config p/default --json | Out-File -Encoding utf8 semgrep_results.json
 ```
 
-### Option 2: Using the local Dockerfile (Customized mode)
+### Option 3: Using the local Dockerfile (Customized mode)
 
 If you need to add custom rules in the future or modify the base behavior, you can build and run the image from this folder.
 

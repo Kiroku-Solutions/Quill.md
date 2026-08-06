@@ -14,16 +14,16 @@ const server = new Server({
 		return { user };
 	},
 
-	async onConnect(data) {
-		console.log(`[server] New connection from ${data.socketId}`);
+	async onConnect() {
+		// Event handler for new connections
 	},
 
-	async onDisconnect(data) {
-		console.log(`[server] Disconnected: ${data.socketId}`);
+	async onDisconnect() {
+		// Event handler for disconnections
 	},
 
-	async onLoadDocument(data) {
-		console.log(`[server] Loading document: ${data.documentName}`);
+	async onLoadDocument() {
+		// Event handler for document loading
 	},
 
 	extensions: [
@@ -33,6 +33,4 @@ const server = new Server({
 	]
 });
 
-server.listen().then(({ port }) => {
-	console.log(`Hocuspocus server listening on ws://0.0.0.0:${port}`);
-});
+server.listen().catch(console.error);

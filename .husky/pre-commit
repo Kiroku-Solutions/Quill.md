@@ -1,1 +1,2 @@
 pnpm check && pnpm lint && pnpm test
+docker compose run --rm semgrep
