@@ -1,0 +1,28 @@
+services:
+  # Escáner de seguridad
+  semgrep:
+    profiles: ['tools']
+    build:
+      context: ./docker/semgrep
+    volumes:
+      - .:/src
+    environment:
+      - SEMGREP_SEND_METRICS=off
+    # Opcional: Esto formatea la salida para que sea legible en Docker Desktop
+    # (sobrescribe el --json del Dockerfile)
+    entrypoint: ['semgrep', 'scan', '--config', 'p/default']
+
+  # Servidor Hocuspocus (Opcional, ya que tienes su Dockerfile en /server)
+  server:
+    build:
+      context: ./server
+    ports:
+      - '1234:1234'
+    environment:
+      - DB_PATH=/app/data/hocuspocus.sqlite
+    volumes:
+      - server-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  server-data:

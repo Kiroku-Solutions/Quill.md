@@ -61,6 +61,17 @@ import type { ConfigStore } from './config.svelte.ts';
 import type { TemplatesStore } from './templates.svelte.ts';
 import type { IssuesStore } from './issues.svelte.ts';
 import type { CommitQueueStore } from './commit-queue.svelte.ts';
+import * as Y from 'yjs';
+import { Awareness } from 'y-protocols/awareness';
+import {
+	createIssueYDoc,
+	isYDocSeeded,
+	serializeYDoc,
+	createRoom,
+	createCollabPresenceStore,
+	type CollabPresenceStore
+} from '../collab/index.ts';
+import { canonicalForm } from '../services/serializer.ts';
 
 /**
  * System frontmatter keys live on `Issue.fields`; everything else is a
@@ -90,12 +101,17 @@ export interface EditorStore {
 	 */
 	readonly activeId: string | null;
 	readonly draft: LoadedIssue | null;
+	readonly ydoc: Y.Doc | null;
+	readonly awareness: Awareness | null;
+	readonly collabPresence: CollabPresenceStore | null;
+	readonly connectionState: 'connecting' | 'connected' | 'disconnected';
+	readonly remoteUnsavedEdits: boolean;
 	readonly isDirty: boolean;
 	readonly integrityWarning: boolean;
 	readonly errors: readonly ValidationError[];
 
 	/** Clone the given issue into the draft buffer. No-op if not found. */
-	readonly open: (id: string) => void;
+	readonly open: (id: string) => Promise<void>;
 	/** Clear the editor — resets `activeId`, `draft`, `isDirty`. */
 	readonly close: () => void;
 	/**
@@ -113,7 +129,9 @@ export interface EditorStore {
 	/** Persist the draft to disk. Delegates to `issues.save(activeId)`. */
 	readonly save: () => Promise<void>;
 	/** Re-clone the source issue into the draft, clearing the dirty flag. */
-	readonly discard: () => void;
+	readonly discard: () => Promise<void>;
+	/** Helper to retrieve the Y.Text instance for a section by name. */
+	readonly getSectionYText: (name: string) => Y.Text | undefined;
 }
 
 export interface EditorStoreDeps {
@@ -147,10 +165,18 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 
 	let activeId = $state<string | null>(null);
 	let draft = $state.raw<LoadedIssue | null>(null);
+	let ydoc = $state.raw<Y.Doc | null>(null);
+	let awareness = $state.raw<Awareness | null>(null);
+	let collabPresence = $state.raw<CollabPresenceStore | null>(null);
+	let connectionState = $state<'connecting' | 'connected' | 'disconnected'>('disconnected');
+	let remoteUnsavedEdits = $state<boolean>(false);
 	let isDirty = $state<boolean>(false);
 	let revision = $state<number>(0);
+	let isSeeding = false;
 
-	function open(id: string): void {
+	let providerCleanup: ((isDirty?: boolean) => void) | null = null;
+
+	async function open(id: string): Promise<void> {
 		const source = issues.byId.get(id);
 		if (!source) {
 			// Unknown id — close rather than open a half-state. The caller
@@ -160,13 +186,116 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		}
 		activeId = id;
 		draft = cloneLoaded(source);
-		isDirty = false;
+		remoteUnsavedEdits = false;
+
+		if (providerCleanup) {
+			providerCleanup(isDirty);
+			providerCleanup = null;
+		}
+		if (collabPresence) collabPresence.destroy();
+		if (ydoc) ydoc.destroy();
+		if (awareness) awareness.destroy();
+
+		// Create an EMPTY Y.Doc — content will come from either the server
+		// (if another client already seeded it) or from the local issue.
+		ydoc = new Y.Doc();
+		ydoc.on('update', () => {
+			if (isSeeding) return;
+			isDirty = true;
+			revision++;
+		});
+
+		awareness = new Awareness(ydoc);
+		collabPresence = createCollabPresenceStore(awareness);
+
+		// Stage 2: MOCK CONFIG FOR NOW
+		// En producción esto provendrá del UI de configuración (Stage 5)
+		const collabConfig = {
+			enabled: import.meta.env.MODE !== 'test',
+			serverUrl: 'ws://127.0.0.1:1234',
+			displayName: 'Dev User'
+		};
+
+		if (collabConfig.enabled) {
+			const repoPath = source.sourcePath ?? 'local-repo';
+			const roomSeed = `quill/${id}/${repoPath}`;
+			try {
+				const { provider, cleanup } = await createRoom(ydoc, roomSeed, collabConfig);
+				// Guard: if close() or another open() ran while we awaited,
+				// the activeId will have changed — discard the provider.
+				if (activeId !== id) {
+					cleanup();
+					return;
+				}
+				if (provider.awareness) {
+					awareness = provider.awareness;
+					if (collabPresence) {
+						collabPresence.destroy();
+					}
+					collabPresence = createCollabPresenceStore(awareness);
+				}
+
+				provider.on('status', ({ status }: { status: string }) => {
+					connectionState = status as 'connecting' | 'connected' | 'disconnected';
+					revision++;
+				});
+
+				providerCleanup = cleanup;
+			} catch {
+				// Connection failed — continue in single-player mode.
+				// Guard against stale open.
+				if (activeId !== id) return;
+			}
+		}
+
+		// Guard: if close() ran during the await, ydoc is null.
+		if (!ydoc) return;
+
+		// After sync: if the server had no prior content for this room,
+		// seed the Y.Doc with the local issue data. Otherwise the server's
+		// content is already in the doc.
+		console.log('[editor] After createRoom. isYDocSeeded=', isYDocSeeded(ydoc), {
+			sectionsSize: ydoc.getMap('sections').size,
+			metaId: ydoc.getMap('meta').get('id')
+		});
+
+		isSeeding = true;
+		if (!isYDocSeeded(ydoc)) {
+			console.log('[editor] Seeding Y.Doc');
+			createIssueYDoc(draft.issue, ydoc);
+		} else {
+			console.log('[editor] Y.Doc already seeded, serializing...');
+			const ydocCanonical = canonicalForm(serializeYDoc(ydoc));
+			const diskCanonical = canonicalForm(draft.issue);
+			if (ydocCanonical !== diskCanonical) {
+				remoteUnsavedEdits = true;
+			}
+		}
+		isSeeding = false;
+
 		revision++;
 	}
 
 	function close(): void {
 		activeId = null;
 		draft = null;
+		if (providerCleanup) {
+			providerCleanup(isDirty);
+			providerCleanup = null;
+		}
+		if (collabPresence) {
+			collabPresence.destroy();
+			collabPresence = null;
+		}
+		if (ydoc) {
+			ydoc.destroy();
+			ydoc = null;
+		}
+		if (awareness) {
+			awareness.destroy();
+			awareness = null;
+		}
+		remoteUnsavedEdits = false;
 		isDirty = false;
 		revision++;
 	}
@@ -181,11 +310,14 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 			// verb and the parser/serializer reject it.
 			if (value === undefined) return;
 			Object.assign(draft.issue.fields, { [key]: value });
+			if (ydoc) ydoc.getMap('meta').set(key, value);
 		} else {
 			if (value === undefined) {
 				delete draft.issue.customFields[key];
+				if (ydoc) ydoc.getMap('customFields').delete(key);
 			} else {
 				draft.issue.customFields[key] = value as FrontmatterValue;
+				if (ydoc) ydoc.getMap('customFields').set(key, value);
 			}
 		}
 		isDirty = true;
@@ -193,7 +325,21 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 	}
 
 	function patchSection(name: string, markdown: string): void {
+		console.trace(`patchSection called with ${name} = ${markdown}`);
 		if (!draft) return;
+
+		if (ydoc) {
+			const sectionsMap = ydoc.getMap('sections');
+			let ytext = sectionsMap.get(name) as Y.Text | undefined;
+			if (!ytext) {
+				ytext = new Y.Text(markdown);
+				sectionsMap.set(name, ytext);
+			} else {
+				ytext.delete(0, ytext.length);
+				ytext.insert(0, markdown);
+			}
+		}
+
 		const sections: IssueSection[] = draft.issue.sections;
 		const existing = sections.find((s) => s.name === name);
 		if (existing) {
@@ -213,43 +359,52 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		// validate → serialize → write → reparse. Issues store's
 		// `update(id, patch)` is the right verb — it captures a snapshot
 		// for `discard()` and flips the dirty flag.
-		issues.update(activeId, cloneIssueFields(draft.issue));
-		await issues.save(activeId);
-		// Remote Edit Mode (FR-16): bypass the commit queue's debounce
-		// so this per-save click produces one commit on the edit branch
-		// with a per-file message. The queue's `flushNow` never throws
-		// — conflicts surface as `commitQueue.lastError`, which the
-		// EditorPanel / EditToolbar render as an Alert. We do not gate
-		// the post-save UI refresh on flush success: the in-memory issue
-		// is already re-parsed and the overlay reflects the pending
-		// write, so the user sees a consistent view either way.
-		if (commitQueue && commitQueue.active && commitQueue.depth > 0) {
-			const refreshed = issues.byId.get(activeId);
-			const path = refreshed?.sourcePath ?? `issue ${String(activeId).padStart(4, '0')}`;
-			await commitQueue.flushNow(`chore(quill.md): update ${path}`);
+
+		try {
+			const issueToSave = ydoc ? serializeYDoc(ydoc, draft.issue) : draft.issue;
+			console.log('[editor] Saving patch:', JSON.stringify(cloneIssueFields(issueToSave)));
+			issues.update(activeId, cloneIssueFields(issueToSave));
+			await issues.save(activeId);
+			// Remote Edit Mode (FR-16): bypass the commit queue's debounce
+			// so this per-save click produces one commit on the edit branch
+			// with a per-file message. The queue's `flushNow` never throws
+			// — conflicts surface as `commitQueue.lastError`, which the
+			// EditorPanel / EditToolbar render as an Alert. We do not gate
+			// the post-save UI refresh on flush success: the in-memory issue
+			// is already re-parsed and the overlay reflects the pending
+			// write, so the user sees a consistent view either way.
+			if (commitQueue && commitQueue.active && commitQueue.depth > 0) {
+				const refreshed = issues.byId.get(activeId);
+				const path = refreshed?.sourcePath ?? `issue ${String(activeId).padStart(4, '0')}`;
+				await commitQueue.flushNow(`chore(quill.md): update ${path}`);
+			}
+		} catch (e) {
+			console.error('[editor] Save failed:', e);
 		}
 		// After a successful save, the issues store has re-parsed the
 		// file (with a fresh integrity hash). Re-clone into the draft
 		// so the editor's view is consistent with disk.
 		const refreshed = issues.byId.get(activeId);
-		if (refreshed) draft = cloneLoaded(refreshed);
-		isDirty = false;
-		revision++;
+		isDirty = false; // Ensure IndexedDB is cleared when we reopen
+		if (refreshed) {
+			await open(activeId);
+		} else {
+			close();
+		}
 	}
 
-	function discard(): void {
+	async function discard(): Promise<void> {
 		if (activeId === null) {
 			close();
 			return;
 		}
-		const source = issues.byId.get(activeId);
-		if (source) {
-			draft = cloneLoaded(source);
-		} else {
-			draft = null;
-		}
-		isDirty = false;
-		revision++;
+		isDirty = false; // Discard should clear IndexedDB
+		await open(activeId);
+	}
+
+	function getSectionYText(name: string): Y.Text | undefined {
+		void revision; // Force reactivity when the Y.Doc updates via ydoc.on('update')
+		return ydoc?.getMap('sections').get(name) as Y.Text | undefined;
 	}
 
 	return {
@@ -259,6 +414,26 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		get draft() {
 			void revision;
 			return draft;
+		},
+		get ydoc() {
+			void revision;
+			return ydoc;
+		},
+		get awareness() {
+			void revision;
+			return awareness;
+		},
+		get collabPresence() {
+			void revision;
+			return collabPresence;
+		},
+		get connectionState() {
+			void revision;
+			return connectionState;
+		},
+		get remoteUnsavedEdits() {
+			void revision;
+			return remoteUnsavedEdits;
 		},
 		get isDirty() {
 			return isDirty;
@@ -284,7 +459,8 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		patchField,
 		patchSection,
 		save,
-		discard
+		discard,
+		getSectionYText
 	};
 }
 

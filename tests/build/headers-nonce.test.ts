@@ -110,13 +110,14 @@ describe('per-build CSP nonce', () => {
 		// stamped nonce attribute to exist; the scanner is the
 		// add-sri.mjs contract.
 		const scriptTags = (indexHtml ?? '').match(/<script\b[^>]*>/g) ?? [];
-		expect(scriptTags.length, 'at least one <script> tag must exist in index.html').toBeGreaterThan(
-			0
-		);
-		const stamped = scriptTags.filter((t) => new RegExp(`nonce="${nonce}"`).test(t));
+		expect(
+			scriptTags.length,
+			'at least one script element must exist in index.html'
+		).toBeGreaterThan(0);
+		const stamped = scriptTags.filter((t) => t.includes(`nonce="${nonce}"`));
 		expect(
 			stamped.length,
-			`at least one <script> in build/index.html must carry nonce="${nonce}"`
+			`at least one script element in build/index.html must carry nonce="${nonce}"`
 		).toBeGreaterThan(0);
 	});
 

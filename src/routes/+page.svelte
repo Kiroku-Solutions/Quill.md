@@ -31,7 +31,7 @@
 
 	let pat = $state('');
 	let repoUrl = $state('');
-	let repoBranch = $state('quill.md');
+	let repoBranch = $state('quill-md');
 	let openError = $state<string | null>(null);
 	let remoteError = $state<string | null>(null);
 	let localLoading = $state(false);

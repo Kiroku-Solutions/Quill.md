@@ -1,0 +1,15 @@
+services:
+  hocuspocus:
+    build: .
+    ports:
+      - '1234:1234'
+    environment:
+      - NODE_ENV=production
+      - PORT=1234
+      - DB_PATH=/app/data/hocuspocus.sqlite
+    volumes:
+      - hocuspocus-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  hocuspocus-data:

@@ -25,11 +25,13 @@
 	import IconButton from '$lib/ui/IconButton.svelte';
 	import Input from '$lib/ui/Input.svelte';
 	import Tabs from '$lib/ui/Tabs.svelte';
-	import Textarea from '$lib/ui/Textarea.svelte';
+	import CodeMirrorEditor from '$lib/ui/CodeMirrorEditor.svelte';
 	import Tooltip from '$lib/ui/Tooltip.svelte';
 	import X from '@lucide/svelte/icons/x';
 	import FormFields from './FormFields.svelte';
 	import MarkdownPreview from './MarkdownPreview.svelte';
+	import PresenceBar from './PresenceBar.svelte';
+	import PresenceCursors from './PresenceCursors.svelte';
 
 	const { editor, mode, templates, issues } = getStores();
 
@@ -84,6 +86,19 @@
 	const isReadOnly = $derived(mode.isReadOnly);
 	const canSave = $derived(!isReadOnly && editor.isDirty && editor.errors.length === 0);
 	const canDiscard = $derived(editor.isDirty);
+
+	$effect(() => {
+		console.log(
+			'[DEBUG] canSave:',
+			canSave,
+			'isReadOnly:',
+			isReadOnly,
+			'isDirty:',
+			editor.isDirty,
+			'errors:',
+			JSON.stringify(editor.errors)
+		);
+	});
 
 	function setTab(id: string): void {
 		activeTab = id as TabId;
@@ -148,10 +163,23 @@
 			</IconButton>
 		</div>
 
+		{#if editor.collabPresence && editor.collabPresence.peerCount > 0}
+			<PresenceBar presence={editor.collabPresence} />
+			<PresenceCursors />
+		{/if}
+
 		{#if editor.integrityWarning}
 			<div class="px-2 pt-2" data-testid="editor-panel-integrity-warning">
 				<Alert variant="warning">
 					{t('integrity.editorWarning')}
+				</Alert>
+			</div>
+		{/if}
+
+		{#if editor.remoteUnsavedEdits}
+			<div class="px-2 pt-2" data-testid="editor-panel-remote-unsaved-edits">
+				<Alert variant="info">
+					{t('editor.remoteUnsavedEditsWarning')}
 				</Alert>
 			</div>
 		{/if}
@@ -201,18 +229,16 @@
 
 				{#if activeTab === 'write'}
 					{#if activeSection}
-						<Textarea
-							value={activeSection.markdown}
-							oninput={(e) =>
-								editor.patchSection(
-									activeSection.name,
-									(e.currentTarget as HTMLTextAreaElement).value
-								)}
-							rows={14}
-							class="font-mono text-sm"
-							data-testid="editor-section-textarea"
-							disabled={isReadOnly}
-						/>
+						{#key editor.activeId + '-' + activeSection.name + '-' + (editor.getSectionYText(activeSection.name) !== undefined)}
+							<CodeMirrorEditor
+								value={activeSection.markdown}
+								ytext={editor.getSectionYText(activeSection.name)}
+								awareness={editor.awareness ?? undefined}
+								onchange={(newValue) => editor.patchSection(activeSection.name, newValue)}
+								class="h-full min-h-[400px]"
+								readonly={isReadOnly}
+							/>
+						{/key}
 					{:else}
 						<p class="text-sm opacity-60">{t('editor.noSectionsEdit')}</p>
 					{/if}

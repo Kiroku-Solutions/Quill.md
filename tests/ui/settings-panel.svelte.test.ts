@@ -79,6 +79,8 @@ function buildStub(opts: {
 	hasLocalAdapter?: boolean;
 	settingsOpen?: boolean;
 	mobileNavOpen?: boolean;
+	collaboration?: { enabled?: boolean; server_url?: string; display_name?: string };
+	onConfigSave?: (cfg: Config) => void;
 }): StoreGraph {
 	const config: Config = {
 		product_goal: '',
@@ -89,7 +91,8 @@ function buildStub(opts: {
 		users: [],
 		kanban: { columns: [] },
 		gantt: { group_by: 'issue_type', default_view: 'week' },
-		remote: { cors_proxy: opts.corsProxy ?? 'https://cors.isomorphic-git.org' }
+		remote: { cors_proxy: opts.corsProxy ?? 'https://cors.isomorphic-git.org' },
+		collaboration: opts.collaboration
 	};
 	return {
 		todo: {} as unknown as StoreGraph['todo'],
@@ -145,7 +148,10 @@ function buildStub(opts: {
 			isReadOnly: !opts.hasLocalAdapter,
 			load: () => Promise.resolve(),
 			refresh: () => Promise.resolve(),
-			save: () => Promise.resolve()
+			save: (cfg) => {
+				if (opts.onConfigSave) opts.onConfigSave(cfg);
+				return Promise.resolve();
+			}
 		},
 		templates: {
 			templates: [],
@@ -172,22 +178,28 @@ function buildStub(opts: {
 			importIssue: () => Promise.resolve(1 as never),
 			update: () => {},
 			save: () => Promise.resolve(),
-			discard: () => {},
+			discard: async () => {},
 			remove: () => Promise.resolve(),
 			validate: () => []
 		},
 		editor: {
+			connectionState: 'disconnected',
+			remoteUnsavedEdits: false,
+			collabPresence: null,
 			activeId: null,
 			draft: null,
 			isDirty: false,
 			integrityWarning: false,
 			errors: [],
-			open: () => {},
+			open: async () => {},
 			close: () => {},
 			patchField: () => {},
 			patchSection: () => {},
 			save: () => Promise.resolve(),
-			discard: () => {}
+			discard: async () => {},
+			ydoc: null,
+			awareness: null,
+			getSectionYText: () => undefined
 		},
 		filter: {
 			filter: { q: undefined, status: undefined, type: undefined },
@@ -293,6 +305,26 @@ describe('SettingsPanel', () => {
 			'[data-testid="settings-clear-cache"]'
 		);
 		expect(clearCacheEl?.disabled).toBe(true);
+	});
+
+	it('renders collaboration settings and updates config on change', async () => {
+		let savedConfig: Config | null = null;
+		renderOpen({
+			hasLocalAdapter: true,
+			collaboration: { enabled: true, server_url: 'wss://test', display_name: 'tester' },
+			onConfigSave: (cfg) => {
+				savedConfig = cfg;
+			}
+		});
+
+		await expect.element(page.getByTestId('settings-collab-enable')).toBeInTheDocument();
+		await expect.element(page.getByTestId('settings-collab-server')).toHaveValue('wss://test');
+
+		// Modify value and trigger blur
+		await page.getByTestId('settings-collab-server').fill('wss://new-server');
+		await page.getByTestId('settings-header').click();
+
+		expect((savedConfig as Config | null)?.collaboration?.server_url).toBe('wss://new-server');
 	});
 
 	it('does not render the panel when open is false', async () => {
