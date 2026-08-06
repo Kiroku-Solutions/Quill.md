@@ -222,24 +222,30 @@ function buildStub(opts: {
 				}
 			},
 			save: () => Promise.resolve(),
-			discard: () => {},
+			discard: async () => {},
 			remove: () => Promise.resolve(),
 			validate: () => []
 		},
 		editor: {
+			connectionState: 'disconnected',
+			remoteUnsavedEdits: false,
+			collabPresence: null,
 			activeId: aeid,
 			draft: aeid !== null ? (loaded.find((l) => l.issue.id === aeid) as never) : null,
 			isDirty: aeid !== null,
 			integrityWarning: false,
 			errors: [],
-			open: (id: string) => {
+			open: async (id: string) => {
 				openCalls.push({ id });
 			},
 			close: () => {},
 			patchField: () => {},
 			patchSection: () => {},
 			save: () => Promise.resolve(),
-			discard: () => {}
+			discard: async () => {},
+			ydoc: null,
+			awareness: null,
+			getSectionYText: () => undefined
 		},
 		filter: {
 			filter: { q: undefined, status: undefined, type: undefined },

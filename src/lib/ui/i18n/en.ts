@@ -201,6 +201,11 @@ export const en = {
 		confirm: 'Empty trash'
 	},
 
+	collab: {
+		presenceAria: 'Connected users',
+		you: 'You'
+	},
+
 	editor: {
 		tabs: {
 			form: 'Form',
@@ -213,6 +218,8 @@ export const en = {
 		noSectionsPreview: 'No sections to preview.',
 		deleteTooltip: 'Move to trash',
 		unsaved: 'Unsaved changes',
+		remoteUnsavedEditsWarning:
+			'Another user has unsaved edits on this issue. Their changes will be included when either of you saves.',
 		footerClose: 'Close'
 	},
 
@@ -269,6 +276,14 @@ export const en = {
 		emptyTrash: (params: Params) => `Empty trash${Number(params.n) > 0 ? ` (${params.n})` : ''}`,
 		emptyTrashLocalTooltip: 'Empty the local .quill.md/.trash/ folder',
 		emptyTrashSignInTooltip: 'Open a local folder to enable this',
+		collabHeading: 'Real-time Collaboration',
+		collabEnableToggle: 'Enable real-time collaboration',
+		collabServerUrl: 'Hocuspocus server URL',
+		collabServerUrlPlaceholder: 'wss://collab.myteam.com',
+		collabDisplayName: 'Display name',
+		collabDisplayNamePlaceholder: 'Optional (defaults to user name)',
+		collabAdvisoryText:
+			'When enabled, your browser connects to the configured Hocuspocus server via WebSocket. Document content is transmitted over TLS-encrypted WebSocket to your self-hosted server. Only users with a valid token can join a collaboration session.',
 		templatesHeading: 'Categories (Templates)',
 		newTemplate: '+ New'
 	},

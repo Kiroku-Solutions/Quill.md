@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getStores } from '$lib/state';
 	import { t } from '$lib/ui/strings';
-	import { Button, Textarea } from '$lib/ui';
+	import { Button, CodeMirrorEditor } from '$lib/ui';
 	import MarkdownPreview from './MarkdownPreview.svelte';
 	import FileTree from './FileTree.svelte';
 	import FileText from '@lucide/svelte/icons/file-text';
@@ -256,11 +256,11 @@
 
 				<div class="min-h-[400px] flex-1">
 					{#if activeTab === 'write'}
-						<Textarea
-							class="h-full min-h-[400px] w-full resize-none border-none bg-transparent p-0 font-mono text-sm focus:ring-0 focus:outline-none"
+						<CodeMirrorEditor
+							class="h-full min-h-[400px] w-full"
 							value={fileContent}
-							oninput={(e) => (fileContent = e.currentTarget.value)}
-							disabled={!canEdit}
+							onchange={(newValue) => (fileContent = newValue)}
+							readonly={!canEdit}
 						/>
 					{:else}
 						<MarkdownPreview markdown={fileContent} class="prose-sm" />

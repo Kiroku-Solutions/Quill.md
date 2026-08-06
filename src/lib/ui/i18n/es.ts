@@ -205,6 +205,11 @@ export const es: Translations = {
 		confirm: 'Vaciar papelera'
 	},
 
+	collab: {
+		presenceAria: 'Usuarios conectados',
+		you: 'Tú'
+	},
+
 	editor: {
 		tabs: {
 			form: 'Formulario',
@@ -215,8 +220,10 @@ export const es: Translations = {
 		sectionsAria: 'Secciones',
 		noSectionsEdit: 'No hay secciones para editar.',
 		noSectionsPreview: 'No hay secciones para previsualizar.',
-		deleteTooltip: 'Mover a papelera',
+		deleteTooltip: 'Mover a la papelera',
 		unsaved: 'Cambios sin guardar',
+		remoteUnsavedEditsWarning:
+			'Otro usuario tiene cambios sin guardar en este elemento. Sus cambios se incluirán cuando cualquiera de los dos guarde.',
 		footerClose: 'Cerrar'
 	},
 
@@ -275,6 +282,14 @@ export const es: Translations = {
 			`Vaciar papelera${Number(params.n) > 0 ? ` (${params.n})` : ''}`,
 		emptyTrashLocalTooltip: 'Vaciar la carpeta local .quill.md/.trash/',
 		emptyTrashSignInTooltip: 'Abre una carpeta local para habilitar esto',
+		collabHeading: 'Colaboración en tiempo real',
+		collabEnableToggle: 'Habilitar colaboración en tiempo real',
+		collabServerUrl: 'URL del servidor Hocuspocus',
+		collabServerUrlPlaceholder: 'wss://collab.myteam.com',
+		collabDisplayName: 'Nombre a mostrar',
+		collabDisplayNamePlaceholder: 'Opcional (por defecto tu nombre)',
+		collabAdvisoryText:
+			'Cuando está habilitado, tu navegador se conecta al servidor Hocuspocus configurado vía WebSocket. El contenido del documento se transmite cifrado con TLS hacia tu servidor. Solo usuarios con un token válido pueden unirse a la sesión de colaboración.',
 		templatesHeading: 'Categorías (Plantillas)',
 		newTemplate: '+ Nueva'
 	},

@@ -150,22 +150,28 @@ function buildStub(opts: { recentHandles: HandleRecord[] }): StoreGraph {
 			importIssue: () => Promise.resolve(1 as never),
 			update: () => {},
 			save: () => Promise.resolve(),
-			discard: () => {},
+			discard: async () => {},
 			remove: () => Promise.resolve(),
 			validate: () => []
 		},
 		editor: {
+			connectionState: 'disconnected',
+			remoteUnsavedEdits: false,
+			collabPresence: null,
 			activeId: null,
 			draft: null,
 			isDirty: false,
 			integrityWarning: false,
 			errors: [],
-			open: () => {},
+			open: async () => {},
 			close: () => {},
 			patchField: () => {},
 			patchSection: () => {},
 			save: () => Promise.resolve(),
-			discard: () => {}
+			discard: async () => {},
+			ydoc: null,
+			awareness: null,
+			getSectionYText: () => undefined
 		},
 		filter: {
 			filter: { q: undefined, status: undefined, type: undefined },

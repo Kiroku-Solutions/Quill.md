@@ -8,7 +8,7 @@
 -->
 <script lang="ts">
 	import { getStores } from '$lib/state';
-	import { Button, Card, IconButton, Tooltip } from '$lib/ui';
+	import { Button, Card, IconButton, Tooltip, Checkbox, Input } from '$lib/ui';
 	import { t } from '$lib/ui/strings';
 	import Sun from '@lucide/svelte/icons/sun';
 	import Moon from '@lucide/svelte/icons/moon';
@@ -51,6 +51,12 @@
 	let editorOpen = $state(false);
 	let editorTemplate = $state<Template | undefined>(undefined);
 
+	// Collaboration settings state
+	let collabEnabled = $state(false);
+	let collabServerUrl = $state('');
+	let collabDisplayName = $state('');
+	let collabInitDone = $state(false);
+
 	async function readTrashCount(): Promise<void> {
 		const adapter = stores.mode.localAdapter;
 		if (!adapter) {
@@ -70,6 +76,30 @@
 		void stores.mode.localAdapter;
 		void readTrashCount();
 	});
+
+	$effect(() => {
+		if (open && !collabInitDone && stores.config.config) {
+			const c = stores.config.config.collaboration;
+			collabEnabled = c?.enabled ?? false;
+			collabServerUrl = c?.server_url ?? '';
+			collabDisplayName = c?.display_name ?? '';
+			collabInitDone = true;
+		} else if (!open) {
+			collabInitDone = false;
+		}
+	});
+
+	async function saveCollabSettings(): Promise<void> {
+		if (!stores.config.config || stores.config.isReadOnly) return;
+		await stores.config.save({
+			...stores.config.config,
+			collaboration: {
+				enabled: collabEnabled,
+				server_url: collabServerUrl,
+				display_name: collabDisplayName
+			}
+		});
+	}
 
 	$effect(() => {
 		if (!open) return;
@@ -210,6 +240,54 @@
 						</Button>
 					{/each}
 				</div>
+			</section>
+
+			<section class="mt-6 flex flex-col gap-2" data-testid="settings-collab">
+				<h3 class="text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
+					{t('settings.collabHeading')}
+				</h3>
+				<Card class="flex flex-col gap-4 p-4">
+					<Checkbox
+						label={t('settings.collabEnableToggle')}
+						bind:checked={collabEnabled}
+						onchange={saveCollabSettings}
+						disabled={stores.config.isReadOnly}
+						data-testid="settings-collab-enable"
+					/>
+					{#if collabEnabled}
+						<div class="flex flex-col gap-3">
+							<div class="flex flex-col gap-1">
+								<label for="collab-server-url" class="text-xs font-semibold text-foreground">
+									{t('settings.collabServerUrl')}
+								</label>
+								<Input
+									id="collab-server-url"
+									bind:value={collabServerUrl}
+									onblur={saveCollabSettings}
+									placeholder={t('settings.collabServerUrlPlaceholder')}
+									disabled={stores.config.isReadOnly}
+									data-testid="settings-collab-server"
+								/>
+							</div>
+							<div class="flex flex-col gap-1">
+								<label for="collab-display-name" class="text-xs font-semibold text-foreground">
+									{t('settings.collabDisplayName')}
+								</label>
+								<Input
+									id="collab-display-name"
+									bind:value={collabDisplayName}
+									onblur={saveCollabSettings}
+									placeholder={t('settings.collabDisplayNamePlaceholder')}
+									disabled={stores.config.isReadOnly}
+									data-testid="settings-collab-name"
+								/>
+							</div>
+							<p class="text-[11px] leading-relaxed text-muted-foreground opacity-80">
+								{t('settings.collabAdvisoryText')}
+							</p>
+						</div>
+					{/if}
+				</Card>
 			</section>
 
 			<section class="mt-6 flex flex-col gap-2" data-testid="settings-recent">

@@ -114,11 +114,19 @@ export async function loadTemplates(adapter: ReadOnlyDirectoryAdapter): Promise<
 		const text = await adapter.readTextFile(path);
 		let parsed: unknown;
 		try {
+			console.log('[DEBUG] Parsing template', path, text);
 			parsed = JSON.parse(text);
+			console.log('[DEBUG] Parsed template', path, parsed);
 		} catch (cause) {
+			console.error('[DEBUG] Failed to parse template', path, cause);
 			throw new Error(`Malformed JSON in ${path}: ${(cause as Error).message}`, { cause });
 		}
-		out.push(assertTemplate(parsed, path));
+		try {
+			out.push(assertTemplate(parsed, path));
+		} catch (cause) {
+			console.error('[DEBUG] Failed to assert template', path, cause);
+			throw cause;
+		}
 	}
 	out.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
 	return out;

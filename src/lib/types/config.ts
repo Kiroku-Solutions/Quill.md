@@ -54,6 +54,15 @@ export interface RemoteConfig {
 	commit_author_email?: string;
 }
 
+export interface CollaborationConfig {
+	/** Enable real-time collaboration (default: false). */
+	enabled?: boolean;
+	/** Hocuspocus server WebSocket URL (e.g. 'wss://collab.myteam.com'). */
+	server_url?: string;
+	/** Display name for presence (overrides provider user name). */
+	display_name?: string;
+}
+
 export interface Config {
 	product_goal: string;
 	definition_of_done: string[];
@@ -64,4 +73,5 @@ export interface Config {
 	kanban: KanbanConfig;
 	gantt: GanttConfig;
 	remote: RemoteConfig;
+	collaboration?: CollaborationConfig;
 }
