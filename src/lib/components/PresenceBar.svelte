@@ -24,6 +24,7 @@
 	<div
 		class="flex items-center gap-1.5 border-b border-border bg-surface px-6 py-2"
 		aria-label={t('collab.presenceAria')}
+		data-testid="presence-bar"
 	>
 		{#each presence.peers as peer, i (peer.clientId)}
 			<Tooltip text={i === 0 ? `${peer.name} (${t('collab.you')})` : peer.name} position="bottom">

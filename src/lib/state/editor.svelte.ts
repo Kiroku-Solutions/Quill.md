@@ -172,6 +172,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 	let remoteUnsavedEdits = $state<boolean>(false);
 	let isDirty = $state<boolean>(false);
 	let revision = $state<number>(0);
+	let isSeeding = false;
 
 	let providerCleanup: ((isDirty?: boolean) => void) | null = null;
 
@@ -198,6 +199,12 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		// Create an EMPTY Y.Doc — content will come from either the server
 		// (if another client already seeded it) or from the local issue.
 		ydoc = new Y.Doc();
+		ydoc.on('update', () => {
+			if (isSeeding) return;
+			isDirty = true;
+			revision++;
+		});
+
 		awareness = new Awareness(ydoc);
 		collabPresence = createCollabPresenceStore(awareness);
 
@@ -247,22 +254,25 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		// After sync: if the server had no prior content for this room,
 		// seed the Y.Doc with the local issue data. Otherwise the server's
 		// content is already in the doc.
+		console.log(`[editor] After createRoom. isYDocSeeded=${isYDocSeeded(ydoc)}`, {
+			sectionsSize: ydoc.getMap('sections').size,
+			metaId: ydoc.getMap('meta').get('id')
+		});
+
+		isSeeding = true;
 		if (!isYDocSeeded(ydoc)) {
+			console.log('[editor] Seeding Y.Doc');
 			createIssueYDoc(draft.issue, ydoc);
 		} else {
+			console.log('[editor] Y.Doc already seeded, serializing...');
 			const ydocCanonical = canonicalForm(serializeYDoc(ydoc));
 			const diskCanonical = canonicalForm(draft.issue);
 			if (ydocCanonical !== diskCanonical) {
 				remoteUnsavedEdits = true;
 			}
 		}
+		isSeeding = false;
 
-		ydoc.on('update', () => {
-			isDirty = true;
-			revision++;
-		});
-
-		isDirty = false;
 		revision++;
 	}
 
@@ -315,6 +325,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 	}
 
 	function patchSection(name: string, markdown: string): void {
+		console.trace(`patchSection called with ${name} = ${markdown}`);
 		if (!draft) return;
 
 		if (ydoc) {
@@ -349,22 +360,26 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		// `update(id, patch)` is the right verb — it captures a snapshot
 		// for `discard()` and flips the dirty flag.
 
-		const issueToSave = ydoc ? serializeYDoc(ydoc) : draft.issue;
-
-		issues.update(activeId, cloneIssueFields(issueToSave));
-		await issues.save(activeId);
-		// Remote Edit Mode (FR-16): bypass the commit queue's debounce
-		// so this per-save click produces one commit on the edit branch
-		// with a per-file message. The queue's `flushNow` never throws
-		// — conflicts surface as `commitQueue.lastError`, which the
-		// EditorPanel / EditToolbar render as an Alert. We do not gate
-		// the post-save UI refresh on flush success: the in-memory issue
-		// is already re-parsed and the overlay reflects the pending
-		// write, so the user sees a consistent view either way.
-		if (commitQueue && commitQueue.active && commitQueue.depth > 0) {
-			const refreshed = issues.byId.get(activeId);
-			const path = refreshed?.sourcePath ?? `issue ${String(activeId).padStart(4, '0')}`;
-			await commitQueue.flushNow(`chore(quill.md): update ${path}`);
+		try {
+			const issueToSave = ydoc ? serializeYDoc(ydoc, draft.issue) : draft.issue;
+			console.log('[editor] Saving patch:', JSON.stringify(cloneIssueFields(issueToSave)));
+			issues.update(activeId, cloneIssueFields(issueToSave));
+			await issues.save(activeId);
+			// Remote Edit Mode (FR-16): bypass the commit queue's debounce
+			// so this per-save click produces one commit on the edit branch
+			// with a per-file message. The queue's `flushNow` never throws
+			// — conflicts surface as `commitQueue.lastError`, which the
+			// EditorPanel / EditToolbar render as an Alert. We do not gate
+			// the post-save UI refresh on flush success: the in-memory issue
+			// is already re-parsed and the overlay reflects the pending
+			// write, so the user sees a consistent view either way.
+			if (commitQueue && commitQueue.active && commitQueue.depth > 0) {
+				const refreshed = issues.byId.get(activeId);
+				const path = refreshed?.sourcePath ?? `issue ${String(activeId).padStart(4, '0')}`;
+				await commitQueue.flushNow(`chore(quill.md): update ${path}`);
+			}
+		} catch (e) {
+			console.error('[editor] Save failed:', e);
 		}
 		// After a successful save, the issues store has re-parsed the
 		// file (with a fresh integrity hash). Re-clone into the draft

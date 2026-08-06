@@ -1,6 +1,6 @@
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import { IndexeddbPersistence } from 'y-indexeddb';
-import type * as Y from 'yjs';
+import * as Y from 'yjs';
 import type { CollabConfig } from './types';
 import { sha256Hex } from '$lib/services/integrity';
 import { deterministicColor } from './colors';
@@ -29,6 +29,21 @@ export async function createRoom(
 
 	const indexeddbProvider = new IndexeddbPersistence(`quill-md-collab-${roomName}`, ydoc);
 
+	// Restore offline cross-tab sync functionality that was present in y-websocket
+	// but is not natively supported by HocuspocusProvider.
+	const bc = new BroadcastChannel(`quill-md-collab-${roomName}`);
+	bc.onmessage = (event) => {
+		console.log(`[collab] BroadcastChannel received ${event.data.byteLength} bytes`);
+		Y.applyUpdate(ydoc, new Uint8Array(event.data), bc);
+	};
+	const onUpdate = (update: Uint8Array, origin: unknown) => {
+		if (origin !== bc) {
+			console.log(`[collab] BroadcastChannel sending ${update.byteLength} bytes`);
+			bc.postMessage(update);
+		}
+	};
+	ydoc.on('update', onUpdate);
+
 	provider.on('status', ({ status }: { status: string }) => {
 		console.log(`[collab] Status changed to: ${status}`);
 	});
@@ -49,19 +64,17 @@ export async function createRoom(
 		console.log(`[collab] Provider destroyed.`);
 	});
 
-	// Wait for the initial sync handshake with the server so we know
-	// whether the server already has content for this room.
-	console.log(`[collab] Connecting to ${config.serverUrl} for room ${roomName}...`);
-	const startTime = Date.now();
-
-	// Wait for local IndexedDB to load first, then wait for network sync.
-	// `whenSynced` is a built-in promise on IndexeddbPersistence.
+	// Wait for the provider to complete its initial sync (or fail).
+	// We use a 5-second timeout, but if you have extremely slow connections,
+	// you could increase this. The provider itself will keep retrying in the
+	// background, but we need a cutoff to decide when to unblock the UI.
+	const start = Date.now();
 	await indexeddbProvider.whenSynced;
-	console.log(`[collab] IndexedDB synced in ${Date.now() - startTime}ms`);
+	console.log(`[collab] IndexedDB synced in ${Date.now() - start}ms`);
 
 	await waitForSync(provider, 5000);
 	console.log(
-		`[collab] Sync check completed in ${Date.now() - startTime}ms. isSynced=${provider.isSynced}`
+		`[collab] Sync check completed in ${Date.now() - start}ms. isSynced=${provider.isSynced}`
 	);
 
 	if (provider.awareness) {
@@ -79,6 +92,9 @@ export async function createRoom(
 				provider.awareness.destroy();
 			}
 			provider.destroy();
+
+			ydoc.off('update', onUpdate);
+			bc.close();
 
 			if (!isDirty) {
 				indexeddbProvider.clearData();

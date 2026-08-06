@@ -24,7 +24,7 @@
 9. [Stage 4 — Git Reconciliation](#9-stage-4--git-reconciliation) ✅ [COMPLETED]
 10. [Stage 5 — Configuration & Settings](#10-stage-5--configuration--settings) ✅ [COMPLETED]
 11. [Stage 6 — Offline & Resilience](#11-stage-6--offline--resilience) ✅ [COMPLETED]
-12. [Stage 7 — Testing & Verification](#12-stage-7--testing--verification)
+12. [Stage 7 — Testing & Verification](#12-stage-7--testing--verification) ✅ [COMPLETED]
 13. [Dependency Inventory](#13-dependency-inventory)
 14. [Risk Register](#14-risk-register)
 15. [ERS Amendments Required](#15-ers-amendments-required)
@@ -764,7 +764,7 @@ pnpm add y-indexeddb
 
 ---
 
-## 12. Stage 7 — Testing & Verification
+## 12. Stage 7 — Testing & Verification ✅ [COMPLETED]
 
 ### 12.1 Unit tests (`server` project)
 

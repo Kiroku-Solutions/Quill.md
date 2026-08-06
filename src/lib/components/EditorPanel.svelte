@@ -87,6 +87,19 @@
 	const canSave = $derived(!isReadOnly && editor.isDirty && editor.errors.length === 0);
 	const canDiscard = $derived(editor.isDirty);
 
+	$effect(() => {
+		console.log(
+			'[DEBUG] canSave:',
+			canSave,
+			'isReadOnly:',
+			isReadOnly,
+			'isDirty:',
+			editor.isDirty,
+			'errors:',
+			JSON.stringify(editor.errors)
+		);
+	});
+
 	function setTab(id: string): void {
 		activeTab = id as TabId;
 	}

@@ -28,7 +28,7 @@ const server = new Server({
 
 	extensions: [
 		new SQLite({
-			database: 'hocuspocus.sqlite'
+			database: process.env.DB_PATH ?? 'hocuspocus.sqlite'
 		})
 	]
 });

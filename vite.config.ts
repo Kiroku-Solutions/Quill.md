@@ -158,6 +158,10 @@ export default defineConfig({
 						// pipeline through `parseIssueFile`. Runs only in the
 						// `server` project.
 						'tests/services/integration.test.ts',
+						// Collab integration tests use @hocuspocus/server which is Node-only
+						'tests/services/collab.test.ts',
+						// Playwright E2E tests should not run in Vitest
+						'tests/e2e/**',
 						// Phase 7E: post-build header / SRI / CSP nonce tests
 						// read `build/`, `static/_headers`, and
 						// `scripts/check-csp.mjs` from disk. Chromium has no
@@ -192,7 +196,9 @@ export default defineConfig({
 						'tests/ui/*.svelte.test.ts',
 						// 6K a11y tests import `vitest/browser` and run axe-core
 						// against a real DOM. They are Playwright-Chromium-only.
-						'tests/a11y/*'
+						'tests/a11y/*',
+						// Playwright E2E tests
+						'tests/e2e/**'
 					]
 				}
 			},

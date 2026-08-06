@@ -29,8 +29,8 @@
 	function getFallbackListener() {
 		return EditorView.updateListener.of((update) => {
 			if (update.docChanged && onchange) {
-				// Avoid cyclic update
 				const newValue = update.state.doc.toString();
+				console.log(`[CodeMirrorEditor] fallbackListener docChanged! new value: "${newValue}"`);
 				if (newValue !== value) {
 					onchange(newValue);
 				}
@@ -62,17 +62,34 @@
 
 	$effect(() => {
 		if (view) {
-			view.dispatch({
+			const hasCollab = !!(ytext && awareness);
+
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const spec: any = {
 				effects: [
-					collabCompartment.reconfigure(ytext && awareness ? yCollab(ytext, awareness) : []),
-					fallbackListenerCompartment.reconfigure(!ytext || !awareness ? getFallbackListener() : [])
+					collabCompartment.reconfigure(hasCollab ? yCollab(ytext!, awareness!) : []),
+					fallbackListenerCompartment.reconfigure(!hasCollab ? getFallbackListener() : [])
 				]
-			});
+			};
+
+			// If binding to a Y.Text that has different content than the local view,
+			// synchronize the view BEFORE applying the yCollab extension.
+			if (hasCollab && ytext!.toString() !== view.state.doc.toString()) {
+				console.log(
+					`[CodeMirrorEditor] syncing ytext to view: from "${view.state.doc.toString()}" to "${ytext!.toString()}"`
+				);
+				spec.changes = { from: 0, to: view.state.doc.length, insert: ytext!.toString() };
+			}
+
+			view.dispatch(spec);
 		}
 	});
 
 	$effect(() => {
 		if (view && !ytext && value !== view.state.doc.toString()) {
+			console.log(
+				`[CodeMirrorEditor] syncing value to view: from "${view.state.doc.toString()}" to "${value}"`
+			);
 			view.dispatch({
 				changes: { from: 0, to: view.state.doc.length, insert: value }
 			});

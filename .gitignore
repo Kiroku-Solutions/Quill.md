@@ -47,3 +47,9 @@ audits
 quill-skill-workspace
 # test-mock.ts
 quill-mcp-server/dist/
+
+# Server
+server/*.sqlite
+server/package-lock.json
+playwright-report/
+test-results/
