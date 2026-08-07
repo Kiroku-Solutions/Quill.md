@@ -3,17 +3,18 @@
 	import { t } from '$lib/ui/strings';
 	import { Button, CodeMirrorEditor } from '$lib/ui';
 	import MarkdownPreview from './MarkdownPreview.svelte';
-	import FileTree from './FileTree.svelte';
+	import FileTree, { type TreeNode } from './FileTree.svelte';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Edit2 from '@lucide/svelte/icons/edit-2';
 	import Check from '@lucide/svelte/icons/check';
 	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
 	import Lock from '@lucide/svelte/icons/lock';
+	import Download from '@lucide/svelte/icons/download';
 	import { untrack } from 'svelte';
 	import { saveDocument, parseDocumentFile } from '$lib/services/document-saver';
 	import type { WritableDirectoryAdapter } from '$lib/adapters/directory-adapter';
 
-	const { mode } = getStores();
+	const { mode, ui } = getStores();
 	const adapter = $derived(mode.mode === 'remote' ? mode.remoteAdapter : mode.localAdapter);
 
 	let files = $state<string[]>([]);
@@ -60,6 +61,14 @@
 		} catch {
 			error = `Failed to read file ${name}`;
 		}
+	}
+
+	function exportCurrent() {
+		if (!selectedFile) return;
+		ui.openExport({
+			type: 'documents',
+			data: [{ title: selectedFile.replace(/\.md$/, ''), markdown: fileContent }]
+		});
 	}
 
 	async function save() {
@@ -152,6 +161,46 @@
 		}
 	}
 
+	async function exportFolder(folderPath: string) {
+		if (!adapter || files.length === 0) return;
+		try {
+			const folderFiles = files.filter((f) => f.startsWith(`${folderPath}/`));
+			if (folderFiles.length === 0) return;
+			const docs = await Promise.all(
+				folderFiles.map(async (name) => {
+					const rawContent = await adapter.readTextFile(`.quill.md/adr/${name}`);
+					const doc = await parseDocumentFile(rawContent);
+					return { title: name.replace(/\.md$/, ''), markdown: doc.content };
+				})
+			);
+			ui.openExport({
+				type: 'documents',
+				data: docs
+			});
+		} catch {
+			error = 'Failed to export folder files';
+		}
+	}
+
+	async function exportAll() {
+		if (!adapter || files.length === 0) return;
+		try {
+			const docs = await Promise.all(
+				files.map(async (name) => {
+					const rawContent = await adapter.readTextFile(`.quill.md/adr/${name}`);
+					const doc = await parseDocumentFile(rawContent);
+					return { title: name.replace(/\.md$/, ''), markdown: doc.content };
+				})
+			);
+			ui.openExport({
+				type: 'documents',
+				data: docs
+			});
+		} catch {
+			error = 'Failed to export all files';
+		}
+	}
+
 	$effect(() => {
 		if (adapter) {
 			untrack(() => loadFiles());
@@ -166,18 +215,43 @@
 			<h3 class="text-xs font-bold tracking-wider text-muted-foreground uppercase">
 				{t('leftrail.view.adr', { default: 'ADRs' })}
 			</h3>
-			{#if !isReadOnly}
-				<button
-					class="text-primary hover:text-primary/80"
-					title={t('adr.new', { default: 'New ADR' })}
-					onclick={createNewFile}
-				>
-					<Edit2 class="h-4 w-4" />
-				</button>
-			{/if}
+			<div class="flex items-center gap-2">
+				{#if files.length > 0}
+					<button
+						class="text-primary hover:text-primary/80"
+						title={t('common.exportAll', { default: 'Export All' }) ?? 'Export All'}
+						onclick={exportAll}
+					>
+						<Download class="h-4 w-4" />
+					</button>
+				{/if}
+				{#if !isReadOnly}
+					<button
+						class="text-primary hover:text-primary/80"
+						title={t('adr.new', { default: 'New ADR' })}
+						onclick={createNewFile}
+					>
+						<Edit2 class="h-4 w-4" />
+					</button>
+				{/if}
+			</div>
 		</div>
 		<div class="flex flex-col gap-1">
-			<FileTree paths={files} selected={selectedFile} onselect={selectFile} />
+			{#snippet nodeAction(node: TreeNode)}
+				{#if node.type === 'folder'}
+					<button
+						class="p-1 text-muted-foreground transition-colors hover:text-primary"
+						title={t('common.exportFolder', { default: 'Export Folder' })}
+						onclick={(e) => {
+							e.stopPropagation();
+							exportFolder(node.path);
+						}}
+					>
+						<Download class="h-3.5 w-3.5" />
+					</button>
+				{/if}
+			{/snippet}
+			<FileTree paths={files} selected={selectedFile} onselect={selectFile} {nodeAction} />
 			{#if files.length === 0}
 				<p class="p-2 text-xs text-muted-foreground italic">
 					{t('adr.empty', { default: 'No ADRs found.' })}
@@ -221,6 +295,14 @@
 								{t('editor.tabs.preview', { default: 'Preview' })}
 							</button>
 						</div>
+						<Button
+							variant="outline"
+							onclick={exportCurrent}
+							class="flex items-center gap-2 border-primary/20 text-primary hover:bg-primary/10"
+						>
+							<Download class="h-4 w-4" />
+							{t('common.export', { default: 'Exportar' })}
+						</Button>
 						{#if canEdit}
 							<Button
 								variant="outline"

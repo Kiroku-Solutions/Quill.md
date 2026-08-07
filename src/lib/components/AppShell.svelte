@@ -28,6 +28,7 @@
 	import LeftRail from './LeftRail.svelte';
 	import TopBar, { type ShellMode } from './TopBar.svelte';
 	import IntegrityWarningBanner from './IntegrityWarningBanner.svelte';
+	import ExportModal from './ExportModal.svelte';
 	import { getStores } from '$lib/state';
 
 	type Props = {
@@ -66,3 +67,9 @@
 		</main>
 	{/if}
 </div>
+
+<ExportModal
+	open={stores.ui.exportOpen}
+	payload={stores.ui.exportPayload}
+	onclose={() => stores.ui.closeExport()}
+/>

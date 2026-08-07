@@ -44,7 +44,16 @@ export interface UiStore {
 	readonly toggleMobileNav: () => void;
 	readonly sidebarCollapsed: boolean;
 	readonly toggleSidebarCollapsed: () => void;
+
+	readonly exportOpen: boolean;
+	readonly exportPayload: ExportPayload | null;
+	readonly openExport: (payload: ExportPayload) => void;
+	readonly closeExport: () => void;
 }
+
+export type ExportPayload =
+	| { type: 'issues'; data: import('$lib/types').Issue[] }
+	| { type: 'documents'; data: import('$lib/services/exporter').ExportDocument[] };
 
 /**
  * Build a {@link UiStore}. Pure factory — no module-level state.
@@ -95,6 +104,18 @@ export function createUiStore(): UiStore {
 		sidebarCollapsed = !sidebarCollapsed;
 	}
 
+	let exportOpen = $state<boolean>(false);
+	let exportPayload = $state<ExportPayload | null>(null);
+
+	function openExport(payload: ExportPayload): void {
+		exportPayload = payload;
+		exportOpen = true;
+	}
+
+	function closeExport(): void {
+		exportOpen = false;
+	}
+
 	return {
 		get settingsOpen() {
 			return settingsOpen;
@@ -117,6 +138,14 @@ export function createUiStore(): UiStore {
 		get sidebarCollapsed() {
 			return sidebarCollapsed;
 		},
-		toggleSidebarCollapsed
+		toggleSidebarCollapsed,
+		get exportOpen() {
+			return exportOpen;
+		},
+		get exportPayload() {
+			return exportPayload;
+		},
+		openExport,
+		closeExport
 	};
 }

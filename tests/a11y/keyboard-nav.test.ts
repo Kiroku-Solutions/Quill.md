@@ -274,7 +274,11 @@ function buildStub(opts: {
 			closeEditor: () => {},
 			toggleEditor: () => {},
 			sidebarCollapsed: false,
-			toggleSidebarCollapsed: () => {}
+			toggleSidebarCollapsed: () => {},
+			exportOpen: false,
+			exportPayload: null,
+			openExport: () => {},
+			closeExport: () => {}
 		}
 	};
 }
