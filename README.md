@@ -17,6 +17,18 @@ A markdown-based, local-first issue tracker that travels with your repository.
 - **Data Integrity:** Computes and verifies SHA-256 hashes on every issue file to detect external modifications and prevent data corruption.
 - **AI Integration (MCP):** Includes a standalone Model Context Protocol server (`quill-mcp-server`) that enables AI tools like Claude Desktop or Cursor to read and create issues directly in your local `.quill.md` workspace.
 
+## Git Configuration for Data Integrity
+
+Quill relies on cryptographic hashes (SHA-256) of your markdown files to detect external modifications and prevent data corruption. Because a hash represents the exact binary sequence of a file, changes to line endings (e.g., `CRLF` on Windows vs `LF` on Unix) will cause the cryptographic verification to fail, even if the text appears identical.
+
+To prevent Git from automatically modifying the line endings of your issue files across different operating systems (via `core.autocrlf`), **you must add a `.gitattributes` file** to the root of any repository where you use Quill:
+
+```text
+.quill.md/** -text
+```
+
+This ensures Git treats all Quill data as binary, preserving cross-platform integrity and preventing false-positive integrity warnings in the UI.
+
 ## Tech Stack
 
 Built with SvelteKit \+ Svelte 5 (Runes mode), powered by [`sv`](https://github.com/sveltejs/cli). Tailwind CSS 4 is used for styling.

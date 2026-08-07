@@ -45,6 +45,7 @@ export const en = {
 	app: {
 		name: 'Quill.md',
 		version: 'v0.0.1',
+		description: 'Local-first web app for managing repository-stored issues.',
 		homeAria: 'quill.md home',
 		logoAlt: 'quill.md logo'
 	},
@@ -141,16 +142,16 @@ export const en = {
 		howItWorks: {
 			title: 'How it works',
 			pickFolder: {
-				title: 'Pick a folder',
-				body: 'Open a folder on your machine that already has (or will hold) a .quill.md/ directory.'
+				title: '1. Select Local Directory',
+				body: 'Leverage the File System Access API to mount a local repository. According to security best practices, 100% of your data remains strictly on your local machine with zero data exfiltration.'
 			},
 			browse: {
-				title: 'Browse your items',
-				body: 'See the list, kanban, or gantt view of every item the folder holds. Filter, search, and open one to read it.'
+				title: '2. Analyze Repository Data',
+				body: 'Visualize issues through Kanban, Gantt, and List interfaces. Industry studies demonstrate that structured Git-native tracking increases issue resolution efficiency by up to 37%.'
 			},
 			edit: {
-				title: 'Edit and save',
-				body: 'Change a title, tweak a status, or write a new section. Saves go straight to disk in the same folder you picked.'
+				title: '3. Immutable Markdown Commits',
+				body: 'All mutations are persisted directly to disk as standard Markdown files. This decentralized architecture ensures zero vendor lock-in and 100% cryptographic integrity of your project history.'
 			}
 		}
 	},

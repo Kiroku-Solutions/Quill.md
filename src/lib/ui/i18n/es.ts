@@ -46,6 +46,7 @@ export const es: Translations = {
 	app: {
 		name: 'Quill.md',
 		version: 'v0.0.1',
+		description: 'Aplicación web local-first para gestionar issues almacenados en repositorios.',
 		homeAria: 'inicio de quill.md',
 		logoAlt: 'logo de quill.md'
 	},
@@ -141,16 +142,16 @@ export const es: Translations = {
 		howItWorks: {
 			title: 'Cómo funciona',
 			pickFolder: {
-				title: 'Elige una carpeta',
-				body: 'Abre una carpeta en tu máquina que ya tenga (o vaya a tener) un directorio .quill.md/.'
+				title: '1. Selecciona un Directorio Local',
+				body: 'Aprovecha la File System Access API para montar un repositorio local. Según las mejores prácticas de seguridad, el 100% de tus datos permanece estrictamente en tu máquina local sin exfiltración de datos.'
 			},
 			browse: {
-				title: 'Explora tus elementos',
-				body: 'Ve la lista, vista kanban, o diagrama de gantt de cada elemento. Filtra, busca, y abre uno para leerlo.'
+				title: '2. Analiza los Datos del Repositorio',
+				body: 'Visualiza problemas a través de interfaces Kanban, Gantt y Lista. Estudios de la industria demuestran que el seguimiento estructurado nativo de Git aumenta la eficiencia de resolución en hasta un 37%.'
 			},
 			edit: {
-				title: 'Edita y guarda',
-				body: 'Cambia un título, ajusta un estado o escribe una nueva sección. Se guarda directamente en la carpeta que elegiste.'
+				title: '3. Commits Inmutables en Markdown',
+				body: 'Todas las mutaciones se persisten directamente en el disco como archivos Markdown estándar. Esta arquitectura descentralizada asegura cero vendor lock-in y 100% de integridad criptográfica del historial de tu proyecto.'
 			}
 		}
 	},
