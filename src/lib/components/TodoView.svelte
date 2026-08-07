@@ -7,10 +7,11 @@
 	import Edit2 from '@lucide/svelte/icons/edit-2';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import FileText from '@lucide/svelte/icons/file-text';
+	import Download from '@lucide/svelte/icons/download';
 	import { untrack } from 'svelte';
 	import type { WritableDirectoryAdapter } from '$lib/adapters/directory-adapter';
 
-	const { mode, todo } = getStores();
+	const { mode, todo, ui } = getStores();
 	const adapter = $derived(mode.mode === 'remote' ? mode.remoteAdapter : mode.localAdapter);
 
 	let fileContent = $state<string>('');
@@ -141,6 +142,33 @@
 		}
 	}
 
+	function exportCurrent() {
+		const currentList = todo.lists.find((l) => l.id === todo.activeListId);
+		if (!currentList) return;
+		ui.openExport({
+			type: 'documents',
+			data: [{ title: currentList.name, markdown: fileContent }]
+		});
+	}
+
+	async function exportAll() {
+		if (!adapter || todo.lists.length === 0) return;
+		try {
+			const docs = await Promise.all(
+				todo.lists.map(async (list) => {
+					const content = await adapter.readTextFile(`.quill.md/todos/${list.id}`);
+					return { title: list.name, markdown: content };
+				})
+			);
+			ui.openExport({
+				type: 'documents',
+				data: docs
+			});
+		} catch {
+			localError = 'Failed to export all files';
+		}
+	}
+
 	$effect(() => {
 		if (adapter) {
 			untrack(() => loadContent());
@@ -155,15 +183,26 @@
 			<h3 class="text-xs font-bold tracking-wider text-muted-foreground uppercase">
 				{t('leftrail.view.todo', { default: 'To-Do List' })}
 			</h3>
-			{#if !isReadOnly}
-				<button
-					class="text-primary hover:text-primary/80"
-					title={t('todo.newList', { default: 'New List' })}
-					onclick={createList}
-				>
-					<Edit2 class="h-4 w-4" />
-				</button>
-			{/if}
+			<div class="flex items-center gap-2">
+				{#if todo.lists.length > 0}
+					<button
+						class="text-primary hover:text-primary/80"
+						title={t('common.exportAll', { default: 'Export All' }) ?? 'Export All'}
+						onclick={exportAll}
+					>
+						<Download class="h-4 w-4" />
+					</button>
+				{/if}
+				{#if !isReadOnly}
+					<button
+						class="text-primary hover:text-primary/80"
+						title={t('todo.newList', { default: 'New List' })}
+						onclick={createList}
+					>
+						<Edit2 class="h-4 w-4" />
+					</button>
+				{/if}
+			</div>
 		</div>
 		<div class="flex flex-col gap-1">
 			{#each todo.lists as list (list.id)}
@@ -197,6 +236,13 @@
 						{todo.lists.find((l) => l.id === todo.activeListId)?.name || todo.activeListId}
 					</h2>
 					<div class="flex items-center gap-3">
+						<button
+							class="p-2 text-muted-foreground transition-colors hover:text-primary"
+							title={t('common.export', { default: 'Export' }) ?? 'Export'}
+							onclick={exportCurrent}
+						>
+							<Download class="h-4 w-4" />
+						</button>
 						<div class="flex rounded-md border border-border bg-background p-1 text-sm">
 							<button
 								class="rounded-sm px-3 py-1 transition-colors {activeTab === 'write'

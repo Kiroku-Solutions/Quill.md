@@ -36,7 +36,10 @@ export const en = {
 		integrityReview: (params: Params) =>
 			`${params.n} integrity ${params.n === 1 ? 'warning' : 'warnings'}`,
 		fullscreen: 'Fullscreen',
-		colorLabel: (params: Params) => `Color ${params.color}`
+		colorLabel: (params: Params) => `Color ${params.color}`,
+		export: 'Export',
+		exportGroup: 'Export group',
+		exportAll: 'Export All'
 	},
 
 	app: {
@@ -182,7 +185,8 @@ export const en = {
 			`You are about to export ${params.count} document(s). Select the output format below:`,
 		export: 'Export',
 		pdf: 'PDF Document',
-		docx: 'Word (DOCX)'
+		docx: 'Word (DOCX)',
+		includeRelations: 'Include relations context (Sprints, Epics)'
 	},
 
 	refreshPatPrompt: {

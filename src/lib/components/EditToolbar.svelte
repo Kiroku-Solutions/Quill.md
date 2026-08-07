@@ -30,7 +30,6 @@
 	import Download from '@lucide/svelte/icons/download';
 	import NewIssueModal from './NewIssueModal.svelte';
 	import EmptyTrashModal from './EmptyTrashModal.svelte';
-	import ExportModal from './ExportModal.svelte';
 	import { getStores } from '$lib/state';
 
 	const stores = getStores();
@@ -56,17 +55,41 @@
 	let trashCount = $state(0);
 	let patPromptOpen = $state(false);
 	let promptPat = $state('');
-	let exportOpen = $state(false);
-
 	const exportDocs = $derived.by(() => {
-		return stores.issues.issues.map((loadedIssue) => {
-			const issue = loadedIssue.issue;
-			const markdown = issue.sections.map((s) => `## ${s.name}\n${s.markdown}`).join('\n\n');
-			return {
-				title: issue.fields.title,
-				markdown
-			};
-		});
+		const filteredIssues = Array.from(stores.issues.byId.values())
+			.filter((li) => {
+				const f = stores.filter.filter;
+				if (f.statusCategory && f.statusCategory !== 'all') {
+					const cfg = stores.config.config;
+					if (cfg) {
+						const statusDef = cfg.statuses.find((s) => s.id === li.issue.fields.status);
+						const isClosed = statusDef?.category === 'done' || statusDef?.category === 'cancelled';
+						if (f.statusCategory === 'open' && isClosed) return false;
+						if (f.statusCategory === 'closed' && !isClosed) return false;
+					}
+				}
+				if (f.status && li.issue.fields.status !== f.status) return false;
+				if (f.type && li.issue.fields.issueType !== f.type) return false;
+				if (f.sprintId) {
+					const inSprint =
+						li.issue.fields.sprintId === f.sprintId ||
+						li.issue.fields.relations.some((r) => r.id === f.sprintId);
+					if (!inSprint) return false;
+				}
+				if (f.q) {
+					const needle = f.q.toLowerCase();
+					if (
+						!li.issue.fields.title.toLowerCase().includes(needle) &&
+						!li.issue.sections.some((s) => s.markdown.toLowerCase().includes(needle))
+					) {
+						return false;
+					}
+				}
+				return true;
+			})
+			.map((li) => li.issue);
+
+		return { type: 'issues' as const, data: filteredIssues };
 	});
 
 	async function readTrashCount(): Promise<void> {
@@ -178,7 +201,7 @@
 		newIssueOpen = true;
 	}
 	function openExport(): void {
-		exportOpen = true;
+		stores.ui.openExport(exportDocs);
 	}
 	function openEmptyTrash(): void {
 		emptyTrashOpen = true;
@@ -319,13 +342,6 @@
 </nav>
 
 <NewIssueModal bind:open={newIssueOpen} onclose={() => (newIssueOpen = false)} />
-
-<ExportModal
-	bind:open={exportOpen}
-	documents={exportDocs}
-	defaultFilename={t('editToolbar.defaultFilename')}
-	onclose={() => (exportOpen = false)}
-/>
 
 {#if !isRemote}
 	<EmptyTrashModal

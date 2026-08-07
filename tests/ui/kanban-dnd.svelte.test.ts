@@ -268,7 +268,11 @@ function buildStub(issues: readonly Issue[], mode: 'local' | 'remote'): StoreGra
 			closeEditor: () => {},
 			toggleEditor: () => {},
 			sidebarCollapsed: false,
-			toggleSidebarCollapsed: () => {}
+			toggleSidebarCollapsed: () => {},
+			exportOpen: false,
+			exportPayload: null,
+			openExport: () => {},
+			closeExport: () => {}
 		}
 	};
 }

@@ -1,37 +1,66 @@
 <script lang="ts">
-	import { Modal } from '$lib/ui';
+	import { SvelteSet } from 'svelte/reactivity';
+	import { Modal, Checkbox } from '$lib/ui';
 	import { t } from '$lib/ui/strings';
-	import { exportDocuments, type ExportDocument } from '$lib/services/exporter';
+	import { exportDocuments } from '$lib/services/exporter';
 	import FileText from '@lucide/svelte/icons/file-text';
+	import { getStores } from '$lib/state';
+	import { buildExportDocuments } from '$lib/services/export-helper';
+	import type { ExportPayload } from '$lib/state/ui.svelte';
 
 	type Props = {
 		open: boolean;
 		onclose: () => void;
-		documents: ExportDocument[];
+		payload: ExportPayload | null;
 		defaultFilename?: string;
 	};
 
-	let { open = $bindable(), onclose, documents, defaultFilename = 'export' }: Props = $props();
+	let { open = $bindable(), onclose, payload, defaultFilename = 'export' }: Props = $props();
 
+	const stores = getStores();
 	let format = $state<'pdf' | 'docx'>('pdf');
 	let exporting = $state(false);
 	let exportError = $state<string | null>(null);
+	let includeRelations = $state(true);
+
+	const documents = $derived.by(() => {
+		if (!payload) return [];
+		if (payload.type === 'documents') return payload.data;
+		return buildExportDocuments(
+			payload.data,
+			(id) => stores.issues.byId.get(id)?.issue.fields.title ?? null,
+			{ includeRelations }
+		);
+	});
+
+	let uncheckedTitles = new SvelteSet<string>();
+
+	const selectedDocuments = $derived(documents.filter((doc) => !uncheckedTitles.has(doc.title)));
 
 	$effect(() => {
 		if (!open) {
 			exportError = null;
 			exporting = false;
 			format = 'pdf';
+			uncheckedTitles.clear();
 		}
 	});
 
+	function toggleDocumentSelection(title: string) {
+		if (uncheckedTitles.has(title)) {
+			uncheckedTitles.delete(title);
+		} else {
+			uncheckedTitles.add(title);
+		}
+	}
+
 	async function doExport(): Promise<void> {
-		if (documents.length === 0) return;
+		if (selectedDocuments.length === 0) return;
 		exporting = true;
 		exportError = null;
 
 		try {
-			await exportDocuments(documents, {
+			await exportDocuments(selectedDocuments, {
 				format,
 				filename: `${defaultFilename}.${format}`
 			});
@@ -73,8 +102,8 @@
 		</div>
 
 		<p class="mb-4 text-sm text-muted-foreground">
-			{t('exportModal.description', { count: documents.length }) ||
-				`You are about to export ${documents.length} document(s). Select the output format below:`}
+			{t('exportModal.description', { count: selectedDocuments.length }) ||
+				`You are about to export ${selectedDocuments.length} document(s). Select the output format below:`}
 		</p>
 
 		<div class="mb-6 grid grid-cols-2 gap-4">
@@ -102,6 +131,40 @@
 				<span class="font-semibold">{t('exportModal.docx')}</span>
 			</button>
 		</div>
+
+		{#if payload?.type === 'issues'}
+			<div class="mb-6 flex items-center justify-center">
+				<Checkbox
+					id="include-relations"
+					label={t('exportModal.includeRelations', {
+						default: 'Incluir contexto de relaciones (Sprints, Epicas)'
+					}) ?? 'Incluir contexto'}
+					checked={includeRelations}
+					onchange={(e) => (includeRelations = e.currentTarget.checked)}
+				/>
+			</div>
+		{/if}
+
+		{#if documents.length > 1}
+			<div class="mb-6 max-h-40 overflow-y-auto rounded-md border border-border p-2">
+				<div class="mb-2 text-xs font-semibold text-muted-foreground uppercase">
+					{t('exportModal.selectDocuments', { default: 'Documents to Export' })}
+				</div>
+				<div class="flex flex-col gap-2">
+					{#each documents as doc (doc.title)}
+						<label class="flex cursor-pointer items-center gap-2 text-sm text-foreground">
+							<input
+								type="checkbox"
+								class="h-4 w-4 cursor-pointer rounded border-border bg-surface text-primary focus:ring-primary focus:ring-offset-background"
+								checked={!uncheckedTitles.has(doc.title)}
+								onchange={() => toggleDocumentSelection(doc.title)}
+							/>
+							<span class="truncate">{doc.title}</span>
+						</label>
+					{/each}
+				</div>
+			</div>
+		{/if}
 
 		{#if exportError}
 			<p class="mt-3 text-xs text-error" role="alert">{exportError}</p>

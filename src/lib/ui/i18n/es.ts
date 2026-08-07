@@ -37,7 +37,10 @@ export const es: Translations = {
 		integrityReview: (params: Params) =>
 			`${params.n} advertencia${params.n === 1 ? '' : 's'} de integridad`,
 		fullscreen: 'Pantalla completa',
-		colorLabel: (params: Params) => `Color ${params.color}`
+		colorLabel: (params: Params) => `Color ${params.color}`,
+		export: 'Exportar',
+		exportGroup: 'Exportar grupo',
+		exportAll: 'Exportar todo'
 	},
 
 	app: {
@@ -187,7 +190,8 @@ export const es: Translations = {
 			`Estás a punto de exportar ${params.count} documento(s). Selecciona el formato de salida a continuación:`,
 		export: 'Exportar',
 		pdf: 'Documento PDF',
-		docx: 'Word (DOCX)'
+		docx: 'Word (DOCX)',
+		includeRelations: 'Incluir contexto de relaciones (Sprints, Epicas)'
 	},
 
 	refreshPatPrompt: {

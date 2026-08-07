@@ -28,12 +28,13 @@
 	import CodeMirrorEditor from '$lib/ui/CodeMirrorEditor.svelte';
 	import Tooltip from '$lib/ui/Tooltip.svelte';
 	import X from '@lucide/svelte/icons/x';
+	import Download from '@lucide/svelte/icons/download';
 	import FormFields from './FormFields.svelte';
 	import MarkdownPreview from './MarkdownPreview.svelte';
 	import PresenceBar from './PresenceBar.svelte';
 	import PresenceCursors from './PresenceCursors.svelte';
 
-	const { editor, mode, templates, issues } = getStores();
+	const { editor, mode, templates, issues, ui } = getStores();
 
 	type TabId = 'form' | 'write' | 'preview';
 
@@ -115,6 +116,10 @@
 	function close(): void {
 		editor.close();
 	}
+	function exportCurrent(): void {
+		if (!active) return;
+		ui.openExport({ type: 'issues', data: [active.issue] });
+	}
 	async function pullToRefresh(): Promise<void> {
 		// Open the PAT prompt via a "soft" refresh: we re-trigger the
 		// toolbar's Refresh handler by navigating away and back, but the
@@ -158,6 +163,13 @@
 			{:else}
 				<div class="flex-1 text-sm font-semibold">{active.issue.fields.title}</div>
 			{/if}
+			<IconButton
+				label={t('common.export', { default: 'Exportar' }) ?? 'Exportar'}
+				onclick={exportCurrent}
+				data-testid="editor-panel-export"
+			>
+				<Download class="h-4 w-4" aria-hidden="true" />
+			</IconButton>
 			<IconButton label={t('editor.closeAria')} onclick={close} data-testid="editor-panel-close">
 				<X class="h-4 w-4" aria-hidden="true" />
 			</IconButton>
