@@ -162,6 +162,11 @@ const ALLOWLIST = [
 		matcher: 'Function(`return this`)()',
 		pattern: 'Function()',
 		note: 'Standard global object polyfill used by three.js/d3-force.'
+	},
+	{
+		matcher: 'Function(``+e)',
+		pattern: 'Function()',
+		note: 'setimmediate polyfill string-handler fallback (html-to-docx/jszip); dead code at runtime.'
 	}
 ];
 

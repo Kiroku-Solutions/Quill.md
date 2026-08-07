@@ -3,9 +3,15 @@ import { playwright } from '@vitest/browser-playwright';
 import tailwindcss from '@tailwindcss/vite';
 import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig({
 	plugins: [
+		!process.env.VITEST &&
+			nodePolyfills({
+				// Only polyfill modules used by html-to-docx to keep bundle small
+				include: ['fs', 'path', 'stream', 'events', 'util', 'buffer']
+			}),
 		tailwindcss(),
 		sveltekit({
 			compilerOptions: {

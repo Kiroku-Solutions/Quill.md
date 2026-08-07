@@ -27,6 +27,7 @@
 	import LogOut from '@lucide/svelte/icons/log-out';
 	import UploadCloud from '@lucide/svelte/icons/upload-cloud';
 	import Trash from '@lucide/svelte/icons/trash-2';
+	import Download from '@lucide/svelte/icons/download';
 	import NewIssueModal from './NewIssueModal.svelte';
 	import EmptyTrashModal from './EmptyTrashModal.svelte';
 	import { getStores } from '$lib/state';
@@ -54,6 +55,42 @@
 	let trashCount = $state(0);
 	let patPromptOpen = $state(false);
 	let promptPat = $state('');
+	const exportDocs = $derived.by(() => {
+		const filteredIssues = Array.from(stores.issues.byId.values())
+			.filter((li) => {
+				const f = stores.filter.filter;
+				if (f.statusCategory && f.statusCategory !== 'all') {
+					const cfg = stores.config.config;
+					if (cfg) {
+						const statusDef = cfg.statuses.find((s) => s.id === li.issue.fields.status);
+						const isClosed = statusDef?.category === 'done' || statusDef?.category === 'cancelled';
+						if (f.statusCategory === 'open' && isClosed) return false;
+						if (f.statusCategory === 'closed' && !isClosed) return false;
+					}
+				}
+				if (f.status && li.issue.fields.status !== f.status) return false;
+				if (f.type && li.issue.fields.issueType !== f.type) return false;
+				if (f.sprintId) {
+					const inSprint =
+						li.issue.fields.sprintId === f.sprintId ||
+						li.issue.fields.relations.some((r) => r.id === f.sprintId);
+					if (!inSprint) return false;
+				}
+				if (f.q) {
+					const needle = f.q.toLowerCase();
+					if (
+						!li.issue.fields.title.toLowerCase().includes(needle) &&
+						!li.issue.sections.some((s) => s.markdown.toLowerCase().includes(needle))
+					) {
+						return false;
+					}
+				}
+				return true;
+			})
+			.map((li) => li.issue);
+
+		return { type: 'issues' as const, data: filteredIssues };
+	});
 
 	async function readTrashCount(): Promise<void> {
 		const adapter = stores.mode.localAdapter;
@@ -163,6 +200,9 @@
 	function openNewIssue(): void {
 		newIssueOpen = true;
 	}
+	function openExport(): void {
+		stores.ui.openExport(exportDocs);
+	}
 	function openEmptyTrash(): void {
 		emptyTrashOpen = true;
 	}
@@ -196,6 +236,10 @@
 			data-testid="toolbar-import-issue"
 		>
 			{t('editToolbar.importIssue')}
+		</Button>
+		<Button variant="secondary" size="sm" onclick={openExport} data-testid="toolbar-export">
+			<Download class="mr-1 h-4 w-4" aria-hidden="true" />
+			{t('editToolbar.export') || 'Export'}
 		</Button>
 	{/if}
 

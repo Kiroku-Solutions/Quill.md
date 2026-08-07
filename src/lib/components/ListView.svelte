@@ -21,8 +21,9 @@
 	import { onMount, tick } from 'svelte';
 	import { getStores } from '$lib/state';
 	import { t } from '$lib/ui/strings';
+	import Download from '@lucide/svelte/icons/download';
 
-	const { issues, filter, editor, config } = getStores();
+	const { issues, filter, editor, config, ui } = getStores();
 
 	type SortKey = 'id' | 'title' | 'updated_date' | 'status';
 	type SortDir = 'asc' | 'desc';
@@ -207,6 +208,13 @@
 		editor.open(id);
 	}
 
+	function exportGroup(groupId: string): void {
+		const gRows = groupedRows[groupId] ?? [];
+		if (gRows.length === 0) return;
+		const issuesToExport = gRows.map((li) => li.issue);
+		ui.openExport({ type: 'issues', data: issuesToExport });
+	}
+
 	function ariaSortFor(k: SortKey): 'ascending' | 'descending' | 'none' {
 		if (sortKey !== k) return 'none';
 		return sortDir === 'asc' ? 'ascending' : 'descending';
@@ -317,10 +325,24 @@
 					<tbody class="bg-surface-dark border-b border-border">
 						<tr>
 							<td colspan="7" class="px-4 py-2 text-sm font-bold text-foreground">
-								{group.title}
-								<span class="ml-2 text-xs font-normal text-muted-foreground opacity-70"
-									>({groupRows.length})</span
-								>
+								<div class="flex items-center justify-between">
+									<div>
+										{group.title}
+										<span class="ml-2 text-xs font-normal text-muted-foreground opacity-70"
+											>({groupRows.length})</span
+										>
+									</div>
+									<button
+										type="button"
+										class="flex items-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-xs font-semibold text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+										onclick={() => exportGroup(group.id)}
+										aria-label={t('common.exportGroup', { default: 'Exportar grupo' }) ??
+											'Exportar grupo'}
+									>
+										<Download class="h-3 w-3" aria-hidden="true" />
+										{t('common.export', { default: 'Exportar' }) ?? 'Exportar'}
+									</button>
+								</div>
 							</td>
 						</tr>
 					</tbody>
