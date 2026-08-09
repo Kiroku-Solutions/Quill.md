@@ -78,6 +78,14 @@ function getPurifier(): DOMPurifyType {
 	// runtime in Node the default export is the factory function.
 	const factory = DOMPurify as unknown as (root: unknown) => DOMPurifyType;
 	cachedPurifier = factory(w);
+
+	// Enforce rel="noopener noreferrer" for any target="_blank" links
+	cachedPurifier.addHook('afterSanitizeAttributes', (node) => {
+		if (node.tagName === 'A' && node.getAttribute('target') === '_blank') {
+			node.setAttribute('rel', 'noopener noreferrer');
+		}
+	});
+
 	return cachedPurifier;
 }
 
@@ -97,7 +105,7 @@ export function __getPurifierForTests(): DOMPurifyType {
  * Built-in rendering presets. Adding a new preset requires extending this
  * literal union so the switch in {@link resolveOptions} stays exhaustive.
  */
-export type RendererPreset = 'default' | 'comment' | 'readme';
+export type RendererPreset = 'default' | 'comment' | 'readme' | 'mermaid';
 
 /**
  * Frozen, readonly option set for the renderer.  All fields are
@@ -138,6 +146,18 @@ const README_DOM_PURIFY_CONFIG: DOMPurifyConfig = {
 	ADD_ATTR: ['target', 'rel']
 };
 
+/** Tag allowlist for Mermaid generated SVGs. Allows SVGs and style tags. */
+const MERMAID_DOM_PURIFY_CONFIG: DOMPurifyConfig = {
+	USE_PROFILES: { html: true, svg: true },
+	FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'button'],
+	FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],
+	ADD_TAGS: ['foreignobject', 'foreignObject'],
+	HTML_INTEGRATION_POINTS: { foreignobject: true },
+	ALLOW_DATA_ATTR: false,
+	KEEP_CONTENT: true,
+	RETURN_TRUSTED_TYPE: true
+};
+
 /** Preset resolution — exhaustively switch on the literal union. */
 function resolveOptions(preset: RendererPreset): RendererOptions {
 	switch (preset) {
@@ -167,6 +187,15 @@ function resolveOptions(preset: RendererPreset): RendererOptions {
 				breaks: false,
 				paragraphWrap: false,
 				domPurifyConfig: README_DOM_PURIFY_CONFIG
+			};
+		case 'mermaid':
+			return {
+				preset,
+				gfm: true,
+				allowRawHtml: true,
+				breaks: false,
+				paragraphWrap: false,
+				domPurifyConfig: MERMAID_DOM_PURIFY_CONFIG
 			};
 	}
 }

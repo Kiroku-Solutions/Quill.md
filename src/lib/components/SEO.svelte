@@ -69,10 +69,24 @@
 		})
 	);
 
-	const jsonLdHtml = $derived(
-		'<scr' + 'ipt type="application/ld+json">' + jsonLd + '</scr' + 'ipt>'
-	);
-	const faqLdHtml = $derived('<scr' + 'ipt type="application/ld+json">' + faqLd + '</scr' + 'ipt>');
+	import { createTrustedScript } from '$lib/utils/trusted-types';
+
+	$effect(() => {
+		let scriptElement = document.createElement('script');
+		scriptElement.type = 'application/ld+json';
+		scriptElement.textContent = createTrustedScript(jsonLd) as unknown as string;
+		document.head.appendChild(scriptElement);
+
+		let faqElement = document.createElement('script');
+		faqElement.type = 'application/ld+json';
+		faqElement.textContent = createTrustedScript(faqLd) as unknown as string;
+		document.head.appendChild(faqElement);
+
+		return () => {
+			scriptElement.remove();
+			faqElement.remove();
+		};
+	});
 </script>
 
 <svelte:head>
@@ -95,10 +109,4 @@
 
 	<!-- Canonical -->
 	<link rel="canonical" href={canonical} />
-
-	<!-- JSON-LD Schema Markup -->
-	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-	{@html jsonLdHtml}
-	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-	{@html faqLdHtml}
 </svelte:head>
