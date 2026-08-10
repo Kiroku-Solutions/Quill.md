@@ -16,7 +16,9 @@
 	import Skeleton from '$lib/ui/Skeleton.svelte';
 	import mermaid from 'mermaid';
 	import { tick } from 'svelte';
+	import { createTrustedHtml, initDefaultPolicy } from '$lib/utils/trusted-types';
 
+	initDefaultPolicy();
 	mermaid.initialize({
 		startOnLoad: false,
 		securityLevel: 'strict',
@@ -95,7 +97,7 @@
 									b.className =
 										'p-1.5 rounded hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer';
 									b.title = title;
-									b.innerHTML = icon;
+									b.innerHTML = createTrustedHtml(icon) as string;
 									b.onclick = onClick;
 									return b;
 								};
@@ -206,9 +208,9 @@
 
 								wrapper.addEventListener('fullscreenchange', () => {
 									if (document.fullscreenElement === wrapper) {
-										fsBtn.innerHTML = minimizeIcon;
+										fsBtn.innerHTML = createTrustedHtml(minimizeIcon) as string;
 									} else {
-										fsBtn.innerHTML = maximizeIcon;
+										fsBtn.innerHTML = createTrustedHtml(maximizeIcon) as string;
 										currentScale = 1;
 										updateZoom();
 									}

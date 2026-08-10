@@ -1,3 +1,21 @@
 # allow crawling everything by default
 User-agent: *
 Disallow:
+
+# AI Search Engine Bots (GEO)
+User-agent: Googlebot
+Allow: /
+User-agent: Bingbot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: anthropic-ai
+Allow: /
+User-agent: GPTBot
+Allow: /
+
+Sitemap: https://quill.md/sitemap.xml

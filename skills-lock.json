@@ -7,6 +7,18 @@
 			"skillPath": "skills/mcp-builder/SKILL.md",
 			"computedHash": "6498a736a8dc5c645047c8a875b8ea7417e2ad97146f005200e50d20a9337ada"
 		},
+		"seo-audit": {
+			"source": "coreyhaines31/marketingskills",
+			"sourceType": "github",
+			"skillPath": "skills/seo-audit/SKILL.md",
+			"computedHash": "606da61224d9d5687020816292c88152a7fcb27ce375b22f92f429e074f07f34"
+		},
+		"seo-geo": {
+			"source": "resciencelab/opc-skills",
+			"sourceType": "github",
+			"skillPath": "skills/seo-geo/SKILL.md",
+			"computedHash": "1d38520f453282af8712874c360e3e34a379827f737fb536bd45055e2d60d964"
+		},
 		"skill-creator": {
 			"source": "anthropics/skills",
 			"sourceType": "github",

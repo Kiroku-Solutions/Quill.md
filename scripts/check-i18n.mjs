@@ -136,7 +136,9 @@ const ALLOWED_ATTRIBUTES = new Set([
 	'open', // <dialog> open boolean / Modal bindable
 	'rows', // <textarea> rows numeric
 	'markerUnits', // SVG attribute (strokeWidth | userSpaceOnUse)
-	'rel' // <link rel="icon"> etc.
+	'rel', // <link rel="icon"> etc.
+	'property', // <meta property="og:title">
+	'content' // <meta content="...">
 ]);
 
 // Values that are NOT user-facing even if they appear as a string
