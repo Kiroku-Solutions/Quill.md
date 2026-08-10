@@ -11,8 +11,8 @@
 	import { goto, onNavigate } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import AppShell from '$lib/components/AppShell.svelte';
+	import SEO from '$lib/components/SEO.svelte';
 	import type { ShellMode } from '$lib/components/TopBar.svelte';
-	import { t } from '$lib/ui/strings';
 	import {
 		createConfigStore,
 		createEditorStore,
@@ -163,8 +163,9 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>{t('app.name')}</title>
 </svelte:head>
+
+<SEO />
 
 <AppShell mode={currentMode}>
 	{@render children()}

@@ -52,5 +52,13 @@ export function redactPatInText(text: string): string {
 	// GitHub classic 40-hex, GitHub fine-grained ghp_*, GitHub OAuth gho_*,
 	// GitHub PAT ghs_*/ghr_*, GitLab glpat-*.
 	const pattern = /\b(?:gh[pousr]_[A-Za-z0-9]{30,}|glpat-[A-Za-z0-9_-]{20,}|[a-f0-9]{40})\b/g;
-	return text.replace(pattern, '[REDACTED:PAT]');
+	let redacted = text.replace(pattern, '[REDACTED:PAT]');
+
+	for (const pat of PAT_REGISTRY) {
+		if (pat && pat.length > 0) {
+			redacted = redacted.split(pat).join('[REDACTED:PAT]');
+		}
+	}
+
+	return redacted;
 }

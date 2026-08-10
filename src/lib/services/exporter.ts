@@ -1,4 +1,17 @@
 import { renderMarkdown } from '$lib/adapters/renderer';
+import { createTrustedHtml, initDefaultPolicy } from '$lib/utils/trusted-types';
+
+/**
+ * Escapes unsafe characters for inclusion in HTML.
+ */
+function escapeHtml(unsafe: string): string {
+	return unsafe
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#039;');
+}
 
 export interface ExportDocument {
 	title: string;
@@ -36,7 +49,10 @@ async function mermaidToPng(
 		// Force explicit pixel dimensions from viewBox to prevent the Image object
 		// from collapsing responsive SVGs to 0px or 300x150px
 		const parser = new DOMParser();
-		const svgDoc = parser.parseFromString(svg, 'image/svg+xml');
+		const svgDoc = parser.parseFromString(
+			createTrustedHtml(svg) as unknown as string,
+			'image/svg+xml'
+		);
 		const svgEl = svgDoc.documentElement;
 
 		let intrinsicWidth = parseFloat(svgEl.getAttribute('width') || '0');
@@ -107,11 +123,12 @@ async function processMarkdownToHtml(
 
 	// We need to parse the HTML to find <code class="language-mermaid"> blocks
 	const parser = new DOMParser();
-	const dom = parser.parseFromString(rawHtml, 'text/html');
+	const dom = parser.parseFromString(createTrustedHtml(rawHtml) as unknown as string, 'text/html');
 
 	const mermaidNodes = dom.querySelectorAll('code.language-mermaid');
 
 	if (mermaidNodes.length > 0 && format === 'pdf') {
+		initDefaultPolicy();
 		const { default: mermaid } = await import('mermaid');
 		// For PDF, we can use htmlLabels because we inject the raw SVG directly into the DOM
 		mermaid.initialize({
@@ -135,7 +152,10 @@ async function processMarkdownToHtml(
 			try {
 				const { default: mermaid } = await import('mermaid');
 				const { svg } = await mermaid.render(`mermaid-${id}`, code);
-				const svgDoc = parser.parseFromString(svg, 'image/svg+xml');
+				const svgDoc = parser.parseFromString(
+					createTrustedHtml(svg) as unknown as string,
+					'image/svg+xml'
+				);
 				replacementNode = svgDoc.documentElement;
 
 				// Remove hardcoded dimensions to make it responsive
@@ -214,7 +234,7 @@ export async function exportDocuments(
 
 			fullHtml += `
 				<div style="font-family: Arial, sans-serif;">
-					<h1>${doc.title}</h1>
+					<h1>${escapeHtml(doc.title)}</h1>
 					${html}
 				</div>
 				${pageBreak}
@@ -269,7 +289,7 @@ export async function exportDocuments(
 
 			fullHtml += `
 				<div class="document">
-					<h1>${doc.title}</h1>
+					<h1>${escapeHtml(doc.title)}</h1>
 					${html}
 				</div>
 				${pageBreak}
@@ -289,7 +309,8 @@ export async function exportDocuments(
 			})
 			.join('\n');
 
-		iframeDoc.write(`
+		iframeDoc.write(
+			createTrustedHtml(`
 			<!DOCTYPE html>
 			<html>
 				<head>
@@ -319,7 +340,8 @@ export async function exportDocuments(
 					${fullHtml}
 				</body>
 			</html>
-		`);
+		`) as unknown as string
+		);
 		iframeDoc.close();
 
 		// Wait for images to load in the iframe

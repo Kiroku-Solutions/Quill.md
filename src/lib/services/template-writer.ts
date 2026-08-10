@@ -11,6 +11,9 @@ export async function saveTemplate(
 	template: Template,
 	overwrite: boolean = true
 ): Promise<void> {
+	if (!/^[a-z0-9-]+$/.test(template.id)) {
+		throw new Error(`Invalid template ID: ${template.id}`);
+	}
 	const path = `${TEMPLATES_DIR}/${template.id}.json`;
 	if (!overwrite) {
 		try {
@@ -30,6 +33,9 @@ export async function removeTemplate(
 	adapter: WritableDirectoryAdapter,
 	templateId: string
 ): Promise<void> {
+	if (!/^[a-z0-9-]+$/.test(templateId)) {
+		throw new Error(`Invalid template ID: ${templateId}`);
+	}
 	const path = `${TEMPLATES_DIR}/${templateId}.json`;
 	await adapter.removeFile(path);
 }
