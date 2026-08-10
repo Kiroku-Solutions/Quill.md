@@ -5,6 +5,9 @@
 	import { getStores } from '$lib/state';
 	import { onMount, untrack } from 'svelte';
 	import { SvelteSet, SvelteMap } from 'svelte/reactivity';
+	import { createTrustedHtml, initDefaultPolicy } from '$lib/utils/trusted-types';
+
+	initDefaultPolicy();
 	const { issues, editor, templates, filter, theme } = getStores();
 
 	let container: HTMLDivElement | undefined = $state();
@@ -185,7 +188,7 @@
 			}
 			if (container) {
 				// eslint-disable-next-line svelte/no-dom-manipulating
-				container.innerHTML = '';
+				container.innerHTML = createTrustedHtml('') as string;
 			}
 		});
 
