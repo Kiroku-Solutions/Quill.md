@@ -12,6 +12,7 @@ export const en = {
 		review: 'Review',
 		dismiss: 'Dismiss',
 		ok: 'OK',
+		confirm: 'Confirm',
 		apply: 'Apply',
 		back: 'Back',
 		previous: 'Previous',
@@ -329,7 +330,9 @@ export const en = {
 		dropped: (params: Params) => `Dropped item ${params.id} in column ${params.col}`,
 		cancelled: (params: Params) => `Cancelled move of item ${params.id}.`,
 		activateHint: 'Press F2 to open the editor',
-		sprintLabel: 'Sprint'
+		sprintLabel: 'Sprint',
+		dodTitle: 'Definition of Done',
+		dodSubtitle: 'Please verify the following requirements before completing this task:'
 	},
 
 	gantt: {
