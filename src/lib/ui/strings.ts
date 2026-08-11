@@ -36,7 +36,7 @@ export function t(key: string, params?: Params): string {
 	if (import.meta.env.DEV) {
 		console.warn(`[quill-md] t: missing key "${key}" in language "${i18n.locale}"`);
 	}
-	return `[[${key}]]`;
+	return params?.default ? String(params.default) : `[[${key}]]`;
 }
 
 function resolveKey(root: unknown, key: string): unknown {

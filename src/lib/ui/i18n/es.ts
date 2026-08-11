@@ -13,6 +13,7 @@ export const es: Translations = {
 		review: 'Revisar',
 		dismiss: 'Descartar',
 		ok: 'Aceptar',
+		confirm: 'Confirmar',
 		apply: 'Aplicar',
 		back: 'Atrás',
 		previous: 'Anterior',
@@ -336,7 +337,9 @@ export const es: Translations = {
 		dropped: (params: Params) => `Elemento ${params.id} soltado en columna ${params.col}`,
 		cancelled: (params: Params) => `Movimiento cancelado para el elemento ${params.id}.`,
 		activateHint: 'Presiona F2 para abrir el editor',
-		sprintLabel: 'Sprint'
+		sprintLabel: 'Sprint',
+		dodTitle: 'Definición de Hecho (DoD)',
+		dodSubtitle: 'Por favor, verifica los siguientes requisitos antes de completar esta tarea:'
 	},
 
 	gantt: {
