@@ -82,7 +82,7 @@
 			const c = stores.config.config.collaboration;
 			collabEnabled = c?.enabled ?? false;
 			collabServerUrl = c?.server_url ?? '';
-			collabDisplayName = c?.display_name ?? '';
+			collabDisplayName = localStorage.getItem('quill.md.collabName') ?? '';
 			collabInitDone = true;
 		} else if (!open) {
 			collabInitDone = false;
@@ -91,14 +91,34 @@
 
 	async function saveCollabSettings(): Promise<void> {
 		if (!stores.config.config || stores.config.isReadOnly) return;
+
+		let normalizedUrl = collabServerUrl.trim();
+		if (
+			normalizedUrl &&
+			!normalizedUrl.startsWith('ws://') &&
+			!normalizedUrl.startsWith('wss://')
+		) {
+			if (normalizedUrl.startsWith('http://')) {
+				normalizedUrl = normalizedUrl.replace('http://', 'ws://');
+			} else if (normalizedUrl.startsWith('https://')) {
+				normalizedUrl = normalizedUrl.replace('https://', 'wss://');
+			} else {
+				normalizedUrl = 'wss://' + normalizedUrl;
+			}
+			collabServerUrl = normalizedUrl;
+		}
+
 		await stores.config.save({
 			...stores.config.config,
 			collaboration: {
 				enabled: collabEnabled,
-				server_url: collabServerUrl,
-				display_name: collabDisplayName
+				server_url: collabServerUrl
 			}
 		});
+	}
+
+	function saveLocalDisplayName(): void {
+		localStorage.setItem('quill.md.collabName', collabDisplayName);
 	}
 
 	$effect(() => {
@@ -276,7 +296,7 @@
 								<Input
 									id="collab-display-name"
 									bind:value={collabDisplayName}
-									onblur={saveCollabSettings}
+									onblur={saveLocalDisplayName}
 									placeholder={t('settings.collabDisplayNamePlaceholder')}
 									disabled={stores.config.isReadOnly}
 									data-testid="settings-collab-name"

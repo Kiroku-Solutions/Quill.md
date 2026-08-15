@@ -59,8 +59,6 @@ export interface CollaborationConfig {
 	enabled?: boolean;
 	/** Hocuspocus server WebSocket URL (e.g. 'wss://collab.myteam.com'). */
 	server_url?: string;
-	/** Display name for presence (overrides provider user name). */
-	display_name?: string;
 }
 
 export interface Config {
