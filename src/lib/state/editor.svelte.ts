@@ -208,12 +208,11 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		awareness = new Awareness(ydoc);
 		collabPresence = createCollabPresenceStore(awareness);
 
-		// Stage 2: MOCK CONFIG FOR NOW
-		// En producción esto provendrá del UI de configuración (Stage 5)
+		const c = deps.config.config?.collaboration;
 		const collabConfig = {
-			enabled: import.meta.env.MODE !== 'test',
-			serverUrl: 'ws://127.0.0.1:1234',
-			displayName: 'Dev User'
+			enabled: c?.enabled ?? false,
+			serverUrl: c?.server_url ?? '',
+			displayName: localStorage.getItem('quill.md.collabName') || 'Anonymous'
 		};
 
 		if (collabConfig.enabled) {

@@ -173,9 +173,6 @@ function assertConfig(value: unknown): Config {
 		if (collab['server_url'] !== undefined && typeof collab['server_url'] !== 'string') {
 			throw new Error('config.json: "collaboration.server_url" must be a string');
 		}
-		if (collab['display_name'] !== undefined && typeof collab['display_name'] !== 'string') {
-			throw new Error('config.json: "collaboration.display_name" must be a string');
-		}
 	} else {
 		// Provide default object if completely missing, so UI can rely on it existing
 		v['collaboration'] = {
