@@ -212,7 +212,7 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 		const collabConfig = {
 			enabled: c?.enabled ?? false,
 			serverUrl: c?.server_url ?? '',
-			displayName: localStorage.getItem('quill.md.collabName') || 'Anonymous'
+			displayName: typeof localStorage !== 'undefined' ? (localStorage.getItem('quill.md.collabName') || 'Anonymous') : 'Anonymous'
 		};
 
 		if (collabConfig.enabled) {
