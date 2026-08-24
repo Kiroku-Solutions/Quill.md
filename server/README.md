@@ -21,6 +21,22 @@ docker compose up -d
 
 The server will listen on port 1234 and mount a `data` volume for SQLite persistence.
 
+### Data Retention & Cleanup (Garbage Collection)
+
+To prevent the SQLite database from growing infinitely in production, the server includes an automatic TTL-based garbage collector.
+
+By default, any document that has not been modified in **7 days** will be automatically deleted from the database, and the disk space will be reclaimed. You can configure this duration using the `STALE_DAYS` environment variable in your `docker-compose.yml`:
+
+```yaml
+services:
+  server:
+    environment:
+      # Number of days before an untouched document is purged
+      - STALE_DAYS=7
+```
+
+**Note:** This is perfectly safe for `quill.md` because Git is the final source of truth. If a user reconnects to an old document after it has been purged from the server, the client will automatically re-upload the latest content from their local IndexedDB cache or the Git repository.
+
 ## How to Connect
 
 Since it is based on WebSockets, to connect to the Hocuspocus server from your client (`quill.md` or any other using `y-websocket` or `@hocuspocus/provider`), you must use the corresponding URL with the `ws://` protocol (unsecure connection, typically for local development) or `wss://` (secure connection via TLS/SSL, for production).
