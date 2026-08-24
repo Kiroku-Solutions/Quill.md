@@ -72,6 +72,7 @@ import {
 	type CollabPresenceStore
 } from '../collab/index.ts';
 import { canonicalForm } from '../services/serializer.ts';
+import { readPat, readSessionMeta } from './pat-storage.ts';
 
 /**
  * System frontmatter keys live on `Issue.fields`; everything else is a
@@ -215,12 +216,15 @@ export function createEditorStore(deps: EditorStoreDeps): EditorStore {
 			displayName:
 				typeof localStorage !== 'undefined'
 					? localStorage.getItem('quill.md.collabName') || 'Anonymous'
-					: 'Anonymous'
+					: 'Anonymous',
+			token: readPat() ?? undefined
 		};
 
 		if (collabConfig.enabled) {
 			const repoPath = source.sourcePath ?? 'local-repo';
-			const roomSeed = `quill/${id}/${repoPath}`;
+			const session = typeof readSessionMeta === 'function' ? readSessionMeta() : null;
+			const repoContext = session ? `${session.url}/${session.editBranch}` : 'local';
+			const roomSeed = `quill/${repoContext}/${id}/${repoPath}`;
 			try {
 				const { provider, cleanup } = await createRoom(ydoc, roomSeed, collabConfig);
 				// Guard: if close() or another open() ran while we awaited,
