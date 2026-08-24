@@ -93,18 +93,41 @@
 		if (!stores.config.config || stores.config.isReadOnly) return;
 
 		let normalizedUrl = collabServerUrl.trim();
-		if (
-			normalizedUrl &&
-			!normalizedUrl.startsWith('ws://') &&
-			!normalizedUrl.startsWith('wss://')
-		) {
-			if (normalizedUrl.startsWith('http://')) {
-				normalizedUrl = normalizedUrl.replace('http://', 'ws://');
-			} else if (normalizedUrl.startsWith('https://')) {
-				normalizedUrl = normalizedUrl.replace('https://', 'wss://');
-			} else {
-				normalizedUrl = 'wss://' + normalizedUrl;
+		if (normalizedUrl) {
+			// nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+			const isWs = normalizedUrl.startsWith('ws://');
+			const isWss = normalizedUrl.startsWith('wss://');
+
+			if (!isWs && !isWss) {
+				if (normalizedUrl.startsWith('http://')) {
+					// nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+					normalizedUrl = normalizedUrl.replace('http://', 'ws://');
+				} else if (normalizedUrl.startsWith('https://')) {
+					normalizedUrl = normalizedUrl.replace('https://', 'wss://');
+				} else {
+					normalizedUrl = 'wss://' + normalizedUrl;
+				}
 			}
+
+			// Security Mitigation: Force WSS for public domains (avoid Cloudflare cleartext vulnerability)
+			// nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+			if (normalizedUrl.startsWith('ws://')) {
+				try {
+					const urlObj = new URL(normalizedUrl);
+					const isLocal =
+						urlObj.hostname === 'localhost' ||
+						urlObj.hostname === '127.0.0.1' ||
+						urlObj.hostname === '::1';
+
+					if (!isLocal) {
+						// Upgrade to wss:// for public domains
+						normalizedUrl = normalizedUrl.replace('ws:', 'wss:');
+					}
+				} catch {
+					// Invalid URL, let it pass to be handled by the connection logic later
+				}
+			}
+
 			collabServerUrl = normalizedUrl;
 		}
 
