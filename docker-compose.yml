@@ -19,10 +19,41 @@ services:
     ports:
       - '1234:1234'
     environment:
+      - NODE_ENV=production
+      - PORT=1234
+      - HEALTH_PORT=8080
       - DB_PATH=/app/data/hocuspocus.sqlite
+      - NODE_OPTIONS=--max-old-space-size=400
+      - STALE_DAYS=7
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
     volumes:
       - server-data:/app/data
     restart: unless-stopped
+    stop_grace_period: 30s
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:8080/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '50m'
+        max-file: '3'
 
 volumes:
   server-data:

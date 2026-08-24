@@ -18,8 +18,12 @@ ENV NODE_ENV=production
 COPY --from=builder /app/node_modules ./node_modules
 COPY . .
 EXPOSE 1234
+# Health check endpoint (internal — not mapped to host)
+EXPOSE 8080
 RUN mkdir -p /app/data && chown -R node:node /app/data
 VOLUME ["/app/data"]
 # Ejecutar como usuario sin privilegios por seguridad (Estado del arte)
 USER node
+# Ensure Docker sends SIGTERM (not SIGKILL) so server.destroy() can flush docs
+STOPSIGNAL SIGTERM
 CMD ["node", "server.js"]
